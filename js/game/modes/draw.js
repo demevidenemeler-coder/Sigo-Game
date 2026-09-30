@@ -20,8 +20,8 @@ export function createDrawMode(game) {
 
   // Im Hochformat schaut die Kamera von der Seite, damit die breite Malfläche den Bildschirm füllt
   function camera(instant) {
-    const bx = WORLD_BOUNDS.x + 1.5;
-    const bz = WORLD_BOUNDS.z * 0.93 + 1.5;
+    const bx = WORLD_BOUNDS.x + 4;
+    const bz = WORLD_BOUNDS.z * 0.93 + 4;
     if (game.isPortrait()) game.fit(new THREE.Vector3(0.5, 0, 0), bz, bx * 0.93, new THREE.Vector3(0.42, 1, 0), instant);
     else game.fit(new THREE.Vector3(0, 0, 0.5), bx, bz, new THREE.Vector3(0, 1, 0.42), instant);
   }

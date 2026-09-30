@@ -6,7 +6,7 @@
   --shadow: rgba(74, 63, 53, 0.22);
   --accent: #c98b5b;
   --emoji: "Noto Color Emoji", "Apple Color Emoji", "Segoe UI Emoji", sans-serif;
-  --item: min(12vmin, 88px);
+  --item: min(13vmin, 96px);
 }
 
 * { box-sizing: border-box; }
@@ -115,7 +115,7 @@ button {
 .tray-item:active { transform: scale(0.94); }
 .tray-item.parts { width: calc(var(--item) * 1.45); }
 .tray-item img { width: 100%; height: 100%; object-fit: contain; pointer-events: none; }
-.tray-item .emoji { font-family: var(--emoji); font-size: calc(var(--item) * 0.62); line-height: 1; pointer-events: none; }
+.tray-item.cargo img, .tray-item.decor img { width: 92%; height: 92%; }
 .tray-item .pot {
   width: 72%;
   height: 72%;
@@ -124,14 +124,53 @@ button {
   pointer-events: none;
 }
 .tray-item.selected { outline: 4px solid var(--accent); transform: scale(1.08); }
+
+/* Bild, das beim Ziehen unter dem Finger mitwandert */
 .ghost {
+  position: fixed;
+  z-index: 100;
+  width: calc(var(--item) * 1.5);
+  height: calc(var(--item) * 1.5);
+  translate: -50% -65%;
+  pointer-events: none;
+  display: grid;
+  place-items: center;
+  filter: drop-shadow(0 14px 16px var(--shadow));
+  transition: opacity 0.15s, scale 0.15s;
+}
+.ghost img { width: 100%; height: 100%; object-fit: contain; }
+.ghost .pot { width: 70%; height: 70%; border-radius: 50%; box-shadow: inset 0 -8px 0 rgba(0, 0, 0, 0.15), 0 0 0 4px #fff; }
+.ghost.removing { opacity: 0.45; scale: 0.8; }
+
+/* Zeige-Hand: zeigt, wie man etwas auf den Zug zieht */
+.hint-hand {
   position: fixed;
   left: 0;
   top: 0;
-  z-index: 100;
-  pointer-events: none;
-  opacity: 0.9;
-  box-shadow: 0 14px 30px var(--shadow);
+  z-index: 40;
+  pointer-events: none !important;
+}
+.hint-hand img, .hint-hand .hand {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+.hint-hand img {
+  width: calc(var(--item) * 1.2);
+  height: calc(var(--item) * 1.2);
+  object-fit: contain;
+  translate: -50% -65%;
+  opacity: 0.85;
+}
+.hint-hand img.pot { border-radius: 50%; width: calc(var(--item) * 0.8); height: calc(var(--item) * 0.8); }
+.hint-hand .hand { font-family: var(--emoji); font-size: calc(var(--item) * 0.8); translate: -30% 0; }
+.hint-hand.play img, .hint-hand.play .hand { animation: drag-demo 2.4s ease-in-out 2; }
+@keyframes drag-demo {
+  0% { transform: translate(var(--x0), var(--y0)) scale(1); opacity: 0; }
+  12% { transform: translate(var(--x0), var(--y0)) scale(0.9); opacity: 1; }
+  70% { transform: translate(var(--x1), var(--y1)) scale(1); opacity: 1; }
+  85% { transform: translate(var(--x1), var(--y1)) scale(1); opacity: 1; }
+  100% { transform: translate(var(--x1), var(--y1)) scale(1); opacity: 0; }
 }
 
 /* ---------- Fahren ---------- */

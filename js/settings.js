@@ -13,6 +13,8 @@ export const DEFAULT_SETTINGS = {
   restMinutes: 30,
   voice: true,
   sounds: true,
+  music: true,
+  musicVolume: 0.5,
   speechRate: 0.85,
 };
 

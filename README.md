@@ -8,30 +8,38 @@ Ohne Punkte, ohne Zeitdruck, ohne Werbung, ohne Internet – und mit eingebautem
 ## Die drei Bereiche (Knöpfe oben links)
 
 ### 🛠️ Werkstatt
-Unten ist eine Leiste mit vier Fächern:
+Unten ist eine Leiste mit vier Fächern (beim Antippen wird das Fach genannt):
 
 | Fach | Was passiert |
 |---|---|
-| 🚃 Teile | Lok antippen → Lok wird getauscht. Wagen antippen → wird hinten angehängt (max. 5). Wagen **am Zug** antippen → wird abgekoppelt. Lok am Zug antippen → pfeift. |
+| 🚃 Wagen | Lok antippen → Lok wird getauscht. Wagen antippen → wird hinten angehängt (max. 5). Oder auf den Zug ziehen → wird an dieser Stelle eingereiht. |
 | 🎨 Farben | Farbtopf wählen, dann ein Teil des Zugs antippen (Kessel, Dach, Räder …) – oder den Topf direkt auf den Zug ziehen. |
-| ⭐ Schmuck | Stern, Herz, Blume, Lampe, Fähnchen, Luftballon – antippen oder auf einen Wagen ziehen. Schmuck am Zug antippen → weg. |
-| 🐄 Ladung | Tiere, Kinder, Oma, Teddy, Kisten … – antippen (steigt in den nächsten freien Wagen) oder auf einen Wagen ziehen. Mitfahrer antippen → steigt aus. |
+| ⭐ Schmuck | Stern, Herz, Blume, Lampe, Fähnchen, Luftballon – antippen oder auf einen Wagen ziehen. |
+| 🐄 Mitfahrer | Kuh, Schwein, Schaf, Hund, Katze, Ente, Teddy, Kind, Oma, Kiste, Geschenk, Apfel – antippen (steigt in den nächsten freien Wagen) oder auf einen Wagen ziehen. |
 
-Alles wird laut benannt („Tierwagen“, „Lila“, „Kuh … Muuh“). Der Tankwagen nimmt keine Ladung –
+**Ziehen:** Beim Ziehen leuchtet ein Ring unter dem Wagen, auf dem es landen wird – man muss nicht genau treffen.
+**Wegnehmen:** Mitfahrer, Schmuck oder Wagen vom Zug **in die Leiste ziehen** → weg. Auf einen anderen Wagen ziehen → umsetzen. Wagen lassen sich so auch umsortieren.
+**Antippen am Zug** ist immer harmlos: Tiere sagen ihren Namen und ihr Geräusch, der Lokführer winkt und pfeift.
+**Zeige-Hand:** Passiert eine Weile nichts, zeigt eine Hand, wie man etwas auf den Zug zieht.
+
+Alles wird laut benannt („Tierwagen“, „Lila“, „Kuh … Muuh“). Der Tankwagen nimmt keine Mitfahrer –
 er hüpft nur kurz (Fehlerkontrolle ohne Fehlerton).
 
 ### ✏️ Strecke malen
-Mit dem Finger eine Linie auf die Wiese malen. Daraus werden automatisch Schienen:
+Mit dem Finger eine Linie auf die Wiese (innerhalb des Holzzauns) malen. Daraus werden automatisch Schienen:
 - Der Kreis schließt sich von selbst.
 - Zu kleine Kreise werden vergrößert, damit der Zug passt; ein gerader Strich wird zum Oval.
-- Bäume und Häuser, die im Weg stehen, verschwinden.
+- Bäume, Blumen und Häuser, die im Weg stehen, verschwinden.
 
 ### 🚂 Fahren
 - Großer grüner Knopf ▶ = losfahren / ⏸ anhalten
-- 📯 = pfeifen/hupen (auch: Zug antippen)
+- 📯 = pfeifen/hupen (auch: Zug antippen) – der Lokführer winkt
 - 🎥 = Kamera fährt neben dem Zug mit
-- Bäume und Häuser antippen → sie wackeln
+- Tiere auf der Weide antippen → sie rufen; Bäume und Häuser antippen → sie wackeln
+- Geräusche: „tschu-tschu“ im Takt der Räder, „ta-tamm“ an jedem Schienenstoß, Rollen, Zischen beim Anhalten
+- Rund um das Spielfeld: Teich mit Enten, Bauernhof mit Weide, Windmühle, Dorf, Wald auf den Hügeln
 
+Leise Xylophon-Musik läuft im Hintergrund (im Eltern-Bereich abschaltbar).
 Zug und Strecke bleiben gespeichert – beim nächsten Mal ist alles wieder da.
 
 ## Eltern-Bereich
@@ -44,6 +52,7 @@ Zug und Strecke bleiben gespeichert – beim nächsten Mal ist alles wieder da.
 | Spielzeit (10 / 15 / 20 / 30 Min. / unbegrenzt) | 15 Min. |
 | Pause danach | 30 Min. |
 | Stimme / Sprechtempo / Geräusche | an / normal / an |
+| Musik / Musik-Lautstärke | an / mittel |
 | Zug zurücksetzen, Strecke zurücksetzen | – |
 
 Ist die Spielzeit um, sagt die App „Der Zug ist müde …“ und der Zug schläft (Mond-Bildschirm).
@@ -84,10 +93,13 @@ css/style.css              Aussehen der Knöpfe und Leisten
 js/app.js                  Start, Spielzeit/Pause, Eltern-Bereich
 js/catalog.js              Loks, Wagen, Farben, Schmuck, Ladung
 js/i18n.js                 Alle Texte und Namen je Sprache
-js/audio.js                Geräusche + Sprachausgabe
+js/audio.js                Geräusche, Zuggeräusche + Sprachausgabe
+js/music.js                Xylophon-Hintergrundmusik (live erzeugt)
 js/settings.js             Speichern auf dem Gerät
 js/game/game.js            3D-Kern: Kamera, Bildschleife, Eingabe
-js/game/trainModel.js      3D-Modelle von Loks, Wagen, Schmuck, Ladung
+js/game/trainModel.js      3D-Modelle von Loks und Wagen, Schmuck
+js/game/figures.js         3D-Tiere, Menschen, Ladung
+js/game/textures.js        Per Code gezeichnete Texturen (Holz, Gras, Schotter, Wasser)
 js/game/train.js           Zug anordnen / auf Strecke setzen
 js/game/track.js           Aus Fingerstrich wird Schienenstrecke
 js/game/world.js           Werkstatt und Landschaft
@@ -101,8 +113,8 @@ sw.js                      Offline-Speicher (neue Dateien in ASSETS eintragen)
 
 ## Ehrliche Grenzen
 
-- Die Grafik ist für Tablets der letzten ~5 Jahre gedacht. Auf sehr alten Geräten kann es ruckeln.
 - Tierlaute kommen aus der Sprachausgabe („Muuh“) und klingen künstlich.
+- Die Grafik ist auf neuere Tablets ausgelegt; ruckelt es, senkt die App automatisch die Auflösung.
 - Selbstkreuzende Strecken (Acht) sind erlaubt, aber es gibt keine Brücke – der Zug fährt „durch“ die Kreuzung.
 
 ## Ideen für später

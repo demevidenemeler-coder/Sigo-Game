@@ -1,6 +1,7 @@
 // Schienen: aus einer mit dem Finger gemalten Linie wird eine geschlossene, geglättete Strecke.
 
 import * as THREE from 'three';
+import { gravelTexture, woodTexture } from './textures.js';
 
 export const RAIL_TOP = 0.27; // Höhe der Schienenoberkante über dem Boden
 const GAUGE = 0.42; // halbe Spurweite
@@ -114,9 +115,9 @@ export function defaultTrackPoints() {
 
 // ---------- 3D-Schienen ----------
 
-const railMat = new THREE.MeshStandardMaterial({ color: '#9aa0a6', roughness: 0.35, metalness: 0.7 });
-const sleeperMat = new THREE.MeshStandardMaterial({ color: '#8a5a33', roughness: 0.9 });
-const bedMat = new THREE.MeshStandardMaterial({ color: '#cbbfa8', roughness: 1, side: THREE.DoubleSide });
+const railMat = new THREE.MeshStandardMaterial({ color: '#a4aab0', roughness: 0.25, metalness: 0.9 });
+const sleeperMat = new THREE.MeshStandardMaterial({ map: woodTexture('#8a5a33', 'sleeper'), roughness: 0.9 });
+const bedMat = new THREE.MeshStandardMaterial({ map: gravelTexture(), roughness: 1, side: THREE.DoubleSide });
 
 export class Track {
   constructor() {
@@ -147,17 +148,20 @@ export class Track {
     // Schotterbett als flaches Band
     const bed = new THREE.BufferGeometry();
     const pos = [];
+    const uv = [];
     const idx = [];
     P.forEach((p, i) => {
       const nx = -T[i].z;
       const nz = T[i].x;
-      pos.push(p.x + nx * 0.85, 0.03, p.z + nz * 0.85, p.x - nx * 0.85, 0.03, p.z - nz * 0.85);
+      pos.push(p.x + nx * 0.9, 0.04, p.z + nz * 0.9, p.x - nx * 0.9, 0.04, p.z - nz * 0.9);
+      uv.push(0, i * 0.25 / 1.8, 1, i * 0.25 / 1.8);
       if (i < n) {
         const a = i * 2;
         idx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2);
       }
     });
     bed.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+    bed.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
     bed.setIndex(idx);
     bed.computeVertexNormals();
     const bedMesh = new THREE.Mesh(bed, bedMat);

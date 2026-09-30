@@ -1,6 +1,7 @@
 // Spielkern: Renderer, Kamera, Bildschleife, Modi (Werkstatt / Malen / Fahren).
 
 import * as THREE from 'three';
+import { RoomEnvironment } from '../../vendor/RoomEnvironment.js';
 import { createWorkshop, createLandscape } from './world.js';
 import { Train } from './train.js';
 import { defaultTrackPoints } from './track.js';
@@ -9,6 +10,7 @@ import { createDrawMode } from './modes/draw.js';
 import { createDriveMode } from './modes/drive.js';
 
 const MODE_ICONS = { workshop: '🛠️', draw: '✏️', drive: '🚂' };
+const SUN_OFFSET = new THREE.Vector3(12, 24, 14);
 
 export class Game {
   constructor({ canvas, ui, services, trainData, trackPoints }) {
@@ -16,10 +18,17 @@ export class Game {
     this.ui = ui;
     this.services = services; // say, sayName, sfx, saveTrain, saveTrack
     this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+    this.pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
+    this.renderer.setPixelRatio(this.pixelRatio);
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
+    this.renderer.toneMapping = THREE.NeutralToneMapping;
+    this.renderer.toneMappingExposure = 1.05;
+    // Weiche Spiegelungen auf Lack und Metall
+    const pmrem = new THREE.PMREMGenerator(this.renderer);
+    this.envMap = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+    this.frameTimes = [];
 
     this.camera = new THREE.PerspectiveCamera(38, 1, 0.1, 300);
     this.cam = { pos: new THREE.Vector3(8, 10, 20), look: new THREE.Vector3(), tPos: new THREE.Vector3(8, 10, 20), tLook: new THREE.Vector3() };
@@ -29,6 +38,11 @@ export class Game {
 
     this.workshop = createWorkshop();
     this.land = createLandscape();
+    for (const sc of [this.workshop.scene, this.land.scene]) {
+      sc.environment = this.envMap;
+      sc.environmentIntensity = 0.55;
+    }
+    this.time = 0;
     this.train = new Train(trainData);
     this.land.track.setPoints(trackPoints ?? defaultTrackPoints());
     this.land.clearAroundTrack();
@@ -66,9 +80,13 @@ export class Game {
 
   tick(now) {
     if (!this.running) return;
-    const dt = Math.min(0.05, (now - this.last) / 1000);
+    const raw = (now - this.last) / 1000;
+    const dt = Math.min(0.05, raw);
     this.last = now;
+    this.time += dt;
+    this.adaptQuality(raw);
     this.mode?.update(dt);
+    if (this.scene === this.land.scene) this.land.animate(dt, this.time);
     this.tweens = this.tweens.filter((tw) => {
       tw.t = Math.min(1, tw.t + dt / tw.dur);
       tw.fn(tw.t);
@@ -80,6 +98,10 @@ export class Game {
     this.cam.look.lerp(this.cam.tLook, k);
     this.camera.position.copy(this.cam.pos);
     this.camera.lookAt(this.cam.look);
+    // Die Sonne (und damit der scharfe Schattenbereich) folgt dem Blickpunkt
+    const sun = this.scene === this.land.scene ? this.land.sun : this.workshop.sun;
+    sun.target.position.copy(this.cam.look);
+    sun.position.copy(this.cam.look).add(SUN_OFFSET);
     if (this.scene.fog) {
       // Nebel nur in der Ferne, egal wie weit die Kamera weg ist
       const dist = this.cam.pos.distanceTo(this.cam.look);
@@ -88,6 +110,20 @@ export class Game {
     }
     this.renderer.render(this.scene, this.camera);
     requestAnimationFrame(this.tick);
+  }
+
+  // Läuft es zu langsam, wird die Auflösung stufenweise gesenkt
+  adaptQuality(frameTime) {
+    if (frameTime > 0.5) return; // Tab war im Hintergrund
+    this.frameTimes.push(frameTime);
+    if (this.frameTimes.length < 90) return;
+    const avg = this.frameTimes.reduce((a, b) => a + b, 0) / this.frameTimes.length;
+    this.frameTimes = [];
+    if (avg > 1 / 40 && this.pixelRatio > 1) {
+      this.pixelRatio = Math.max(1, this.pixelRatio - 0.25);
+      this.renderer.setPixelRatio(this.pixelRatio);
+      this.resize();
+    }
   }
 
   tween(dur, fn, done) {
@@ -256,16 +292,18 @@ export class Game {
     this.canvas.addEventListener('pointercancel', end);
   }
 
-  // Wagen hüpft kurz (Rückmeldung beim Antippen)
-  hop(car) {
-    const y0 = 0;
-    this.tween(0.35, (t) => { car.position.y = y0 + Math.sin(t * Math.PI) * 0.35; });
+  // Kurz hüpfen (Rückmeldung beim Antippen) – von der eigenen Grundhöhe aus
+  hop(obj) {
+    const base = obj.userData.baseY ?? (obj.userData.hopBase ??= obj.position.y);
+    this.tween(0.35, (t) => { obj.position.y = base + Math.sin(t * Math.PI) * 0.35; });
   }
 
   popIn(obj) {
+    if (!obj) return;
+    const s0 = obj.scale.x;
     this.tween(0.45, (t) => {
-      const s = t < 1 ? 1 + Math.sin(t * Math.PI) * 0.25 - (1 - t) * 0.9 : 1;
-      obj.scale.setScalar(Math.max(0.05, s));
+      const k = t < 1 ? 1 + Math.sin(t * Math.PI) * 0.25 - (1 - t) * 0.9 : 1;
+      obj.scale.setScalar(s0 * Math.max(0.05, k));
     });
   }
 }

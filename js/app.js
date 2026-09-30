@@ -2,7 +2,8 @@ import {
   loadSettings, saveSettings, loadSession, saveSession, loadTrain, saveTrain, loadTrack, saveTrack,
 } from './settings.js';
 import { LANGUAGES, setLanguage, lang, speechLang, t, nameOf, soundWordOf } from './i18n.js';
-import { unlockAudio, playSound, speak, stopSpeaking, voiceInfo } from './audio.js';
+import { unlockAudio, playSound, speak, stopSpeaking, voiceInfo, setChannelVolume } from './audio.js';
+import { Music } from './music.js';
 import { defaultTrain } from './catalog.js';
 import { defaultTrackPoints } from './game/track.js';
 import { Game } from './game/game.js';
@@ -19,6 +20,16 @@ let speechToken = 0;
 async function say(text, opts = {}) {
   if (!settings.voice) return;
   await speak(text, { lang: speechLang(), rate: settings.speechRate, ...opts });
+}
+
+const music = new Music();
+
+// Musik und Zuggeräusche folgen den Einstellungen
+function applySound() {
+  setChannelVolume('engine', settings.sounds ? 1 : 0);
+  setChannelVolume('sfx', settings.sounds ? 1 : 0);
+  if (settings.music && document.body.dataset.screen === 'game') music.start(settings.musicVolume);
+  else music.stop();
 }
 
 function sfx(name) {
@@ -49,7 +60,7 @@ const game = new Game({
   ui: document.getElementById('ui'),
   trainData: loadTrain() ?? defaultTrain(),
   trackPoints: loadTrack(),
-  services: { say: sayText, sayName, sfx, t, saveTrain, saveTrack },
+  services: { say: sayText, sayName, sfx, t, saveTrain, saveTrack, soundsOn: () => settings.sounds },
 });
 
 function el(tag, className, text) {
@@ -64,12 +75,14 @@ function showOverlay(name, content) {
   overlay.dataset.screen = name;
   overlay.classList.remove('hidden');
   document.body.dataset.screen = name;
+  music.stop();
 }
 
 function hideOverlay() {
   overlay.classList.add('hidden');
   overlay.replaceChildren();
   document.body.dataset.screen = 'game';
+  applySound();
 }
 
 function goFullscreen() {
@@ -224,6 +237,9 @@ function showSettings() {
   page.append(row(t('speechRate'), choice([[0.7, t('slow')], [0.85, t('normal')]], settings.speechRate,
     (v) => update({ speechRate: v }))));
   page.append(row(t('sounds'), choice(onOff, settings.sounds, (v) => update({ sounds: v }))));
+  page.append(row(t('music'), choice(onOff, settings.music, (v) => update({ music: v }))));
+  page.append(row(t('musicVolume'), choice([[0.3, t('quiet')], [0.5, t('medium')], [0.8, t('loud')]], settings.musicVolume,
+    (v) => update({ musicVolume: v }))));
 
   if (isResting()) {
     const time = new Date(session.restUntil).toLocaleTimeString(lang(), { hour: '2-digit', minute: '2-digit' });

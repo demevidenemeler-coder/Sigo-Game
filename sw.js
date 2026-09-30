@@ -1,18 +1,27 @@
-// Offline-Unterstützung: Alle Dateien werden beim ersten Laden gespeichert.
-// Nach Änderungen an der App VERSION erhöhen, damit das Tablet die neue Fassung holt.
-const VERSION = 'sigo-v1';
+// Offline-Unterstützung: Mit Internet wird immer die neueste Fassung geladen (und gespeichert),
+// ohne Internet die gespeicherte. Neue Dateien in ASSETS eintragen.
+const VERSION = 'sigo-v2';
 const ASSETS = [
   './',
   'index.html',
   'manifest.webmanifest',
   'css/style.css',
+  'vendor/three.module.min.js',
+  'vendor/RoundedBoxGeometry.js',
   'js/app.js',
   'js/audio.js',
+  'js/catalog.js',
   'js/i18n.js',
-  'js/items.js',
   'js/settings.js',
-  'js/activities/index.js',
-  'js/activities/sortieren.js',
+  'js/game/game.js',
+  'js/game/thumbs.js',
+  'js/game/track.js',
+  'js/game/train.js',
+  'js/game/trainModel.js',
+  'js/game/world.js',
+  'js/game/modes/workshop.js',
+  'js/game/modes/draw.js',
+  'js/game/modes/drive.js',
   'icons/icon-192.png',
   'icons/icon-512.png',
   'icons/icon-maskable-512.png',
@@ -31,8 +40,16 @@ self.addEventListener('activate', (e) => {
 });
 
 self.addEventListener('fetch', (e) => {
-  if (e.request.method !== 'GET') return;
+  if (e.request.method !== 'GET' || !e.request.url.startsWith(self.location.origin)) return;
   e.respondWith(
-    caches.match(e.request, { ignoreSearch: true }).then((hit) => hit || fetch(e.request)),
+    fetch(e.request)
+      .then((res) => {
+        if (res.ok) {
+          const copy = res.clone();
+          caches.open(VERSION).then((c) => c.put(e.request, copy));
+        }
+        return res;
+      })
+      .catch(() => caches.match(e.request, { ignoreSearch: true })),
   );
 });

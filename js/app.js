@@ -1,15 +1,15 @@
-import { loadSettings, saveSettings, loadSession, saveSession } from './settings.js';
-import { LANGUAGES, setLanguage, lang, speechLang, t, categoryName } from './i18n.js';
+import {
+  loadSettings, saveSettings, loadSession, saveSession, loadTrain, saveTrain, loadTrack, saveTrack,
+} from './settings.js';
+import { LANGUAGES, setLanguage, lang, speechLang, t, nameOf, soundWordOf } from './i18n.js';
 import { unlockAudio, playSound, speak, stopSpeaking, voiceInfo } from './audio.js';
-import { CATEGORIES, itemName, itemSoundWord } from './items.js';
-import { ACTIVITIES } from './activities/index.js';
+import { defaultTrain } from './catalog.js';
+import { defaultTrackPoints } from './game/track.js';
+import { Game } from './game/game.js';
 
-const app = document.getElementById('app');
+const overlay = document.getElementById('overlay');
 let settings = loadSettings();
 let session = loadSession();
-let restTimer = null;
-let screenId = 0; // verhindert, dass alte Bildschirme nach einem Wechsel weiterlaufen
-
 setLanguage(settings.language);
 
 // ---------- Ton & Sprache ----------
@@ -25,35 +25,32 @@ function sfx(name) {
   return settings.sounds ? playSound(name) : Promise.resolve();
 }
 
-async function sayItem(item) {
+// Name sagen, bei Tieren und Leuten danach das Lautwort („Kuh … Muuh“)
+async function sayName(id) {
   const my = ++speechToken;
   stopSpeaking();
-  await say(itemName(item, lang()));
-  if (my !== speechToken || !settings.sounds) return;
-  if (item.synth) {
-    await playSound(item.synth);
-  } else {
-    const word = itemSoundWord(item, lang());
-    if (word) await speak(word, { lang: speechLang(), rate: settings.speechRate, pitch: 1.5 });
+  await say(nameOf(id));
+  const word = soundWordOf(id);
+  if (word && my === speechToken && settings.sounds) {
+    await speak(word, { lang: speechLang(), rate: settings.speechRate, pitch: 1.5 });
   }
 }
 
-async function sayCategory(catId) {
+function sayText(text) {
   ++speechToken;
   stopSpeaking();
-  await say(categoryName(catId));
+  return say(text);
 }
 
-const ctx = {
-  get settings() { return settings; },
-  t,
-  say,
-  sfx,
-  sayItem,
-  sayCategory,
-};
+// ---------- Spiel ----------
 
-// ---------- Hilfsfunktionen ----------
+const game = new Game({
+  canvas: document.getElementById('scene'),
+  ui: document.getElementById('ui'),
+  trainData: loadTrain() ?? defaultTrain(),
+  trackPoints: loadTrack(),
+  services: { say: sayText, sayName, sfx, t, saveTrain, saveTrack },
+});
 
 function el(tag, className, text) {
   const e = document.createElement(tag);
@@ -62,14 +59,17 @@ function el(tag, className, text) {
   return e;
 }
 
-function newScreen(name) {
-  screenId++;
-  clearInterval(restTimer);
-  ++speechToken;
-  stopSpeaking();
-  app.replaceChildren();
-  app.dataset.screen = name;
-  return screenId;
+function showOverlay(name, content) {
+  overlay.replaceChildren(content);
+  overlay.dataset.screen = name;
+  overlay.classList.remove('hidden');
+  document.body.dataset.screen = name;
+}
+
+function hideOverlay() {
+  overlay.classList.add('hidden');
+  overlay.replaceChildren();
+  document.body.dataset.screen = 'game';
 }
 
 function goFullscreen() {
@@ -77,96 +77,51 @@ function goFullscreen() {
   if (!document.fullscreenElement && d.requestFullscreen) d.requestFullscreen().catch(() => {});
 }
 
-function isResting() {
-  return session.restUntil && Date.now() < session.restUntil;
-}
+// ---------- Spielzeit & Pause ----------
+
+const isResting = () => session.restUntil && Date.now() < session.restUntil;
 
 function resetSession() {
-  session = { roundsDone: 0, restUntil: 0 };
+  session = { playedMs: 0, restUntil: 0 };
   saveSession(session);
 }
 
-// ---------- Bildschirme ----------
-
-function showHome() {
-  if (isResting()) return showRest();
-  if (session.restUntil) resetSession(); // Pause ist vorbei
-  newScreen('home');
-
-  const wrap = el('div', 'home-screen');
-  for (const act of ACTIVITIES) {
-    const btn = el('button', 'activity-btn');
-    btn.type = 'button';
-    btn.append(el('span', 'activity-icon', act.icon));
-    btn.addEventListener('click', () => {
-      unlockAudio();
-      goFullscreen();
-      say(t(act.titleKey));
-      startRound(act);
-    });
-    wrap.append(btn);
-  }
-  app.append(wrap);
-}
-
-function progressDots() {
-  const bar = el('div', 'progress');
-  for (let i = 0; i < settings.roundsPerSession; i++) {
-    bar.append(el('span', i < session.roundsDone ? 'dot filled' : 'dot'));
-  }
-  return bar;
-}
-
-async function startRound(act) {
-  if (session.roundsDone >= settings.roundsPerSession) return endSession();
-  const my = newScreen('activity');
-
-  const stage = el('div', 'stage');
-  app.append(progressDots(), stage);
-
-  await act.play(stage, ctx);
-  if (my !== screenId) return; // Eltern haben zwischendurch die Einstellungen geöffnet
-
-  session.roundsDone++;
-  saveSession(session);
-  app.querySelector('.progress')?.replaceWith(progressDots());
-
-  if (session.roundsDone >= settings.roundsPerSession) {
-    setTimeout(() => { if (my === screenId) endSession(); }, 1200);
-    return;
-  }
-
-  // Das Kind entscheidet selbst, ob es weitergeht
-  const next = el('button', 'next-btn', '▶');
-  next.type = 'button';
-  next.setAttribute('aria-label', 'Nochmal');
-  next.addEventListener('click', () => startRound(act));
-  app.append(next);
-}
+let lastTick = Date.now();
+setInterval(() => {
+  const now = Date.now();
+  const delta = Math.min(now - lastTick, 5000);
+  lastTick = now;
+  if (document.body.dataset.screen !== 'game' || document.hidden) return;
+  session.playedMs += delta;
+  if (Math.round(session.playedMs / 1000) % 10 === 0) saveSession(session);
+  if (settings.playMinutes > 0 && session.playedMs >= settings.playMinutes * 60_000) endSession();
+}, 1000);
 
 function endSession() {
   session.restUntil = Date.now() + settings.restMinutes * 60_000;
   saveSession(session);
-  showRest(true);
+  sayText(t('tired'));
+  showRest();
 }
 
-function showRest(justFinished = false) {
-  newScreen('rest');
+let restTimer = null;
+function showRest() {
+  game.stop();
   const wrap = el('div', 'rest-screen');
   const scene = el('div', 'rest-scene');
-  scene.append(el('span', 'rest-moon', '🌙'), el('span', 'rest-animal', '🐻'), el('span', 'rest-z', 'z'));
+  scene.append(el('span', 'rest-moon', '🌙'), el('span', 'rest-animal', '🚂'), el('span', 'rest-z', 'z'));
   wrap.append(scene);
-  app.append(wrap);
-  if (justFinished) say(t('restSpeech'));
+  showOverlay('rest', wrap);
 
+  clearInterval(restTimer);
   const offerRestart = () => {
     if (isResting()) return false;
     clearInterval(restTimer);
-    const again = el('button', 'next-btn', '▶');
+    const again = el('button', 'big-play', '▶');
     again.type = 'button';
     again.addEventListener('click', () => {
       resetSession();
-      showHome();
+      startPlaying();
     });
     wrap.append(again);
     return true;
@@ -174,12 +129,41 @@ function showRest(justFinished = false) {
   if (!offerRestart()) restTimer = setInterval(offerRestart, 15_000);
 }
 
+// ---------- Start ----------
+
+function showStart() {
+  if (isResting()) return showRest();
+  if (session.restUntil) resetSession(); // Pause ist vorbei
+  game.setMode('workshop', { silent: true });
+  game.start();
+  const wrap = el('div', 'start-screen');
+  const play = el('button', 'big-play', '▶');
+  play.type = 'button';
+  play.addEventListener('click', () => {
+    unlockAudio();
+    goFullscreen();
+    startPlaying();
+  });
+  wrap.append(play);
+  showOverlay('start', wrap);
+}
+
+function startPlaying() {
+  hideOverlay();
+  game.start();
+  if (!game.modeName) game.setMode('workshop');
+  else {
+    game.refreshMode(); // falls in den Einstellungen Zug oder Strecke zurückgesetzt wurden
+    sayText(t(game.modeName));
+  }
+  lastTick = Date.now();
+}
+
 // ---------- Eltern-Bereich ----------
 
 function row(label, control, hint) {
   const r = el('div', 'set-row');
-  const l = el('div', 'set-label', label);
-  r.append(l, control);
+  r.append(el('div', 'set-label', label), control);
   if (hint) r.append(el('div', 'set-hint', hint));
   return r;
 }
@@ -204,8 +188,16 @@ function update(patch) {
   saveSettings(settings);
 }
 
+function button(label, cls, onClick) {
+  const b = el('button', cls, label);
+  b.type = 'button';
+  b.addEventListener('click', onClick);
+  return b;
+}
+
 function showSettings() {
-  newScreen('settings');
+  game.stop();
+  stopSpeaking();
   const page = el('div', 'settings');
   page.append(el('h1', null, t('settingsTitle')), el('p', 'set-info', t('parentInfo')));
 
@@ -214,27 +206,11 @@ function showSettings() {
     settings.language,
     (v) => { update({ language: v }); setLanguage(v); showSettings(); },
   )));
-
-  const topics = el('div', 'choice');
-  for (const c of CATEGORIES) {
-    const b = el('button', settings.categories[c.id] ? 'opt active' : 'opt', categoryName(c.id));
-    b.type = 'button';
-    b.addEventListener('click', () => {
-      const next = { ...settings.categories, [c.id]: !settings.categories[c.id] };
-      if (Object.values(next).filter(Boolean).length < 2) return; // mind. zwei Körbe
-      update({ categories: next });
-      b.classList.toggle('active', next[c.id]);
-    });
-    topics.append(b);
-  }
-  page.append(row(t('topics'), topics, t('topicsHint')));
-
-  page.append(row(t('homesPerRound'), choice([[2, '2'], [3, '3']], settings.homesPerRound,
-    (v) => update({ homesPerRound: v }))));
-  page.append(row(t('itemsPerRound'), choice([3, 4, 6, 8].map((n) => [n, String(n)]), settings.itemsPerRound,
-    (v) => update({ itemsPerRound: v }))));
-  page.append(row(t('roundsPerSession'), choice([1, 2, 3, 5, 8].map((n) => [n, String(n)]), settings.roundsPerSession,
-    (v) => update({ roundsPerSession: v }))));
+  page.append(row(t('playMinutes'), choice(
+    [...[10, 15, 20, 30].map((n) => [n, `${n} ${t('minutes')}`]), [0, t('unlimited')]],
+    settings.playMinutes,
+    (v) => update({ playMinutes: v }),
+  ), t('playedToday', { min: Math.floor(session.playedMs / 60_000) })));
   page.append(row(t('restMinutes'), choice(
     [[0, t('noRest')], ...[15, 30, 60, 120].map((n) => [n, `${n} ${t('minutes')}`])],
     settings.restMinutes,
@@ -254,17 +230,35 @@ function showSettings() {
     page.append(el('p', 'set-info', t('restActive', { time })));
   }
 
-  const actions = el('div', 'set-actions');
-  const back = el('button', 'big', t('back'));
-  back.type = 'button';
-  back.addEventListener('click', showHome);
-  const fresh = el('button', 'big secondary', t('newSession'));
-  fresh.type = 'button';
-  fresh.addEventListener('click', () => { resetSession(); showHome(); });
-  actions.append(back, fresh);
-  page.append(actions);
+  const resets = el('div', 'set-actions');
+  resets.append(
+    button(t('resetTrain'), 'big secondary', () => {
+      const data = defaultTrain();
+      game.train.data = data;
+      game.train.rebuild();
+      saveTrain(data);
+      sfx('poof');
+    }),
+    button(t('resetTrack'), 'big secondary', () => {
+      const pts = defaultTrackPoints();
+      game.land.track.setPoints(pts);
+      game.land.clearAroundTrack();
+      saveTrack(null);
+      sfx('poof');
+    }),
+  );
+  page.append(resets);
 
-  app.append(page);
+  const actions = el('div', 'set-actions');
+  actions.append(
+    button(t('back'), 'big', () => (isResting() ? showRest() : startPlaying())),
+    button(t('newSession'), 'big secondary', () => {
+      resetSession();
+      startPlaying();
+    }),
+  );
+  page.append(actions);
+  showOverlay('settings', page);
 }
 
 // 3 Sekunden gedrückt halten öffnet den Eltern-Bereich
@@ -282,23 +276,23 @@ function setupParentGate() {
     btn.classList.add('holding');
     timer = setTimeout(() => {
       cancel();
-      if (app.dataset.screen !== 'settings') {
-        speechSynthesis?.getVoices();
-        showSettings();
-      }
+      if (document.body.dataset.screen !== 'settings') showSettings();
     }, 3000);
   });
   btn.addEventListener('pointerup', cancel);
   btn.addEventListener('pointercancel', cancel);
-  btn.addEventListener('contextmenu', (e) => e.preventDefault());
 }
 
-// ---------- Start ----------
-
 document.addEventListener('contextmenu', (e) => e.preventDefault());
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) saveSession(session);
+});
 setupParentGate();
-showHome();
+showStart();
 
 if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
   navigator.serviceWorker.register('sw.js').catch(() => {});
 }
+
+// Nur beim Entwickeln am Computer: Zugriff für automatische Tests
+if (location.hostname === 'localhost') window.__game = game;

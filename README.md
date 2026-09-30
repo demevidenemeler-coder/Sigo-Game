@@ -1,93 +1,112 @@
-# Sigo – ruhige Lernspiele für Kleinkinder
+# Sigo – Züge bauen, schmücken und fahren lassen
 
-Ein Tablet-Spiel für ein 3-jähriges Kind, **inspiriert** von Montessori:
-ruhig, ohne Punkte, ohne Zeitdruck, ohne Werbung, ohne Internet – und mit eingebautem Ende.
+Ein 3D-Tablet-Spiel für kleine Kinder (ab ca. 3 Jahren): eigenen Zug zusammenbauen,
+anmalen, schmücken, beladen – dann mit dem Finger eine Strecke malen und losfahren.
 
-## Aktivität 1: Aufräumen
+Ohne Punkte, ohne Zeitdruck, ohne Werbung, ohne Internet – und mit eingebautem Ende.
 
-Tiere, Fahrzeuge und Musikinstrumente liegen durcheinander und kommen in ihren Korb.
+## Die drei Bereiche (Knöpfe oben links)
 
-- **Antippen** → das Ding wird benannt („Kuh“) und macht sein Geräusch („Muuh“, Tatütata, Trommel …)
-- **In den richtigen Korb ziehen** → es springt hinein und bleibt dort sichtbar
-- **Falscher Korb** → es rutscht sanft zurück. Kein Fehlerton, kein rotes X
-  (Montessori: die Fehlerkontrolle steckt im Material)
-- **Korb antippen** → die Kategorie wird genannt („Tiere“)
-- Das blasse Bild im Korb zeigt, was hinein gehört
-- Nach jeder Runde entscheidet das Kind selbst mit ▶, ob es weitergeht
-- Die Punkte oben zeigen, wie viele Runden es noch gibt
-- Nach der letzten Runde schläft der Bär ein: „Fertig für heute“. Danach ist Pause.
+### 🛠️ Werkstatt
+Unten ist eine Leiste mit vier Fächern:
+
+| Fach | Was passiert |
+|---|---|
+| 🚃 Teile | Lok antippen → Lok wird getauscht. Wagen antippen → wird hinten angehängt (max. 5). Wagen **am Zug** antippen → wird abgekoppelt. Lok am Zug antippen → pfeift. |
+| 🎨 Farben | Farbtopf wählen, dann ein Teil des Zugs antippen (Kessel, Dach, Räder …) – oder den Topf direkt auf den Zug ziehen. |
+| ⭐ Schmuck | Stern, Herz, Blume, Lampe, Fähnchen, Luftballon – antippen oder auf einen Wagen ziehen. Schmuck am Zug antippen → weg. |
+| 🐄 Ladung | Tiere, Kinder, Oma, Teddy, Kisten … – antippen (steigt in den nächsten freien Wagen) oder auf einen Wagen ziehen. Mitfahrer antippen → steigt aus. |
+
+Alles wird laut benannt („Tierwagen“, „Lila“, „Kuh … Muuh“). Der Tankwagen nimmt keine Ladung –
+er hüpft nur kurz (Fehlerkontrolle ohne Fehlerton).
+
+### ✏️ Strecke malen
+Mit dem Finger eine Linie auf die Wiese malen. Daraus werden automatisch Schienen:
+- Der Kreis schließt sich von selbst.
+- Zu kleine Kreise werden vergrößert, damit der Zug passt; ein gerader Strich wird zum Oval.
+- Bäume und Häuser, die im Weg stehen, verschwinden.
+
+### 🚂 Fahren
+- Großer grüner Knopf ▶ = losfahren / ⏸ anhalten
+- 📯 = pfeifen/hupen (auch: Zug antippen)
+- 🎥 = Kamera fährt neben dem Zug mit
+- Bäume und Häuser antippen → sie wackeln
+
+Zug und Strecke bleiben gespeichert – beim nächsten Mal ist alles wieder da.
 
 ## Eltern-Bereich
 
-**Zahnrad oben rechts 3 Sekunden gedrückt halten.** Einstellbar sind:
+**Zahnrad oben rechts 3 Sekunden gedrückt halten.**
 
 | Einstellung | Standard |
 |---|---|
 | Sprache (Deutsch / English) | Deutsch |
-| Themen (Tiere, Fahrzeuge, Musik) | Tiere + Fahrzeuge |
-| Körbe pro Runde | 2 |
-| Dinge pro Runde | 4 |
-| Runden pro Spielzeit | 5 |
+| Spielzeit (10 / 15 / 20 / 30 Min. / unbegrenzt) | 15 Min. |
 | Pause danach | 30 Min. |
-| Stimme / Geräusche / Sprechtempo | an / an / normal |
+| Stimme / Sprechtempo / Geräusche | an / normal / an |
+| Zug zurücksetzen, Strecke zurücksetzen | – |
 
-Empfehlung: klein anfangen (2 Körbe, 3–4 Dinge) und erst steigern, wenn es zu leicht wird.
-Einstellungen bleiben nur auf dem Tablet gespeichert.
+Ist die Spielzeit um, sagt die App „Der Zug ist müde …“ und der Zug schläft (Mond-Bildschirm).
+Erst nach der Pause – oder über den Eltern-Bereich – geht es weiter.
 
 ## Auf das Android-Tablet bringen
 
-Die App ist eine Web-App (PWA). Für Installation und Offline-Betrieb braucht sie eine **https-Adresse**.
+Die App ist eine Web-App (PWA) und braucht für Installation und Offline-Betrieb eine **https-Adresse**.
 
-**Weg 1 – GitHub Pages (kostenlos):**
+**GitHub Pages (kostenlos):**
 1. Den Branch in `main` mergen.
 2. Auf GitHub: *Settings → Pages → Source: Deploy from a branch → `main` / `(root)`* → Speichern.
    (Bei privaten Repos braucht Pages ein kostenpflichtiges GitHub-Konto. Alternativ das Repo öffentlich machen – es enthält keine privaten Daten.)
-3. Nach ca. 1 Minute ist die App unter `https://<benutzername>.github.io/<repo-name>/` erreichbar.
-4. Auf dem Tablet in **Chrome** öffnen → Menü ⋮ → **„Zum Startbildschirm hinzufügen“ / „App installieren“**.
-5. Einmal öffnen, solange Internet da ist – danach läuft sie offline.
+3. Nach ca. 1 Minute: `https://<benutzername>.github.io/<repo-name>/`
+4. Auf dem Tablet in **Chrome** öffnen → Menü ⋮ → **„App installieren“ / „Zum Startbildschirm hinzufügen“**.
+5. Einmal mit Internet öffnen – danach läuft sie offline. Updates kommen automatisch, sobald wieder Internet da ist.
 
-**Weg 2 – nur zum Ausprobieren am Computer:**
+**Zum Ausprobieren am Computer:**
 ```bash
 python3 -m http.server 8000
-# dann http://localhost:8000 im Browser öffnen
+# dann http://localhost:8000 öffnen
 ```
 
 ### Wichtige Tablet-Einstellungen
-
-- **Deutsche Stimme:** *Einstellungen → System → Sprachen → Sprachausgabe* → Google Sprachausgabe,
-  Deutsch installieren. Im Eltern-Bereich steht, ob eine Stimme gefunden wurde.
-- **App fixieren** (damit das Kind nicht aus der App kommt): *Einstellungen → Sicherheit → App-Fixierung* einschalten,
-  dann in der App-Übersicht auf das App-Symbol → „Fixieren“.
+- **Deutsche Stimme:** *Einstellungen → System → Sprachen → Sprachausgabe* → Google Sprachausgabe, Deutsch installieren.
+  Im Eltern-Bereich steht, ob eine Stimme gefunden wurde.
+- **App fixieren** (damit das Kind nicht herauskommt): *Einstellungen → Sicherheit → App-Fixierung*.
 - **Lautstärke** vorher auf ein ruhiges Maß stellen.
 
-## Aufbau (zum Erweitern)
+## Technik (zum Erweitern)
+
+Reines HTML/JavaScript mit [three.js](https://threejs.org) (liegt in `vendor/`, MIT-Lizenz). Kein Build-Schritt.
+Alle Modelle sind aus einfachen Formen gebaut, alle Geräusche werden live erzeugt – keine Bild- oder Sounddateien.
 
 ```
-index.html              Einstiegsseite
-css/style.css           Aussehen (Farben ganz oben)
-js/app.js               Ablauf: Start, Runden, Pause, Eltern-Bereich
-js/audio.js             Geräusche (live erzeugt) + Sprachausgabe
-js/i18n.js              Alle Texte je Sprache
-js/items.js             Kategorien und Dinge (Emoji, Name, Lautwort, Geräusch)
-js/settings.js          Einstellungen speichern
-js/activities/          Eine Datei pro Aktivität
-sw.js                   Offline-Speicher
+index.html                 Einstiegsseite
+css/style.css              Aussehen der Knöpfe und Leisten
+js/app.js                  Start, Spielzeit/Pause, Eltern-Bereich
+js/catalog.js              Loks, Wagen, Farben, Schmuck, Ladung
+js/i18n.js                 Alle Texte und Namen je Sprache
+js/audio.js                Geräusche + Sprachausgabe
+js/settings.js             Speichern auf dem Gerät
+js/game/game.js            3D-Kern: Kamera, Bildschleife, Eingabe
+js/game/trainModel.js      3D-Modelle von Loks, Wagen, Schmuck, Ladung
+js/game/train.js           Zug anordnen / auf Strecke setzen
+js/game/track.js           Aus Fingerstrich wird Schienenstrecke
+js/game/world.js           Werkstatt und Landschaft
+js/game/modes/*.js         Werkstatt, Malen, Fahren
+sw.js                      Offline-Speicher (neue Dateien in ASSETS eintragen)
 ```
 
-- **Neues Tier/Fahrzeug/Instrument:** eine Zeile in `ITEMS` und Namen in `NAMES` (`js/items.js`).
-- **Neue Sprache:** Block in `LANGUAGES` (`js/i18n.js`) + Namen in `NAMES`.
-- **Neue Aktivität:** Datei in `js/activities/` mit `{ id, icon, titleKey, play(stage, ctx) }`, in `activities/index.js` eintragen.
-- **Nach jeder Änderung** in `sw.js` die `VERSION` erhöhen (und neue Dateien in `ASSETS` eintragen), sonst zeigt das Tablet die alte Fassung.
+- **Neuer Wagen:** Eintrag in `WAGONS` (`catalog.js`), Bau-Funktion in `trainModel.js` (`BUILDERS`), Name in `i18n.js`.
+- **Neue Ladung / neuer Schmuck:** Eintrag in `CARGO` bzw. `DECOR` + Name in `i18n.js`.
+- **Neue Sprache:** Block in `LANGUAGES` (`i18n.js`).
 
 ## Ehrliche Grenzen
 
-- Die Bilder sind Emojis (Platzhalter). Montessori bevorzugt **realistische Bilder** – ein nächster Schritt wären echte Fotos, gern eure eigenen.
-- Die Tierlaute spricht die Sprachausgabe („Muuh“) – das klingt künstlich. Echte Aufnahmen (selbst eingesprochen!) wären schöner.
-- Ein Bildschirm ersetzt keine echten Gegenstände. Am besten spielt ihr parallel echtes Sortieren: Spielzeugtiere und -autos in zwei Kisten.
+- Die Grafik ist für Tablets der letzten ~5 Jahre gedacht. Auf sehr alten Geräten kann es ruckeln.
+- Tierlaute kommen aus der Sprachausgabe („Muuh“) und klingen künstlich.
+- Selbstkreuzende Strecken (Acht) sind erlaubt, aber es gibt keine Brücke – der Zug fährt „durch“ die Kreuzung.
 
-## Ideen für die nächsten Aktivitäten
-
-1. Geräusche-Rätsel: Ein Geräusch ertönt – welches Tier/Fahrzeug war es? (2 Auswahlbilder)
-2. Groß und klein: Dinge der Größe nach ordnen (wie der Rosa Turm)
-3. Farben sortieren: rote Dinge zu Rot, blaue zu Blau
-4. Musik machen: Instrumente antippen, einfache Melodie
+## Ideen für später
+- Bahnhof: Zug hält an, Fahrgäste steigen ein/aus
+- Tunnel und Brücke zum Hinsetzen
+- Weichen / zwei Züge
+- Eigene Fotos als Fahrgäste, selbst eingesprochene Tierlaute

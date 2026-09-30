@@ -1,7 +1,7 @@
 {
   "name": "Sigo",
   "short_name": "Sigo",
-  "description": "Ruhige Lernspiele für kleine Kinder, inspiriert von Montessori.",
+  "description": "Züge bauen, schmücken und auf der selbst gemalten Strecke fahren lassen.",
   "lang": "de",
   "start_url": "./",
   "scope": "./",

@@ -1,0 +1,266 @@
+/* Ruhige, natürliche Farben – bewusst keine grellen Reize */
+:root {
+  --bg: #f4ecdf;
+  --ink: #4a3f35;
+  --tile: #fffaf2;
+  --shadow: rgba(74, 63, 53, 0.18);
+  --accent: #c98b5b;
+  --home-tiere: #cfe3c1;
+  --home-fahrzeuge: #c9d8e8;
+  --home-musik: #e6d4e9;
+  --emoji: "Noto Color Emoji", "Apple Color Emoji", "Segoe UI Emoji", sans-serif;
+  --tile-size: min(19vmin, 150px);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: none;
+  overscroll-behavior: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  border: none;
+  background: none;
+  cursor: pointer;
+  touch-action: none;
+}
+
+#app {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+/* ---------- Eltern-Knopf ---------- */
+#parent-btn {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  width: 44px;
+  height: 44px;
+  opacity: 0.35;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+}
+#parent-btn span { font-size: 20px; grid-area: 1 / 1; }
+#parent-btn svg { grid-area: 1 / 1; width: 44px; height: 44px; transform: rotate(-90deg); }
+#parent-btn circle { fill: none; stroke-width: 3; }
+#parent-btn .ring-bg { stroke: transparent; }
+#parent-btn .ring { stroke: var(--accent); stroke-dasharray: 94.25; stroke-dashoffset: 94.25; }
+#parent-btn.holding { opacity: 1; }
+#parent-btn.holding .ring { stroke-dashoffset: 0; transition: stroke-dashoffset 3s linear; }
+[data-screen="settings"] ~ #parent-btn { display: none; }
+
+/* ---------- Startbildschirm ---------- */
+.home-screen {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5vmin;
+  flex-wrap: wrap;
+}
+.activity-btn {
+  width: min(42vmin, 320px);
+  aspect-ratio: 1;
+  border-radius: 40px;
+  background: var(--tile);
+  box-shadow: 0 10px 30px var(--shadow);
+  display: grid;
+  place-items: center;
+  animation: breathe 4s ease-in-out infinite;
+}
+.activity-btn:active { transform: scale(0.96); }
+.activity-icon { font-family: var(--emoji); font-size: min(24vmin, 180px); line-height: 1; }
+
+/* ---------- Fortschritt ---------- */
+.progress {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  padding: 14px 0 4px;
+}
+.dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid var(--accent);
+  opacity: 0.6;
+}
+.dot.filled { background: var(--accent); opacity: 1; }
+
+.stage { flex: 1; min-height: 0; display: flex; }
+
+/* ---------- Aufräumen ---------- */
+.sort-board {
+  flex: 1;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  gap: 2vmin;
+  padding: 2vmin 3vmin 3vmin;
+  min-height: 0;
+}
+.sort-items {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  align-content: center;
+  gap: 3vmin;
+}
+.item {
+  width: var(--tile-size);
+  height: var(--tile-size);
+  border-radius: 28%;
+  background: var(--tile);
+  box-shadow: 0 6px 16px var(--shadow);
+  display: grid;
+  place-items: center;
+  rotate: var(--tilt);
+  transition: transform 0.45s cubic-bezier(0.3, 1.5, 0.5, 1);
+  will-change: transform;
+}
+.item .emoji {
+  font-family: var(--emoji);
+  font-size: calc(var(--tile-size) * 0.66);
+  line-height: 1;
+  pointer-events: none;
+}
+.item.dragging {
+  z-index: 20;
+  position: relative;
+  box-shadow: 0 16px 34px var(--shadow);
+  rotate: 0deg;
+}
+.item.wiggle .emoji { animation: wiggle 0.6s ease; }
+
+.sort-homes {
+  display: flex;
+  gap: 3vmin;
+  height: min(36vh, 300px);
+}
+.home {
+  flex: 1;
+  position: relative;
+  border-radius: 36px;
+  background: var(--home-color);
+  border: 4px dashed rgba(74, 63, 53, 0.15);
+  display: flex;
+  align-items: center;
+  padding: 2vmin 3vmin;
+  gap: 2vmin;
+  transition: transform 0.25s ease, border-color 0.25s ease;
+}
+.home.hover { transform: scale(1.04); border-color: rgba(74, 63, 53, 0.45); }
+.home.pulse { animation: pulse 0.5s ease; }
+.home-example {
+  font-family: var(--emoji);
+  font-size: min(15vmin, 110px);
+  line-height: 1;
+  opacity: 0.35;
+  filter: saturate(0.6);
+  pointer-events: none;
+}
+.home-content {
+  flex: 1;
+  align-self: stretch;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: center;
+  justify-content: center;
+  gap: 1vmin;
+  pointer-events: none;
+}
+.mini {
+  font-family: var(--emoji);
+  font-size: min(9vmin, 70px);
+  line-height: 1;
+  animation: pop 0.4s ease;
+}
+.finished .home { animation: pulse 0.8s ease; }
+
+/* ---------- Weiter / Nochmal ---------- */
+.next-btn {
+  position: fixed;
+  left: 50%;
+  top: 38%;
+  translate: -50% -50%;
+  width: min(30vmin, 200px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fffaf2;
+  font-size: min(13vmin, 90px);
+  padding-left: 1.5vmin;
+  box-shadow: 0 12px 30px var(--shadow);
+  z-index: 30;
+  animation: appear 0.5s ease, breathe 3s ease-in-out 0.5s infinite;
+}
+
+/* ---------- Ruhe-Bildschirm ---------- */
+[data-screen="rest"] { background: #2f3a4a; }
+.rest-screen { flex: 1; display: grid; place-items: center; }
+.rest-scene { position: relative; font-family: var(--emoji); line-height: 1; }
+.rest-moon { position: absolute; top: -18vmin; right: -14vmin; font-size: 14vmin; }
+.rest-animal { font-size: 30vmin; display: inline-block; animation: sleep 4s ease-in-out infinite; filter: brightness(0.85); }
+.rest-z {
+  position: absolute;
+  top: -2vmin;
+  right: -4vmin;
+  font-family: system-ui, sans-serif;
+  font-size: 8vmin;
+  color: #dfe6f0;
+  animation: float 3s ease-in-out infinite;
+}
+[data-screen="rest"] .next-btn { top: 82%; background: #8aa0bb; }
+
+/* ---------- Einstellungen ---------- */
+[data-screen="settings"] { overflow-y: auto; touch-action: pan-y; -webkit-user-select: text; user-select: text; }
+.settings { max-width: 720px; width: 100%; margin: 0 auto; padding: 24px 20px 60px; touch-action: pan-y; }
+.settings h1 { font-size: 26px; margin: 8px 0 4px; }
+.set-info { opacity: 0.8; line-height: 1.45; }
+.set-row { padding: 16px 0; border-bottom: 1px solid rgba(74, 63, 53, 0.12); }
+.set-label { font-weight: 600; margin-bottom: 10px; }
+.set-hint { font-size: 14px; opacity: 0.7; margin-top: 8px; }
+.choice { display: flex; flex-wrap: wrap; gap: 8px; }
+.opt, .big {
+  touch-action: manipulation;
+  padding: 12px 18px;
+  border-radius: 14px;
+  background: var(--tile);
+  box-shadow: 0 2px 6px var(--shadow);
+  min-width: 56px;
+}
+.opt.active { background: var(--accent); color: #fffaf2; }
+.set-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 24px; }
+.big { background: var(--accent); color: #fffaf2; font-weight: 600; padding: 16px 22px; }
+.big.secondary { background: var(--tile); color: var(--ink); }
+
+/* ---------- Animationen (sanft) ---------- */
+@keyframes breathe { 50% { transform: scale(1.04); } }
+@keyframes wiggle { 25% { transform: rotate(-12deg); } 75% { transform: rotate(12deg); } }
+@keyframes pulse { 50% { transform: scale(1.05); } }
+@keyframes pop { from { transform: scale(0.2); opacity: 0; } }
+@keyframes appear { from { opacity: 0; scale: 0.6; } }
+@keyframes sleep { 50% { transform: translateY(1.5vmin) scale(1.02); } }
+@keyframes float { 0% { opacity: 0; transform: translate(0, 2vmin); } 50% { opacity: 1; } 100% { opacity: 0; transform: translate(3vmin, -6vmin); } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; }
+}

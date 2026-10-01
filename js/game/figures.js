@@ -433,7 +433,8 @@ export function buildFigure(id) {
   g.userData.figure = id;
   g.userData.waveArm = inner.userData.waveArm;
   g.updateMatrixWorld(true);
-  g.userData.top = new THREE.Box3().setFromObject(g).max.y;
+  g.userData.box = new THREE.Box3().setFromObject(g);
+  g.userData.top = g.userData.box.max.y;
   return g;
 }
 

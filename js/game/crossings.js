@@ -26,30 +26,61 @@ const rbox = (w, h, d, r = 0.05) => new RoundedBoxGeometry(w, h, d, 2, Math.min(
 
 // ---------- Bauteile ----------
 
-// Brücke, die der (auch gebogenen) Strecke von s0 bis s1 folgt: Holzdeck, rote Träger, Geländer, Pfeiler
+// Musik-Brücke, die der (auch gebogenen) Strecke von s0 bis s1 folgt:
+// Die Bohlen sind bunte Xylophon-Stäbe (tief = rot und breit, hoch = lila und schmal, wie beim echten Xylophon).
+// Fährt die Lok drüber, spielt jeder Stab seinen Ton; antippen geht auch.
 const STEP = 1;
+export const BAR_COLORS = ['#e5484d', '#ee7a2b', '#f5b731', '#f2d93a', '#8cc43f', '#3fb26b', '#2fb5b0', '#3b8fd9', '#5a63d6', '#9a5bd1'];
+// Tonfolge hin und her: 0 1 2 … 9 8 7 … 1 0 1 …
+const noteFor = (i) => {
+  const k = i % 18;
+  return k < 10 ? k : 18 - k;
+};
+const barGeo = new Map();
+function barGeometry(len, width) {
+  const k = `${len.toFixed(2)}:${width.toFixed(2)}`;
+  if (!barGeo.has(k)) barGeo.set(k, new RoundedBoxGeometry(len, 0.09, width, 2, 0.035));
+  return barGeo.get(k);
+}
+
 function bridge(track, s0, s1) {
   const g = new THREE.Group();
-  const deck = new THREE.MeshStandardMaterial({ map: woodTexture('#9a6b42', 'deck'), roughness: 0.8 });
+  g.userData.bridge = true;
+  const deck = new THREE.MeshStandardMaterial({ map: woodTexture('#7a5232', 'deckDark'), roughness: 0.85 });
   const steel = mat('#c8453a', 0.45, 0.4);
   const stone = mat('#b9b1a3', 0.9);
+  const pin = mat('#d9dde2', 0.3, 0.8);
   const n = Math.max(2, Math.ceil((s1 - s0) / STEP));
   const len = (s1 - s0) / n;
+  const bars = [];
   for (let i = 0; i < n; i++) {
-    const f = track.frameAt(s0 + (i + 0.5) * len);
+    const s = s0 + (i + 0.5) * len;
+    const f = track.frameAt(s);
     const seg = new THREE.Group();
     seg.position.set(f.p.x, 0, f.p.z);
     seg.rotation.y = f.angle;
-    add(seg, new THREE.BoxGeometry(len + 0.08, 0.14, 2.4), deck, 0, 0.05, 0);
-    for (const z of [1.2, -1.2]) {
+    add(seg, new THREE.BoxGeometry(len + 0.08, 0.12, 2.6), deck, 0, 0.03, 0);
+    // Xylophon-Stab mit zwei silbernen Stiften
+    const note = noteFor(i);
+    const width = 2.45 - note * 0.07;
+    const barMat = new THREE.MeshStandardMaterial({ color: BAR_COLORS[note], roughness: 0.35, emissive: BAR_COLORS[note], emissiveIntensity: 0 });
+    const bar = add(seg, barGeometry(Math.max(0.3, len - 0.14), width), barMat, 0, 0.13, 0);
+    for (const z of [width / 2 - 0.22, -width / 2 + 0.22]) add(seg, new THREE.SphereGeometry(0.05, 8, 6), pin, 0, 0.18, z);
+    bar.userData.note = note;
+    bar.userData.baseY = 0.13;
+    bar.userData.flash = 0;
+    bars.push({ mesh: bar, note, s });
+    for (const z of [1.3, -1.3]) {
       add(seg, new THREE.BoxGeometry(len + 0.08, 0.42, 0.14), steel, 0, 0.12, z);
       add(seg, new THREE.BoxGeometry(len + 0.08, 0.08, 0.08), steel, 0, 0.95, z);
       if (i % 2 === 0) add(seg, new THREE.BoxGeometry(0.08, 0.7, 0.08), steel, 0, 0.62, z);
     }
     // Pfeiler im Wasser
-    if (i % 4 === 2 && i < n - 1) add(seg, rbox(0.7, 0.6, 2.6, 0.08), stone, 0, -0.22, 0);
+    if (i % 4 === 2 && i < n - 1) add(seg, rbox(0.7, 0.6, 2.8, 0.08), stone, 0, -0.22, 0);
     g.add(seg);
   }
+  g.userData.bars = bars;
+  g.userData.barLen = len;
   // Widerlager an beiden Enden
   for (const s of [s0, s1]) {
     const f = track.frameAt(s);
@@ -183,7 +214,7 @@ export class Crossings {
       const s1 = r.s1 + 1.2;
       const obj = bridge(tr, s0, s1);
       this.group.add(obj);
-      this.bridges.push({ s0, s1, s: (s0 + s1) / 2, obj });
+      this.bridges.push({ s0, s1, s: (s0 + s1) / 2, obj, bars: obj.userData.bars, barLen: obj.userData.barLen, last: -1 });
     }
 
     // Bahnübergänge: jeder Abschnitt der Strecke auf der Straße
@@ -251,6 +282,29 @@ export class Crossings {
     };
   }
 
+  // Stab leuchten und hüpfen lassen (der Ton kommt vom Aufrufer)
+  flashBar(bar) {
+    bar.mesh.userData.flash = 1;
+  }
+
+  // Getroffener Brückenteil → nächster Xylophon-Stab
+  barNear(object, point) {
+    let o = object;
+    while (o && !o.userData.bridge) o = o.parent;
+    if (!o) return null;
+    let best = null;
+    let bestD = Infinity;
+    const wp = new THREE.Vector3();
+    for (const bar of o.userData.bars) {
+      const d = bar.mesh.getWorldPosition(wp).distanceTo(point);
+      if (d < bestD) {
+        bestD = d;
+        best = bar;
+      }
+    }
+    return best;
+  }
+
   // Abschnitte der Strecke, auf die kein Bahnhof o. Ä. gesetzt werden kann: { s, span }
   zones() {
     return [
@@ -284,6 +338,13 @@ export class Crossings {
       parts.lights.forEach((l, i) => { l.material.emissiveIntensity = c.closed ? ((i % 2 === 0) === blink ? 2.5 : 0) : 0; });
     }
     for (const b of this.bridges) {
+      for (const { mesh } of b.bars) {
+        const u = mesh.userData;
+        if (u.flash <= 0) continue;
+        u.flash = Math.max(0, u.flash - dt * 2.5);
+        mesh.material.emissiveIntensity = u.flash * 0.9;
+        mesh.position.y = u.baseY + Math.sin(u.flash * Math.PI) * 0.06;
+      }
       const u = b.obj.userData;
       const f = u.fish;
       u.fishTimer -= dt;

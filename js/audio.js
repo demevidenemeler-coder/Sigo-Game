@@ -352,6 +352,20 @@ Object.assign(SOUNDS, {
     o.frequency.exponentialRampToValueAtTime(1700 + Math.random() * 300, t + 0.1);
     noise(t, 0.1, 0.12, 'bandpass', 3200, sfxBus, 3);
   },
+  munch(t) {
+    // Mampf: zwei kurze, knackige Bisse
+    for (const dt of [0, 0.11]) {
+      noise(t + dt, 0.07, 0.55, 'bandpass', 1100 + Math.random() * 600, sfxBus, 1.5);
+      noise(t + dt, 0.05, 0.35, 'lowpass', 400);
+    }
+  },
+  nope(t) {
+    // „Hm-hm“ (nein danke) – zwei weiche, fallende Töne
+    for (const [dt, f] of [[0, 420], [0.22, 340]]) {
+      const o = tone('triangle', f, t + dt, 0.02, 0.16, 0.22, lowpass(1200));
+      o.frequency.exponentialRampToValueAtTime(f * 0.85, t + dt + 0.15);
+    }
+  },
   splat(t) {
     // Matsch klatscht an den Wagen
     const n = noise(t, 0.18, 0.7, 'lowpass', 1400);
@@ -374,6 +388,20 @@ export function playSound(name) {
   fn(c.currentTime + 0.02);
   const ms = (SOUND_LENGTH[name] ?? 1.0) * 1000;
   return new Promise((r) => setTimeout(r, ms));
+}
+
+// ---------- Xylophon (Musik-Brücke) ----------
+
+// Pentatonik (C-Dur ohne F und H): klingt in jeder Reihenfolge schön und passt zur Hintergrundmusik
+export const XYLO_NOTES = [523.25, 587.33, 659.25, 783.99, 880, 1046.5, 1174.66, 1318.51, 1567.98, 1760];
+
+export function xyloNote(index, vel = 0.32) {
+  const c = ac();
+  const f = XYLO_NOTES[Math.max(0, Math.min(XYLO_NOTES.length - 1, index))];
+  const t = c.currentTime + 0.01;
+  tone('sine', f, t, 0.003, 0.7, vel);
+  tone('sine', f * 3.93, t, 0.002, 0.14, vel * 0.22);
+  tone('sine', f * 9.2, t, 0.001, 0.05, vel * 0.07);
 }
 
 // ---------- Zug-Geräusche (laufen während der Fahrt) ----------

@@ -156,6 +156,13 @@ button {
   pointer-events: none;
 }
 .tray-item.selected { outline: 4px solid var(--accent); transform: scale(1.08); }
+/* „Das hier!“ – Lieblingsfutter bzw. Tier-Fach wackelt als Hinweis */
+.wiggle-hint { animation: wiggle-hint 0.5s ease-in-out 6; outline: 4px solid #ff8fab !important; }
+@keyframes wiggle-hint {
+  0%, 100% { transform: scale(1.1) rotate(0deg); }
+  25% { transform: scale(1.18) rotate(-8deg); }
+  75% { transform: scale(1.18) rotate(8deg); }
+}
 
 /* Bild, das beim Ziehen unter dem Finger mitwandert */
 .ghost {
@@ -235,6 +242,31 @@ button {
 .drive-btn.go.stop { background: #d9463b; animation: none; }
 
 .drive-btn.go.waiting { animation: attention 1.2s ease-in-out infinite; box-shadow: 0 0 0 8px rgba(79, 166, 90, 0.35), 0 6px 16px var(--shadow); }
+
+/* Regenbogen nach dem Regen: weicher Bogen über dem Bild */
+.rainbow {
+  position: fixed;
+  left: 50%;
+  top: 6vh;
+  width: 130vmax;
+  aspect-ratio: 2 / 1;
+  translate: -50% 0;
+  border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+  background: radial-gradient(circle at 50% 100%,
+    transparent 0 61%,
+    rgba(160, 90, 220, 0.0) 61%,
+    rgba(150, 90, 230, 0.75) 62.5%,
+    rgba(70, 110, 240, 0.8) 64%,
+    rgba(60, 190, 120, 0.8) 65.5%,
+    rgba(250, 225, 60, 0.85) 67%,
+    rgba(250, 150, 40, 0.85) 68.5%,
+    rgba(240, 70, 70, 0.8) 70%,
+    transparent 71.5%);
+  filter: blur(3px);
+  mix-blend-mode: screen;
+  pointer-events: none !important;
+  opacity: 0;
+}
 
 /* Waschen: ◀ Eimer ▶ unten in der Mitte, Schwamm folgt dem Finger */
 .wash-controls {

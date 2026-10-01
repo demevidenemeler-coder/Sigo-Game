@@ -7,10 +7,11 @@
 // - Eine Zeige-Hand zeigt, wie es geht, wenn eine Weile nichts passiert.
 
 import * as THREE from 'three';
-import { LOCOS, WAGONS, COLORS, DECOR, CARGO, ANIMALS, PASSENGERS, MAX_WAGONS, MAX_DECOR, newCar, partDef, isLoco, pushCargo, spliceCargo } from '../../catalog.js';
+import { LOCOS, WAGONS, COLORS, DECOR, CARGO, ANIMALS, PASSENGERS, FOODS, LIKES, MAX_WAGONS, MAX_DECOR, newCar, partDef, isLoco, pushCargo, spliceCargo } from '../../catalog.js';
 import { renderThumbnails } from '../thumbs.js';
 import { createTray } from '../tray.js';
 import { wave, applyDirt } from '../trainModel.js';
+import { createFeeder } from '../feeding.js';
 
 const TABS = [
   { id: 'locos', icon: '🚂', say: 'tabLocos' },
@@ -19,8 +20,9 @@ const TABS = [
   { id: 'decor', icon: '⭐', say: 'tabDecor' },
   { id: 'animals', icon: '🐄', say: 'tabAnimals' },
   { id: 'passengers', icon: '🧸', say: 'tabPassengers' },
+  { id: 'food', icon: '🥕', say: 'tabFood' },
 ];
-const LISTS = { locos: LOCOS, wagons: WAGONS, paint: COLORS, decor: DECOR, animals: ANIMALS, passengers: PASSENGERS };
+const LISTS = { locos: LOCOS, wagons: WAGONS, paint: COLORS, decor: DECOR, animals: ANIMALS, passengers: PASSENGERS, food: FOODS };
 // Tiere und Mitfahrer sind beides „Ladung“
 const kindOf = (tab) => {
   if (tab === 'animals' || tab === 'passengers') return 'cargo';
@@ -34,7 +36,8 @@ export function createWorkshopMode(game) {
   const train = game.train;
   const ws = game.workshop;
   let tab = 'wagons';
-  const selected = { paint: COLORS[0], decor: DECOR[0], cargo: CARGO[0] };
+  const selected = { paint: COLORS[0], decor: DECOR[0], cargo: CARGO[0], food: FOODS[0] };
+  const feeder = createFeeder(game, services);
   let lastCar = 0;
   let thumbs = null;
   let busy = false;
@@ -190,7 +193,8 @@ export function createWorkshopMode(game) {
         }
         if (!ghost) return;
         moveGhost(ghost, ev.clientX, ev.clientY);
-        setHighlight(targetFor(targetKind, ev.clientX, ev.clientY));
+        if (kind === 'food') feeder.setTarget(overTray(ev.clientY) ? null : feeder.nearestEater(ev.clientX, ev.clientY));
+        else setHighlight(targetFor(targetKind, ev.clientX, ev.clientY));
       };
       const up = (ev) => {
         button.removeEventListener('pointermove', move);
@@ -198,7 +202,13 @@ export function createWorkshopMode(game) {
         button.removeEventListener('pointercancel', up);
         const target = highlighted;
         setHighlight(null);
-        if (ghost) {
+        if (ghost && kind === 'food') {
+          ghost.remove();
+          const fig = overTray(ev.clientY) ? null : feeder.nearestEater(ev.clientX, ev.clientY);
+          feeder.setTarget(null);
+          if (ev.type === 'pointerup' && fig) feedFig(fig, entry.id, ev.clientX, ev.clientY);
+          else if (ev.type === 'pointerup' && !overTray(ev.clientY)) noEaterHere();
+        } else if (ghost) {
           ghost.remove();
           if (ev.type === 'pointerup' && target != null && target >= 0) dropFromTray(kind, entry, target, ev);
         } else if (ev.type === 'pointerup') {
@@ -219,6 +229,12 @@ export function createWorkshopMode(game) {
       services.sayName(entry.id);
     } else if (kind === 'decor') {
       addDecor(Math.min(lastCar, train.cars.length - 1), entry.id);
+    } else if (kind === 'food') {
+      // Antippen: das erste Tier, das es mag – sonst das erste Tier (das zeigt dann, was es lieber mag)
+      const list = feeder.eaters();
+      if (!list.length) return noEaters();
+      const fig = list.find((f) => (LIKES[f.userData.figure] ?? []).includes(entry.id)) ?? list[0];
+      feedFig(fig, entry.id);
     } else if (kind === 'cargo') {
       const target = hasRoom(lastCar) ? lastCar : train.data.cars.findIndex((_, i) => hasRoom(i));
       if (target < 0) full();
@@ -383,6 +399,46 @@ export function createWorkshopMode(game) {
     return true;
   }
 
+  // ---------- Füttern ----------
+
+  function feedFig(fig, foodId, x, y) {
+    let from = null;
+    if (x != null) {
+      // Das Futter startet dort, wo der Finger losgelassen hat
+      game.raycaster.setFromCamera(game.ndc(x, y), game.camera);
+      const p = fig.getWorldPosition(new THREE.Vector3());
+      from = game.raycaster.ray.at(game.raycaster.ray.origin.distanceTo(p) * 0.85, new THREE.Vector3());
+    }
+    feeder.feed(fig, foodId, { thumbs, from, onRefuse: hintFood });
+  }
+
+  // Lieblingsfutter in der Leiste wackelt kurz (und wird sichtbar gescrollt)
+  function hintFood(fav) {
+    if (tab !== 'food') return;
+    const btn = items.children[FOODS.findIndex((f) => f.id === fav)];
+    if (!btn) return;
+    btn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    btn.classList.remove('wiggle-hint');
+    void btn.offsetWidth;
+    btn.classList.add('wiggle-hint');
+    setTimeout(() => btn.classList.remove('wiggle-hint'), 3200);
+  }
+
+  function noEaters() {
+    services.sfx('boing');
+    services.say(services.t('noEaters'));
+    const b = tray.root.querySelector('.tab[data-tab="animals"]');
+    b?.classList.remove('wiggle-hint');
+    void b?.offsetWidth;
+    b?.classList.add('wiggle-hint');
+    setTimeout(() => b?.classList.remove('wiggle-hint'), 3200);
+  }
+
+  function noEaterHere() {
+    if (!feeder.eaters().length) return noEaters();
+    services.sfx('poof');
+  }
+
   function full() {
     services.sfx('boing');
     services.say(services.t('full'));
@@ -401,7 +457,10 @@ export function createWorkshopMode(game) {
     if (d.what === 'item') {
       const obj = d.obj;
       wave(obj, game);
-      if (d.removable.list === 'cargo') {
+      if (d.removable.list === 'cargo' && tab === 'food' && LIKES[d.removable.id]) {
+        // Im Futter-Fach: Tier antippen = mit dem gewählten Futter füttern
+        feedFig(obj, selected.food.id);
+      } else if (d.removable.list === 'cargo') {
         game.hop(obj);
         services.sayName(d.removable.id);
       } else if (obj.userData.bell) {
@@ -418,6 +477,10 @@ export function createWorkshopMode(game) {
     if (tab === 'paint') return paint(d.car, d.hit.object?.userData.paint ?? 'body');
     if (tab === 'decor') return addDecor(d.car, selected.decor.id);
     if (kindOf(tab) === 'cargo') return addCargo(d.car, selected.cargo.id);
+    if (tab === 'food' && d.what === 'wagon') {
+      const fig = train.cars[d.car].userData.cargoItems.find((f) => LIKES[f.userData.figure]);
+      if (fig) return feedFig(fig, selected.food.id);
+    }
     if (d.what === 'loco') return horn();
     const car = train.cars[d.car];
     if (car.userData.crane) {
@@ -458,6 +521,7 @@ export function createWorkshopMode(game) {
     if (!btn) return;
     let target = tab === 'wagons' ? train.cars.length - 1 : 0;
     if (kindOf(tab) === 'cargo') target = Math.max(0, train.data.cars.findIndex((_, i) => hasRoom(i)));
+    if (tab === 'food') target = Math.max(0, train.data.cars.findIndex((c) => c.cargo.some((id) => LIKES[id])));
     const from = btn.getBoundingClientRect();
     const to = screenPos(train.cars[target]);
     hint.style.setProperty('--x0', `${from.left + from.width / 2}px`);
@@ -496,6 +560,7 @@ export function createWorkshopMode(game) {
           ...[...LOCOS, ...WAGONS].map((p) => ({ kind: 'parts', id: p.id })),
           ...DECOR.map((d) => ({ kind: 'decor', id: d.id })),
           ...CARGO.map((c) => ({ kind: 'cargo', id: c.id })),
+          ...FOODS.map((f) => ({ kind: 'food', id: f.id })),
         ]);
       }
       active = true;
@@ -514,10 +579,12 @@ export function createWorkshopMode(game) {
       tray.hide();
       hideHint();
       setHighlight(null);
+      feeder.clear();
       game.setBottomInset(0);
     },
     update(dt) {
       train.animate(dt, 0, false);
+      feeder.update(dt);
       if (ws.highlight.visible) ws.highlight.material.opacity = 0.6 + Math.sin(game.time * 8) * 0.3;
       if (performance.now() - lastInteraction > IDLE_HINT_MS) {
         lastInteraction = performance.now();

@@ -13,6 +13,7 @@ const MOODS = {
   regen: { skyTop: C('#8796a6'), skyBottom: C('#c7cfd6'), hemi: 1.05, sun: 1.1, sunColor: C('#dfe6ee'), env: 0.4 },
   schnee: { skyTop: C('#a9c0d6'), skyBottom: C('#eef2f5'), hemi: 1.35, sun: 1.6, sunColor: C('#f2f6ff'), env: 0.5 },
 };
+const WET = new THREE.Color('#3f6b3a');
 const NIGHT = { skyTop: C('#071330'), skyBottom: C('#22345e'), hemi: 0.22, sun: 0.4, sunColor: C('#8fa6ff'), env: 0.12 };
 
 function dotTexture() {
@@ -37,6 +38,8 @@ export class Environment {
     this.weather = 'sonne';
     this.rain = 0;
     this.snow = 0;
+    this.wet = 0; // nasser Boden / Pfützen (bleibt nach dem Regen eine Weile)
+    this.snowCover = 0; // liegender Schnee (schmilzt nach dem Schneefall langsam)
     this.tunnel = 0;
     this.tunnelTarget = 0;
 
@@ -106,6 +109,15 @@ export class Environment {
     this.rain += (rainT - this.rain) * (rainT > this.rain ? k : fast);
     this.snow += (snowT - this.snow) * (snowT > this.snow ? k * 0.6 : fast);
     this.tunnel += (this.tunnelTarget - this.tunnel) * (1 - Math.exp(-dt * 5));
+    // Wetterfolgen: Schnee bleibt liegen und schmilzt langsam (bei Regen schneller); Schmelzwasser macht nass
+    if (this.weather === 'schnee') this.snowCover = Math.min(1, this.snowCover + dt / 18);
+    else {
+      const melt = Math.min(this.snowCover, dt / (this.weather === 'regen' ? 15 : 40));
+      this.snowCover -= melt;
+      this.wet = Math.min(1, this.wet + melt * 0.9);
+    }
+    if (this.weather === 'regen') this.wet = Math.min(1, this.wet + dt / 14);
+    else if (this.snowCover <= 0) this.wet = Math.max(0, this.wet - dt / (this.night > 0.5 ? 120 : 60));
 
     // Stimmung mischen: Sonne → Regen/Schnee → Nacht
     const base = MOODS.sonne;
@@ -137,9 +149,11 @@ export class Environment {
     for (const m of lamps) m.emissiveIntensity = m.userData.lampDay + (m.userData.lampNight - m.userData.lampDay) * glow;
 
     // Schnee färbt Wiese und Bäume weiß (leichtes Eigenleuchten, damit auch die grüne Grastextur weiß wirkt)
+    // Nasser Boden wird etwas dunkler und satter
+    const cover = Math.max(this.snowCover, this.snow * 0.3);
     for (const { m, base: c } of this.snowables) {
-      m.color.copy(c).lerp(C('#ffffff'), this.snow * 0.7);
-      m.emissive.setScalar(this.snow * 0.5 * (1 - this.night * 0.8));
+      m.color.copy(c).lerp(WET, this.wet * 0.22).lerp(C('#ffffff'), cover * 0.7);
+      m.emissive.setScalar(cover * 0.5 * (1 - this.night * 0.8));
     }
 
     // Regen

@@ -10,7 +10,7 @@
 // - Knöpfe: Los/Halt, Pfeife, Kamera, Tag/Nacht, Wetter.
 
 import * as THREE from 'three';
-import { chuff, railJoint, RollingSound, NoiseLoop, setEcho } from '../../audio.js';
+import { chuff, railJoint, RollingSound, NoiseLoop, setEcho, xyloNote } from '../../audio.js';
 import { wave, applyDirt, slotWorldPosition } from '../trainModel.js';
 import { partDef, pushCargo, spliceCargo } from '../../catalog.js';
 import { addWaiting } from '../trackObjects.js';
@@ -434,6 +434,7 @@ export function createDriveMode(game) {
 
   // ---------- Pro Bild ----------
 
+  let lastSplash = 0;
   function updateObjects(dt, offsets, moving) {
     const head = d.s;
     // Tunnel: Lok drin?
@@ -441,6 +442,38 @@ export function createDriveMode(game) {
     const inTunnel = cross.tunnels.some((tn) => objects.ahead(tn.s0, head - 1.5) < tn.s1 - tn.s0);
     env.setTunnel(inTunnel);
     setEcho(inTunnel);
+
+    // Pfützen auf der Strecke: Jeder Wagen spritzt beim Durchfahren – und wird ein bisschen schmutzig
+    if (moving) {
+      for (const p of game.weatherFx.trackPuddles()) {
+        for (const o of offsets) {
+          const before = signed(head - o.center - d.lastDs, p.s);
+          const now = signed(head - o.center, p.s);
+          if (before < 0 && now >= 0) {
+            game.weatherFx.splash(p.mesh.position, 0.6 + Math.min(1, d.speed / 4));
+            if (performance.now() - lastSplash > 140) {
+              lastSplash = performance.now();
+              services.sfx('splash');
+            }
+            const data = o.car.userData.data;
+            data.dirt = Math.min(1, (data.dirt ?? 0) + 0.08);
+            applyDirt(o.car);
+          }
+        }
+      }
+    }
+
+    // Musik-Brücke: Die Lok spielt jeden Xylophon-Stab, über den sie fährt
+    for (const br of cross.bridges) {
+      const rel = objects.ahead(br.s0, head - 0.3);
+      const idx = moving && rel < br.s1 - br.s0 ? Math.floor(rel / br.barLen) : -1;
+      if (idx !== br.last && idx >= 0 && idx < br.bars.length) {
+        const bar = br.bars[idx];
+        cross.flashBar(bar);
+        xyloNote(bar.note, 0.28);
+      }
+      br.last = idx;
+    }
 
     // Bahnübergang: Schranke zu, wenn der Zug kommt oder drüberfährt – die Autos warten
     for (const it of cross.crossings) {
@@ -660,7 +693,7 @@ export function createDriveMode(game) {
     pointerUp(e, cancelled) {
       if (cancelled || !down || Math.hypot(e.clientX - down.x, e.clientY - down.y) > 18) return;
       down = null;
-      const targets = [objects.group, ...train.cars, ...land.tappable.filter((o) => o.visible)];
+      const targets = [objects.group, land.crossings.group, ...train.cars, ...land.tappable.filter((o) => o.visible)];
       const hit = game.pick(e.clientX, e.clientY, targets)[0];
       const hitOwner = hit?.object.userData.owner;
       // Mitfahrer im Zug antippen hat Vorrang (Aussteigen am Bahnhof)
@@ -689,6 +722,20 @@ export function createDriveMode(game) {
       }
       const obj = hit.object;
       const owner = obj.userData.owner;
+      // 0) Musik-Brücke: Stab antippen spielt seinen Ton
+      const bar = land.crossings.barNear(obj, hit.point);
+      if (bar) {
+        land.crossings.flashBar(bar);
+        xyloNote(bar.note);
+        return;
+      }
+      // Andere Bauwerke (Tunnelportal, Bahnübergang): kleines Geräusch, sonst nichts
+      let anc = obj;
+      while (anc && anc !== land.crossings.group) anc = anc.parent;
+      if (anc) {
+        services.sfx('pling');
+        return;
+      }
       // 1) Dinge an der Strecke
       const item = obj.userData.trackItem ?? owner?.userData.item;
       if (item) {
@@ -727,6 +774,9 @@ export function createDriveMode(game) {
       // 3) Landschaft: Tiere rufen, Bäume wackeln
       let o = obj;
       while (o.parent && !land.tappable.includes(o)) o = o.parent;
+      if (o.userData.kind === 'snowman') return game.weatherFx.tapSnowman(o);
+      if (o.userData.kind === 'puddle') return game.weatherFx.tapPuddle(o);
+      if (!land.tappable.includes(o)) return;
       if (o.userData.figure) {
         game.hop(o);
         services.sayName(o.userData.figure);

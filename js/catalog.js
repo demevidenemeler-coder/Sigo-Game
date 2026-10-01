@@ -54,6 +54,17 @@ export const ANIMALS = ['kuh', 'schwein', 'schaf', 'pferd', 'hund', 'katze', 'hu
 export const PASSENGERS = ['kind', 'papa', 'oma', 'teddy', 'ball', 'kiste', 'geschenk', 'milch', 'apfel'].map((id) => ({ id }));
 export const CARGO = [...ANIMALS, ...PASSENGERS];
 
+// Futter (Werkstatt-Fach „Futter“). Wer was mag – das Erste ist das Lieblingsfutter.
+export const FOODS = ['heu', 'karotte', 'apfel', 'banane', 'koerner', 'fisch', 'knochen', 'fleisch', 'blatt', 'fliege'].map((id) => ({ id }));
+export const LIKES = {
+  kuh: ['heu'], schaf: ['heu'], pferd: ['karotte', 'heu', 'apfel'], schwein: ['apfel', 'karotte', 'banane', 'koerner'],
+  hund: ['knochen', 'fleisch'], katze: ['fisch'], huhn: ['koerner'], hahn: ['koerner'], ente: ['koerner'],
+  hase: ['karotte'], frosch: ['fliege'], loewe: ['fleisch'], elefant: ['banane', 'apfel', 'heu'], giraffe: ['blatt'],
+  pinguin: ['fisch'], kind: ['apfel', 'banane', 'karotte'], papa: ['apfel', 'banane', 'karotte'],
+  oma: ['apfel', 'banane', 'karotte'], teddy: ['apfel', 'banane'],
+};
+export const isEater = (id) => id in LIKES;
+
 // Dinge, die man an die Strecke setzen kann
 export const TRACK_OBJECTS = [
   { id: 'bahnhof', span: 9, max: 4 },

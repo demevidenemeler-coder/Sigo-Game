@@ -10,6 +10,7 @@ import { createWorkshopMode } from './modes/workshop.js';
 import { createDrawMode } from './modes/draw.js';
 import { createDriveMode } from './modes/drive.js';
 import { createWashMode } from './modes/wash.js';
+import { WeatherFx } from './weatherFx.js';
 
 const MODE_ICONS = { workshop: '🛠️', wash: '🧽', draw: '🛤️', drive: '🚂' };
 const SUN_OFFSET = new THREE.Vector3(12, 24, 14);
@@ -53,6 +54,7 @@ export class Game {
     this.land.objects.load(trackData?.objects);
     this.land.clearAroundTrack();
     this.drive = { s: 0, speed: 0, target: 0 };
+    this.weatherFx = new WeatherFx(this);
 
     this.modes = {
       workshop: createWorkshopMode(this),
@@ -96,16 +98,13 @@ export class Game {
     if (this.scene === this.land.scene) {
       this.land.animate(dt, this.time);
       this.env.update(dt, this.cam.look, this.train.loco, this.services.soundsOn());
+      this.weatherFx.update(dt, this.cam.look);
       this.renderer.toneMappingExposure = 1.05 - 0.4 * this.env.night;
     } else {
+      this.weatherFx.hideOverlay();
       this.renderer.toneMappingExposure = 1.05;
     }
-    this.tweens = this.tweens.filter((tw) => {
-      tw.t = Math.min(1, tw.t + dt / tw.dur);
-      tw.fn(tw.t);
-      if (tw.t >= 1) tw.done?.();
-      return tw.t < 1;
-    });
+    this.stepTweens(dt);
     const k = 1 - Math.exp(-dt * 3.5);
     this.cam.pos.lerp(this.cam.tPos, k);
     this.cam.look.lerp(this.cam.tLook, k);
@@ -137,6 +136,20 @@ export class Game {
       this.renderer.setPixelRatio(this.pixelRatio);
       this.resize();
     }
+  }
+
+  // Animationen weiterführen. Neue Animationen, die in einem done-Callback starten, gehen dabei nicht verloren.
+  stepTweens(dt) {
+    const active = this.tweens;
+    this.tweens = [];
+    const keep = [];
+    for (const tw of active) {
+      tw.t = Math.min(1, tw.t + dt / tw.dur);
+      tw.fn(tw.t);
+      if (tw.t >= 1) tw.done?.();
+      else keep.push(tw);
+    }
+    this.tweens = keep.concat(this.tweens);
   }
 
   tween(dur, fn, done) {

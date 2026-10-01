@@ -18,11 +18,17 @@ Unten: oben eine Reihe Fächer (mit Beschriftung), darunter große Karten – mi
 | ⭐ Schmuck | Gesicht, Stern, Herz, Blume, Lampe, Lichterkette, Glocke, Fähnchen, Luftballon, Regenbogen |
 | 🐄 Tiere | Kuh, Schwein, Schaf, Pferd, Hund, Katze, Huhn, Hahn, Ente, Hase, Frosch, Löwe, Elefant, Giraffe, Pinguin |
 | 🧸 Mitfahrer | Kind, Papa, Oma, Teddy, Ball, Kiste, Geschenk, Milchkanne, Apfel |
+| 🥕 Futter | Heu, Karotte, Apfel, Banane, Körner, Fisch, Knochen, Fleisch, Blätter, Fliege |
 
 **Ziehen:** Beim Ziehen leuchtet ein Ring unter dem Wagen, auf dem es landen wird – man muss nicht genau treffen.
 **Wegnehmen:** Mitfahrer, Schmuck oder Wagen vom Zug **in die Leiste ziehen** → weg. Auf einen anderen Wagen ziehen → umsetzen.
 **Antippen am Zug** ist immer harmlos: Tiere machen ihr (echtes) Geräusch und werden benannt, der Lokführer winkt und pfeift,
 der Kran schwenkt, die Glocke läutet, die Spielzeugautos hupen.
+**Tiere füttern (Fach 🥕):** Futter auf ein Tier im Zug ziehen (das Tier wird größer: „Für mich?“) – oder Futter
+antippen, dann bekommt es das erste Tier, das es mag. Mag das Tier das Futter, mampft es in drei Bissen, Herzchen steigen auf
+und es ruft. Mag es das Futter nicht, schüttelt es den Kopf („Bäh!“), das Futter fällt herunter, eine **Denkblase zeigt das
+Lieblingsfutter** und dieses wackelt in der Leiste. Kein Scheitern – nur ein Hinweis. (Kuh/Schaf: Heu, Hase: Karotte,
+Katze/Pinguin: Fisch, Hund: Knochen, Löwe: Fleisch, Hühner/Ente: Körner, Frosch: Fliege, Giraffe: Blätter …)
 **Zeige-Hand:** Passiert eine Weile nichts, zeigt eine Hand, wie man etwas auf den Zug zieht.
 
 ### 🧽 Waschen
@@ -59,7 +65,13 @@ der Kran schwenkt, die Glocke läutet, die Spielzeugautos hupen.
   E-Lok und Schnellzug brauchen nichts (fahren mit Strom).
 - **Waschanlage:** Der Zug wird beim Fahren schmutzig (bei Regen schneller). In der Waschanlage drehen sich die Bürsten, es schäumt – blitzsauber.
 - **Tunnel:** drinnen wird es dunkel, die Lampen gehen an, die Pfeife hallt.
-- **Brücke:** die Schienenstöße klingen hohl; manchmal springt ein Fisch.
+- **Musik-Brücke:** Die Brücken haben bunte Xylophon-Stäbe (tief = rot und breit, hoch = lila und schmal).
+  Fährt die Lok drüber, spielt jeder Stab seinen Ton – eine Melodie. Stäbe antippen spielt sie auch. Manchmal springt ein Fisch.
+- **Wetterfolgen:** Regen macht nass – **Pfützen** wachsen auf und neben der Strecke. Fährt der Zug hindurch, **spritzt** es
+  (und er wird schmutzig → Waschen!). Pfützen antippen = platsch. Mit Sonne trocknen sie langsam.
+  Hört der Regen am Tag auf, erscheint ein **Regenbogen**. **Schnee bleibt liegen**, Pfützen frieren zu Eis, und neben den
+  Bahnhöfen und an der Strecke bauen sich **Schneemänner** auf (Kugel für Kugel; antippen → der Hut hüpft).
+  Danach schmilzt alles langsam – das Schmelzwasser gibt wieder Pfützen.
 - **Bahnübergang:** Kommt der Zug, gehen die Schranken zu, Licht blinkt, Glocke bimmelt – die Autos auf der Landstraße halten und warten.
   Autos antippen → hupen.
 - Tiere auf der Weide antippen → sie rufen; Bäume und Häuser wackeln.
@@ -135,7 +147,10 @@ js/game/world.js           Werkstatt und Landschaft
 js/game/features.js        Feste Landschaft: Fluss, Landstraße mit Verkehr, Berge
 js/game/crossings.js       Automatische Brücken, Tunnel, Bahnübergänge
 js/game/trackObjects.js    Bahnhof (farbig), Waschanlage, Tankstelle
-js/game/environment.js     Tag/Nacht, Regen, Schnee, Tunnel-Dunkelheit
+js/game/environment.js     Tag/Nacht, Regen, Schnee, Tunnel-Dunkelheit, nasser Boden, liegender Schnee
+js/game/weatherFx.js       Wetterfolgen: Pfützen, Spritzen, Regenbogen, Schneemänner
+js/game/foods.js           Futter-Modelle
+js/game/feeding.js         Tiere füttern (Fressen, Kopfschütteln, Denkblase)
 js/game/lamps.js           Lampen, die nachts heller leuchten
 sounds/                    Tiergeräusche (MP3, CC0) + QUELLEN.md
 js/game/modes/*.js         Werkstatt, Waschen, Strecke bauen, Fahren
@@ -156,6 +171,7 @@ sw.js                      Offline-Speicher (neue Dateien in ASSETS eintragen)
 
 ## Ideen für später
 - Lieferaufträge mit Kran (Kisten am Bauernhof abholen)
+- Tiere auf den Gleisen, Lok ins Bett bringen (schönes Spielende)
 - Landschaft selbst gestalten (Bäume, Häuser, Tiere setzen)
 - Eigene Fotos als Fahrgäste, selbst eingesprochene Laute
 - Weichen / zwei Züge (eher für ältere Kinder)

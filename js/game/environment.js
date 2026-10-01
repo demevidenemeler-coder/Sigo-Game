@@ -13,7 +13,7 @@ const MOODS = {
   regen: { skyTop: C('#8796a6'), skyBottom: C('#c7cfd6'), hemi: 1.05, sun: 1.1, sunColor: C('#dfe6ee'), env: 0.4 },
   schnee: { skyTop: C('#a9c0d6'), skyBottom: C('#eef2f5'), hemi: 1.35, sun: 1.6, sunColor: C('#f2f6ff'), env: 0.5 },
 };
-const NIGHT = { skyTop: C('#071330'), skyBottom: C('#22345e'), hemi: 0.32, sun: 0.55, sunColor: C('#9fb4ff'), env: 0.18 };
+const NIGHT = { skyTop: C('#071330'), skyBottom: C('#22345e'), hemi: 0.22, sun: 0.4, sunColor: C('#8fa6ff'), env: 0.12 };
 
 function dotTexture() {
   const c = document.createElement('canvas');
@@ -119,6 +119,8 @@ export class Environment {
     L.sky.uniforms.bottom.value.copy(mix('skyBottom'));
     L.scene.fog.color.copy(L.sky.uniforms.bottom.value);
     L.hemi.intensity = mix('hemi') * dark;
+    L.hemi.color.set('#fff7ea').lerp(C('#6f86c9'), this.night);
+    L.hemi.groundColor.set('#8fa877').lerp(C('#2a3550'), this.night);
     L.sun.intensity = mix('sun') * dark;
     L.sun.color.copy(mix('sunColor'));
     L.scene.environmentIntensity = mix('env') * dark;
@@ -130,8 +132,11 @@ export class Environment {
     const glow = Math.max(this.night, this.tunnel);
     for (const m of lamps) m.emissiveIntensity = m.userData.lampDay + (m.userData.lampNight - m.userData.lampDay) * glow;
 
-    // Schnee färbt Wiese und Bäume weiß
-    for (const { m, base: c } of this.snowables) m.color.copy(c).lerp(C('#ffffff'), this.snow * 0.7);
+    // Schnee färbt Wiese und Bäume weiß (leichtes Eigenleuchten, damit auch die grüne Grastextur weiß wirkt)
+    for (const { m, base: c } of this.snowables) {
+      m.color.copy(c).lerp(C('#ffffff'), this.snow * 0.7);
+      m.emissive.setScalar(this.snow * 0.5 * (1 - this.night * 0.8));
+    }
 
     // Regen
     this.drops.visible = this.rain > 0.02;

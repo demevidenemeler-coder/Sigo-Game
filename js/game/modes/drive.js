@@ -201,8 +201,9 @@ export function createDriveMode(game) {
     fwd.set(1, 0, 0).applyQuaternion(loco.quaternion);
     side.set(0, 0, 1).applyQuaternion(loco.quaternion);
     loco.getWorldPosition(tmp);
-    const dist = stoppedAt ? 11 : 9;
-    game.cam.tPos.copy(tmp).addScaledVector(fwd, 3).addScaledVector(side, dist).add(new THREE.Vector3(0, 4.5, 0));
+    // Am Bahnhof schwenkt die Kamera auf die andere Seite: Zug vorne, Bahnsteig dahinter
+    const dist = stoppedAt?.type === 'bahnhof' ? -11 : 9;
+    game.cam.tPos.copy(tmp).addScaledVector(fwd, 3).addScaledVector(side, dist).add(new THREE.Vector3(0, stoppedAt ? 6 : 4.5, 0));
     game.cam.tLook.copy(tmp).addScaledVector(fwd, -2).add(new THREE.Vector3(0, 1, 0));
   }
 
@@ -362,6 +363,29 @@ export function createDriveMode(game) {
       }
       game.saveTrain();
     });
+  }
+
+  function screenDist(o, x, y) {
+    const v = o.getWorldPosition(new THREE.Vector3());
+    v.y += 0.6;
+    v.project(game.camera);
+    return Math.hypot(((v.x + 1) / 2) * window.innerWidth - x, ((1 - v.y) / 2) * window.innerHeight - y);
+  }
+
+  function nearestOnScreen(list, x, y) {
+    let best = list[0];
+    let bestD = Infinity;
+    for (const o of list) {
+      const v = o.getWorldPosition(new THREE.Vector3());
+      v.y += 0.6;
+      v.project(game.camera);
+      const dd = Math.hypot(((v.x + 1) / 2) * window.innerWidth - x, ((1 - v.y) / 2) * window.innerHeight - y);
+      if (dd < bestD) {
+        bestD = dd;
+        best = o;
+      }
+    }
+    return best;
   }
 
   // ---------- Pro Bild ----------
@@ -595,6 +619,27 @@ export function createDriveMode(game) {
       down = null;
       const targets = [objects.group, ...train.cars, ...land.tappable.filter((o) => o.visible)];
       const hit = game.pick(e.clientX, e.clientY, targets)[0];
+      const hitOwner = hit?.object.userData.owner;
+      // Mitfahrer im Zug antippen hat Vorrang (Aussteigen am Bahnhof)
+      const hitCargo = hitOwner?.userData.removable?.list === 'cargo' && train.carIndexOf(hit.object) >= 0;
+      // Am Bahnhof: Tipp auf einen Wagen mit Fahrgästen (z. B. aufs Dach) = einer steigt aus
+      const hitIndex = hit ? train.carIndexOf(hit.object) : -1;
+      if (stoppedAt?.type === 'bahnhof' && !hitCargo && hitIndex > 0) {
+        const car = train.cars[hitIndex];
+        const n = car.userData.cargoItems.length;
+        if (n) {
+          const fig = car.userData.cargoItems[n - 1];
+          return alight(hitIndex, fig.userData.removable, fig);
+        }
+      }
+      // Steht der Zug am Bahnhof/an der Tankstelle: Tipp in der Nähe zählt (für kleine Finger)
+      if (stoppedAt && !hitCargo) {
+        const list = stoppedAt.type === 'bahnhof' ? stoppedAt.waiting : [stoppedAt.parts.tower, stoppedAt.parts.bunker, stoppedAt.parts.pump];
+        const near = list.length ? nearestOnScreen(list, e.clientX, e.clientY) : null;
+        if (near && screenDist(near, e.clientX, e.clientY) < 130) {
+          return stoppedAt.type === 'bahnhof' ? board(near, stoppedAt) : refuel(stoppedAt, near.userData.action);
+        }
+      }
       if (!hit) {
         if (game.pickCar(e.clientX, e.clientY)) horn();
         return;
@@ -610,6 +655,16 @@ export function createDriveMode(game) {
         if (action === 'hupen') {
           game.hop(owner);
           return services.sfx('carhonk');
+        }
+        // Großzügig für kleine Finger: Tipp irgendwo auf den Bahnhof → nächste wartende Figur steigt ein
+        if (item.type === 'bahnhof' && stoppedAt === item && item.waiting.length) {
+          const fig = nearestOnScreen(item.waiting, e.clientX, e.clientY);
+          return board(fig, item);
+        }
+        // Tankstelle: Tipp irgendwo → das nächstgelegene Teil (Wasserturm, Kohle, Zapfsäule)
+        if (item.type === 'tankstelle') {
+          const parts = [item.parts.tower, item.parts.bunker, item.parts.pump];
+          return refuel(item, nearestOnScreen(parts, e.clientX, e.clientY).userData.action);
         }
         game.hop(item.obj);
         services.sayName(item.type);

@@ -93,6 +93,9 @@ export class Game {
     if (this.scene === this.land.scene) {
       this.land.animate(dt, this.time);
       this.env.update(dt, this.cam.look, this.train.loco, this.services.soundsOn());
+      this.renderer.toneMappingExposure = 1.05 - 0.4 * this.env.night;
+    } else {
+      this.renderer.toneMappingExposure = 1.05;
     }
     this.tweens = this.tweens.filter((tw) => {
       tw.t = Math.min(1, tw.t + dt / tw.dur);

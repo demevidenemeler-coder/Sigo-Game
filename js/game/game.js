@@ -15,6 +15,11 @@ import { Hint } from './hint.js';
 
 const MODE_ICONS = { workshop: '🛠️', wash: '🧽', draw: '🛤️', drive: '🚂' };
 const SUN_OFFSET = new THREE.Vector3(12, 24, 14);
+// Achsen des Sonnenlichts (zum Einrasten der Schattenkarte)
+const SUN_DIR = SUN_OFFSET.clone().normalize();
+const SUN_RIGHT = new THREE.Vector3(0, 1, 0).cross(SUN_DIR).normalize();
+const SUN_UP = SUN_DIR.clone().cross(SUN_RIGHT).normalize();
+const SNAP = new THREE.Vector3();
 
 export class Game {
   constructor({ canvas, ui, services, trainData, trackData }) {
@@ -114,8 +119,18 @@ export class Game {
     this.camera.lookAt(this.cam.look);
     // Die Sonne (und damit der scharfe Schattenbereich) folgt dem Blickpunkt
     const sun = this.scene === this.land.scene ? this.land.sun : this.workshop.sun;
-    sun.target.position.copy(this.cam.look);
-    sun.position.copy(this.cam.look).add(SUN_OFFSET);
+    // Auf das Schatten-Raster einrasten: sonst „schwimmen“ die Schattenkanten bei jeder Kamerabewegung (Flimmern)
+    const sc = sun.shadow.camera;
+    const texel = (sc.right - sc.left) / sun.shadow.mapSize.x;
+    const look = this.cam.look;
+    const a = SUN_RIGHT.dot(look);
+    const b = SUN_UP.dot(look);
+    const c = SUN_DIR.dot(look);
+    const snapped = SNAP.copy(SUN_RIGHT).multiplyScalar(Math.round(a / texel) * texel)
+      .addScaledVector(SUN_UP, Math.round(b / texel) * texel)
+      .addScaledVector(SUN_DIR, c);
+    sun.target.position.copy(snapped);
+    sun.position.copy(snapped).add(SUN_OFFSET);
     // Nahgrenze der Kamera mitwachsen lassen: viel genauere Tiefe → kein Flackern flacher Flächen aus der Ferne
     const camDist = this.cam.pos.distanceTo(this.cam.look);
     const near = THREE.MathUtils.clamp(camDist * 0.04, 0.1, 6);

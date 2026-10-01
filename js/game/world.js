@@ -51,8 +51,8 @@ function sunLight(scene, size, mapSize = 2048) {
   c.right = c.top = size;
   c.near = 1;
   c.far = 90;
-  sun.shadow.bias = -0.0004;
-  sun.shadow.normalBias = 0.03;
+  sun.shadow.bias = -0.0005;
+  sun.shadow.normalBias = 0.05;
   scene.add(sun, sun.target);
   return sun;
 }
@@ -443,16 +443,41 @@ export function createLandscape() {
   scene.add(trainAnchor);
 
   // Alles, was im Weg der Schienen (und der Bahnhöfe, Tunnel …) steht, verschwindet
+  // Alles, was im Weg der Schienen (und der Bahnhöfe, Brücken …) steht, verschwindet.
+  // Schnell über ein Raster: pro Zelle der Abstand zur Strecke bzw. zum nächsten belegten Bereich.
+  const GRID = { x0: -110, z0: -85, w: 220, h: 170 };
+  function distanceGrid(stamps) {
+    const g = new Float32Array(GRID.w * GRID.h).fill(99);
+    for (const [x, z, r, reach] of stamps) {
+      const ci = Math.round(x - GRID.x0);
+      const cj = Math.round(z - GRID.z0);
+      const R = Math.ceil(r + reach);
+      for (let j = Math.max(0, cj - R); j <= Math.min(GRID.h - 1, cj + R); j++) {
+        for (let i = Math.max(0, ci - R); i <= Math.min(GRID.w - 1, ci + R); i++) {
+          const d = Math.hypot(i + GRID.x0 - x, j + GRID.z0 - z) - r;
+          const k = j * GRID.w + i;
+          if (d < g[k]) g[k] = d;
+        }
+      }
+    }
+    return (px, pz) => {
+      const i = Math.round(px - GRID.x0);
+      const j = Math.round(pz - GRID.z0);
+      if (i < 0 || j < 0 || i >= GRID.w || j >= GRID.h) return 99;
+      return g[j * GRID.w + i];
+    };
+  }
+
   function clearAroundTrack() {
-    const fp = [...objects.footprints(), ...crossings.footprints()];
-    const blocked = (x, z, pad) => fp.some(([fx, fz, r]) => Math.hypot(fx - x, fz - z) < r + pad);
+    const trackDist = distanceGrid(track.samples.map(([x, z]) => [x, z, 0, 4]));
+    const fpDist = distanceGrid([...objects.footprints(), ...crossings.footprints()].map(([x, z, r]) => [x, z, r, 2]));
     for (const o of scenery) {
       const r = o.userData.kind === 'house' ? 2.8 : 2.0;
-      o.visible = track.distanceTo(o.position.x, o.position.z) > r && !blocked(o.position.x, o.position.z, 1);
+      o.visible = trackDist(o.position.x, o.position.z) > r && fpDist(o.position.x, o.position.z) > 1;
     }
     for (const { mesh, data } of props) {
       data.forEach((d, i) => {
-        const s = track.distanceTo(d.x, d.z) > 1.3 && !blocked(d.x, d.z, 0) ? d.s : 0;
+        const s = trackDist(d.x, d.z) > 1.3 && fpDist(d.x, d.z) > 0 ? d.s : 0;
         m4.makeRotationY(d.r).scale(new THREE.Vector3(s, s, s)).setPosition(d.x, d.y * s, d.z);
         mesh.setMatrixAt(i, m4);
       });

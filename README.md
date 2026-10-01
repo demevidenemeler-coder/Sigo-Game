@@ -49,6 +49,9 @@ Nach ein paar Hinweisen ohne Reaktion ist Ruhe, bis wieder getippt wird.
   mit ständigem Autoverkehr (mit eigener Straßenbrücke) und **drei Berge**.
 - **Ein Finger verschiebt die Ansicht, zwei Finger zoomen** (am Computer: Mausrad).
 - **✏️ Stift** antippen, dann mit dem Finger eine Linie malen → Schienen. Der Kreis schließt sich von selbst.
+  **Strecken-Aufräumer:** Kleine Schlaufen und Knäuel werden herausgeschnitten, höchstens eine Kreuzung (Acht) bleibt,
+  zu enge Zacken werden zu Kurven. Bei ganz wildem Gekritzel wird der Umriss zur Strecke. Nach ca. 320 m Strich ist die
+  Strecke automatisch fertig – so bleibt das Tablet flüssig.
   Danach schaltet der Stift wieder ab – so wird die Strecke nicht aus Versehen überschrieben.
 - **Brücke, Tunnel und Bahnübergang entstehen von selbst**, wo die gemalte Strecke Fluss, Berg oder Straße kreuzt –
   auch bei schrägen oder gebogenen Linien (die Brücke folgt der Kurve). Die Stimme sagt an, was entstanden ist

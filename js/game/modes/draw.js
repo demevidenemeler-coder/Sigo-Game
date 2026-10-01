@@ -7,7 +7,7 @@
 // - Gesetzte Dinge entlang der Strecke verschieben; in die Leiste ziehen = wegnehmen.
 
 import * as THREE from 'three';
-import { ChalkLine, strokeToTrack } from '../track.js';
+import { ChalkLine, strokeToTrack, MAX_TRACK_LENGTH } from '../track.js';
 import { WORLD_BOUNDS } from '../world.js';
 import { TRACK_OBJECTS } from '../../catalog.js';
 import { renderThumbnails } from '../thumbs.js';
@@ -351,6 +351,8 @@ export function createDrawMode(game) {
         lastScribble = performance.now();
         services.sfx('scribble');
       }
+      // Genug gemalt: die Strecke wird automatisch fertig (sonst entstehen riesige Knäuel)
+      if (chalk.length > MAX_TRACK_LENGTH) finish();
     },
     pointerUp(e, cancelled) {
       pointers.delete(e.pointerId);

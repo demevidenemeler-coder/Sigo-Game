@@ -24,6 +24,59 @@ function add(parent, geometry, material, x = 0, y = 0, z = 0) {
 
 const rbox = (w, h, d, r = 0.05) => new RoundedBoxGeometry(w, h, d, 2, Math.min(r, w / 2, h / 2, d / 2));
 
+// Viele kleine Teile mit gleichem Material zu einem Mesh zusammenfassen (lange Brücken bleiben flüssig).
+// keep(obj) = true: Teil bleibt einzeln (z. B. Xylophon-Stäbe, die aufleuchten, oder der Fisch).
+function mergeStatic(group, keep) {
+  group.updateMatrixWorld(true);
+  const byMat = new Map();
+  const kept = [];
+  group.traverse((o) => {
+    if (o === group) return;
+    if (keep(o)) {
+      kept.push(o);
+      return;
+    }
+    if (!o.isMesh || kept.some((k) => isInside(o, k))) return;
+    const geo = o.geometry.index ? o.geometry.toNonIndexed() : o.geometry.clone();
+    geo.applyMatrix4(o.matrixWorld);
+    if (!byMat.has(o.material)) byMat.set(o.material, []);
+    byMat.get(o.material).push(geo);
+  });
+  const out = new THREE.Group();
+  out.userData = group.userData;
+  for (const [material, geos] of byMat) {
+    const count = geos.reduce((n, g) => n + g.attributes.position.count, 0);
+    const merged = new THREE.BufferGeometry();
+    for (const name of ['position', 'normal', 'uv']) {
+      if (!geos.every((g) => g.attributes[name])) continue;
+      const size = geos[0].attributes[name].itemSize;
+      const arr = new Float32Array(count * size);
+      let off = 0;
+      for (const g of geos) {
+        arr.set(g.attributes[name].array, off);
+        off += g.attributes[name].array.length;
+      }
+      merged.setAttribute(name, new THREE.BufferAttribute(arr, size));
+    }
+    merged.computeBoundingSphere();
+    const m = new THREE.Mesh(merged, material);
+    m.castShadow = true;
+    m.receiveShadow = true;
+    out.add(m);
+  }
+  for (const k of kept) {
+    // an gleicher Stelle in die neue Gruppe übernehmen
+    k.matrixWorld.decompose(k.position, k.quaternion, k.scale);
+    out.add(k);
+  }
+  return out;
+}
+
+function isInside(o, ancestor) {
+  for (let p = o.parent; p; p = p.parent) if (p === ancestor) return true;
+  return false;
+}
+
 // ---------- Bauteile ----------
 
 // Musik-Brücke, die der (auch gebogenen) Strecke von s0 bis s1 folgt:
@@ -100,7 +153,7 @@ function bridge(track, s0, s1) {
   g.add(fishBase);
   g.userData.fish = fish;
   g.userData.fishTimer = 3 + Math.random() * 6;
-  return g;
+  return mergeStatic(g, (o) => o === fishBase || o.userData.note !== undefined);
 }
 
 // Tunnelportal aus Stein (schaut entlang +x)
@@ -129,7 +182,7 @@ function crossingPlanks(track, s0, s1) {
     const p = add(g, new THREE.BoxGeometry(len + 0.05, 0.08, 2.2), mat('#6b4a2b', 0.9), f.p.x, 0.05, f.p.z);
     p.rotation.y = f.angle;
   }
-  return g;
+  return mergeStatic(g, () => false);
 }
 
 // Schranke mit Andreaskreuz und Blinklicht am Straßenrand; der Arm reicht über die ganze Straße.

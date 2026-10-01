@@ -53,6 +53,98 @@ function chaikin(pts) {
   return out;
 }
 
+// ---------- Aufräumen: Schlaufen, Knäuel, Zacken ----------
+
+export const MAX_TRACK_LENGTH = 320; // längere Striche werden abgeschnitten (sonst wird es zäh)
+const LOOP_MIN = 45; // kleinere Schlaufen werden herausgeschnitten
+const MAX_CROSSINGS = 1; // eine Acht ist erlaubt, mehr Kreuzungen nicht
+
+function segHit(p1, p2, q1, q2) {
+  const d = (p2[0] - p1[0]) * (q2[1] - q1[1]) - (p2[1] - p1[1]) * (q2[0] - q1[0]);
+  if (Math.abs(d) < 1e-9) return null;
+  const u = ((q1[0] - p1[0]) * (q2[1] - q1[1]) - (q1[1] - p1[1]) * (q2[0] - q1[0])) / d;
+  const v = ((q1[0] - p1[0]) * (p2[1] - p1[1]) - (q1[1] - p1[1]) * (p2[0] - p1[0])) / d;
+  if (u <= 0 || u >= 1 || v <= 0 || v >= 1) return null;
+  return [p1[0] + (p2[0] - p1[0]) * u, p1[1] + (p2[1] - p1[1]) * u];
+}
+
+// Alle Selbstkreuzungen eines (geschlossenen) Linienzugs: [{ i, j, at, inner }] – inner = Länge der Schlaufe i→j
+function selfCrossings(pts) {
+  const n = pts.length;
+  const out = [];
+  const cum = [0];
+  for (let k = 1; k <= n; k++) cum.push(cum[k - 1] + Math.hypot(pts[k % n][0] - pts[k - 1][0], pts[k % n][1] - pts[k - 1][1]));
+  const total = cum[n];
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 2; j < n; j++) {
+      if (i === 0 && j === n - 1) continue;
+      const at = segHit(pts[i], pts[(i + 1) % n], pts[j], pts[(j + 1) % n]);
+      if (!at) continue;
+      const inner = cum[j + 1] - cum[i + 1];
+      out.push({ i, j, at, inner: Math.min(inner, total - inner), keepInside: inner > total - inner });
+    }
+  }
+  return out;
+}
+
+// Schneidet die kleinste Schlaufe heraus, solange es zu kleine Schlaufen oder zu viele Kreuzungen gibt
+function removeLoops(pts) {
+  for (let guard = 0; guard < 60 && pts.length > 8; guard++) {
+    const xs = selfCrossings(pts);
+    if (!xs.length) break;
+    xs.sort((a, b) => a.inner - b.inner);
+    const c = xs[0];
+    if (c.inner >= LOOP_MIN && xs.length <= MAX_CROSSINGS) break;
+    // Schlaufe zwischen den beiden Kreuzungs-Segmenten entfernen, Kreuzungspunkt bleibt
+    if (!c.keepInside) pts = [...pts.slice(0, c.i + 1), c.at, ...pts.slice(c.j + 1)];
+    else pts = [c.at, ...pts.slice(c.i + 1, c.j + 1)];
+  }
+  return pts;
+}
+
+// Zu enge Kurven (Zacken) weicher machen: nur dort glätten, wo der Knick zu stark ist
+function easeSharpTurns(pts, step, minRadius) {
+  const maxTurn = step / minRadius;
+  for (let pass = 0; pass < 40; pass++) {
+    let changed = false;
+    const n = pts.length;
+    const next = pts.map((p) => p.slice());
+    for (let i = 0; i < n; i++) {
+      const a = pts[(i - 1 + n) % n];
+      const b = pts[i];
+      const c = pts[(i + 1) % n];
+      const a1 = Math.atan2(b[1] - a[1], b[0] - a[0]);
+      const a2 = Math.atan2(c[1] - b[1], c[0] - b[0]);
+      let turn = Math.abs(a2 - a1);
+      if (turn > Math.PI) turn = 2 * Math.PI - turn;
+      if (turn > maxTurn) {
+        next[i] = [(a[0] + b[0] * 2 + c[0]) / 4, (a[1] + b[1] * 2 + c[1]) / 4];
+        changed = true;
+      }
+    }
+    pts = resample(next, step, true);
+    if (!changed) break;
+  }
+  return pts;
+}
+
+// Umriss einer Punktwolke (konvexe Hülle) – Rückfallebene für ein wildes Knäuel
+function hull(points) {
+  const p = points.slice().sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+  const cross = (o, a, b) => (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
+  const lower = [];
+  for (const q of p) {
+    while (lower.length >= 2 && cross(lower[lower.length - 2], lower[lower.length - 1], q) <= 0) lower.pop();
+    lower.push(q);
+  }
+  const upper = [];
+  for (const q of p.reverse()) {
+    while (upper.length >= 2 && cross(upper[upper.length - 2], upper[upper.length - 1], q) <= 0) upper.pop();
+    upper.push(q);
+  }
+  return [...lower.slice(0, -1), ...upper.slice(0, -1)];
+}
+
 function transform(pts, fn) {
   const cx = pts.reduce((s, p) => s + p[0], 0) / pts.length;
   const cz = pts.reduce((s, p) => s + p[1], 0) / pts.length;
@@ -68,6 +160,8 @@ export function strokeToTrack(stroke, { minLength, bounds }) {
   if (stroke.length < 2 || polyLength(stroke, false) < 3) return null;
   let pts = resample(stroke, 1.0, false);
   if (pts.length < 3) return null;
+  // Viel zu lange Striche kürzen
+  if (pts.length > MAX_TRACK_LENGTH) pts = pts.slice(0, MAX_TRACK_LENGTH);
 
   // Gerade Striche: zu einem schmalen Oval machen, damit ein Kreis entsteht
   const [x0, z0] = pts[0];
@@ -81,9 +175,19 @@ export function strokeToTrack(stroke, { minLength, bounds }) {
     pts = [...pts, ...back];
   }
 
+  // Knäuel aufräumen: kleine Schlaufen raus, höchstens eine Kreuzung.
+  // Bleibt davon zu wenig übrig (wildes Gekritzel), wird der Umriss des Gekritzels zur Strecke.
+  const raw = pts;
+  pts = resample(pts, 2.0, true);
+  const before = polyLength(pts, true);
+  pts = removeLoops(pts);
+  if (pts.length < 8 || polyLength(pts, true) < Math.max(30, before * 0.25)) pts = resample(hull(raw), 2.0, true);
   pts = resample(pts, 1.5, true);
   for (let i = 0; i < 3; i++) pts = chaikin(pts);
   pts = resample(pts, 2.0, true);
+  // keine zu engen Kurven (der Zug soll gut fahren können)
+  pts = easeSharpTurns(pts, 2.0, 3.2);
+  pts = removeLoops(pts);
 
   // Größe anpassen
   const L = polyLength(pts, true);
@@ -173,6 +277,9 @@ export class Track {
     // Schwellen
     const count = Math.floor(this.length / 0.55);
     this.sleepers = new THREE.InstancedMesh(new THREE.BoxGeometry(0.28, 0.12, 1.25), sleeperMat, count);
+    // Die Schwellen erscheinen nach und nach – ohne das würde three.js die Sichtbarkeits-Kugel
+    // aus den ersten paar Schwellen berechnen und später alle auf einmal ausblenden.
+    this.sleepers.frustumCulled = false;
     this.sleepers.receiveShadow = true;
     this.sleepers.castShadow = true;
     this.sleeperMatrices = [];
@@ -287,6 +394,7 @@ export class ChalkLine {
     this.max = max;
     this.last = null;
     this.points = [];
+    this.length = 0;
     this.dotScale = 1; // größer, wenn weit herausgezoomt
   }
 
@@ -294,6 +402,7 @@ export class ChalkLine {
     this.mesh.count = 0;
     this.last = null;
     this.points = [];
+    this.length = 0;
   }
 
   add(x, z) {
@@ -307,6 +416,7 @@ export class ChalkLine {
       const [lx, lz] = this.last;
       const d = Math.hypot(x - lx, z - lz);
       if (d < 0.2 * this.dotScale) return false;
+      this.length += d;
       const steps = Math.ceil(d / (0.25 * this.dotScale));
       for (let i = 1; i <= steps; i++) addDot(lx + ((x - lx) * i) / steps, lz + ((z - lz) * i) / steps);
     } else {

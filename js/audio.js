@@ -346,6 +346,19 @@ Object.assign(SOUNDS, {
   sparkle(t) {
     [1568, 1976, 2349, 3136].forEach((f, i) => tone('sine', f, t + i * 0.07, 0.002, 0.3, 0.12));
   },
+  squeak(t) {
+    // Schwamm quietscht auf dem Lack
+    const o = tone('sine', 1150 + Math.random() * 300, t, 0.01, 0.12, 0.12);
+    o.frequency.exponentialRampToValueAtTime(1700 + Math.random() * 300, t + 0.1);
+    noise(t, 0.1, 0.12, 'bandpass', 3200, sfxBus, 3);
+  },
+  splat(t) {
+    // Matsch klatscht an den Wagen
+    const n = noise(t, 0.18, 0.7, 'lowpass', 1400);
+    n.filter.frequency.exponentialRampToValueAtTime(180, t + 0.15);
+    const o = tone('sine', 160, t, 0.004, 0.12, 0.35);
+    o.frequency.exponentialRampToValueAtTime(70, t + 0.1);
+  },
   scrub(t) {
     for (let i = 0; i < 5; i++) noise(t + i * 0.12, 0.1, 0.25, 'bandpass', 1800 + (i % 2) * 900, sfxBus, 2);
   },

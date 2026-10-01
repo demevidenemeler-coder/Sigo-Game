@@ -10,9 +10,10 @@ import { lamp } from './lamps.js';
 const RIVER_WIDTH = 5;
 const ROAD_WIDTH = 3.2;
 
-const RIVER_PATH = [[-140, -34], [-80, -28], [-48, -9], [-20, -1], [4, 10], [26, 6], [46, 21], [74, 30], [140, 38]];
-const ROAD_PATH = [[-150, 25], [-75, 27], [-38, 20], [-4, 17], [24, 15], [40, 6], [58, -8], [84, -26], [150, -34]];
-export const MOUNTAINS = [{ x: -27, z: -24, r: 9.5, h: 7 }, { x: 34, z: -22, r: 8, h: 6 }];
+const RIVER_PATH = [[-210, -51], [-120, -42], [-72, -14], [-30, -2], [6, 15], [39, 9], [69, 31], [111, 45], [210, 57]];
+const ROAD_PATH = [[-225, 37], [-113, 40], [-57, 30], [-6, 25], [36, 22], [60, 9], [87, -12], [126, -39], [225, -51]];
+// Koordinaten passend zur großen Karte (Spielfeld ±78 × ±50)
+export const MOUNTAINS = [{ x: -40, z: -36, r: 11, h: 8 }, { x: 51, z: -33, r: 9.5, h: 7 }, { x: -58, z: 8, r: 10, h: 7.5 }];
 
 function curveOf(path) {
   return new THREE.CatmullRomCurve3(path.map(([x, z]) => new THREE.Vector3(x, 0, z)), false, 'centripetal');
@@ -181,9 +182,10 @@ export function createFeatures(scene) {
 
   // Autos auf der Straße (beide Richtungen)
   const cars = [];
-  for (let i = 0; i < 8; i++) {
+  const CARS = 12;
+  for (let i = 0; i < CARS; i++) {
     const c = roadCar(CAR_COLORS[i % CAR_COLORS.length]);
-    c.userData.t = (i / 8) * roadS.length;
+    c.userData.t = (i / CARS) * roadS.length;
     c.userData.dir = i % 2 ? 1 : -1;
     c.userData.speed = 3 + (i % 3) * 0.6;
     group.add(c);

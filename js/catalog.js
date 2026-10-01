@@ -56,7 +56,7 @@ export const CARGO = [...ANIMALS, ...PASSENGERS];
 
 // Dinge, die man an die Strecke setzen kann
 export const TRACK_OBJECTS = [
-  { id: 'bahnhof', span: 9, max: 3 },
+  { id: 'bahnhof', span: 9, max: 4 },
   { id: 'waschanlage', span: 6, max: 1 },
   { id: 'tankstelle', span: 7, max: 1 },
 ];
@@ -66,6 +66,7 @@ export const STATION_COLORS = [
   { id: 'rot', hex: '#e5484d' },
   { id: 'blau', hex: '#3b7cc9' },
   { id: 'gelb', hex: '#f2c832' },
+  { id: 'gruen', hex: '#4fa65a' },
 ];
 
 export const MAX_WAGONS = 6;

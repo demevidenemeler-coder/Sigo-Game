@@ -11,7 +11,7 @@ import { lamp } from './lamps.js';
 import { woodTexture, grassTexture, waterTexture } from './textures.js';
 
 // Spielfeld, auf dem gemalt werden kann (halbe Breite / halbe Tiefe)
-export const WORLD_BOUNDS = { x: 52, z: 34 }; // 4-fache Fläche gegenüber früher
+export const WORLD_BOUNDS = { x: 78, z: 50 }; // groß, damit lange Strecken mit vielen Bahnhöfen Platz haben
 const FENCE = { x: WORLD_BOUNDS.x + 3, z: WORLD_BOUNDS.z + 3 };
 
 function seeded(seed) {
@@ -271,7 +271,7 @@ export function createLandscape() {
   const animated = [];
 
   // Boden mit Hügeln und Grastextur
-  const groundGeo = new THREE.PlaneGeometry(440, 440, 170, 170);
+  const groundGeo = new THREE.PlaneGeometry(520, 520, 200, 200);
   groundGeo.rotateX(-Math.PI / 2);
   const pos = groundGeo.attributes.position;
   const colors = [];
@@ -359,9 +359,9 @@ export function createLandscape() {
   }
 
   // Wald auf den Hügeln
-  for (let i = 0; i < 170; i++) {
+  for (let i = 0; i < 220; i++) {
     const a = rand() * Math.PI * 2;
-    const r = 80 + rand() * 70;
+    const r = 105 + rand() * 75;
     const x = Math.cos(a) * r * 1.2;
     const z = Math.sin(a) * r * 0.9;
     if (features.blocked(x, z, 2)) continue;
@@ -373,7 +373,7 @@ export function createLandscape() {
 
   // Bäume und Büsche auf dem Spielfeld (verschwinden, wo Schienen liegen)
   const scenery = [];
-  for (let i = 0; i < 120; i++) {
+  for (let i = 0; i < 260; i++) {
     const x = (rand() * 2 - 1) * (FENCE.x + 6);
     const z = (rand() * 2 - 1) * (FENCE.z + 4);
     if (Math.hypot(x - pond.position.x, (z - pond.position.z) * 1.2) < 8) continue;
@@ -391,9 +391,9 @@ export function createLandscape() {
   }
 
   // Blumen und Grasbüschel (viele, deshalb als Instanzen)
-  const flowerCount = 2600;
+  const flowerCount = 5200;
   const flowers = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(0.12, 0), new THREE.MeshStandardMaterial({ roughness: 0.8 }), flowerCount);
-  const tuftCount = 4800;
+  const tuftCount = 9000;
   const tufts = new THREE.InstancedMesh(new THREE.ConeGeometry(0.1, 0.45, 4), mat('#5d9e48', 1), tuftCount);
   const flowerColors = ['#ffffff', '#f5c53a', '#f08bb4', '#b58ad6', '#e5484d'].map((c) => new THREE.Color(c));
   const props = [];
@@ -468,7 +468,7 @@ export function createLandscape() {
       if (a.kind === 'spin') a.obj.rotation.z -= dt * 0.6;
       else if (a.kind === 'cloud') {
         a.obj.position.x += a.speed * dt;
-        if (a.obj.position.x > 170) a.obj.position.x = -170;
+        if (a.obj.position.x > 220) a.obj.position.x = -220;
       } else if (a.kind === 'swim') {
         const ang = time * a.speed + a.phase;
         a.obj.position.set(a.center.x + Math.cos(ang) * a.r * 1.2, 0.05 + Math.sin(time * 3 + a.phase) * 0.03, a.center.z + Math.sin(ang) * a.r * 0.8);

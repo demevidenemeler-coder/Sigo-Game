@@ -336,7 +336,7 @@ export class TrackObjects {
     const item = { type, s, obj: new THREE.Group(), parts: {}, owner: this };
     item.obj.userData.item = item;
     const used = this.items.map((it) => it.color);
-    BUILDERS[type](item, type === 'bahnhof' ? [0, 1, 2].find((c) => !used.includes(c)) : 0);
+    BUILDERS[type](item, type === 'bahnhof' ? STATION_COLORS.findIndex((_, c) => !used.includes(c)) : 0);
     item.obj.traverse((o) => { o.userData.trackItem ??= item; });
     this.group.add(item.obj);
     this.items.push(item);

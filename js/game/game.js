@@ -9,8 +9,9 @@ import { defaultTrackPoints } from './track.js';
 import { createWorkshopMode } from './modes/workshop.js';
 import { createDrawMode } from './modes/draw.js';
 import { createDriveMode } from './modes/drive.js';
+import { createWashMode } from './modes/wash.js';
 
-const MODE_ICONS = { workshop: '🛠️', draw: '🛤️', drive: '🚂' };
+const MODE_ICONS = { workshop: '🛠️', wash: '🧽', draw: '🛤️', drive: '🚂' };
 const SUN_OFFSET = new THREE.Vector3(12, 24, 14);
 
 export class Game {
@@ -57,6 +58,7 @@ export class Game {
       workshop: createWorkshopMode(this),
       draw: createDrawMode(this),
       drive: createDriveMode(this),
+      wash: createWashMode(this),
     };
     this.mode = null;
     this.modeName = null;

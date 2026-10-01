@@ -5,7 +5,7 @@ anmalen, schmücken, beladen – dann mit dem Finger eine Strecke malen und losf
 
 Ohne Punkte, ohne Zeitdruck, ohne Werbung, ohne Internet – und mit eingebautem Ende.
 
-## Die drei Bereiche (Knöpfe oben links)
+## Die vier Bereiche (Knöpfe oben links)
 
 ### 🛠️ Werkstatt
 Unten: oben eine Reihe Fächer (mit Beschriftung), darunter große Karten – mit ◀ ▶ blättern (oder wischen).
@@ -25,16 +25,24 @@ Unten: oben eine Reihe Fächer (mit Beschriftung), darunter große Karten – mi
 der Kran schwenkt, die Glocke läutet, die Spielzeugautos hupen.
 **Zeige-Hand:** Passiert eine Weile nichts, zeigt eine Hand, wie man etwas auf den Zug zieht.
 
+### 🧽 Waschen
+- Ein Wagen ganz nah. **Mit dem Finger (Schwamm) über den Matsch wischen** → es schäumt und quietscht,
+  die Flecken werden blasser und verschwinden, der Lack wird wieder sauber.
+- Ist alles weg: Wasser spült den Schaum ab, es glitzert – „Blitzsauber!“ – und es geht von selbst zum nächsten schmutzigen Wagen.
+- **🪣 Eimer** = Matsch an den Wagen werfen (zum Nochmal-Waschen). **◀ ▶** = anderer Wagen.
+- Liegt der Schwamm still, wackelt er über dem Wagen und zeigt, was zu tun ist.
+- Der Schmutz vom Fahren (Regen!) ist derselbe – hier oder in der Waschanlage an der Strecke wird er wieder sauber.
+
 ### 🛤️ Strecke bauen
-- Großes Spielfeld (Holzzaun) in einer festen Landschaft: **ein Fluss** quer durchs Land, **eine lange Landstraße**
-  mit ständigem Autoverkehr (mit eigener Straßenbrücke) und **zwei Berge**.
+- Sehr großes Spielfeld (Holzzaun) in einer festen Landschaft: **ein Fluss** quer durchs Land, **eine lange Landstraße**
+  mit ständigem Autoverkehr (mit eigener Straßenbrücke) und **drei Berge**.
 - **Ein Finger verschiebt die Ansicht, zwei Finger zoomen** (am Computer: Mausrad).
 - **✏️ Stift** antippen, dann mit dem Finger eine Linie malen → Schienen. Der Kreis schließt sich von selbst.
   Danach schaltet der Stift wieder ab – so wird die Strecke nicht aus Versehen überschrieben.
 - **Brücke, Tunnel und Bahnübergang entstehen von selbst**, wo die gemalte Strecke Fluss, Berg oder Straße kreuzt –
   auch bei schrägen oder gebogenen Linien (die Brücke folgt der Kurve). Die Stimme sagt an, was entstanden ist
   („Eine Brücke über den Fluss!“).
-- In der Leiste: **Bahnhof (bis zu 3, je rot / blau / gelb), Waschanlage, Tankstelle**.
+- In der Leiste: **Bahnhof (bis zu 4, je rot / blau / gelb / grün), Waschanlage, Tankstelle**.
   Antippen → setzt sich an eine freie Stelle. Ziehen → rastet an der Strecke ein.
   Gesetzte Dinge lassen sich entlang der Strecke verschieben; in die Leiste ziehen = weg.
   Auf Brücken, in Tunneln und auf Bahnübergängen kann nichts stehen.
@@ -130,7 +138,7 @@ js/game/trackObjects.js    Bahnhof (farbig), Waschanlage, Tankstelle
 js/game/environment.js     Tag/Nacht, Regen, Schnee, Tunnel-Dunkelheit
 js/game/lamps.js           Lampen, die nachts heller leuchten
 sounds/                    Tiergeräusche (MP3, CC0) + QUELLEN.md
-js/game/modes/*.js         Werkstatt, Strecke bauen, Fahren
+js/game/modes/*.js         Werkstatt, Waschen, Strecke bauen, Fahren
 js/game/tray.js            Leiste unten (Fächer + Karten mit Blätter-Pfeilen)
 sw.js                      Offline-Speicher (neue Dateien in ASSETS eintragen)
 ```

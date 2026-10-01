@@ -8,11 +8,12 @@ Ohne Punkte, ohne Zeitdruck, ohne Werbung, ohne Internet – und mit eingebautem
 ## Die drei Bereiche (Knöpfe oben links)
 
 ### 🛠️ Werkstatt
-Unten ist eine Leiste mit sechs Fächern (beim Antippen wird das Fach genannt). Die Leiste lässt sich seitlich wischen.
+Unten: oben eine Reihe Fächer (mit Beschriftung), darunter große Karten – mit ◀ ▶ blättern (oder wischen).
 
 | Fach | Inhalt |
 |---|---|
-| 🚃 Loks und Wagen | **Loks:** Dampflok, Diesellok, E-Lok, Schnellzug. **Wagen:** Personen-, Güter-, Tier-, Flach-, Zirkus-, Schluss-, Tank-, Holz-, Kohle-, Kranwagen, Autotransporter (max. 6) |
+| 🚂 Loks | Dampflok, Diesellok, E-Lok, Schnellzug |
+| 🚃 Wagen | Personen-, Güter-, Tier-, Flach-, Zirkus-, Schluss-, Tank-, Holz-, Kohle-, Kranwagen, Autotransporter (max. 6) |
 | 🎨 Farben | 10 Farben – Topf wählen, dann ein Teil antippen (Kessel, Dach, Räder …) oder den Topf auf den Zug ziehen |
 | ⭐ Schmuck | Gesicht, Stern, Herz, Blume, Lampe, Lichterkette, Glocke, Fähnchen, Luftballon, Regenbogen |
 | 🐄 Tiere | Kuh, Schwein, Schaf, Pferd, Hund, Katze, Huhn, Hahn, Ente, Hase, Frosch, Löwe, Elefant, Giraffe, Pinguin |
@@ -25,13 +26,15 @@ der Kran schwenkt, die Glocke läutet, die Spielzeugautos hupen.
 **Zeige-Hand:** Passiert eine Weile nichts, zeigt eine Hand, wie man etwas auf den Zug zieht.
 
 ### 🛤️ Strecke bauen
-- Mit dem Finger eine Linie auf die Wiese (innerhalb des Holzzauns) malen → Schienen. Der Kreis schließt sich von selbst.
-- Unten in der Leiste: **Bahnhof, Tunnel, Brücke, Waschanlage, Tankstelle, Bahnübergang**.
+- Großes Spielfeld (Holzzaun). **Ein Finger verschiebt die Ansicht, zwei Finger zoomen** (am Computer: Mausrad).
+- **✏️ Stift** antippen, dann mit dem Finger eine Linie malen → Schienen. Der Kreis schließt sich von selbst.
+  Danach schaltet der Stift wieder ab – so wird die Strecke nicht aus Versehen überschrieben.
+- In der Leiste: **Bahnhof, Tunnel, Brücke, Waschanlage, Tankstelle, Bahnübergang**.
   Antippen → setzt sich an eine freie Stelle. Ziehen → rastet an der Strecke ein.
   Gesetzte Dinge lassen sich entlang der Strecke verschieben; in die Leiste ziehen = weg.
 
 ### 🚂 Fahren
-- ▶ = losfahren / ⏸ anhalten · 📯 = pfeifen · 🎥 = Kamera fährt mit · unten links: 🌙/☀️ Tag & Nacht, Wetter (Sonne, Regen, Schnee)
+- ▶ = losfahren / ⏸ anhalten · 📯 = pfeifen · 🎥 = Kamera fährt mit · unten links: 🌞/🌙 Tag & Nacht, 🌤️/🌧️/❄️ Wetter – die Knöpfe zeigen immer den aktuellen Zustand
 - **Bahnhof:** Der Zug hält von selbst („Bahnhof! Wer steigt ein?“). Wartende antippen → hüpfen in den Zug.
   Mitfahrer im Zug antippen → steigen aus. ▶ blinkt = weiterfahren.
 - **Tankstelle:** Steht eine an der Strecke, brauchen Dampflok (Kohle 🪨 + Wasser 💧) und Diesellok (Diesel ⛽) Vorräte – Anzeige oben links.
@@ -116,6 +119,7 @@ js/game/environment.js     Tag/Nacht, Regen, Schnee, Tunnel-Dunkelheit
 js/game/lamps.js           Lampen, die nachts heller leuchten
 sounds/                    Tiergeräusche (MP3, CC0) + QUELLEN.md
 js/game/modes/*.js         Werkstatt, Strecke bauen, Fahren
+js/game/tray.js            Leiste unten (Fächer + Karten mit Blätter-Pfeilen)
 sw.js                      Offline-Speicher (neue Dateien in ASSETS eintragen)
 ```
 

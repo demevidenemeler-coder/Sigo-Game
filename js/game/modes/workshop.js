@@ -9,25 +9,31 @@
 import * as THREE from 'three';
 import { LOCOS, WAGONS, COLORS, DECOR, CARGO, ANIMALS, PASSENGERS, MAX_WAGONS, MAX_DECOR, newCar, partDef, isLoco } from '../../catalog.js';
 import { renderThumbnails } from '../thumbs.js';
+import { createTray } from '../tray.js';
 import { wave, applyDirt } from '../trainModel.js';
 
 const TABS = [
-  { id: 'parts', icon: '🚃', say: 'tabParts' },
+  { id: 'locos', icon: '🚂', say: 'tabLocos' },
+  { id: 'wagons', icon: '🚃', say: 'tabWagons' },
   { id: 'paint', icon: '🎨', say: 'tabPaint' },
   { id: 'decor', icon: '⭐', say: 'tabDecor' },
   { id: 'animals', icon: '🐄', say: 'tabAnimals' },
   { id: 'passengers', icon: '🧸', say: 'tabPassengers' },
 ];
-const LISTS = { parts: [...LOCOS, ...WAGONS], paint: COLORS, decor: DECOR, animals: ANIMALS, passengers: PASSENGERS };
+const LISTS = { locos: LOCOS, wagons: WAGONS, paint: COLORS, decor: DECOR, animals: ANIMALS, passengers: PASSENGERS };
 // Tiere und Mitfahrer sind beides „Ladung“
-const kindOf = (tab) => (tab === 'animals' || tab === 'passengers' ? 'cargo' : tab);
+const kindOf = (tab) => {
+  if (tab === 'animals' || tab === 'passengers') return 'cargo';
+  if (tab === 'locos' || tab === 'wagons') return 'parts';
+  return tab;
+};
 const IDLE_HINT_MS = 12000;
 
 export function createWorkshopMode(game) {
   const { services } = game;
   const train = game.train;
   const ws = game.workshop;
-  let tab = 'parts';
+  let tab = 'wagons';
   const selected = { paint: COLORS[0], decor: DECOR[0], cargo: CARGO[0] };
   let lastCar = 0;
   let thumbs = null;
@@ -39,33 +45,20 @@ export function createWorkshopMode(game) {
 
   // ---------- Leiste unten ----------
 
-  const tray = document.createElement('div');
-  tray.className = 'tray hidden';
-  const tabBar = document.createElement('div');
-  tabBar.className = 'tabs';
-  const items = document.createElement('div');
-  items.className = 'tray-items';
-  tray.append(tabBar, items);
-  game.ui.append(tray);
+  const tray = createTray(game.ui, {
+    tabs: TABS.map((t) => ({ id: t.id, icon: t.icon, label: services.t(t.say) })),
+    onTab(id) {
+      services.sfx('pop');
+      services.say(services.t(TABS.find((t) => t.id === id).say));
+      showTab(id);
+    },
+  });
+  const items = tray.items;
 
   const hint = document.createElement('div');
   hint.className = 'hint-hand hidden';
   hint.innerHTML = '<img alt=""><span class="hand">👆</span>';
   game.ui.append(hint);
-
-  for (const t of TABS) {
-    const b = document.createElement('button');
-    b.type = 'button';
-    b.className = 'tab';
-    b.dataset.tab = t.id;
-    b.textContent = t.icon;
-    b.addEventListener('click', () => {
-      services.sfx('pop');
-      services.say(services.t(t.say));
-      showTab(t.id);
-    });
-    tabBar.append(b);
-  }
 
   const thumbKey = (kind, id) => `${kind}:${id}`;
 
@@ -92,9 +85,8 @@ export function createWorkshopMode(game) {
 
   function showTab(id) {
     tab = id;
-    tabBar.querySelectorAll('.tab').forEach((b) => b.classList.toggle('active', b.dataset.tab === id));
-    items.replaceChildren(...LISTS[id].map((e) => itemButton(kindOf(id), e)));
-    items.scrollLeft = 0;
+    tray.setActiveTab(id);
+    tray.setItems(LISTS[id].map((e) => itemButton(kindOf(id), e)));
     items.dataset.kind = id;
     hideHint();
     requestAnimationFrame(updateInset);
@@ -102,7 +94,7 @@ export function createWorkshopMode(game) {
 
   function updateInset() {
     if (!active) return;
-    game.setBottomInset(tray.getBoundingClientRect().height);
+    game.setBottomInset(tray.height());
     fitTrain(false);
   }
 
@@ -125,7 +117,7 @@ export function createWorkshopMode(game) {
 
   const slotsOf = (i) => partDef(train.data.cars[i].type).slots ?? 0;
   const hasRoom = (i) => train.data.cars[i].cargo.length < slotsOf(i);
-  const overTray = (y) => y > tray.getBoundingClientRect().top - 10;
+  const overTray = (y) => y > tray.top() - 10;
 
   // Nächster passender Wagen zum Finger – ohne genau treffen zu müssen
   function targetFor(kind, x, y, sourceIndex = -1) {
@@ -460,10 +452,10 @@ export function createWorkshopMode(game) {
   function showHint() {
     if (!active || busy) return;
     const list = LISTS[tab];
-    const entry = tab === 'parts' ? list[LOCOS.length] : list[0];
+    const entry = list[0];
     const btn = items.children[list.indexOf(entry)];
     if (!btn) return;
-    let target = tab === 'parts' ? train.cars.length - 1 : 0;
+    let target = tab === 'wagons' ? train.cars.length - 1 : 0;
     if (kindOf(tab) === 'cargo') target = Math.max(0, train.data.cars.findIndex((_, i) => hasRoom(i)));
     const from = btn.getBoundingClientRect();
     const to = screenPos(train.cars[target]);
@@ -508,16 +500,17 @@ export function createWorkshopMode(game) {
       active = true;
       game.useScene('workshop');
       train.layoutStraight();
-      tray.classList.remove('hidden');
+      tray.setLabels(Object.fromEntries(TABS.map((t) => [t.id, services.t(t.say)])));
+      tray.show();
       showTab(tab);
-      game.setBottomInset(tray.getBoundingClientRect().height);
+      game.setBottomInset(tray.height());
       fitTrain(!game.cam.initialized);
       game.cam.initialized = true;
       lastInteraction = performance.now() - (hintsShown === 0 ? IDLE_HINT_MS - 2500 : 0);
     },
     exit() {
       active = false;
-      tray.classList.add('hidden');
+      tray.hide();
       hideHint();
       setHighlight(null);
       game.setBottomInset(0);

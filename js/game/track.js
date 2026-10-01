@@ -286,6 +286,7 @@ export class ChalkLine {
     this.max = max;
     this.last = null;
     this.points = [];
+    this.dotScale = 1; // größer, wenn weit herausgezoomt
   }
 
   reset() {
@@ -298,14 +299,14 @@ export class ChalkLine {
     const m = new THREE.Matrix4();
     const addDot = (px, pz) => {
       if (this.mesh.count >= this.max) return;
-      m.makeTranslation(px, 0.08, pz);
+      m.makeScale(this.dotScale, 1, this.dotScale).setPosition(px, 0.08, pz);
       this.mesh.setMatrixAt(this.mesh.count++, m);
     };
     if (this.last) {
       const [lx, lz] = this.last;
       const d = Math.hypot(x - lx, z - lz);
-      if (d < 0.2) return false;
-      const steps = Math.ceil(d / 0.25);
+      if (d < 0.2 * this.dotScale) return false;
+      const steps = Math.ceil(d / (0.25 * this.dotScale));
       for (let i = 1; i <= steps; i++) addDot(lx + ((x - lx) * i) / steps, lz + ((z - lz) * i) / steps);
     } else {
       addDot(x, z);

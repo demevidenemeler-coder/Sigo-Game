@@ -503,68 +503,103 @@ function buildKohle(car, mats) {
 }
 
 const TOY_CAR_COLORS = ['#e5484d', '#4fa65a', '#f2c832', '#8b5bb5'];
+// Spielzeugauto, fast so breit wie der Wagen (wie bei echten Autotransportern im Kinderzimmer)
 function toyCar(color) {
   const g = new THREE.Group();
   const m = new THREE.MeshPhysicalMaterial({ color, roughness: 0.3, clearcoat: 1 });
-  g.add(mesh(box(0.8, 0.22, 0.48, 0.08), m, 0, 0.2, 0));
-  g.add(mesh(box(0.42, 0.2, 0.42, 0.08), m, -0.05, 0.38, 0));
-  for (const z of [0.215, -0.215]) g.add(mesh(box(0.3, 0.12, 0.02, 0.02), shared.window, -0.05, 0.39, z));
-  for (const x of [0.25, -0.25]) {
-    for (const z of [0.22, -0.22]) g.add(mesh(cylZ(0.09, 0.08, 12), shared.tire, x, 0.09, z));
+  g.add(mesh(box(1.45, 0.3, 0.8, 0.12), m, 0, 0.27, 0));
+  g.add(mesh(box(0.8, 0.3, 0.72, 0.12), m, -0.1, 0.55, 0));
+  for (const z of [0.365, -0.365]) g.add(mesh(box(0.6, 0.18, 0.02, 0.03), shared.window, -0.1, 0.57, z));
+  g.add(mesh(box(0.02, 0.2, 0.6, 0.03), shared.window, 0.31, 0.57, 0));
+  for (const z of [0.25, -0.25]) g.add(mesh(sph(0.06), shared.lamp, 0.72, 0.3, z));
+  for (const x of [0.45, -0.45]) {
+    for (const z of [0.38, -0.38]) {
+      g.add(mesh(cylZ(0.15, 0.1, 16), shared.tire, x, 0.15, z));
+      g.add(mesh(cylZ(0.07, 0.11, 10), shared.metal, x, 0.15, z));
+    }
   }
   return g;
 }
 
 function buildAuto(car, mats) {
-  const len = 2.6;
+  const len = 3.4;
   underframe(car, len, mats);
-  car.add(mesh(box(len - 0.1, 0.08, 1.1, 0.03), mats.body, 0, 0.76, 0, 'body'));
-  car.add(mesh(box(len - 0.1, 0.06, 1.1, 0.03), mats.body, 0, 1.45, 0, 'body'));
-  for (const x of [-1.2, 0, 1.2]) {
-    for (const z of [0.52, -0.52]) car.add(mesh(box(0.06, 0.72, 0.06, 0.02), mats.roof, x, 1.1, z, 'roof'));
+  car.add(mesh(box(len - 0.1, 0.08, 1.15, 0.03), mats.body, 0, 0.76, 0, 'body'));
+  car.add(mesh(box(len - 0.1, 0.07, 1.15, 0.03), mats.body, 0, 1.52, 0, 'body'));
+  for (const x of [-1.6, -0.55, 0.55, 1.6]) {
+    for (const z of [0.55, -0.55]) car.add(mesh(box(0.07, 1.4, 0.07, 0.02), mats.roof, x, 1.5, z, 'roof'));
   }
-  for (const z of [0.52, -0.52]) car.add(mesh(cylX(0.02, len - 0.1, 6), mats.roof, 0, 1.75, z, 'roof'));
+  for (const z of [0.55, -0.55]) {
+    car.add(mesh(cylX(0.025, len - 0.1, 6), mats.roof, 0, 1.15, z, 'roof'));
+    car.add(mesh(cylX(0.025, len - 0.1, 6), mats.roof, 0, 2.18, z, 'roof'));
+  }
   car.userData.toyCars = [];
-  [[-0.6, 0.8], [0.6, 0.8], [-0.6, 1.48], [0.6, 1.48]].forEach(([x, y], i) => {
+  [[-0.82, 0.8], [0.82, 0.8], [-0.82, 1.56], [0.82, 1.56]].forEach(([x, y], i) => {
     const c = toyCar(TOY_CAR_COLORS[i]);
     c.position.set(x, y, 0);
     car.add(c);
     car.userData.toyCars.push(c);
   });
-  car.userData.decorY = { side: 1.1, top: 1.8, sideZ: 0.6, sideX: [-0.6, 0.6, 0, -0.6], topX: [-1.2, 1.2, 0, -1.2] };
+  car.userData.decorY = { side: 1.15, top: 2.2, sideZ: 0.6, sideX: [-1.1, 1.1, 0, -1.1], topX: [-1.6, 1.6, 0, -1.6] };
   return len;
 }
 
 function buildKran(car, mats) {
-  const len = 2.6;
+  const len = 3.2;
   underframe(car, len, mats);
   floor(car, len, mats);
-  const turret = new THREE.Group();
-  turret.position.set(0.2, 0.86, 0);
-  turret.add(mesh(cyl(0.38, 0.42, 0.14, 24), mats.roof, 0, 0.07, 0, 'roof'));
-  turret.add(mesh(box(0.75, 0.6, 0.7, 0.06), mats.body, -0.1, 0.45, 0, 'body'));
-  for (const z of [0.36, -0.36]) turret.add(mesh(box(0.3, 0.25, 0.02, 0.03), shared.window, 0.05, 0.55, z));
-  turret.add(mesh(box(0.4, 0.4, 0.6, 0.04), shared.dark, -0.55, 0.36, 0));
-  // Ausleger (Gitter) mit Haken
-  const boom = new THREE.Group();
-  boom.position.set(0.2, 0.55, 0);
-  boom.rotation.z = 0.6;
-  for (const z of [0.12, -0.12]) boom.add(mesh(box(1.6, 0.06, 0.05, 0.01), mats.body, 0.8, 0, z, 'body'));
-  for (let i = 0; i < 6; i++) {
-    const d = mesh(box(0.05, 0.3, 0.05, 0.01), mats.body, 0.15 + i * 0.27, 0, 0, 'body');
-    d.rotation.x = Math.PI / 2;
-    d.rotation.z = 0.6;
-    boom.add(d);
+  // Stützfüße an den Seiten
+  for (const x of [-1.2, 1.2]) {
+    for (const zs of [1, -1]) {
+      car.add(mesh(box(0.18, 0.12, 0.5, 0.03), mats.body, x, 0.82, zs * 0.75, 'body'));
+      car.add(mesh(box(0.2, 0.5, 0.2, 0.03), mats.trim, x, 0.6, zs * 0.95, 'trim'));
+    }
   }
+  const turret = new THREE.Group();
+  turret.position.set(-0.6, 0.86, 0);
+  turret.add(mesh(cyl(0.6, 0.65, 0.18, 28), mats.roof, 0, 0.09, 0, 'roof'));
+  // Führerhaus und Gegengewicht
+  turret.add(mesh(box(1.15, 0.95, 1.0, 0.08), mats.body, 0, 0.66, 0, 'body'));
+  turret.add(mesh(box(1.25, 0.1, 1.08, 0.04), mats.roof, 0, 1.18, 0, 'roof'));
+  for (const z of [0.505, -0.505]) turret.add(mesh(box(0.45, 0.4, 0.02, 0.04), shared.window, 0.25, 0.78, z));
+  turret.add(mesh(box(0.02, 0.4, 0.7, 0.04), shared.window, 0.58, 0.78, 0));
+  turret.add(mesh(box(0.5, 0.75, 1.0, 0.05), shared.dark, -0.75, 0.56, 0));
+  for (let i = 0; i < 3; i++) turret.add(mesh(box(0.52, 0.04, 1.02, 0.01), mats.body, -0.75, 0.35 + i * 0.22, 0, 'body'));
+  // Gitterausleger (vier Gurte mit Diagonalen)
+  const BOOM = 2.4;
+  const ANGLE = 0.85;
+  const boom = new THREE.Group();
+  boom.position.set(0.45, 1.0, 0);
+  boom.rotation.z = ANGLE;
+  for (const y of [0.13, -0.13]) {
+    for (const z of [0.2, -0.2]) boom.add(mesh(box(BOOM, 0.07, 0.07, 0.02), mats.body, BOOM / 2, y, z, 'body'));
+  }
+  const diag = cached('craneDiag', () => new THREE.BoxGeometry(0.045, 0.37, 0.045));
+  for (let i = 0; i < 8; i++) {
+    const x = 0.15 + i * 0.29;
+    for (const z of [0.2, -0.2]) {
+      const dg = mesh(diag, mats.body, x, 0, z, 'body');
+      dg.rotation.z = i % 2 ? 0.7 : -0.7;
+      boom.add(dg);
+    }
+    const tb = mesh(cached('craneTop', () => new THREE.BoxGeometry(0.045, 0.045, 0.42)), mats.body, x, 0.13, 0, 'body');
+    boom.add(tb);
+  }
+  boom.add(mesh(cylZ(0.12, 0.5, 16), shared.dark, BOOM, 0, 0));
   turret.add(boom);
-  const tip = new THREE.Vector3(0.2 + Math.cos(0.6) * 1.6, 0.55 + Math.sin(0.6) * 1.6, 0);
-  const rope = mesh(cyl(0.012, 0.012, 0.7, 4), shared.dark, tip.x, tip.y - 0.35, 0);
-  turret.add(rope);
-  const hook = mesh(cached('hook', () => new THREE.TorusGeometry(0.07, 0.022, 6, 12, Math.PI * 1.4)), shared.metal, tip.x, tip.y - 0.74, 0);
+  // Seil und Hakenblock hängen senkrecht von der Spitze
+  const tip = new THREE.Vector3(0.45 + Math.cos(ANGLE) * BOOM, 1.0 + Math.sin(ANGLE) * BOOM, 0);
+  const blockY = 1.45;
+  const ropeLen = tip.y - blockY;
+  turret.add(mesh(cyl(0.018, 0.018, ropeLen, 4), shared.dark, tip.x, tip.y - ropeLen / 2, 0.06));
+  turret.add(mesh(cyl(0.018, 0.018, ropeLen, 4), shared.dark, tip.x, tip.y - ropeLen / 2, -0.06));
+  turret.add(mesh(box(0.3, 0.32, 0.26, 0.05), mats.roof, tip.x, blockY, 0, 'roof'));
+  const hook = mesh(cached('hookBig', () => new THREE.TorusGeometry(0.14, 0.045, 8, 16, Math.PI * 1.4)), shared.metal, tip.x, blockY - 0.3, 0);
+  hook.rotation.z = Math.PI * 0.8;
   turret.add(hook);
   car.add(turret);
   car.userData.crane = turret;
-  car.userData.decorY = { side: 0.78, top: 1.65, sideZ: 0.6, sideX: [-0.75, 0, 0.75, -0.35], topX: [-0.15, -1.0, -0.15, -1.0] };
+  car.userData.decorY = { side: 0.78, top: 2.15, sideZ: 0.6, sideX: [0.6, -1.3, 1.3, 0.6], topX: [-0.6, -1.0, -0.6, -1.0] };
   return len;
 }
 

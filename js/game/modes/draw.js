@@ -1,6 +1,8 @@
 // Strecke bauen:
-// - Mit dem Finger eine Linie malen → daraus werden Schienen (Kreis schließt sich von selbst).
-// - Aus der Leiste Bahnhof, Tunnel, Brücke … an die Strecke ziehen oder antippen (setzt sich an eine freie Stelle).
+// - Nichts ausgewählt: ein Finger verschiebt die Ansicht, zwei Finger zoomen (Vogelperspektive).
+// - ✏️ Stift auswählen und eine Linie malen → daraus werden Schienen (Kreis schließt sich von selbst).
+//   Danach schaltet der Stift wieder ab, damit die Strecke nicht aus Versehen überschrieben wird.
+// - Bahnhof, Tunnel, Brücke … aus der Leiste an die Strecke ziehen oder antippen.
 // - Gesetzte Dinge entlang der Strecke verschieben; in die Leiste ziehen = wegnehmen.
 
 import * as THREE from 'three';
@@ -8,8 +10,12 @@ import { ChalkLine, strokeToTrack } from '../track.js';
 import { WORLD_BOUNDS } from '../world.js';
 import { TRACK_OBJECTS } from '../../catalog.js';
 import { renderThumbnails } from '../thumbs.js';
+import { createTray } from '../tray.js';
 
 const TAP_SOUND = { bahnhof: 'dingdong', tunnel: 'whistle', bruecke: 'clank', waschanlage: 'scrub', tankstelle: 'gurgle', uebergang: 'xbell' };
+const VIEW_DIR = new THREE.Vector3(0, 1, 0.3); // fast senkrecht von oben
+const MIN_HALF = 10;
+const MAX_HALF = WORLD_BOUNDS.x + 8;
 
 export function createDrawMode(game) {
   const { services, land, train } = game;
@@ -17,11 +23,15 @@ export function createDrawMode(game) {
   const chalk = new ChalkLine();
   land.scene.add(chalk.mesh);
   let drawing = false;
+  let pencil = false;
   let lastScribble = 0;
-  let hintShown = false;
   let active = false;
   let thumbs = null;
-  let press = null;
+  let press = null; // ein gesetztes Objekt wird verschoben
+  let pan = null; // Ansicht verschieben
+  let pinch = null; // zoomen mit zwei Fingern
+  const pointers = new Map();
+  const view = { x: 0, z: 0, half: MAX_HALF };
 
   const hint = document.createElement('div');
   hint.className = 'draw-hint hidden';
@@ -29,17 +39,32 @@ export function createDrawMode(game) {
   game.ui.append(hint);
 
   // ---------- Leiste ----------
-  const tray = document.createElement('div');
-  tray.className = 'tray build-tray hidden';
-  const items = document.createElement('div');
-  items.className = 'tray-items';
-  tray.append(items);
-  game.ui.append(tray);
+  const tray = createTray(game.ui, { extraClass: 'build-tray' });
+  const overTray = (y) => !tray.hidden && y > tray.top() - 10;
+  let pencilBtn = null;
 
-  const overTray = (y) => !tray.classList.contains('hidden') && y > tray.getBoundingClientRect().top - 10;
+  function setPencil(on) {
+    pencil = on;
+    pencilBtn?.classList.toggle('selected', on);
+    if (on) {
+      hint.classList.remove('hidden');
+      setTimeout(() => hint.classList.add('hidden'), 3500);
+    } else {
+      hint.classList.add('hidden');
+    }
+  }
 
   function buildTray() {
-    items.replaceChildren(...TRACK_OBJECTS.map((o) => {
+    pencilBtn = document.createElement('button');
+    pencilBtn.type = 'button';
+    pencilBtn.className = 'tray-item build tool';
+    pencilBtn.innerHTML = '<span class="tool-icon">✏️</span>';
+    pencilBtn.addEventListener('click', () => {
+      setPencil(!pencil);
+      services.sfx('pop');
+      if (pencil) services.say(services.t('tabPencil'));
+    });
+    tray.setItems([pencilBtn, ...TRACK_OBJECTS.map((o) => {
       const b = document.createElement('button');
       b.type = 'button';
       b.className = 'tray-item build';
@@ -50,7 +75,7 @@ export function createDrawMode(game) {
       b.append(img);
       bindTrayItem(b, o.id);
       return b;
-    }));
+    })]);
   }
 
   function makeGhost(src) {
@@ -112,14 +137,27 @@ export function createDrawMode(game) {
     return item;
   }
 
-  // ---------- Kamera ----------
+  // ---------- Kamera: verschieben und zoomen ----------
 
-  // Im Hochformat schaut die Kamera von der Seite, damit die breite Malfläche den Bildschirm füllt
-  function camera(instant) {
-    const bx = WORLD_BOUNDS.x + 4;
-    const bz = WORLD_BOUNDS.z * 0.93 + 4;
-    if (game.isPortrait()) game.fit(new THREE.Vector3(0.5, 0, 0), bz, bx * 0.93, new THREE.Vector3(0.42, 1, 0), instant);
-    else game.fit(new THREE.Vector3(0, 0, 0.5), bx, bz, new THREE.Vector3(0, 1, 0.42), instant);
+  function applyView(instant) {
+    view.half = THREE.MathUtils.clamp(view.half, MIN_HALF, MAX_HALF);
+    const mx = WORLD_BOUNDS.x + 6;
+    const mz = WORLD_BOUNDS.z + 6;
+    view.x = THREE.MathUtils.clamp(view.x, -mx, mx);
+    view.z = THREE.MathUtils.clamp(view.z, -mz, mz);
+    game.fit(new THREE.Vector3(view.x, 0, view.z), view.half, view.half * 0.62, VIEW_DIR, instant);
+    if (instant) game.applyCameraNow();
+    // Kreidepunkte wachsen mit, damit die Linie auch weit weg gut sichtbar ist
+    chalk.dotScale = Math.max(1, view.half / 22);
+  }
+
+  // Den Bodenpunkt unter dem Finger festhalten, während sich die Kamera bewegt
+  function keepUnderFinger(anchor, x, y) {
+    const p = game.groundPoint(x, y);
+    if (!p) return;
+    view.x += anchor.x - p.x;
+    view.z += anchor.z - p.z;
+    applyView(true);
   }
 
   function clamp(p) {
@@ -149,6 +187,7 @@ export function createDrawMode(game) {
     game.drive.speed = 0;
     train.placeOnCurve(land.track.curve, land.track.length, game.drive.s);
     fade();
+    setPencil(false);
     services.sfx('chime');
     services.say(services.t('trackDone'));
     game.pulseMode('drive');
@@ -164,7 +203,23 @@ export function createDrawMode(game) {
     return null;
   }
 
+  function startPinch() {
+    const [a, b] = [...pointers.values()];
+    const mid = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+    pinch = { d0: Math.hypot(a.x - b.x, a.y - b.y), half0: view.half, anchor: game.groundPoint(mid.x, mid.y) };
+    pan = null;
+    if (drawing) {
+      drawing = false;
+      chalk.reset();
+    }
+    if (press) {
+      press.item.obj.visible = true;
+      press = null;
+    }
+  }
+
   return {
+    multiTouch: true,
     enter() {
       active = true;
       if (!thumbs) {
@@ -175,33 +230,45 @@ export function createDrawMode(game) {
       game.drive.target = 0;
       game.drive.speed = 0;
       train.placeOnCurve(land.track.curve, land.track.length, game.drive.s);
-      tray.classList.remove('hidden');
-      game.setBottomInset(tray.getBoundingClientRect().height);
-      camera(false);
-      if (!hintShown) {
-        hintShown = true;
-        hint.classList.remove('hidden');
-        setTimeout(() => hint.classList.add('hidden'), 4200);
-      }
+      tray.show();
+      game.setBottomInset(tray.height());
+      view.x = 0;
+      view.z = 0;
+      // Im Hochformat etwas näher starten (das breite Feld passt sonst nur winzig hinein)
+      view.half = game.isPortrait() ? MAX_HALF * 0.6 : MAX_HALF;
+      applyView(false);
+      setPencil(false);
     },
     exit() {
       active = false;
       hint.classList.add('hidden');
-      tray.classList.add('hidden');
+      tray.hide();
       game.setBottomInset(0);
+      pointers.clear();
+      pan = null;
+      pinch = null;
       if (drawing) finish();
     },
     onResize() {
       if (!active) return;
-      game.setBottomInset(tray.getBoundingClientRect().height);
-      camera(true);
+      game.setBottomInset(tray.height());
+      applyView(true);
     },
     update(dt) {
       if (land.track.update(dt)) services.sfx('klack');
       train.animate(dt, 0, false);
     },
+    wheel(e) {
+      const anchor = game.groundPoint(e.clientX, e.clientY);
+      view.half *= 1 + Math.sign(e.deltaY) * 0.12;
+      applyView(true);
+      if (anchor) keepUnderFinger(anchor, e.clientX, e.clientY);
+    },
     pointerDown(e) {
+      pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
       hint.classList.add('hidden');
+      if (pointers.size === 2) return startPinch();
+      if (pointers.size > 2) return;
       const item = pickItem(e.clientX, e.clientY);
       if (item) {
         press = { item, x: e.clientX, y: e.clientY, moved: false };
@@ -209,12 +276,28 @@ export function createDrawMode(game) {
       }
       const p = game.groundPoint(e.clientX, e.clientY);
       if (!p) return;
-      drawing = true;
-      chalk.reset();
-      clamp(p);
-      chalk.add(p.x, p.z);
+      if (pencil) {
+        drawing = true;
+        chalk.reset();
+        clamp(p);
+        chalk.add(p.x, p.z);
+      } else {
+        // Kamera erst „einrasten“ lassen, dann den Punkt unter dem Finger merken
+        applyView(true);
+        pan = { anchor: game.groundPoint(e.clientX, e.clientY) ?? p };
+      }
     },
     pointerMove(e) {
+      if (!pointers.has(e.pointerId)) return;
+      pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      if (pinch && pointers.size >= 2) {
+        const [a, b] = [...pointers.values()];
+        const d = Math.hypot(a.x - b.x, a.y - b.y);
+        view.half = pinch.half0 * (pinch.d0 / Math.max(10, d));
+        applyView(true);
+        if (pinch.anchor) keepUnderFinger(pinch.anchor, (a.x + b.x) / 2, (a.y + b.y) / 2);
+        return;
+      }
       if (press) {
         if (!press.moved && Math.hypot(e.clientX - press.x, e.clientY - press.y) < 15) return;
         press.moved = true;
@@ -224,6 +307,10 @@ export function createDrawMode(game) {
           const p = game.groundPoint(e.clientX, e.clientY);
           if (p) objects.moveTo(press.item, p.x, p.z);
         }
+        return;
+      }
+      if (pan) {
+        keepUnderFinger(pan.anchor, e.clientX, e.clientY);
         return;
       }
       if (!drawing) return;
@@ -236,6 +323,17 @@ export function createDrawMode(game) {
       }
     },
     pointerUp(e, cancelled) {
+      pointers.delete(e.pointerId);
+      if (pinch) {
+        if (pointers.size < 2) pinch = null;
+        // verbleibender Finger verschiebt weiter
+        if (pointers.size === 1) {
+          const [p] = [...pointers.values()];
+          const g = game.groundPoint(p.x, p.y);
+          if (g) pan = { anchor: g };
+        }
+        return;
+      }
       if (press) {
         const { item, moved } = press;
         press = null;
@@ -254,6 +352,10 @@ export function createDrawMode(game) {
         }
         land.clearAroundTrack();
         game.saveTrack();
+        return;
+      }
+      if (pan) {
+        pan = null;
         return;
       }
       if (drawing) finish();

@@ -46,15 +46,15 @@ export class Environment {
     for (let i = 0; i < n; i++) {
       const v = new THREE.Vector3().randomDirection();
       v.y = Math.abs(v.y) * 0.9 + 0.08;
-      v.normalize().multiplyScalar(170);
+      v.normalize().multiplyScalar(400);
       pos.set([v.x, v.y, v.z], i * 3);
     }
     const sg = new THREE.BufferGeometry();
     sg.setAttribute('position', new THREE.BufferAttribute(pos, 3));
     this.stars = new THREE.Points(sg, new THREE.PointsMaterial({ color: '#ffffff', size: 2.2, sizeAttenuation: false, transparent: true, opacity: 0, fog: false, depthWrite: false }));
     scene.add(this.stars);
-    this.moon = new THREE.Mesh(new THREE.SphereGeometry(7, 24, 16), new THREE.MeshBasicMaterial({ color: '#fff6d8', transparent: true, opacity: 0, fog: false }));
-    this.moon.position.set(-60, 90, -110);
+    this.moon = new THREE.Mesh(new THREE.SphereGeometry(16, 24, 16), new THREE.MeshBasicMaterial({ color: '#fff6d8', transparent: true, opacity: 0, fog: false }));
+    this.moon.position.set(-140, 210, -260);
     scene.add(this.moon);
 
     // Regentropfen (dünne Striche)
@@ -99,8 +99,12 @@ export class Environment {
   update(dt, look, loco, soundOn) {
     const k = 1 - Math.exp(-dt * 1.2);
     this.night += (this.nightTarget - this.night) * k;
-    this.rain += ((this.weather === 'regen' ? 1 : 0) - this.rain) * k;
-    this.snow += ((this.weather === 'schnee' ? 1 : 0) - this.snow) * k * 0.6;
+    // Einblenden sanft, Ausblenden zügig (damit z. B. bei Sonne keine Flocken nachrieseln)
+    const fast = 1 - Math.exp(-dt * 4);
+    const rainT = this.weather === 'regen' ? 1 : 0;
+    const snowT = this.weather === 'schnee' ? 1 : 0;
+    this.rain += (rainT - this.rain) * (rainT > this.rain ? k : fast);
+    this.snow += (snowT - this.snow) * (snowT > this.snow ? k * 0.6 : fast);
     this.tunnel += (this.tunnelTarget - this.tunnel) * (1 - Math.exp(-dt * 5));
 
     // Stimmung mischen: Sonne → Regen/Schnee → Nacht

@@ -20,7 +20,8 @@ const CHUFF = (2 * Math.PI * 0.36) / 4; // vier Dampfstöße pro Umdrehung des T
 const ACCENT = [1, 0.55, 0.8, 0.55];
 const BRAKE = 1.6; // Bremsverzögerung beim Halten
 const FUEL_ICONS = { kohle: '🪨', wasser: '💧', diesel: '⛽' };
-const WEATHERS = [['sonne', '☀️'], ['regen', '🌧️'], ['schnee', '❄️']];
+// Die Knöpfe zeigen immer den AKTUELLEN Zustand (nicht den nächsten)
+const WEATHERS = [['sonne', '🌤️'], ['regen', '🌧️'], ['schnee', '❄️']];
 const WAITING_IDS = ['kind', 'oma', 'papa', 'hund', 'katze', 'teddy', 'hase', 'pinguin', 'schaf', 'ente', 'pferd', 'huhn', 'kuh', 'frosch'];
 const span = (type) => TRACK_OBJECTS.find((o) => o.id === type).span;
 
@@ -129,16 +130,16 @@ export function createDriveMode(game) {
     }
     updateGo();
   });
-  const nightBtn = btn(envControls, 'env', '🌙', () => {
+  const nightBtn = btn(envControls, 'env', '🌞', () => {
     night = !night;
     env.setNight(night);
-    nightBtn.textContent = night ? '☀️' : '🌙';
+    nightBtn.textContent = night ? '🌙' : '🌞';
     services.sayName(night ? 'nacht' : 'tag');
   });
-  const weatherBtn = btn(envControls, 'env', '🌧️', () => {
+  const weatherBtn = btn(envControls, 'env', WEATHERS[0][1], () => {
     weather = (weather + 1) % WEATHERS.length;
     env.setWeather(WEATHERS[weather][0]);
-    weatherBtn.textContent = WEATHERS[(weather + 1) % WEATHERS.length][1];
+    weatherBtn.textContent = WEATHERS[weather][1];
     services.sayName(WEATHERS[weather][0]);
   });
   game.ui.append(controls, envControls, gauges);

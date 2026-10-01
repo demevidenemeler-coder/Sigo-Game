@@ -31,7 +31,7 @@ export class Game {
     this.envMap = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
     this.frameTimes = [];
 
-    this.camera = new THREE.PerspectiveCamera(38, 1, 0.1, 300);
+    this.camera = new THREE.PerspectiveCamera(38, 1, 0.1, 900);
     this.cam = { pos: new THREE.Vector3(8, 10, 20), look: new THREE.Vector3(), tPos: new THREE.Vector3(8, 10, 20), tLook: new THREE.Vector3() };
     this.bottomInset = 0;
     this.raycaster = new THREE.Raycaster();
@@ -115,8 +115,8 @@ export class Game {
     if (this.scene.fog) {
       // Nebel nur in der Ferne, egal wie weit die Kamera weg ist
       const dist = this.cam.pos.distanceTo(this.cam.look);
-      this.scene.fog.near = dist + 20;
-      this.scene.fog.far = dist + 70;
+      this.scene.fog.near = dist + 40;
+      this.scene.fog.far = dist + 170;
     }
     this.renderer.render(this.scene, this.camera);
     requestAnimationFrame(this.tick);
@@ -286,24 +286,49 @@ export class Game {
     return best;
   }
 
+  // Eingabe an den aktiven Modus weiterreichen. Normalerweise zählt nur ein Finger;
+  // Modi mit multiTouch (Bauen: Zoomen mit zwei Fingern) bekommen alle Finger.
   bindPointer() {
     let active = null;
+    const multi = new Set();
     this.canvas.addEventListener('pointerdown', (e) => {
+      if (this.mode?.multiTouch) {
+        multi.add(e.pointerId);
+        this.canvas.setPointerCapture(e.pointerId);
+        this.mode.pointerDown?.(e);
+        return;
+      }
       if (active !== null) return;
       active = e.pointerId;
       this.canvas.setPointerCapture(e.pointerId);
       this.mode?.pointerDown?.(e);
     });
     this.canvas.addEventListener('pointermove', (e) => {
-      if (e.pointerId === active) this.mode?.pointerMove?.(e);
+      if (multi.has(e.pointerId) || e.pointerId === active) this.mode?.pointerMove?.(e);
     });
     const end = (e) => {
+      if (multi.has(e.pointerId)) {
+        multi.delete(e.pointerId);
+        this.mode?.pointerUp?.(e, e.type === 'pointercancel');
+        return;
+      }
       if (e.pointerId !== active) return;
       active = null;
       this.mode?.pointerUp?.(e, e.type === 'pointercancel');
     };
     this.canvas.addEventListener('pointerup', end);
     this.canvas.addEventListener('pointercancel', end);
+    this.canvas.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      this.mode?.wheel?.(e);
+    }, { passive: false });
+  }
+
+  // Kamera sofort setzen (z. B. beim Verschieben mit dem Finger), ohne weiches Nachziehen
+  applyCameraNow() {
+    this.camera.position.copy(this.cam.pos);
+    this.camera.lookAt(this.cam.look);
+    this.camera.updateMatrixWorld();
   }
 
   // Kurz hüpfen (Rückmeldung beim Antippen) – von der eigenen Grundhöhe aus

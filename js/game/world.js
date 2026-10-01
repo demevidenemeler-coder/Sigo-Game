@@ -9,7 +9,7 @@ import { lamp } from './lamps.js';
 import { woodTexture, grassTexture, waterTexture } from './textures.js';
 
 // Spielfeld, auf dem gemalt werden kann (halbe Breite / halbe Tiefe)
-export const WORLD_BOUNDS = { x: 26, z: 17 };
+export const WORLD_BOUNDS = { x: 52, z: 34 }; // 4-fache Fläche gegenüber früher
 const FENCE = { x: WORLD_BOUNDS.x + 3, z: WORLD_BOUNDS.z + 3 };
 
 function seeded(seed) {
@@ -234,7 +234,7 @@ function cloud(rand) {
 }
 
 function sky(scene) {
-  const geo = new THREE.SphereGeometry(180, 32, 16);
+  const geo = new THREE.SphereGeometry(420, 32, 16);
   const material = new THREE.ShaderMaterial({
     side: THREE.BackSide,
     depthWrite: false,
@@ -269,7 +269,7 @@ export function createLandscape() {
   const animated = [];
 
   // Boden mit Hügeln und Grastextur
-  const groundGeo = new THREE.PlaneGeometry(240, 240, 120, 120);
+  const groundGeo = new THREE.PlaneGeometry(440, 440, 170, 170);
   groundGeo.rotateX(-Math.PI / 2);
   const pos = groundGeo.attributes.position;
   const colors = [];
@@ -284,7 +284,7 @@ export function createLandscape() {
   groundGeo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
   groundGeo.computeVertexNormals();
   const grass = grassTexture().clone();
-  grass.repeat.set(36, 36);
+  grass.repeat.set(66, 66);
   grass.needsUpdate = true;
   const ground = new THREE.Mesh(groundGeo, new THREE.MeshStandardMaterial({ map: grass, color: '#d3e3c0', vertexColors: true, roughness: 1 }));
   ground.receiveShadow = true;
@@ -354,9 +354,9 @@ export function createLandscape() {
   }
 
   // Wald auf den Hügeln
-  for (let i = 0; i < 110; i++) {
+  for (let i = 0; i < 170; i++) {
     const a = rand() * Math.PI * 2;
-    const r = 48 + rand() * 45;
+    const r = 80 + rand() * 70;
     const x = Math.cos(a) * r * 1.2;
     const z = Math.sin(a) * r * 0.9;
     const t = tree(rand() > 0.5 ? 'tanne' : 'rund', rand);
@@ -367,7 +367,7 @@ export function createLandscape() {
 
   // Bäume und Büsche auf dem Spielfeld (verschwinden, wo Schienen liegen)
   const scenery = [];
-  for (let i = 0; i < 46; i++) {
+  for (let i = 0; i < 120; i++) {
     const x = (rand() * 2 - 1) * (FENCE.x + 6);
     const z = (rand() * 2 - 1) * (FENCE.z + 4);
     if (Math.hypot(x - pond.position.x, (z - pond.position.z) * 1.2) < 8) continue;
@@ -384,9 +384,9 @@ export function createLandscape() {
   }
 
   // Blumen und Grasbüschel (viele, deshalb als Instanzen)
-  const flowerCount = 900;
+  const flowerCount = 2600;
   const flowers = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(0.12, 0), new THREE.MeshStandardMaterial({ roughness: 0.8 }), flowerCount);
-  const tuftCount = 1600;
+  const tuftCount = 4800;
   const tufts = new THREE.InstancedMesh(new THREE.ConeGeometry(0.1, 0.45, 4), mat('#5d9e48', 1), tuftCount);
   const flowerColors = ['#ffffff', '#f5c53a', '#f08bb4', '#b58ad6', '#e5484d'].map((c) => new THREE.Color(c));
   const props = [];
@@ -409,9 +409,9 @@ export function createLandscape() {
   props.push({ mesh: flowers, data: flowerData }, { mesh: tufts, data: tuftData });
 
   // Wolken
-  for (let i = 0; i < 12; i++) {
+  for (let i = 0; i < 18; i++) {
     const c = cloud(rand);
-    c.position.set((rand() - 0.5) * 160, 26 + rand() * 10, -40 - rand() * 60);
+    c.position.set((rand() - 0.5) * 300, 34 + rand() * 12, -70 - rand() * 90);
     scene.add(c);
     animated.push({ kind: 'cloud', obj: c, speed: 0.4 + rand() * 0.5 });
   }
@@ -450,7 +450,7 @@ export function createLandscape() {
       if (a.kind === 'spin') a.obj.rotation.z -= dt * 0.6;
       else if (a.kind === 'cloud') {
         a.obj.position.x += a.speed * dt;
-        if (a.obj.position.x > 90) a.obj.position.x = -90;
+        if (a.obj.position.x > 170) a.obj.position.x = -170;
       } else if (a.kind === 'swim') {
         const ang = time * a.speed + a.phase;
         a.obj.position.set(a.center.x + Math.cos(ang) * a.r * 1.2, 0.05 + Math.sin(time * 3 + a.phase) * 0.03, a.center.z + Math.sin(ang) * a.r * 0.8);

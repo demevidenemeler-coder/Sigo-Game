@@ -104,11 +104,12 @@ export function strokeToTrack(stroke, { minLength, bounds }) {
   return pts.length >= 4 ? pts : null;
 }
 
+// Start-Strecke: kreuzt zweimal den Fluss und einmal die Straße (Brücke und Schranke gleich zu sehen), mit Platz für 3 Bahnhöfe
 export function defaultTrackPoints() {
   const pts = [];
   for (let i = 0; i < 24; i++) {
     const a = (i / 24) * Math.PI * 2;
-    pts.push([+(Math.cos(a) * 13).toFixed(2), +(Math.sin(a) * 7.5).toFixed(2)]);
+    pts.push([+(4 + Math.cos(a) * 18).toFixed(2), +(2 + Math.sin(a) * 13).toFixed(2)]);
   }
   return pts;
 }

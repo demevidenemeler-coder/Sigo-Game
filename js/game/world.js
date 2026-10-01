@@ -5,6 +5,8 @@ import { RoundedBoxGeometry } from '../../vendor/RoundedBoxGeometry.js';
 import { Track, RAIL_TOP } from './track.js';
 import { buildFigure } from './figures.js';
 import { TrackObjects } from './trackObjects.js';
+import { Crossings } from './crossings.js';
+import { createFeatures } from './features.js';
 import { lamp } from './lamps.js';
 import { woodTexture, grassTexture, waterTexture } from './textures.js';
 
@@ -290,6 +292,9 @@ export function createLandscape() {
   ground.receiveShadow = true;
   scene.add(ground);
 
+  // Fluss, Landstraße und Berge (fest in der Landschaft)
+  const features = createFeatures(scene);
+
   // Zaun um das Spielfeld
   const fence = new THREE.Group();
   fenceLine(fence, -FENCE.x, -FENCE.z, FENCE.x, -FENCE.z, rand);
@@ -322,7 +327,7 @@ export function createLandscape() {
 
   // Bauernhof mit Weide (rechts)
   const farm = barn();
-  farm.position.set(FENCE.x + 10, 0, -9);
+  farm.position.set(FENCE.x + 14, 0, -2);
   farm.rotation.y = -0.5;
   scene.add(farm);
   const pasture = { x: FENCE.x + 8, z: 8, w: 5, d: 5 };
@@ -342,7 +347,7 @@ export function createLandscape() {
 
   // Windmühle (links hinten) und Dorf (hinten)
   const mill = windmill();
-  mill.position.set(-FENCE.x - 7, 0, -12);
+  mill.position.set(-FENCE.x - 5, 0, 15);
   mill.rotation.y = 0.5;
   scene.add(mill);
   animated.push({ kind: 'spin', obj: mill.userData.rotor });
@@ -359,6 +364,7 @@ export function createLandscape() {
     const r = 80 + rand() * 70;
     const x = Math.cos(a) * r * 1.2;
     const z = Math.sin(a) * r * 0.9;
+    if (features.blocked(x, z, 2)) continue;
     const t = tree(rand() > 0.5 ? 'tanne' : 'rund', rand);
     t.position.set(x, heightAt(x, z) - 0.1, z);
     t.scale.multiplyScalar(1.6);
@@ -373,6 +379,7 @@ export function createLandscape() {
     if (Math.hypot(x - pond.position.x, (z - pond.position.z) * 1.2) < 8) continue;
     if (Math.abs(x - farm.position.x) < 7 && Math.abs(z - farm.position.z) < 6) continue;
     if (Math.abs(x - pasture.x) < 7 && Math.abs(z - pasture.z) < 7) continue;
+    if (features.blocked(x, z, 2)) continue;
     const kinds = ['rund', 'tanne', 'birke', 'apfel'];
     const obj = rand() > 0.9 ? house(rand) : tree(kinds[Math.floor(rand() * kinds.length)], rand);
     obj.position.set(x, 0, z);
@@ -395,6 +402,7 @@ export function createLandscape() {
     for (let i = 0; i < count; i++) {
       const x = (rand() * 2 - 1) * (FENCE.x + 10);
       const z = (rand() * 2 - 1) * (FENCE.z + 8);
+      if (features.blocked(x, z, 0.3)) continue;
       list.push({ x, z, y, s: scaleMin + rand() * scaleRange, r: rand() * Math.PI });
     }
   };
@@ -402,6 +410,8 @@ export function createLandscape() {
   const tuftData = [];
   place(flowerData, flowerCount, 0.12, 0.7, 0.8);
   place(tuftData, tuftCount, 0.2, 0.6, 1.0);
+  flowers.count = flowerData.length; // ausgelassene Stellen (Fluss, Straße, Berg) nicht zeichnen
+  tufts.count = tuftData.length;
   flowerData.forEach((_, i) => flowers.setColorAt(i, flowerColors[i % flowerColors.length]));
   flowers.receiveShadow = true;
   tufts.receiveShadow = true;
@@ -416,9 +426,15 @@ export function createLandscape() {
     animated.push({ kind: 'cloud', obj: c, speed: 0.4 + rand() * 0.5 });
   }
 
+  for (const c of features.cars) tappable.push(c);
+
   const track = new Track();
   scene.add(track.group);
   const objects = new TrackObjects(scene, track);
+  // Brücken, Tunnel, Bahnübergänge entstehen automatisch, wo die Strecke Fluss, Berg oder Straße kreuzt
+  const crossings = new Crossings(scene, features, track);
+  objects.reserved = () => crossings.zones();
+  objects.blocked = (x, z) => features.blocked(x, z, 0.5);
 
   const trainAnchor = new THREE.Group();
   trainAnchor.position.y = RAIL_TOP;
@@ -426,7 +442,7 @@ export function createLandscape() {
 
   // Alles, was im Weg der Schienen (und der Bahnhöfe, Tunnel …) steht, verschwindet
   function clearAroundTrack() {
-    const fp = objects.footprints();
+    const fp = [...objects.footprints(), ...crossings.footprints()];
     const blocked = (x, z, pad) => fp.some(([fx, fz, r]) => Math.hypot(fx - x, fz - z) < r + pad);
     for (const o of scenery) {
       const r = o.userData.kind === 'house' ? 2.8 : 2.0;
@@ -446,6 +462,8 @@ export function createLandscape() {
   const tmp = new THREE.Vector3();
   function animate(dt, time) {
     objects.animate(dt, time);
+    crossings.animate(dt, time);
+    features.updateTraffic(dt, crossings.crossings);
     for (const a of animated) {
       if (a.kind === 'spin') a.obj.rotation.z -= dt * 0.6;
       else if (a.kind === 'cloud') {
@@ -482,5 +500,5 @@ export function createLandscape() {
   const snowables = [ground.material, tufts.material];
   for (const [k, m] of matCache) if (/^#(5fae5a|4f9a4f|76b95e|3f8a4a)/.test(k)) snowables.push(m);
 
-  return { scene, sun, hemi: scene.userData.hemi, sky: skyMat, snowables, track, objects, trainAnchor, scenery, tappable, clearAroundTrack, animate, ground, animated };
+  return { scene, sun, hemi: scene.userData.hemi, sky: skyMat, snowables, track, objects, features, crossings, trainAnchor, scenery, tappable, clearAroundTrack, animate, ground, animated };
 }

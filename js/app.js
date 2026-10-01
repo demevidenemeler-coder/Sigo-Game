@@ -274,6 +274,7 @@ function showSettings() {
     button(t('resetTrack'), 'big secondary', () => {
       const pts = defaultTrackPoints();
       game.land.track.setPoints(pts);
+      game.land.crossings.rebuild();
       [...game.land.objects.items].forEach((it) => game.land.objects.remove(it));
       game.land.clearAroundTrack();
       saveTrack(null);

@@ -26,24 +26,34 @@ der Kran schwenkt, die Glocke läutet, die Spielzeugautos hupen.
 **Zeige-Hand:** Passiert eine Weile nichts, zeigt eine Hand, wie man etwas auf den Zug zieht.
 
 ### 🛤️ Strecke bauen
-- Großes Spielfeld (Holzzaun). **Ein Finger verschiebt die Ansicht, zwei Finger zoomen** (am Computer: Mausrad).
+- Großes Spielfeld (Holzzaun) in einer festen Landschaft: **ein Fluss** quer durchs Land, **eine lange Landstraße**
+  mit ständigem Autoverkehr (mit eigener Straßenbrücke) und **zwei Berge**.
+- **Ein Finger verschiebt die Ansicht, zwei Finger zoomen** (am Computer: Mausrad).
 - **✏️ Stift** antippen, dann mit dem Finger eine Linie malen → Schienen. Der Kreis schließt sich von selbst.
   Danach schaltet der Stift wieder ab – so wird die Strecke nicht aus Versehen überschrieben.
-- In der Leiste: **Bahnhof, Tunnel, Brücke, Waschanlage, Tankstelle, Bahnübergang**.
+- **Brücke, Tunnel und Bahnübergang entstehen von selbst**, wo die gemalte Strecke Fluss, Berg oder Straße kreuzt –
+  auch bei schrägen oder gebogenen Linien (die Brücke folgt der Kurve). Die Stimme sagt an, was entstanden ist
+  („Eine Brücke über den Fluss!“).
+- In der Leiste: **Bahnhof (bis zu 3, je rot / blau / gelb), Waschanlage, Tankstelle**.
   Antippen → setzt sich an eine freie Stelle. Ziehen → rastet an der Strecke ein.
   Gesetzte Dinge lassen sich entlang der Strecke verschieben; in die Leiste ziehen = weg.
+  Auf Brücken, in Tunneln und auf Bahnübergängen kann nichts stehen.
 
 ### 🚂 Fahren
 - ▶ = losfahren / ⏸ anhalten · 📯 = pfeifen · 🎥 = Kamera fährt mit · unten links: 🌞/🌙 Tag & Nacht, 🌤️/🌧️/❄️ Wetter – die Knöpfe zeigen immer den aktuellen Zustand
 - **Bahnhof:** Der Zug hält von selbst („Bahnhof! Wer steigt ein?“). Wartende antippen → hüpfen in den Zug.
   Mitfahrer im Zug antippen → steigen aus. ▶ blinkt = weiterfahren.
+- **Fahrgäste mit Ziel:** Gibt es mindestens zwei Bahnhöfe, zeigt jeder Wartende eine **Sprechblase in einer Bahnhofsfarbe**.
+  Er fährt mit und **steigt am Bahnhof dieser Farbe von selbst aus** („Danke!“) und geht ins Bahnhofshaus.
+  Farben zuordnen statt Punkte zählen – kein Druck, nichts kann falsch gemacht werden.
 - **Tankstelle:** Steht eine an der Strecke, brauchen Dampflok (Kohle 🪨 + Wasser 💧) und Diesellok (Diesel ⛽) Vorräte – Anzeige oben links.
   Ist etwas knapp, hält der Zug dort. Wasserturm, Kohlebunker oder Zapfsäule antippen → füllt auf. Leer = der Zug schleicht nur noch.
   E-Lok und Schnellzug brauchen nichts (fahren mit Strom).
 - **Waschanlage:** Der Zug wird beim Fahren schmutzig (bei Regen schneller). In der Waschanlage drehen sich die Bürsten, es schäumt – blitzsauber.
 - **Tunnel:** drinnen wird es dunkel, die Lampen gehen an, die Pfeife hallt.
-- **Brücke:** über einen Fluss (manchmal springt ein Fisch); die Schienenstöße klingen hohl.
-- **Bahnübergang:** Schranke geht zu, Licht blinkt, Glocke bimmelt, die Autos warten. Autos antippen → hupen.
+- **Brücke:** die Schienenstöße klingen hohl; manchmal springt ein Fisch.
+- **Bahnübergang:** Kommt der Zug, gehen die Schranken zu, Licht blinkt, Glocke bimmelt – die Autos auf der Landstraße halten und warten.
+  Autos antippen → hupen.
 - Tiere auf der Weide antippen → sie rufen; Bäume und Häuser wackeln.
 - Jede Lok fährt anders schnell (Schnellzug am schnellsten).
 
@@ -96,7 +106,7 @@ python3 -m http.server 8000
 ## Technik (zum Erweitern)
 
 Reines HTML/JavaScript mit [three.js](https://threejs.org) (liegt in `vendor/`, MIT-Lizenz). Kein Build-Schritt.
-Alle Modelle sind aus einfachen Formen gebaut, alle Geräusche werden live erzeugt – keine Bild- oder Sounddateien.
+Alle Modelle sind aus einfachen Formen gebaut; die meisten Geräusche werden live erzeugt (nur Tierlaute sind Aufnahmen).
 
 ```
 index.html                 Einstiegsseite
@@ -114,7 +124,9 @@ js/game/textures.js        Per Code gezeichnete Texturen (Holz, Gras, Schotter, 
 js/game/train.js           Zug anordnen / auf Strecke setzen
 js/game/track.js           Aus Fingerstrich wird Schienenstrecke
 js/game/world.js           Werkstatt und Landschaft
-js/game/trackObjects.js    Bahnhof, Tunnel, Brücke, Waschanlage, Tankstelle, Bahnübergang
+js/game/features.js        Feste Landschaft: Fluss, Landstraße mit Verkehr, Berge
+js/game/crossings.js       Automatische Brücken, Tunnel, Bahnübergänge
+js/game/trackObjects.js    Bahnhof (farbig), Waschanlage, Tankstelle
 js/game/environment.js     Tag/Nacht, Regen, Schnee, Tunnel-Dunkelheit
 js/game/lamps.js           Lampen, die nachts heller leuchten
 sounds/                    Tiergeräusche (MP3, CC0) + QUELLEN.md
@@ -129,9 +141,10 @@ sw.js                      Offline-Speicher (neue Dateien in ASSETS eintragen)
 
 ## Ehrliche Grenzen
 
-- Tierlaute kommen aus der Sprachausgabe („Muuh“) und klingen künstlich.
+- Einige Tierlaute (Ente, Pferd, Löwe, Elefant, Pinguin) sind nachgebaut und klingen künstlich.
 - Die Grafik ist auf neuere Tablets ausgelegt; ruckelt es, senkt die App automatisch die Auflösung.
-- Selbstkreuzende Strecken (Acht) sind erlaubt, aber es gibt keine Brücke – der Zug fährt „durch“ die Kreuzung.
+- Selbstkreuzende Strecken (Acht) sind erlaubt, aber dort entsteht keine Brücke – der Zug fährt „durch“ die Kreuzung.
+- Malt man sehr viel an Fluss oder Straße entlang, werden Brücke/Übergang sehr lang und es bleibt wenig Platz für Bahnhöfe („Alles voll!“).
 
 ## Ideen für später
 - Lieferaufträge mit Kran (Kisten am Bauernhof abholen)

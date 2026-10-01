@@ -4,9 +4,9 @@
 
 import * as THREE from 'three';
 import { RoundedBoxGeometry } from '../../vendor/RoundedBoxGeometry.js';
-import { TRACK_OBJECTS } from '../catalog.js';
-import { buildFigure } from './figures.js';
-import { woodTexture, waterTexture } from './textures.js';
+import { TRACK_OBJECTS, STATION_COLORS } from '../catalog.js';
+import { buildFigure, setBubble } from './figures.js';
+import { woodTexture } from './textures.js';
 import { lamp } from './lamps.js';
 
 const def = (type) => TRACK_OBJECTS.find((o) => o.id === type);
@@ -72,22 +72,24 @@ function signTexture(text, bg = '#2f5c9e') {
 
 // ---------- Bahnhof ----------
 
-const STATION_NAMES = ['Sigo-Stadt', 'Waldheim', 'Seeblick'];
 const WAITING = ['kind', 'oma', 'papa', 'hund', 'katze', 'teddy', 'hase', 'pinguin', 'schaf', 'ente', 'pferd', 'huhn'];
 
-function buildBahnhof(item, index) {
+// Jeder Bahnhof hat eine eigene Farbe (Dach, Säulen, Schild, Farbtafel)
+function buildBahnhof(item, color) {
   const g = item.obj;
+  item.color = color;
+  const hex = STATION_COLORS[color].hex;
   const len = def('bahnhof').span - 1;
   // Bahnsteig mit gelber Kante
   add(g, rbox(len, 0.45, 1.8, 0.05), mat('#cfc6b6', 0.9), 0, 0.22, 1.75);
   add(g, new THREE.BoxGeometry(len, 0.02, 0.12), mat('#f2c832'), 0, 0.455, 1.0);
   // Schmales Dach hinten am Bahnsteig (die Wartenden bleiben von oben sichtbar)
-  for (const x of [-len / 2 + 0.6, 0, len / 2 - 0.6]) add(g, new THREE.CylinderGeometry(0.06, 0.06, 2.3, 8), mat('#2f5c9e', 0.4), x, 1.6, 2.6);
-  const roof = add(g, rbox(len - 0.4, 0.1, 0.9, 0.04), mat('#c8453a', 0.5), 0, 2.8, 2.55);
+  for (const x of [-len / 2 + 0.6, 0, len / 2 - 0.6]) add(g, new THREE.CylinderGeometry(0.06, 0.06, 2.3, 8), mat('#f5f1ea', 0.4), x, 1.6, 2.6);
+  const roof = add(g, rbox(len - 0.4, 0.1, 0.9, 0.04), mat(hex, 0.5), 0, 2.8, 2.55);
   roof.rotation.x = -0.15;
   // Bahnhofsgebäude mit Uhr und Schild
   add(g, rbox(3.6, 2.4, 2.2, 0.08), mat('#f7eedb'), 0, 1.2, 4.0);
-  add(g, gableRoof(2.6, 1.0, 4.0), mat('#8a3b31', 0.6), 0, 2.4, 4.0);
+  add(g, gableRoof(2.6, 1.0, 4.0), mat(hex, 0.6), 0, 2.4, 4.0);
   add(g, new THREE.BoxGeometry(0.7, 1.3, 0.06), mat('#8a5a33'), 0, 0.65, 2.88);
   for (const x of [-1.15, 1.15]) {
     add(g, new THREE.BoxGeometry(0.6, 0.6, 0.06), lamp(new THREE.MeshStandardMaterial({ color: '#9fc6e6', emissive: '#ffcf70', roughness: 0.2 }), 0, 1.2), x, 1.35, 2.88);
@@ -101,10 +103,14 @@ function buildBahnhof(item, index) {
   const hand2 = add(g, new THREE.BoxGeometry(0.26, 0.03, 0.15), mat('#222222'), 1.6, 2.7, 2.2);
   hand2.geometry.translate(0.12, 0, 0);
   item.parts.clockHand = hand2;
-  const sign = new THREE.Mesh(new THREE.PlaneGeometry(2.2, 0.55), new THREE.MeshStandardMaterial({ map: signTexture(`🚂 ${STATION_NAMES[index % 3]}`) }));
+  const sign = new THREE.Mesh(new THREE.PlaneGeometry(2.2, 0.55), new THREE.MeshStandardMaterial({ map: signTexture('🚂', hex) }));
   sign.position.set(0, 2.05, 2.92);
-  sign.rotation.y = 0;
   g.add(sign);
+  // Große runde Farbtafel auf einem Mast – von oben und von weitem gut zu sehen
+  add(g, new THREE.CylinderGeometry(0.07, 0.07, 3.2, 8), mat('#f5f1ea', 0.4), -1.6, 1.6, 2.2);
+  const disc = add(g, new THREE.CylinderGeometry(0.75, 0.75, 0.12, 32), mat(hex, 0.4), -1.6, 3.6, 2.2);
+  disc.rotation.x = Math.PI / 2;
+  add(g, new THREE.TorusGeometry(0.75, 0.07, 8, 32), mat('#ffffff', 0.4), -1.6, 3.6, 2.2);
   // Bänke und Laternen
   for (const x of [-2.4, 2.4]) {
     add(g, rbox(1.0, 0.08, 0.35, 0.03), mat('#8a5a33'), x, 0.72, 2.3);
@@ -117,7 +123,19 @@ function buildBahnhof(item, index) {
   for (let i = 0; i < 2; i++) addWaiting(item, WAITING[Math.floor(Math.random() * WAITING.length)]);
 }
 
-export function addWaiting(item, id) {
+// Ziel für einen Fahrgast an diesem Bahnhof: ein anderer Bahnhof (nur wenn es mehrere gibt)
+function pickDest(item) {
+  const others = (item.owner?.items ?? []).filter((it) => it.type === 'bahnhof' && it !== item).map((it) => it.color);
+  return others.length ? others[Math.floor(Math.random() * others.length)] : null;
+}
+
+export function setDest(fig, dest) {
+  fig.userData.dest = dest;
+  setBubble(fig, dest == null ? null : STATION_COLORS[dest].hex);
+}
+
+// dest: undefined = selbst aussuchen, null = kein Ziel
+export function addWaiting(item, id, dest) {
   const free = item.slots.find((x) => !item.waiting.some((w) => w.userData.slot === x));
   if (free === undefined) return null;
   const f = buildFigure(id);
@@ -131,103 +149,8 @@ export function addWaiting(item, id) {
   f.traverse((o) => { o.userData.owner = f; });
   item.obj.add(f);
   item.waiting.push(f);
+  setDest(f, dest === undefined ? pickDest(item) : dest);
   return f;
-}
-
-// ---------- Tunnel ----------
-
-function buildTunnel(item) {
-  const g = item.obj;
-  const half = def('tunnel').span / 2;
-  // Berg: unregelmäßige Kugel, oben Wiese, unten Fels
-  const geo = new THREE.IcosahedronGeometry(1, 4);
-  const pos = geo.attributes.position;
-  const colors = [];
-  const grass = new THREE.Color('#6fae55');
-  const rock = new THREE.Color('#9b9488');
-  for (let i = 0; i < pos.count; i++) {
-    const v = new THREE.Vector3().fromBufferAttribute(pos, i);
-    const n = 1 + 0.08 * Math.sin(v.x * 9) * Math.cos(v.z * 7) + 0.06 * Math.sin(v.y * 11 + v.x * 3);
-    v.multiplyScalar(n);
-    pos.setXYZ(i, v.x, v.y, v.z);
-    const c = rock.clone().lerp(grass, THREE.MathUtils.smoothstep(v.y, 0.15, 0.5));
-    colors.push(c.r, c.g, c.b);
-  }
-  geo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
-  geo.computeVertexNormals();
-  const hill = add(g, geo, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 1, flatShading: true }), 0, -0.7, 0);
-  hill.scale.set(half - 0.25, 4.2, 4.2);
-  // Bäumchen und Steine oben
-  for (const [x, z] of [[-1.5, 0.8], [1.2, -0.9], [0.2, 1.6]]) {
-    add(g, new THREE.CylinderGeometry(0.1, 0.14, 0.6, 6), mat('#8a5a33'), x, 3.55, z);
-    add(g, new THREE.ConeGeometry(0.55, 1.3, 8), mat('#3f8a4a', 0.9), x, 4.3, z);
-  }
-  // Portale aus Stein
-  for (const sx of [1, -1]) {
-    const p = new THREE.Group();
-    p.position.x = sx * half;
-    p.rotation.y = sx > 0 ? -Math.PI / 2 : Math.PI / 2;
-    const stone = mat('#b9b1a3', 0.9);
-    const arch = add(p, new THREE.TorusGeometry(1.3, 0.28, 10, 24, Math.PI), stone, 0, 1.2, 0);
-    arch.scale.z = 1.6;
-    for (const z of [1.3, -1.3]) add(p, new THREE.BoxGeometry(0.56, 1.25, 0.6), stone, z, 0.62, 0).rotation.y = Math.PI / 2;
-    add(p, new THREE.CircleGeometry(1.03, 24, 0, Math.PI), new THREE.MeshBasicMaterial({ color: '#141414' }), 0, 1.2, -0.05);
-    add(p, new THREE.PlaneGeometry(2.06, 1.2), new THREE.MeshBasicMaterial({ color: '#141414' }), 0, 0.6, -0.05);
-    g.add(p);
-  }
-}
-
-// ---------- Brücke über einen Fluss ----------
-
-function buildBruecke(item) {
-  const g = item.obj;
-  const span = def('bruecke').span;
-  const water = waterTexture().clone();
-  water.repeat.set(1, 8);
-  water.needsUpdate = true;
-  item.parts.water = water;
-  const river = add(g, new THREE.PlaneGeometry(3.6, 46), new THREE.MeshStandardMaterial({ map: water, roughness: 0.1, metalness: 0.1 }), 0, 0.025, 0);
-  river.rotation.x = -Math.PI / 2;
-  river.receiveShadow = true;
-  river.castShadow = false;
-  for (const x of [2.1, -2.1]) {
-    const bank = add(g, new THREE.PlaneGeometry(0.7, 46), mat('#d9c9a0', 1), x, 0.022, 0);
-    bank.rotation.x = -Math.PI / 2;
-    bank.castShadow = false;
-  }
-  // Widerlager und Brückendeck
-  for (const sx of [1, -1]) add(g, rbox(1.0, 0.5, 2.6, 0.05), mat('#b9b1a3', 0.9), sx * (span / 2 - 0.5), 0.15, 0);
-  add(g, rbox(span - 1.0, 0.12, 2.3, 0.03), new THREE.MeshStandardMaterial({ map: woodTexture('#9a6b42', 'deck'), roughness: 0.8 }), 0, 0.02, 0);
-  // Stahlfachwerk
-  const steel = mat('#c8453a', 0.45, 0.4);
-  const L = span - 1.4;
-  for (const z of [1.15, -1.15]) {
-    add(g, new THREE.BoxGeometry(L, 0.14, 0.14), steel, 0, 0.25, z);
-    add(g, new THREE.BoxGeometry(L - 1.2, 0.14, 0.14), steel, 0, 2.45, z);
-    const n = 5;
-    for (let i = 0; i <= n; i++) {
-      const x = -L / 2 + 0.6 + (i * (L - 1.2)) / n;
-      add(g, new THREE.BoxGeometry(0.12, 2.2, 0.12), steel, x, 1.35, z);
-      if (i < n) {
-        const dlen = Math.hypot((L - 1.2) / n, 2.2);
-        const d = add(g, new THREE.BoxGeometry(0.1, dlen, 0.1), steel, x + (L - 1.2) / n / 2, 1.35, z);
-        d.rotation.z = (i % 2 ? 1 : -1) * Math.atan2((L - 1.2) / n, 2.2);
-      }
-    }
-    for (const sx of [1, -1]) {
-      const e = add(g, new THREE.BoxGeometry(0.12, Math.hypot(0.6, 2.2), 0.12), steel, sx * (L / 2 - 0.3), 1.35, z);
-      e.rotation.z = sx * Math.atan2(0.6, 2.2);
-    }
-  }
-  for (let i = 0; i < 4; i++) add(g, new THREE.BoxGeometry(0.12, 0.12, 2.4), steel, -L / 2 + 0.9 + i * ((L - 1.8) / 3), 2.45, 0);
-  // Fisch, der ab und zu aus dem Wasser springt
-  const fish = new THREE.Group();
-  add(fish, new THREE.SphereGeometry(0.2, 12, 8), mat('#f08c2b', 0.4), 0, 0, 0).scale.set(1.5, 0.8, 0.6);
-  add(fish, new THREE.ConeGeometry(0.16, 0.25, 4), mat('#f08c2b', 0.4), -0.35, 0, 0).rotation.z = Math.PI / 2;
-  fish.visible = false;
-  g.add(fish);
-  item.parts.fish = fish;
-  item.parts.fishTimer = 4 + Math.random() * 6;
 }
 
 // ---------- Waschanlage ----------
@@ -329,104 +252,24 @@ function buildTankstelle(item) {
 
 // ---------- Bahnübergang ----------
 
-const CAR_COLORS = ['#3b7cc9', '#e5484d', '#4fa65a', '#f2c832', '#8b5bb5'];
-
-function roadCar(color) {
-  const c = new THREE.Group();
-  const m = new THREE.MeshPhysicalMaterial({ color, roughness: 0.3, clearcoat: 1 });
-  add(c, rbox(0.9, 0.35, 1.7, 0.15), m, 0, 0.35, 0);
-  add(c, rbox(0.8, 0.35, 0.9, 0.15), m, 0, 0.65, -0.1);
-  add(c, new THREE.BoxGeometry(0.72, 0.25, 0.02), mat('#233345', 0.1), 0, 0.68, 0.36);
-  for (const x of [0.42, -0.42]) {
-    for (const z of [0.55, -0.55]) add(c, new THREE.CylinderGeometry(0.18, 0.18, 0.14, 14).rotateZ(Math.PI / 2), mat('#2a2a2a', 0.5), x, 0.18, z);
-  }
-  for (const x of [0.25, -0.25]) add(c, new THREE.SphereGeometry(0.07, 8, 6), lamp(new THREE.MeshStandardMaterial({ color: '#fff6d8', emissive: '#ffd36b' }), 0.3, 2.5), x, 0.4, 0.86);
-  c.userData.action = 'hupen';
-  c.traverse((o) => { o.userData.owner = c; });
-  return c;
-}
-
-function buildUebergang(item) {
-  const g = item.obj;
-  const road = add(g, new THREE.PlaneGeometry(3.0, 34), mat('#6b6f75', 0.9), 0, 0.03, 0);
-  road.rotation.x = -Math.PI / 2;
-  road.castShadow = false;
-  for (const x of [1.4, -1.4]) {
-    const line = add(g, new THREE.PlaneGeometry(0.1, 34), mat('#f5f1ea', 0.8), x, 0.035, 0);
-    line.rotation.x = -Math.PI / 2;
-    line.castShadow = false;
-  }
-  for (let z = -16; z < 16; z += 2) {
-    if (Math.abs(z) < 2) continue;
-    const dash = add(g, new THREE.PlaneGeometry(0.1, 1.0), mat('#f5f1ea', 0.8), 0, 0.036, z);
-    dash.rotation.x = -Math.PI / 2;
-    dash.castShadow = false;
-  }
-  add(g, new THREE.BoxGeometry(3.0, 0.08, 2.0), mat('#5c3b22', 0.9), 0, 0.12, 0);
-  // Andreaskreuze mit Blinklicht und Schranken
-  item.parts.lights = [];
-  item.parts.barriers = [];
-  for (const sz of [1, -1]) {
-    const post = new THREE.Group();
-    post.position.set(sz * 1.9, 0, sz * 2.6);
-    add(post, new THREE.CylinderGeometry(0.06, 0.06, 2.4, 8), mat('#f5f1ea', 0.5), 0, 1.2, 0);
-    for (const r of [0.6, -0.6]) {
-      const bar = add(post, new THREE.BoxGeometry(0.9, 0.14, 0.04), mat('#e5484d', 0.5), 0, 2.15, 0.05);
-      bar.rotation.z = r;
-    }
-    for (const x of [0.15, -0.15]) {
-      const l = add(post, new THREE.SphereGeometry(0.09, 10, 8), new THREE.MeshStandardMaterial({ color: '#5a1a14', emissive: '#ff2a1a', emissiveIntensity: 0 }), x, 1.6, 0.08);
-      item.parts.lights.push(l);
-    }
-    g.add(post);
-    // Schranke: dreht sich von senkrecht (offen) nach waagerecht (zu)
-    const pivot = new THREE.Group();
-    pivot.position.set(sz * 1.7, 0.9, sz * 3.4);
-    add(pivot, rbox(0.3, 0.6, 0.3, 0.05), mat('#d9d4c8', 0.6), 0, -0.4, 0);
-    const arm = new THREE.Group();
-    for (let i = 0; i < 6; i++) add(arm, new THREE.BoxGeometry(0.5, 0.1, 0.08), mat(i % 2 ? '#ffffff' : '#e5484d', 0.5), -sz * (0.25 + i * 0.5), 0, 0);
-    pivot.add(arm);
-    arm.rotation.z = (-sz * Math.PI) / 2; // offen = senkrecht
-    g.add(pivot);
-    item.parts.barriers.push({ arm, sz });
-  }
-  // Autos auf der Straße
-  item.parts.cars = [];
-  [[0.7, 1], [-0.7, -1]].forEach(([x, dir], i) => {
-    const c = roadCar(CAR_COLORS[(i * 2 + Math.floor(Math.random() * 3)) % CAR_COLORS.length]);
-    c.position.set(x, 0, -dir * (6 + i * 7));
-    c.rotation.y = dir > 0 ? 0 : Math.PI;
-    c.userData.dir = dir;
-    c.userData.speed = 2.2 + Math.random();
-    g.add(c);
-    item.parts.cars.push(c);
-  });
-  item.closed = 0;
-}
-
 const BUILDERS = {
   bahnhof: buildBahnhof,
-  tunnel: buildTunnel,
-  bruecke: buildBruecke,
   waschanlage: buildWaschanlage,
   tankstelle: buildTankstelle,
-  uebergang: buildUebergang,
 };
 
 // Freizuhaltende Bereiche (für Bäume/Blumen), in lokalen Koordinaten: [x, z, Radius]
 const FOOTPRINTS = {
   bahnhof: [[0, 2.5, 5]],
-  tunnel: [[0, 0, 5.5]],
-  bruecke: Array.from({ length: 13 }, (_, i) => [0, -18 + i * 3, 2.6]),
   waschanlage: [[0, 0, 3]],
   tankstelle: [[-1.2, 2.7, 2.5], [1.2, -2.6, 2.5], [1.6, 2.3, 1.5]],
-  uebergang: Array.from({ length: 12 }, (_, i) => [0, -16.5 + i * 3, 2.4]),
 };
 
 // Vorschau-Modell für die Leiste (ohne Strecke)
 export function buildTrackObjectPreview(type) {
   const item = { type, s: 0, obj: new THREE.Group(), parts: {} };
   BUILDERS[type](item, 0);
+  for (const w of item.waiting ?? []) setDest(w, null);
   return item.obj;
 }
 
@@ -445,8 +288,27 @@ export class TrackObjects {
   }
 
   // Liegt Stelle s frei (kein anderes Objekt überlappt)?
-  isFree(s, span, except = null) {
+  // Gebäude-Seite an Stelle s: +1 links, -1 rechts der Fahrtrichtung, 0 = beide Seiten belegt (Fluss, Straße, Berg)
+  sideAt(s) {
+    if (!this.blocked) return 1;
+    for (const side of [1, -1]) {
+      let ok = true;
+      for (const ds of [-3.5, 0, 3.5]) {
+        const f = this.track.frameAt(s + ds);
+        for (const off of [1.5, 2.8, 4.2, 5.3]) {
+          if (this.blocked(f.p.x - f.t.z * off * side, f.p.z + f.t.x * off * side)) ok = false;
+        }
+      }
+      if (ok) return side;
+    }
+    return 0;
+  }
+
+  isFree(s, span, except = null, type = null) {
     const L = this.track.length;
+    if (type === 'bahnhof' && this.sideAt(s) === 0) return false;
+    const dist = (a, b) => Math.abs(((a - b + L / 2) % L + L) % L - L / 2);
+    if ((this.reserved?.() ?? []).some((z) => dist(s, z.s) < (span + z.span) / 2 + 0.5)) return false;
     return this.items.every((it) => {
       if (it === except) return true;
       const d = Math.abs(((s - it.s + L / 2) % L + L) % L - L / 2);
@@ -455,11 +317,11 @@ export class TrackObjects {
   }
 
   // Nächste freie Stelle in der Nähe von s
-  freeSpotNear(s, span, except = null) {
+  freeSpotNear(s, span, except = null, type = null) {
     for (let k = 0; k < 120; k++) {
       for (const sign of [1, -1]) {
         const c = s + sign * k * 0.75;
-        if (this.isFree(c, span, except)) return this.track.wrap(c);
+        if (this.isFree(c, span, except, type)) return this.track.wrap(c);
       }
     }
     return null;
@@ -469,16 +331,30 @@ export class TrackObjects {
     const d = def(type);
     if (this.count(type) >= d.max) return null;
     const near = this.track.nearestS(x, z);
-    const s = this.freeSpotNear(near.s, d.span);
+    const s = this.freeSpotNear(near.s, d.span, null, type);
     if (s == null) return null;
-    const item = { type, s, obj: new THREE.Group(), parts: {} };
+    const item = { type, s, obj: new THREE.Group(), parts: {}, owner: this };
     item.obj.userData.item = item;
-    BUILDERS[type](item, this.count(type));
+    const used = this.items.map((it) => it.color);
+    BUILDERS[type](item, type === 'bahnhof' ? [0, 1, 2].find((c) => !used.includes(c)) : 0);
     item.obj.traverse((o) => { o.userData.trackItem ??= item; });
     this.group.add(item.obj);
     this.items.push(item);
     this.place(item);
+    this.refreshDestinations();
     return item;
+  }
+
+  // Wartende ohne (gültiges) Ziel bekommen eins, sobald es einen zweiten Bahnhof gibt
+  refreshDestinations() {
+    const stations = this.items.filter((it) => it.type === 'bahnhof');
+    for (const st of stations) {
+      for (const w of st.waiting) {
+        const d = w.userData.dest;
+        const valid = d != null && d !== st.color && stations.some((o) => o.color === d);
+        if (!valid) setDest(w, pickDest(st));
+      }
+    }
   }
 
   // Gute freie Stelle: möglichst weit weg von den anderen Objekten
@@ -488,7 +364,7 @@ export class TrackObjects {
     let best = null;
     let bestScore = -1;
     for (let s = 0; s < L; s += 1.5) {
-      if (!this.isFree(s, d.span)) continue;
+      if (!this.isFree(s, d.span, null, type)) continue;
       const score = this.items.length ? Math.min(...this.items.map((it) => Math.abs(((s - it.s + L / 2) % L + L) % L - L / 2))) : L - s;
       if (score > bestScore) {
         bestScore = score;
@@ -503,12 +379,13 @@ export class TrackObjects {
   remove(item) {
     this.group.remove(item.obj);
     this.items = this.items.filter((i) => i !== item);
+    this.refreshDestinations();
   }
 
   moveTo(item, x, z) {
     const d = def(item.type);
     const near = this.track.nearestS(x, z);
-    const s = this.freeSpotNear(near.s, d.span, item);
+    const s = this.freeSpotNear(near.s, d.span, item, item.type);
     if (s == null) return false;
     item.s = s;
     this.place(item);
@@ -518,7 +395,9 @@ export class TrackObjects {
   place(item) {
     const f = this.track.frameAt(item.s);
     item.obj.position.set(f.p.x, 0, f.p.z);
-    item.obj.rotation.set(0, f.angle, 0);
+    // Stünde das Gebäude (links der Fahrtrichtung) im Fluss, auf der Straße oder im Berg → auf die andere Seite
+    item.flipped = this.sideAt(item.s) === -1;
+    item.obj.rotation.set(0, f.angle + (item.flipped ? Math.PI : 0), 0);
     item.x = f.p.x;
     item.z = f.p.z;
   }
@@ -530,7 +409,7 @@ export class TrackObjects {
     for (const it of old) {
       const d = def(it.type);
       const near = this.track.nearestS(it.x, it.z);
-      const s = this.freeSpotNear(near.s, d.span);
+      const s = this.freeSpotNear(near.s, d.span, null, it.type);
       if (s == null) {
         this.group.remove(it.obj);
         continue;
@@ -539,6 +418,7 @@ export class TrackObjects {
       this.items.push(it);
       this.place(it);
     }
+    this.refreshDestinations();
   }
 
   serialize() {
@@ -546,7 +426,7 @@ export class TrackObjects {
   }
 
   load(list) {
-    for (const o of list ?? []) this.add(o.type, o.x, o.z);
+    for (const o of list ?? []) if (BUILDERS[o.type]) this.add(o.type, o.x, o.z);
   }
 
   footprints() {
@@ -572,24 +452,6 @@ export class TrackObjects {
       if (it.type === 'bahnhof') {
         it.parts.clockHand.rotation.z = -time * 0.2;
         for (const w of it.waiting) w.position.y = w.userData.baseY + Math.max(0, Math.sin(time * 2 + w.userData.slot)) * 0.03;
-      } else if (it.type === 'bruecke') {
-        it.parts.water.offset.y -= dt * 0.15;
-        const f = it.parts.fish;
-        it.parts.fishTimer -= dt;
-        if (it.parts.fishTimer <= 0) {
-          it.parts.fishTimer = 6 + Math.random() * 8;
-          f.userData.t = 0;
-          f.userData.z = (Math.random() - 0.5) * 20;
-          if (Math.abs(f.userData.z) < 2.5) f.userData.z += 5;
-          f.visible = true;
-        }
-        if (f.visible) {
-          f.userData.t += dt / 1.1;
-          const t = f.userData.t;
-          f.position.set(-1 + t * 2, Math.sin(t * Math.PI) * 1.4 - 0.1, f.userData.z);
-          f.rotation.z = Math.cos(t * Math.PI) * 0.9;
-          if (t >= 1) f.visible = false;
-        }
       } else if (it.type === 'waschanlage') {
         const speed = it.washing ? 14 : 1;
         for (const b of it.parts.brushes) {
@@ -612,37 +474,7 @@ export class TrackObjects {
             b.userData.v = new THREE.Vector3((Math.random() - 0.5) * 2, 0.8 + Math.random(), (Math.random() - 0.5) * 2);
           }
         }
-      } else if (it.type === 'uebergang') {
-        this.animateCrossing(it, dt, time);
       }
-    }
-  }
-
-  animateCrossing(it, dt, time) {
-    const closed = it.closed > 0;
-    // Schranken senken/heben
-    for (const b of it.parts.barriers) {
-      const target = closed ? 0 : (-b.sz * Math.PI) / 2;
-      b.arm.rotation.z += (target - b.arm.rotation.z) * Math.min(1, dt * 3);
-    }
-    const blink = closed && Math.sin(time * 9) > 0;
-    it.parts.lights.forEach((l, i) => { l.material.emissiveIntensity = closed ? ((i % 2 === 0) === blink ? 2.5 : 0) : 0; });
-    // Autos fahren, halten vor geschlossener Schranke
-    for (const c of it.parts.cars) {
-      const dir = c.userData.dir;
-      let z = c.position.z + dir * c.userData.speed * dt;
-      const stopLine = -dir * 4.4;
-      const before = dir > 0 ? c.position.z <= stopLine : c.position.z >= stopLine;
-      if (closed && before) z = dir > 0 ? Math.min(z, stopLine) : Math.max(z, stopLine);
-      // nicht auf das vordere Auto auffahren
-      for (const o of it.parts.cars) {
-        if (o !== c && o.userData.dir === dir) {
-          const gap = (o.position.z - z) * dir;
-          if (gap > 0 && gap < 2.4) z = o.position.z - dir * 2.4;
-        }
-      }
-      c.position.z = z;
-      if (Math.abs(z) > 16) c.position.z = -dir * 16;
     }
   }
 }

@@ -7,7 +7,7 @@
 // - Eine Zeige-Hand zeigt, wie es geht, wenn eine Weile nichts passiert.
 
 import * as THREE from 'three';
-import { LOCOS, WAGONS, COLORS, DECOR, CARGO, ANIMALS, PASSENGERS, MAX_WAGONS, MAX_DECOR, newCar, partDef, isLoco } from '../../catalog.js';
+import { LOCOS, WAGONS, COLORS, DECOR, CARGO, ANIMALS, PASSENGERS, MAX_WAGONS, MAX_DECOR, newCar, partDef, isLoco, pushCargo, spliceCargo } from '../../catalog.js';
 import { renderThumbnails } from '../thumbs.js';
 import { createTray } from '../tray.js';
 import { wave, applyDirt } from '../trainModel.js';
@@ -347,14 +347,14 @@ export function createWorkshopMode(game) {
     services.sayName(kind);
   }
 
-  function addCargo(index, id) {
+  function addCargo(index, id, dest = null) {
     if (!hasRoom(index)) {
       // Passt nicht (Lok, Tankwagen oder voll) – Wagen hüpft, sonst nichts
       game.hop(train.cars[index]);
       services.sfx('boing');
       return false;
     }
-    train.data.cars[index].cargo.push(id);
+    pushCargo(train.data.cars[index], id, dest);
     const car = train.rebuildCar(index);
     game.popIn(car.userData.cargoItems[car.userData.cargoItems.length - 1]);
     lastCar = index;
@@ -365,7 +365,8 @@ export function createWorkshopMode(game) {
   }
 
   function removeItem(index, removable) {
-    train.data.cars[index][removable.list].splice(removable.index, 1);
+    if (removable.list === 'cargo') spliceCargo(train.data.cars[index], removable.index);
+    else train.data.cars[index][removable.list].splice(removable.index, 1);
     train.rebuildCar(index);
     game.saveTrain();
     services.sfx('poof');
@@ -375,9 +376,9 @@ export function createWorkshopMode(game) {
   function moveItem(from, removable, to) {
     const list = removable.list;
     if (list === 'cargo' && !hasRoom(to)) return false;
-    const [id] = train.data.cars[from][list].splice(removable.index, 1);
+    const { id, dest } = list === 'cargo' ? spliceCargo(train.data.cars[from], removable.index) : { id: train.data.cars[from][list].splice(removable.index, 1)[0] };
     train.rebuildCar(from);
-    if (list === 'cargo') addCargo(to, id);
+    if (list === 'cargo') addCargo(to, id, dest);
     else addDecor(to, id);
     return true;
   }

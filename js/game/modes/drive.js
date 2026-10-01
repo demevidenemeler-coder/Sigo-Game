@@ -12,8 +12,9 @@
 import * as THREE from 'three';
 import { chuff, railJoint, RollingSound, NoiseLoop, setEcho } from '../../audio.js';
 import { wave, applyDirt, slotWorldPosition } from '../trainModel.js';
-import { partDef, TRACK_OBJECTS } from '../../catalog.js';
+import { partDef, pushCargo, spliceCargo } from '../../catalog.js';
 import { addWaiting } from '../trackObjects.js';
+import { buildFigure } from '../figures.js';
 
 const JOINT = 5; // Abstand der Schienenstöße
 const CHUFF = (2 * Math.PI * 0.36) / 4; // vier Dampfstöße pro Umdrehung des Treibrads
@@ -23,7 +24,6 @@ const FUEL_ICONS = { kohle: '🪨', wasser: '💧', diesel: '⛽' };
 // Die Knöpfe zeigen immer den AKTUELLEN Zustand (nicht den nächsten)
 const WEATHERS = [['sonne', '🌤️'], ['regen', '🌧️'], ['schnee', '❄️']];
 const WAITING_IDS = ['kind', 'oma', 'papa', 'hund', 'katze', 'teddy', 'hase', 'pinguin', 'schaf', 'ente', 'pferd', 'huhn', 'kuh', 'frosch'];
-const span = (type) => TRACK_OBJECTS.find((o) => o.id === type).span;
 
 class Puffs {
   constructor(scene) {
@@ -203,7 +203,7 @@ export function createDriveMode(game) {
     side.set(0, 0, 1).applyQuaternion(loco.quaternion);
     loco.getWorldPosition(tmp);
     // Am Bahnhof schwenkt die Kamera auf die andere Seite: Zug vorne, Bahnsteig dahinter
-    const dist = stoppedAt?.type === 'bahnhof' ? -11 : 9;
+    const dist = stoppedAt?.type === 'bahnhof' ? (stoppedAt.flipped ? 11 : -11) : 9;
     game.cam.tPos.copy(tmp).addScaledVector(fwd, 3).addScaledVector(side, dist).add(new THREE.Vector3(0, stoppedAt ? 6 : 4.5, 0));
     game.cam.tLook.copy(tmp).addScaledVector(fwd, -2).add(new THREE.Vector3(0, 1, 0));
   }
@@ -243,7 +243,9 @@ export function createDriveMode(game) {
     updateGo();
     if (item.type === 'bahnhof') {
       services.sfx('dingdong');
-      setTimeout(() => services.say(services.t('station')), 600);
+      // Wer zu diesem Bahnhof (dieser Farbe) wollte, steigt von selbst aus
+      if (hasArrivals(item)) setTimeout(() => deliverNext(item, 0), 700);
+      else setTimeout(() => services.say(services.t('station')), 600);
     } else {
       services.sfx('bell');
       services.say(services.t('fuelEmpty'));
@@ -287,7 +289,7 @@ export function createDriveMode(game) {
     const car = train.cars[idx];
     const from = fig.getWorldPosition(new THREE.Vector3());
     const to = slotWorldPosition(car, train.data.cars[idx].cargo.length);
-    train.data.cars[idx].cargo.push(id);
+    pushCargo(train.data.cars[idx], id, fig.userData.dest ?? null);
     services.sfx('whoosh');
     fly(fig, from, to, 0.75, () => {
       land.scene.remove(fig);
@@ -300,17 +302,58 @@ export function createDriveMode(game) {
     });
   }
 
+  function hasArrivals(item) {
+    return train.data.cars.some((c, i) => i > 0 && (c.dest ?? []).includes(item.color));
+  }
+
+  // Ein Fahrgast ist am Ziel: hüpft aus dem Zug zur Bahnhofstür und geht hinein
+  function deliver(carIndex, slot, item) {
+    const car = train.cars[carIndex];
+    const old = car.userData.cargoItems[slot];
+    const from = old ? old.getWorldPosition(new THREE.Vector3()) : slotWorldPosition(car, slot);
+    const { id } = spliceCargo(train.data.cars[carIndex], slot);
+    train.rebuildCar(carIndex);
+    train.placeOnCurve(track.curve, track.length, d.s);
+    const fig = buildFigure(id);
+    fig.scale.setScalar(1.2);
+    land.scene.add(fig);
+    const door = item.obj.localToWorld(new THREE.Vector3(0, 0.45, 2.75));
+    services.sfx('whoosh');
+    fly(fig, from, door, 0.8, () => {
+      services.sfx('pop');
+      services.animalCall?.(id);
+      game.tween(0.5, (t) => fig.scale.setScalar(1.2 * (1 - t)), () => land.scene.remove(fig));
+    });
+    game.saveTrain();
+  }
+
+  function deliverNext(item, count) {
+    if (stoppedAt !== item) return;
+    const ci = train.data.cars.findIndex((c, i) => i > 0 && (c.dest ?? []).includes(item.color));
+    if (ci < 0) {
+      if (count) {
+        services.sfx('chime');
+        services.say(`${services.t('thanks')} ${services.t('station')}`);
+      }
+      return;
+    }
+    deliver(ci, train.data.cars[ci].dest.indexOf(item.color), item);
+    setTimeout(() => deliverNext(item, count + 1), 650);
+  }
+
   function alight(carIndex, removable, obj) {
     const item = stoppedAt;
     const id = removable.id;
-    const fig = addWaiting(item, id);
+    const dest = train.data.cars[carIndex].dest?.[removable.index] ?? null;
+    if (dest === item.color) return deliver(carIndex, removable.index, item);
+    const fig = addWaiting(item, id, dest ?? undefined);
     if (!fig) {
       services.sfx('boing');
       return;
     }
     const from = obj.getWorldPosition(new THREE.Vector3());
     const target = fig.getWorldPosition(new THREE.Vector3());
-    train.data.cars[carIndex].cargo.splice(removable.index, 1);
+    spliceCargo(train.data.cars[carIndex], removable.index);
     train.rebuildCar(carIndex);
     train.placeOnCurve(track.curve, track.length, d.s);
     const local = fig.position.clone();
@@ -394,18 +437,17 @@ export function createDriveMode(game) {
   function updateObjects(dt, offsets, moving) {
     const head = d.s;
     // Tunnel: Lok drin?
-    const inTunnel = objects.items.some((it) => it.type === 'tunnel' && Math.abs(signed(head - 1.5, it.s)) < span('tunnel') / 2 + 0.3);
+    const cross = land.crossings;
+    const inTunnel = cross.tunnels.some((tn) => objects.ahead(tn.s0, head - 1.5) < tn.s1 - tn.s0);
     env.setTunnel(inTunnel);
     setEcho(inTunnel);
 
-    // Bahnübergang: Schranke zu, wenn der Zug kommt oder drüberfährt
-    for (const it of objects.items) {
-      if (it.type !== 'uebergang') continue;
-      const aheadDist = objects.ahead(head, it.s);
-      const covered = objects.ahead(it.s, head) < train.length + 2;
-      const closed = (d.speed > 0.05 && aheadDist < 14) || covered;
-      it.closed = closed ? 1 : 0;
-      if (closed) {
+    // Bahnübergang: Schranke zu, wenn der Zug kommt oder drüberfährt – die Autos warten
+    for (const it of cross.crossings) {
+      const aheadDist = objects.ahead(head, it.s0);
+      const covered = objects.ahead(it.s0, head) < it.s1 - it.s0 + train.length + 2;
+      it.closed = (d.speed > 0.05 && aheadDist < 16) || covered;
+      if (it.closed) {
         const t = (crossingBell.get(it) ?? 0) - dt;
         crossingBell.set(it, t <= 0 ? 0.55 : t);
         if (t <= 0 && services.soundsOn()) services.sfx('xbell');
@@ -463,14 +505,14 @@ export function createDriveMode(game) {
 
   function railSounds(sBefore, sAfter, offsets) {
     let hits = 0;
-    const bridges = objects.items.filter((it) => it.type === 'bruecke');
+    const bridges = land.crossings.bridges;
     for (const o of offsets) {
       for (const off of o.axles) {
         const a = Math.floor((sBefore - off) / JOINT);
         const b = Math.floor((sAfter - off) / JOINT);
         if (a !== b && hits < 3) {
           const axleS = sAfter - off;
-          const hollow = bridges.some((br) => Math.abs(signed(axleS, br.s)) < span('bruecke') / 2);
+          const hollow = bridges.some((br) => objects.ahead(br.s0, axleS) < br.s1 - br.s0);
           railJoint(0.5 + Math.min(1, d.speed / 5) * 0.5, hollow);
           hits++;
         }

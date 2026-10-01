@@ -3,8 +3,8 @@
 
 import * as THREE from 'three';
 import { RoundedBoxGeometry } from '../../vendor/RoundedBoxGeometry.js';
-import { partDef, isLoco } from '../catalog.js';
-import { buildFigure } from './figures.js';
+import { partDef, isLoco, STATION_COLORS } from '../catalog.js';
+import { buildFigure, setBubble } from './figures.js';
 import { woodTexture } from './textures.js';
 import { lamp } from './lamps.js';
 
@@ -820,6 +820,8 @@ function addCargo(car) {
     fig.userData.baseY = car.userData.cargoY;
     fig.userData.phase = i * 1.7;
     fig.userData.removable = { list: 'cargo', index: i, id };
+    const dest = car.userData.data.dest?.[i];
+    if (dest != null && STATION_COLORS[dest]) setBubble(fig, STATION_COLORS[dest].hex);
     fig.traverse((o) => { o.userData.owner = fig; });
     car.userData.cargoItems.push(fig);
     car.add(fig);

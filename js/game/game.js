@@ -48,6 +48,7 @@ export class Game {
     this.train = new Train(trainData);
     const points = Array.isArray(trackData) ? trackData : trackData?.points;
     this.land.track.setPoints(points ?? defaultTrackPoints());
+    this.land.crossings.rebuild();
     this.land.objects.load(trackData?.objects);
     this.land.clearAroundTrack();
     this.drive = { s: 0, speed: 0, target: 0 };

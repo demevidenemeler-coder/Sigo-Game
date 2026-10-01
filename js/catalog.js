@@ -57,11 +57,15 @@ export const CARGO = [...ANIMALS, ...PASSENGERS];
 // Dinge, die man an die Strecke setzen kann
 export const TRACK_OBJECTS = [
   { id: 'bahnhof', span: 9, max: 3 },
-  { id: 'tunnel', span: 10, max: 2 },
-  { id: 'bruecke', span: 8, max: 2 },
   { id: 'waschanlage', span: 6, max: 1 },
   { id: 'tankstelle', span: 7, max: 1 },
-  { id: 'uebergang', span: 4, max: 2 },
+];
+
+// Bahnhofsfarben: Fahrgäste zeigen in einer Sprechblase, zu welchem Bahnhof sie wollen
+export const STATION_COLORS = [
+  { id: 'rot', hex: '#e5484d' },
+  { id: 'blau', hex: '#3b7cc9' },
+  { id: 'gelb', hex: '#f2c832' },
 ];
 
 export const MAX_WAGONS = 6;
@@ -77,7 +81,7 @@ export function isLoco(type) {
 
 export function newCar(type) {
   const def = partDef(type);
-  const car = { type, paint: { ...def.paint }, decor: [], cargo: [], dirt: 0 };
+  const car = { type, paint: { ...def.paint }, decor: [], cargo: [], dest: [], dirt: 0 };
   if (isLoco(type)) car.fuel = { kohle: 1, wasser: 1, diesel: 1 };
   return car;
 }
@@ -89,13 +93,31 @@ export function defaultTrain() {
   w1.cargo = ['kind', 'teddy'];
   const w2 = newCar('tier');
   w2.cargo = ['kuh', 'schaf'];
+  w1.dest = [null, null];
+  w2.dest = [null, null];
   return { cars: [loco, w1, w2] };
+}
+
+// Ladung und Ziel (Bahnhofsfarbe oder null) gehören zusammen
+export function pushCargo(car, id, dest = null) {
+  car.cargo.push(id);
+  car.dest ??= [];
+  car.dest[car.cargo.length - 1] = dest;
+}
+
+export function spliceCargo(car, index) {
+  const [id] = car.cargo.splice(index, 1);
+  const [dest] = (car.dest ?? []).splice(index, 1);
+  return { id, dest: dest ?? null };
 }
 
 // Ältere Spielstände ergänzen (neue Felder)
 export function upgradeTrain(data) {
   for (const c of data.cars) {
     c.dirt ??= 0;
+    c.dest ??= [];
+    c.dest.length = c.cargo.length;
+    for (let i = 0; i < c.dest.length; i++) c.dest[i] ??= null;
     if (isLoco(c.type)) c.fuel ??= { kohle: 1, wasser: 1, diesel: 1 };
   }
   return data;

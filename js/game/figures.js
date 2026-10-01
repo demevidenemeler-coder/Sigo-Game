@@ -432,9 +432,60 @@ export function buildFigure(id) {
   g.add(inner);
   g.userData.figure = id;
   g.userData.waveArm = inner.userData.waveArm;
+  g.updateMatrixWorld(true);
+  g.userData.top = new THREE.Box3().setFromObject(g).max.y;
   return g;
 }
 
 export function hasFigure(id) {
   return id in BUILD;
+}
+
+// ---------- Sprechblase mit Zielfarbe (zu welchem Bahnhof die Figur möchte) ----------
+
+const bubbleCache = new Map();
+function bubbleMaterial(hex) {
+  if (!bubbleCache.has(hex)) {
+    const c = document.createElement('canvas');
+    c.width = c.height = 128;
+    const g = c.getContext('2d');
+    g.fillStyle = '#ffffff';
+    g.strokeStyle = 'rgba(0,0,0,0.25)';
+    g.lineWidth = 5;
+    g.beginPath();
+    g.arc(64, 56, 48, 0, Math.PI * 2);
+    g.moveTo(50, 98);
+    g.lineTo(64, 124);
+    g.lineTo(78, 98);
+    g.fill();
+    g.stroke();
+    g.beginPath();
+    g.arc(64, 56, 48, 0, Math.PI * 2);
+    g.fill();
+    g.fillStyle = hex;
+    g.beginPath();
+    g.arc(64, 56, 34, 0, Math.PI * 2);
+    g.fill();
+    const t = new THREE.CanvasTexture(c);
+    t.colorSpace = THREE.SRGBColorSpace;
+    bubbleCache.set(hex, new THREE.SpriteMaterial({ map: t, depthWrite: false }));
+  }
+  return bubbleCache.get(hex);
+}
+
+// hex = null entfernt die Blase
+export function setBubble(fig, hex) {
+  if (fig.userData.bubble) {
+    fig.remove(fig.userData.bubble);
+    fig.userData.bubble = null;
+  }
+  if (!hex) return;
+  const s = new THREE.Sprite(bubbleMaterial(hex));
+  s.scale.setScalar(0.8);
+  s.position.y = fig.userData.top + 0.42;
+  s.center.set(0.5, 0.1);
+  s.renderOrder = 5;
+  s.userData.owner = fig;
+  fig.add(s);
+  fig.userData.bubble = s;
 }

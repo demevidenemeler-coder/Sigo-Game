@@ -2,7 +2,8 @@
 // - Nichts ausgewählt: ein Finger verschiebt die Ansicht, zwei Finger zoomen (Vogelperspektive).
 // - ✏️ Stift auswählen und eine Linie malen → daraus werden Schienen (Kreis schließt sich von selbst).
 //   Danach schaltet der Stift wieder ab, damit die Strecke nicht aus Versehen überschrieben wird.
-// - Bahnhof, Tunnel, Brücke … aus der Leiste an die Strecke ziehen oder antippen.
+// - Brücken, Tunnel und Bahnübergänge entstehen von selbst, wo die Strecke Fluss, Berg oder Straße kreuzt.
+// - Bahnhof, Waschanlage, Tankstelle aus der Leiste an die Strecke ziehen oder antippen.
 // - Gesetzte Dinge entlang der Strecke verschieben; in die Leiste ziehen = wegnehmen.
 
 import * as THREE from 'three';
@@ -12,7 +13,7 @@ import { TRACK_OBJECTS } from '../../catalog.js';
 import { renderThumbnails } from '../thumbs.js';
 import { createTray } from '../tray.js';
 
-const TAP_SOUND = { bahnhof: 'dingdong', tunnel: 'whistle', bruecke: 'clank', waschanlage: 'scrub', tankstelle: 'gurgle', uebergang: 'xbell' };
+const TAP_SOUND = { bahnhof: 'dingdong', waschanlage: 'scrub', tankstelle: 'gurgle' };
 const VIEW_DIR = new THREE.Vector3(0, 1, 0.3); // fast senkrecht von oben
 const MIN_HALF = 10;
 const MAX_HALF = WORLD_BOUNDS.x + 8;
@@ -180,6 +181,8 @@ export function createDrawMode(game) {
       return;
     }
     land.track.setPoints(pts, true);
+    const added = land.crossings.rebuild();
+    for (const o of land.crossings.group.children) game.popIn(o);
     objects.resnap();
     land.clearAroundTrack();
     game.saveTrack();
@@ -189,7 +192,9 @@ export function createDrawMode(game) {
     fade();
     setPencil(false);
     services.sfx('chime');
-    services.say(services.t('trackDone'));
+    // Neu entstandene Bauwerke ansagen
+    const news = [['bridge', 'autoBridge'], ['tunnel', 'autoTunnel'], ['crossing', 'autoCrossing']].filter(([k]) => added[k]).map(([, key]) => services.t(key));
+    services.say([services.t('trackDone'), ...news].join(' '));
     game.pulseMode('drive');
   }
 

@@ -339,6 +339,12 @@ export function createWorkshopMode(game) {
 
   function addDecor(index, kind) {
     const list = train.data.cars[index].decor;
+    // Gesicht, Lichterkette und Regenbogen gibt es nur einmal pro Wagen
+    if (['gesicht', 'lichterkette', 'regenbogen'].includes(kind) && list.includes(kind)) {
+      game.hop(train.cars[index]);
+      services.sfx('pling');
+      return;
+    }
     list.push(kind);
     if (list.length > MAX_DECOR) list.shift();
     const car = train.rebuildCar(index);

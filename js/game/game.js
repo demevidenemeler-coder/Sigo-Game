@@ -4,16 +4,17 @@ import * as THREE from 'three';
 import { RoomEnvironment } from '../../vendor/RoomEnvironment.js';
 import { createWorkshop, createLandscape } from './world.js';
 import { Train } from './train.js';
+import { Environment } from './environment.js';
 import { defaultTrackPoints } from './track.js';
 import { createWorkshopMode } from './modes/workshop.js';
 import { createDrawMode } from './modes/draw.js';
 import { createDriveMode } from './modes/drive.js';
 
-const MODE_ICONS = { workshop: '🛠️', draw: '✏️', drive: '🚂' };
+const MODE_ICONS = { workshop: '🛠️', draw: '🛤️', drive: '🚂' };
 const SUN_OFFSET = new THREE.Vector3(12, 24, 14);
 
 export class Game {
-  constructor({ canvas, ui, services, trainData, trackPoints }) {
+  constructor({ canvas, ui, services, trainData, trackData }) {
     this.canvas = canvas;
     this.ui = ui;
     this.services = services; // say, sayName, sfx, saveTrain, saveTrack
@@ -43,8 +44,11 @@ export class Game {
       sc.environmentIntensity = 0.55;
     }
     this.time = 0;
+    this.env = new Environment(this.land);
     this.train = new Train(trainData);
-    this.land.track.setPoints(trackPoints ?? defaultTrackPoints());
+    const points = Array.isArray(trackData) ? trackData : trackData?.points;
+    this.land.track.setPoints(points ?? defaultTrackPoints());
+    this.land.objects.load(trackData?.objects);
     this.land.clearAroundTrack();
     this.drive = { s: 0, speed: 0, target: 0 };
 
@@ -86,7 +90,10 @@ export class Game {
     this.time += dt;
     this.adaptQuality(raw);
     this.mode?.update(dt);
-    if (this.scene === this.land.scene) this.land.animate(dt, this.time);
+    if (this.scene === this.land.scene) {
+      this.land.animate(dt, this.time);
+      this.env.update(dt, this.cam.look, this.train.loco, this.services.soundsOn());
+    }
     this.tweens = this.tweens.filter((tw) => {
       tw.t = Math.min(1, tw.t + dt / tw.dur);
       tw.fn(tw.t);
@@ -177,6 +184,10 @@ export class Game {
 
   saveTrain() {
     this.services.saveTrain(this.train.data);
+  }
+
+  saveTrack() {
+    this.services.saveTrack({ points: this.land.track.points, objects: this.land.objects.serialize() });
   }
 
   // ---------- Kamera ----------

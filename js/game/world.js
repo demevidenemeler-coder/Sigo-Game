@@ -4,6 +4,8 @@ import * as THREE from 'three';
 import { RoundedBoxGeometry } from '../../vendor/RoundedBoxGeometry.js';
 import { Track, RAIL_TOP } from './track.js';
 import { buildFigure } from './figures.js';
+import { TrackObjects } from './trackObjects.js';
+import { lamp } from './lamps.js';
 import { woodTexture, grassTexture, waterTexture } from './textures.js';
 
 // Spielfeld, auf dem gemalt werden kann (halbe Breite / halbe Tiefe)
@@ -35,7 +37,9 @@ function add(parent, geometry, material, x, y, z, shadow = true) {
 }
 
 function sunLight(scene, size, mapSize = 2048) {
-  scene.add(new THREE.HemisphereLight('#fff7ea', '#8fa877', 1.3));
+  const hemi = new THREE.HemisphereLight('#fff7ea', '#8fa877', 1.3);
+  scene.add(hemi);
+  scene.userData.hemi = hemi;
   const sun = new THREE.DirectionalLight('#fff4e0', 2.6);
   sun.position.set(12, 24, 14);
   sun.castShadow = true;
@@ -144,6 +148,8 @@ function tree(kind, rand) {
   return g;
 }
 
+const windowMat = lamp(new THREE.MeshStandardMaterial({ color: '#9fc6e6', emissive: '#ffcf70', roughness: 0.2 }), 0, 1.3);
+
 function house(rand, big = false) {
   const g = new THREE.Group();
   const walls = ['#f2c7a5', '#f7f1e3', '#d8e6f0', '#f5d98b', '#f0c9c9'];
@@ -157,7 +163,7 @@ function house(rand, big = false) {
   add(g, new THREE.BoxGeometry(0.3, 0.6, 0.3), mat('#9a6b4a'), w * 0.25, 2.1, -0.2);
   add(g, new THREE.BoxGeometry(0.42, 0.7, 0.05), mat('#8a5a33'), 0, 0.35, 0.81);
   for (const x of [-w * 0.3, w * 0.3]) {
-    add(g, new THREE.BoxGeometry(0.42, 0.38, 0.05), mat('#9fc6e6', 0.2), x, 0.9, 0.81);
+    add(g, new THREE.BoxGeometry(0.42, 0.38, 0.05), windowMat, x, 0.9, 0.81);
     add(g, new THREE.BoxGeometry(0.5, 0.06, 0.08), mat('#ffffff'), x, 0.68, 0.83);
   }
   g.userData.kind = 'house';
@@ -238,6 +244,7 @@ function sky(scene) {
     fragmentShader: 'uniform vec3 top; uniform vec3 bottom; varying float h; void main(){ gl_FragColor = vec4(mix(bottom, top, smoothstep(0.0, 0.5, h)), 1.0); }',
   });
   scene.add(new THREE.Mesh(geo, material));
+  return material;
 }
 
 // Hügel erst außerhalb des Spielfelds; innen ist alles flach
@@ -256,7 +263,7 @@ export function createLandscape() {
   const scene = new THREE.Scene();
   scene.background = new THREE.Color('#e3f1f6');
   scene.fog = new THREE.Fog('#e3f1f6', 60, 160);
-  sky(scene);
+  const skyMat = sky(scene);
   const sun = sunLight(scene, 34);
   const rand = seeded(7);
   const animated = [];
@@ -411,20 +418,23 @@ export function createLandscape() {
 
   const track = new Track();
   scene.add(track.group);
+  const objects = new TrackObjects(scene, track);
 
   const trainAnchor = new THREE.Group();
   trainAnchor.position.y = RAIL_TOP;
   scene.add(trainAnchor);
 
-  // Alles, was im Weg der Schienen steht, verschwindet
+  // Alles, was im Weg der Schienen (und der Bahnhöfe, Tunnel …) steht, verschwindet
   function clearAroundTrack() {
+    const fp = objects.footprints();
+    const blocked = (x, z, pad) => fp.some(([fx, fz, r]) => Math.hypot(fx - x, fz - z) < r + pad);
     for (const o of scenery) {
       const r = o.userData.kind === 'house' ? 2.8 : 2.0;
-      o.visible = track.distanceTo(o.position.x, o.position.z) > r;
+      o.visible = track.distanceTo(o.position.x, o.position.z) > r && !blocked(o.position.x, o.position.z, 1);
     }
     for (const { mesh, data } of props) {
       data.forEach((d, i) => {
-        const s = track.distanceTo(d.x, d.z) > 1.3 ? d.s : 0;
+        const s = track.distanceTo(d.x, d.z) > 1.3 && !blocked(d.x, d.z, 0) ? d.s : 0;
         m4.makeRotationY(d.r).scale(new THREE.Vector3(s, s, s)).setPosition(d.x, d.y * s, d.z);
         mesh.setMatrixAt(i, m4);
       });
@@ -435,6 +445,7 @@ export function createLandscape() {
   // Tiere grasen, Enten schwimmen, Windmühle dreht sich, Wolken ziehen
   const tmp = new THREE.Vector3();
   function animate(dt, time) {
+    objects.animate(dt, time);
     for (const a of animated) {
       if (a.kind === 'spin') a.obj.rotation.z -= dt * 0.6;
       else if (a.kind === 'cloud') {
@@ -467,5 +478,9 @@ export function createLandscape() {
     }
   }
 
-  return { scene, sun, track, trainAnchor, scenery, tappable, clearAroundTrack, animate };
+  // Was bei Schnee weiß wird
+  const snowables = [ground.material, tufts.material];
+  for (const [k, m] of matCache) if (/^#(5fae5a|4f9a4f|76b95e|3f8a4a)/.test(k)) snowables.push(m);
+
+  return { scene, sun, hemi: scene.userData.hemi, sky: skyMat, snowables, track, objects, trainAnchor, scenery, tappable, clearAroundTrack, animate, ground, animated };
 }

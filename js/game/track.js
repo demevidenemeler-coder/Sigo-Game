@@ -144,6 +144,7 @@ export class Track {
       T.push(this.curve.getTangentAt(u % 1));
     }
     this.samples = P.filter((_, i) => i % 4 === 0).map((p) => [p.x, p.z]);
+    this.sampleS = this.samples.map((_, i) => (i * 4 * this.length) / n);
 
     // Schotterbett als flaches Band
     const bed = new THREE.BufferGeometry();
@@ -213,6 +214,48 @@ export class Track {
     this.sleepers.count = Math.floor(this.sleeperMatrices.length * this.appear);
     if (this.appear >= 1) this.rails.forEach((r) => { r.visible = true; });
     return this.appear >= 1;
+  }
+
+  // Nächster Punkt auf der Strecke: Position s entlang der Strecke und Abstand
+  nearestS(x, z) {
+    let best = Infinity;
+    let bi = 0;
+    this.samples.forEach(([sx, sz], i) => {
+      const d = Math.hypot(sx - x, sz - z);
+      if (d < best) {
+        best = d;
+        bi = i;
+      }
+    });
+    // fein nachjustieren
+    let s = this.sampleS[bi];
+    const p = new THREE.Vector3();
+    for (const step of [0.5, 0.25, 0.1]) {
+      for (const ds of [-step, step]) {
+        this.curve.getPointAt(this.u(s + ds), p);
+        const d = Math.hypot(p.x - x, p.z - z);
+        if (d < best) {
+          best = d;
+          s += ds;
+        }
+      }
+    }
+    return { s: this.wrap(s), dist: best };
+  }
+
+  wrap(s) {
+    return ((s % this.length) + this.length) % this.length;
+  }
+
+  u(s) {
+    return this.wrap(s) / this.length;
+  }
+
+  // Position und Richtung an Stelle s
+  frameAt(s) {
+    const p = this.curve.getPointAt(this.u(s));
+    const t = this.curve.getTangentAt(this.u(s));
+    return { p, t, angle: Math.atan2(-t.z, t.x) };
   }
 
   distanceTo(x, z) {

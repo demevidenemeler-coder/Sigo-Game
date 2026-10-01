@@ -7,6 +7,8 @@ let sfxBus = null;
 let engineBus = null;
 let musicBus = null;
 let noiseBuf = null;
+let echoWet = null;
+const samples = new Map();
 
 function ac() {
   if (!ctx) {
@@ -28,6 +30,19 @@ function ac() {
     musicBus = ctx.createGain();
     musicBus.gain.value = 0;
     for (const b of [sfxBus, engineBus, musicBus]) b.connect(master);
+    // Hall (z. B. im Tunnel): Effekte und Zuggeräusche laufen zusätzlich durch ein Echo
+    const echoIn = ctx.createGain();
+    const delay = ctx.createDelay(1);
+    delay.delayTime.value = 0.22;
+    const feedback = ctx.createGain();
+    feedback.gain.value = 0.42;
+    echoWet = ctx.createGain();
+    echoWet.gain.value = 0;
+    echoIn.connect(delay);
+    delay.connect(feedback).connect(delay);
+    delay.connect(echoWet).connect(master);
+    sfxBus.connect(echoIn);
+    engineBus.connect(echoIn);
     // Ein Rausch-Puffer für alle Rausch-Geräusche (spart Rechenzeit)
     noiseBuf = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate);
     const d = noiseBuf.getChannelData(0);
@@ -50,6 +65,63 @@ export function unlockAudio() {
   const c = ac();
   if (c.state === 'suspended') c.resume();
   if ('speechSynthesis' in window) speechSynthesis.getVoices();
+}
+
+export function setEcho(on) {
+  ac();
+  echoWet.gain.setTargetAtTime(on ? 0.5 : 0, ctx.currentTime, 0.2);
+}
+
+// ---------- Echte Aufnahmen (Tiergeräusche) ----------
+
+export function preloadSamples(names) {
+  const c = ac();
+  for (const n of names) {
+    if (samples.has(n)) continue;
+    samples.set(n, fetch(`sounds/${n}.mp3`)
+      .then((r) => r.arrayBuffer())
+      .then((b) => c.decodeAudioData(b))
+      .then((buf) => { samples.set(n, buf); return buf; })
+      .catch(() => { samples.set(n, null); return null; }));
+  }
+}
+
+export async function playSample(name, { gain = 1, rate = 1 } = {}) {
+  const c = ac();
+  let buf = samples.get(name);
+  if (buf === undefined) {
+    preloadSamples([name]);
+    buf = samples.get(name);
+  }
+  if (buf instanceof Promise) buf = await buf;
+  if (!buf) return false;
+  const src = c.createBufferSource();
+  src.buffer = buf;
+  src.playbackRate.value = rate;
+  const g = c.createGain();
+  g.gain.value = gain;
+  src.connect(g).connect(sfxBus);
+  src.start();
+  await new Promise((r) => setTimeout(r, (buf.duration / rate) * 1000));
+  return true;
+}
+
+// Tierlaute: echte Aufnahme, wenn vorhanden, sonst nachgebaut
+const ANIMAL_SAMPLES = { kuh: 'kuh', katze: 'katze', hund: 'hund', hahn: 'hahn', huhn: 'huhn', schwein: 'schwein', schaf: 'schaf', frosch: 'frosch' };
+const ANIMAL_SYNTH = { ente: 'quack', pferd: 'neigh', loewe: 'roar', elefant: 'trumpet', pinguin: 'squawk' };
+export const ANIMAL_SAMPLE_NAMES = [...Object.values(ANIMAL_SAMPLES), 'voegel'];
+
+export function hasAnimalSound(id) {
+  return id in ANIMAL_SAMPLES || id in ANIMAL_SYNTH;
+}
+
+export async function animalSound(id) {
+  if (ANIMAL_SAMPLES[id]) return playSample(ANIMAL_SAMPLES[id], { gain: id === 'schwein' ? 0.6 : 0.9 });
+  if (ANIMAL_SYNTH[id]) {
+    await playSound(ANIMAL_SYNTH[id]);
+    return true;
+  }
+  return false;
 }
 
 export function setChannelVolume(channel, value) {
@@ -183,7 +255,103 @@ const SOUNDS = {
   },
 };
 
-const SOUND_LENGTH = { whistle: 1.6, elhorn: 1.2, chime: 1.2, poof: 0.4, pop: 0.2, hiss: 1.4 };
+Object.assign(SOUNDS, {
+  quack(t) {
+    for (const dt of [0, 0.28]) {
+      const o = tone('sawtooth', 520, t + dt, 0.01, 0.17, 0.35, filter('bandpass', 1300, 4));
+      o.frequency.exponentialRampToValueAtTime(330, t + dt + 0.16);
+    }
+  },
+  neigh(t) {
+    // Wiehern: hoch einsetzend, zitternd abfallend
+    const bp = filter('bandpass', 1600, 2);
+    const o = tone('sawtooth', 950, t, 0.03, 1.0, 0.35, bp);
+    o.frequency.exponentialRampToValueAtTime(420, t + 1.0);
+    const lfo = ctx.createOscillator();
+    const lg = ctx.createGain();
+    lfo.frequency.value = 16;
+    lg.gain.value = 70;
+    lfo.connect(lg).connect(o.frequency);
+    lfo.start(t);
+    lfo.stop(t + 1.1);
+    noise(t + 1.05, 0.25, 0.3, 'lowpass', 900);
+  },
+  roar(t) {
+    const lp = lowpass(700);
+    const o = tone('sawtooth', 95, t, 0.15, 1.2, 0.6, lp);
+    o.frequency.linearRampToValueAtTime(70, t + 1.2);
+    const n = noise(t, 1.3, 0.35, 'lowpass', 900);
+    const lfo = ctx.createOscillator();
+    const lg = ctx.createGain();
+    lfo.frequency.value = 28;
+    lg.gain.value = 0.25;
+    lfo.connect(lg).connect(n.gain.gain);
+    lfo.start(t);
+    lfo.stop(t + 1.4);
+  },
+  trumpet(t) {
+    // Elefant: Törööö
+    const bp = filter('bandpass', 1000, 1.5);
+    const o = tone('sawtooth', 380, t, 0.08, 1.1, 0.4, bp);
+    o.frequency.linearRampToValueAtTime(560, t + 0.35);
+    o.frequency.linearRampToValueAtTime(500, t + 1.1);
+    const lfo = ctx.createOscillator();
+    const lg = ctx.createGain();
+    lfo.frequency.value = 7;
+    lg.gain.value = 18;
+    lfo.connect(lg).connect(o.frequency);
+    lfo.start(t);
+    lfo.stop(t + 1.2);
+  },
+  squawk(t) {
+    for (const dt of [0, 0.22, 0.44]) {
+      const o = tone('square', 620, t + dt, 0.01, 0.16, 0.18, filter('bandpass', 1400, 3));
+      o.frequency.exponentialRampToValueAtTime(480, t + dt + 0.15);
+    }
+  },
+  dieselhorn(t) {
+    const lp = lowpass(2200);
+    for (const f of [440, 554, 659]) tone('sawtooth', f, t, 0.04, 1.0, 0.14, lp);
+  },
+  clank(t) {
+    // hohler Schienenstoß auf der Brücke
+    const o = tone('sine', 150, t, 0.002, 0.3, 0.5);
+    o.frequency.exponentialRampToValueAtTime(110, t + 0.25);
+    noise(t, 0.08, 0.4, 'bandpass', 900, sfxBus, 4);
+  },
+  gurgle(t) {
+    for (let i = 0; i < 9; i++) {
+      const o = tone('sine', 250 + Math.random() * 300, t + i * 0.09, 0.005, 0.08, 0.25);
+      o.frequency.exponentialRampToValueAtTime(600 + Math.random() * 300, t + i * 0.09 + 0.07);
+    }
+  },
+  coal(t) {
+    for (let i = 0; i < 14; i++) noise(t + i * 0.06 + Math.random() * 0.03, 0.05, 0.3, 'bandpass', 600 + Math.random() * 1200, sfxBus, 2);
+  },
+  xbell(t) {
+    tone('sine', 1760, t, 0.002, 0.25, 0.18);
+    tone('sine', 1760 * 2.4, t, 0.002, 0.1, 0.05);
+  },
+  carhonk(t) {
+    for (const dt of [0, 0.2]) tone('square', 480, t + dt, 0.01, 0.13, 0.15, lowpass(1600));
+  },
+  creak(t) {
+    const o = tone('sawtooth', 110, t, 0.05, 0.6, 0.18, filter('bandpass', 700, 6));
+    o.frequency.linearRampToValueAtTime(170, t + 0.6);
+  },
+  dingdong(t) {
+    tone('sine', 659, t, 0.005, 1.4, 0.3);
+    tone('sine', 523, t + 0.55, 0.005, 1.6, 0.3);
+  },
+  sparkle(t) {
+    [1568, 1976, 2349, 3136].forEach((f, i) => tone('sine', f, t + i * 0.07, 0.002, 0.3, 0.12));
+  },
+  scrub(t) {
+    for (let i = 0; i < 5; i++) noise(t + i * 0.12, 0.1, 0.25, 'bandpass', 1800 + (i % 2) * 900, sfxBus, 2);
+  },
+});
+
+const SOUND_LENGTH = { neigh: 1.3, roar: 1.4, trumpet: 1.2, quack: 0.5, squawk: 0.7, dingdong: 2.0, whistle: 1.6, elhorn: 1.2, chime: 1.2, poof: 0.4, pop: 0.2, hiss: 1.4 };
 
 // Spielt ein Geräusch; das Promise endet ungefähr, wenn es verklungen ist.
 export function playSound(name) {
@@ -207,9 +375,15 @@ export function chuff(accent, speed01) {
 }
 
 // Schienenstoß: jede Achse klackt einzeln über die Lücke – so entsteht „ta-tamm … ta-tamm“
-export function railJoint(strength = 1) {
+export function railJoint(strength = 1, hollow = false) {
   const c = ac();
   const t = c.currentTime + 0.01;
+  if (hollow) {
+    const o = tone('sine', 160, t, 0.002, 0.28, 0.5 * strength, engineBus);
+    o.frequency.exponentialRampToValueAtTime(115, t + 0.25);
+    noise(t, 0.06, 0.35 * strength, 'bandpass', 1100, engineBus, 5);
+    return;
+  }
   noise(t, 0.035, 0.5 * strength, 'bandpass', 2600, engineBus, 3);
   const o = tone('sine', 95, t, 0.002, 0.09, 0.55 * strength, engineBus);
   o.frequency.exponentialRampToValueAtTime(55, t + 0.08);
@@ -221,7 +395,8 @@ export class RollingSound {
     this.nodes = null;
   }
 
-  start(electric) {
+  // kind: 'steam' | 'electric' | 'diesel'
+  start(kind) {
     const c = ac();
     this.stop();
     const src = c.createBufferSource();
@@ -235,14 +410,15 @@ export class RollingSound {
     src.connect(lp).connect(g).connect(engineBus);
     src.start();
     const nodes = { src, lp, g };
-    if (electric) {
+    const freqs = kind === 'electric' ? [55, 110.5, 220] : kind === 'diesel' ? [41, 82.5, 124] : null;
+    if (freqs) {
       const hg = c.createGain();
       hg.gain.value = 0;
       const hl = c.createBiquadFilter();
       hl.type = 'lowpass';
-      hl.frequency.value = 500;
+      hl.frequency.value = kind === 'diesel' ? 320 : 500;
       hl.connect(hg).connect(engineBus);
-      nodes.hum = [55, 110.5, 220].map((f) => {
+      nodes.hum = freqs.map((f) => {
         const o = c.createOscillator();
         o.type = 'sawtooth';
         o.frequency.value = f;
@@ -250,7 +426,9 @@ export class RollingSound {
         o.start();
         return o;
       });
+      nodes.freqs = freqs;
       nodes.hg = hg;
+      nodes.base = kind === 'diesel' ? 0.07 : 0.02;
     }
     this.nodes = nodes;
   }
@@ -262,8 +440,8 @@ export class RollingSound {
     n.g.gain.setTargetAtTime(speed01 > 0.01 ? 0.08 + speed01 * 0.3 : 0, t, 0.15);
     n.lp.frequency.setTargetAtTime(180 + speed01 * 520, t, 0.15);
     if (n.hum) {
-      n.hg.gain.setTargetAtTime(0.02 + speed01 * 0.06, t, 0.2);
-      n.hum.forEach((o, i) => o.frequency.setTargetAtTime([55, 110.5, 220][i] * (1 + speed01 * 1.2), t, 0.2));
+      n.hg.gain.setTargetAtTime(n.base + speed01 * 0.06, t, 0.2);
+      n.hum.forEach((o, i) => o.frequency.setTargetAtTime(n.freqs[i] * (1 + speed01 * 1.2), t, 0.2));
     }
   }
 
@@ -277,6 +455,43 @@ export class RollingSound {
       n.src.stop();
       n.hum?.forEach((o) => o.stop());
     }, 500);
+    this.nodes = null;
+  }
+}
+
+// Dauergeräusch aus Rauschen (Regen, Waschanlage) – Lautstärke frei regelbar
+export class NoiseLoop {
+  constructor(filterType, freq, q = 0.7) {
+    this.filterType = filterType;
+    this.freq = freq;
+    this.q = q;
+    this.nodes = null;
+  }
+
+  set(volume) {
+    const c = ac();
+    if (!this.nodes && volume > 0) {
+      const src = c.createBufferSource();
+      src.buffer = noiseBuf;
+      src.loop = true;
+      const f = c.createBiquadFilter();
+      f.type = this.filterType;
+      f.frequency.value = this.freq;
+      f.Q.value = this.q;
+      const g = c.createGain();
+      g.gain.value = 0;
+      src.connect(f).connect(g).connect(sfxBus);
+      src.start();
+      this.nodes = { src, g };
+    }
+    if (this.nodes) this.nodes.g.gain.setTargetAtTime(volume, c.currentTime, 0.4);
+  }
+
+  stop() {
+    if (!this.nodes) return;
+    const n = this.nodes;
+    n.g.gain.setTargetAtTime(0, ctx.currentTime, 0.2);
+    setTimeout(() => n.src.stop(), 800);
     this.nodes = null;
   }
 }

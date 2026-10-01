@@ -244,6 +244,165 @@ const BUILD = {
     leaf.rotation.z = -0.4;
   },
 
+  pferd(g) {
+    const fur = '#9a6236';
+    part(g, rbox(0.62, 0.3, 0.28, 0.12), fur, 0, 0.55, 0);
+    const neck = part(g, rbox(0.14, 0.34, 0.16, 0.06), fur, 0.3, 0.76, 0);
+    neck.rotation.z = -0.5;
+    part(g, rbox(0.3, 0.15, 0.15, 0.06), fur, 0.46, 0.9, 0);
+    part(g, rbox(0.1, 0.11, 0.14, 0.04), '#c9956a', 0.6, 0.87, 0);
+    eyes(g, 0.48, 0.95, 0, 0.065);
+    for (const s of [1, -1]) {
+      const ear = part(g, cone(0.035, 0.09), fur, 0.38, 1.02, s * 0.05);
+      ear.rotation.x = -s * 0.2;
+    }
+    // Mähne und Schweif
+    for (let i = 0; i < 4; i++) part(g, sphere(0.05), '#3d2a1c', 0.22 + i * 0.06, 0.76 + i * 0.07, 0, 1, 1, 0.8);
+    const tail = part(g, cyl(0.04, 0.02, 0.32), '#3d2a1c', -0.36, 0.48, 0);
+    tail.rotation.z = 0.35;
+    legs(g, fur, [0.22, -0.22], [0.09, -0.09], 0.42, 0.045, '#3d3d3d');
+  },
+
+  huhn(g) {
+    part(g, sphere(0.17), '#f7f4ec', 0, 0.26, 0, 1.25, 1, 0.95);
+    part(g, sphere(0.1), '#f7f4ec', 0.15, 0.45, 0);
+    part(g, cone(0.035, 0.08), '#f0a030', 0.26, 0.44, 0).rotation.z = -Math.PI / 2;
+    part(g, sphere(0.04), '#e5484d', 0.15, 0.56, 0, 1, 1.2, 0.5);
+    part(g, sphere(0.03), '#e5484d', 0.22, 0.38, 0, 0.7, 1.2, 0.6);
+    eyes(g, 0.21, 0.48, 0, 0.055);
+    const tail = part(g, cone(0.08, 0.16), '#efe9dc', -0.2, 0.36, 0);
+    tail.rotation.z = 0.7;
+    legs(g, '#f0a030', [0.02], [0.05, -0.05], 0.12, 0.015);
+  },
+
+  hahn(g) {
+    BUILD.huhn(g);
+    for (let i = 0; i < 3; i++) part(g, sphere(0.035), '#e5484d', 0.1 + i * 0.05, 0.57 + (i === 1 ? 0.03 : 0), 0);
+    const tail = part(g, cone(0.1, 0.26), '#3d6b4a', -0.23, 0.45, 0);
+    tail.rotation.z = 0.5;
+    part(g, cone(0.07, 0.2), '#d9822f', -0.2, 0.42, 0.04).rotation.z = 0.9;
+  },
+
+  hase(g) {
+    const fur = '#d9cbb8';
+    part(g, sphere(0.17), fur, 0, 0.2, 0, 1.2, 1, 0.95);
+    part(g, sphere(0.12), fur, 0.16, 0.38, 0);
+    eyes(g, 0.25, 0.42, 0, 0.055);
+    part(g, sphere(0.02), '#e5738a', 0.28, 0.37, 0);
+    for (const s of [1, -1]) {
+      const ear = part(g, sphere(0.05), fur, 0.12, 0.58, s * 0.05, 0.6, 2.2, 0.6);
+      ear.rotation.z = 0.2;
+      ear.rotation.x = -s * 0.15;
+      part(g, sphere(0.025), '#f2b8c2', 0.13, 0.58, s * 0.06, 0.4, 1.8, 0.4).rotation.z = 0.2;
+    }
+    part(g, sphere(0.06), '#ffffff', -0.2, 0.25, 0);
+    for (const s of [1, -1]) part(g, sphere(0.06), fur, 0.1, 0.05, s * 0.08, 1.4, 0.6, 0.8);
+  },
+
+  frosch(g) {
+    const green = '#5fae5a';
+    part(g, sphere(0.18), green, 0, 0.16, 0, 1.15, 0.75, 1.05);
+    for (const s of [1, -1]) {
+      part(g, sphere(0.07), green, 0.08, 0.3, s * 0.09);
+      part(g, sphere(0.04), '#ffffff', 0.12, 0.33, s * 0.09);
+      part(g, sphere(0.022), '#1e1e1e', 0.15, 0.34, s * 0.09);
+      part(g, sphere(0.07), green, -0.1, 0.07, s * 0.16, 1.4, 0.5, 0.8);
+    }
+    part(g, geo('fsmile', () => new THREE.TorusGeometry(0.1, 0.012, 6, 16, Math.PI)), '#2f6b30', 0.17, 0.17, 0).rotation.set(0, Math.PI / 2, Math.PI);
+  },
+
+  loewe(g) {
+    const fur = '#e8b04a';
+    part(g, rbox(0.5, 0.26, 0.26, 0.1), fur, 0, 0.42, 0);
+    part(g, sphere(0.22), '#b5652a', 0.3, 0.6, 0, 0.8, 1, 1.05);
+    part(g, sphere(0.15), fur, 0.38, 0.6, 0);
+    part(g, sphere(0.06), '#f5d79a', 0.5, 0.56, 0, 1, 0.8, 1.2);
+    part(g, sphere(0.03), '#3d2a1c', 0.55, 0.59, 0);
+    eyes(g, 0.48, 0.66, 0, 0.065);
+    for (const s of [1, -1]) part(g, sphere(0.05), fur, 0.33, 0.76, s * 0.11);
+    legs(g, fur, [0.17, -0.17], [0.09, -0.09], 0.3, 0.05);
+    const tail = part(g, cyl(0.02, 0.02, 0.35), fur, -0.32, 0.45, 0);
+    tail.rotation.z = 0.6;
+    part(g, sphere(0.05), '#b5652a', -0.46, 0.34, 0);
+  },
+
+  elefant(g) {
+    const grey = '#9aa3ad';
+    part(g, sphere(0.3), grey, 0, 0.5, 0, 1.25, 0.95, 0.95);
+    part(g, sphere(0.2), grey, 0.36, 0.62, 0);
+    const trunk = part(g, cyl(0.06, 0.04, 0.35), grey, 0.52, 0.45, 0);
+    trunk.rotation.z = 0.35;
+    for (const s of [1, -1]) {
+      part(g, sphere(0.16), '#8a929c', 0.3, 0.64, s * 0.2, 0.4, 1.1, 1);
+      part(g, cone(0.025, 0.1), '#f5f1ea', 0.48, 0.5, s * 0.08).rotation.z = -1.2;
+    }
+    eyes(g, 0.49, 0.7, 0, 0.09);
+    legs(g, grey, [0.2, -0.2], [0.13, -0.13], 0.28, 0.08);
+    const tail = part(g, cyl(0.015, 0.015, 0.2), grey, -0.38, 0.45, 0);
+    tail.rotation.z = 0.3;
+  },
+
+  giraffe(g) {
+    const fur = '#f2c45a';
+    part(g, rbox(0.4, 0.24, 0.22, 0.09), fur, 0, 0.62, 0);
+    const neck = part(g, cyl(0.06, 0.08, 0.6), fur, 0.18, 0.98, 0);
+    neck.rotation.z = -0.25;
+    part(g, rbox(0.2, 0.12, 0.12, 0.05), fur, 0.3, 1.3, 0);
+    eyes(g, 0.32, 1.35, 0, 0.055);
+    for (const s of [1, -1]) part(g, cyl(0.015, 0.015, 0.1), '#8a5a33', 0.25, 1.41, s * 0.04);
+    for (const [x, y, z] of [[0.05, 0.68, 0.12], [-0.1, 0.6, 0.12], [0.1, 0.58, -0.12], [-0.05, 0.68, -0.12], [0.16, 0.92, 0.06], [0.22, 1.1, -0.05]]) {
+      part(g, sphere(0.04), '#a8703f', x, y, z, 1, 1, 0.3);
+    }
+    legs(g, fur, [0.14, -0.14], [0.07, -0.07], 0.5, 0.03, '#5c3b22');
+  },
+
+  pinguin(g) {
+    part(g, sphere(0.18), '#2b2f36', 0, 0.28, 0, 0.95, 1.4, 0.95);
+    part(g, sphere(0.15), '#ffffff', 0.1, 0.26, 0, 0.62, 1.25, 0.85);
+    part(g, cone(0.04, 0.1), '#f0a030', 0.2, 0.45, 0).rotation.z = -Math.PI / 2;
+    eyes(g, 0.15, 0.5, 0, 0.055);
+    for (const s of [1, -1]) {
+      const wing = part(g, sphere(0.06), '#2b2f36', 0, 0.3, s * 0.16, 0.7, 2, 0.3);
+      wing.rotation.x = s * 0.3;
+      part(g, sphere(0.05), '#f0a030', 0.06, 0.02, s * 0.06, 1.4, 0.4, 1);
+    }
+  },
+
+  papa(g) {
+    for (const s of [1, -1]) {
+      part(g, cyl(0.05, 0.05, 0.32), '#3a3a3a', s * 0.07, 0.16, 0);
+      part(g, rbox(0.09, 0.05, 0.14, 0.02), '#5c3b22', s * 0.07, 0.025, 0.02);
+    }
+    part(g, rbox(0.3, 0.36, 0.19, 0.08), '#4fa65a', 0, 0.5, 0);
+    for (const s of [1, -1]) {
+      const arm = part(g, cyl(0.04, 0.04, 0.28), '#4fa65a', s * 0.18, 0.48, 0);
+      arm.rotation.z = s * 0.15;
+      part(g, sphere(0.045), SKIN, s * 0.2, 0.33, 0);
+    }
+    part(g, sphere(0.16), SKIN, 0, 0.83, 0);
+    part(g, geo('hairPapa', () => new THREE.SphereGeometry(0.165, 18, 12, 0, Math.PI * 2, 0, Math.PI * 0.42)), '#3d2a1c', 0, 0.84, -0.01);
+    part(g, sphere(0.12), '#3d2a1c', 0, 0.75, 0.06, 1.1, 0.7, 0.7);
+    part(g, sphere(0.05), SKIN, 0, 0.79, 0.14, 1, 0.6, 0.6);
+    eyes(g, 0, 0.86, 0.14, 0.06, 'z');
+  },
+
+  ball(g) {
+    const colors = ['#e5484d', '#f5f1ea', '#3b7cc9', '#f2c832'];
+    for (let i = 0; i < 4; i++) {
+      const seg = part(g, geo(`ball${i}`, () => new THREE.SphereGeometry(0.2, 16, 12, (i * Math.PI) / 2, Math.PI / 2)), colors[i], 0, 0.2, 0);
+      seg.material = new THREE.MeshPhysicalMaterial({ color: colors[i], roughness: 0.3, clearcoat: 1 });
+    }
+  },
+
+  milch(g) {
+    const metal = new THREE.MeshStandardMaterial({ color: '#c9ccd1', roughness: 0.3, metalness: 0.85 });
+    part(g, cyl(0.15, 0.15, 0.36), metal, 0, 0.18, 0);
+    part(g, cyl(0.08, 0.15, 0.1), metal, 0, 0.41, 0);
+    part(g, cyl(0.1, 0.1, 0.06), metal, 0, 0.48, 0);
+    part(g, geo('handle', () => new THREE.TorusGeometry(0.06, 0.012, 6, 12, Math.PI)), metal, 0, 0.5, 0);
+    part(g, cyl(0.152, 0.152, 0.08), '#3b7cc9', 0, 0.22, 0);
+  },
+
   // Lokführer mit Mütze (nur für die Lok)
   fahrer(g) {
     part(g, rbox(0.26, 0.28, 0.2, 0.07), '#2f5c9e', 0, 0.3, 0);
@@ -263,7 +422,7 @@ const BUILD = {
 };
 
 // Tiere drehen den Kopf zur Kamera ein wenig, damit man die Gesichter sieht
-const TURN = { kuh: 0.35, schwein: 0.35, schaf: 0.35, hund: 0.35, katze: 0.35, ente: 0.35 };
+const TURN = Object.fromEntries(['kuh', 'schwein', 'schaf', 'hund', 'katze', 'ente', 'pferd', 'huhn', 'hahn', 'hase', 'frosch', 'loewe', 'elefant', 'giraffe', 'pinguin'].map((id) => [id, id === 'pinguin' ? 1.0 : 0.35]));
 
 export function buildFigure(id) {
   const g = new THREE.Group();

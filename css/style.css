@@ -80,29 +80,38 @@ button {
 }
 .tabs {
   display: grid;
-  grid-template-columns: repeat(2, var(--item));
+  grid-template-columns: repeat(3, calc(var(--item) * 0.8));
   gap: 1.2vmin;
   flex: none;
 }
 .tab {
-  width: var(--item);
+  width: calc(var(--item) * 0.8);
   aspect-ratio: 1;
   border-radius: 24%;
   background: #efe4d3;
   font-family: var(--emoji);
-  font-size: calc(var(--item) * 0.5);
+  font-size: calc(var(--item) * 0.42);
 }
 .tab.active { background: var(--accent); box-shadow: 0 4px 10px var(--shadow); }
 .tray-items {
   flex: 1;
+  min-width: 0;
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 1.4vmin;
-  justify-content: center;
-  align-content: center;
-  min-height: calc(var(--item) * 2 + 1.2vmin);
+  align-items: center;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 8px 6px;
+  touch-action: pan-x;
+  scrollbar-width: none;
+  -webkit-mask-image: linear-gradient(90deg, #000 92%, transparent);
+  mask-image: linear-gradient(90deg, #000 92%, transparent);
 }
+.tray-items::-webkit-scrollbar { display: none; }
 .tray-item {
+  flex: none;
+  touch-action: pan-x;
   width: var(--item);
   height: var(--item);
   border-radius: 24%;
@@ -114,6 +123,7 @@ button {
 }
 .tray-item:active { transform: scale(0.94); }
 .tray-item.parts { width: calc(var(--item) * 1.45); }
+.tray-item.build { width: calc(var(--item) * 1.35); height: calc(var(--item) * 1.1); }
 .tray-item img { width: 100%; height: 100%; object-fit: contain; pointer-events: none; }
 .tray-item.cargo img, .tray-item.decor img { width: 92%; height: 92%; }
 .tray-item .pot {
@@ -201,6 +211,38 @@ button {
   animation: breathe 3s ease-in-out infinite;
 }
 .drive-btn.go.stop { background: #d9463b; animation: none; }
+
+.drive-btn.go.waiting { animation: attention 1.2s ease-in-out infinite; box-shadow: 0 0 0 8px rgba(79, 166, 90, 0.35), 0 6px 16px var(--shadow); }
+
+/* Tag/Nacht und Wetter (unten links) */
+.env-controls {
+  position: fixed;
+  left: calc(16px + env(safe-area-inset-left));
+  bottom: calc(16px + env(safe-area-inset-bottom));
+  display: flex;
+  gap: 2vmin;
+}
+.env-controls .drive-btn { width: min(12vmin, 80px); font-size: min(6vmin, 38px); }
+
+/* Vorräte der Lok (nur wenn eine Tankstelle steht) */
+.fuel-gauges {
+  position: fixed;
+  left: calc(14px + env(safe-area-inset-left));
+  top: calc(min(15vmin, 84px) + 26px + env(safe-area-inset-top));
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 12px;
+  background: rgba(255, 250, 242, 0.85);
+  border-radius: 18px;
+  box-shadow: 0 4px 12px var(--shadow);
+}
+.gauge { display: flex; align-items: center; gap: 8px; }
+.gauge-icon { font-family: var(--emoji); font-size: 26px; }
+.gauge-bar { width: min(22vmin, 140px); height: 16px; border-radius: 8px; background: #e6dccb; overflow: hidden; }
+.gauge-bar i { display: block; height: 100%; background: #4fa65a; border-radius: 8px; transition: width 0.3s; }
+.gauge.low .gauge-bar i { background: #d9463b; }
+.gauge.low { animation: attention 1s ease-in-out infinite; }
 
 /* ---------- Mal-Hinweis ---------- */
 .draw-hint {
@@ -300,7 +342,7 @@ body[data-screen="settings"] #parent-btn { display: none; }
 @media (orientation: portrait) {
   :root { --item: min(14vmin, 92px); }
   .tray { flex-direction: column; align-items: stretch; }
-  .tabs { grid-template-columns: repeat(4, var(--item)); justify-content: center; }
+  .tabs { grid-template-columns: repeat(6, calc(var(--item) * 0.8)); justify-content: center; }
 }
 
 /* ---------- Animationen (sanft) ---------- */

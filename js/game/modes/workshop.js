@@ -7,17 +7,20 @@
 // - Eine Zeige-Hand zeigt, wie es geht, wenn eine Weile nichts passiert.
 
 import * as THREE from 'three';
-import { LOCOS, WAGONS, COLORS, DECOR, CARGO, MAX_WAGONS, MAX_DECOR, newCar, partDef, isLoco } from '../../catalog.js';
+import { LOCOS, WAGONS, COLORS, DECOR, CARGO, ANIMALS, PASSENGERS, MAX_WAGONS, MAX_DECOR, newCar, partDef, isLoco } from '../../catalog.js';
 import { renderThumbnails } from '../thumbs.js';
-import { wave } from '../trainModel.js';
+import { wave, applyDirt } from '../trainModel.js';
 
 const TABS = [
   { id: 'parts', icon: '🚃', say: 'tabParts' },
   { id: 'paint', icon: '🎨', say: 'tabPaint' },
   { id: 'decor', icon: '⭐', say: 'tabDecor' },
-  { id: 'cargo', icon: '🐄', say: 'tabCargo' },
+  { id: 'animals', icon: '🐄', say: 'tabAnimals' },
+  { id: 'passengers', icon: '🧸', say: 'tabPassengers' },
 ];
-const LISTS = { parts: [...LOCOS, ...WAGONS], paint: COLORS, decor: DECOR, cargo: CARGO };
+const LISTS = { parts: [...LOCOS, ...WAGONS], paint: COLORS, decor: DECOR, animals: ANIMALS, passengers: PASSENGERS };
+// Tiere und Mitfahrer sind beides „Ladung“
+const kindOf = (tab) => (tab === 'animals' || tab === 'passengers' ? 'cargo' : tab);
 const IDLE_HINT_MS = 12000;
 
 export function createWorkshopMode(game) {
@@ -90,7 +93,8 @@ export function createWorkshopMode(game) {
   function showTab(id) {
     tab = id;
     tabBar.querySelectorAll('.tab').forEach((b) => b.classList.toggle('active', b.dataset.tab === id));
-    items.replaceChildren(...LISTS[id].map((e) => itemButton(id, e)));
+    items.replaceChildren(...LISTS[id].map((e) => itemButton(kindOf(id), e)));
+    items.scrollLeft = 0;
     items.dataset.kind = id;
     hideHint();
     requestAnimationFrame(updateInset);
@@ -325,7 +329,8 @@ export function createWorkshopMode(game) {
   function paint(index, group) {
     const hex = selected.paint.hex;
     train.data.cars[index].paint[group] = hex;
-    train.cars[index].userData.mats[group].color.set(hex);
+    if (group === 'trim') train.cars[index].userData.mats.trim.color.set(hex);
+    else applyDirt(train.cars[index]);
     game.hop(train.cars[index]);
     game.saveTrain();
     services.sfx('splash');
@@ -387,7 +392,7 @@ export function createWorkshopMode(game) {
   function horn() {
     game.hop(train.loco);
     wave(train.loco.userData.driver, game);
-    services.sfx(train.data.cars[0].type === 'dampf' ? 'whistle' : 'elhorn');
+    services.sfx(partDef(train.data.cars[0].type).horn);
   }
 
   // Antippen am Zug
@@ -396,17 +401,40 @@ export function createWorkshopMode(game) {
     lastCar = d.car;
     if (d.what === 'item') {
       const obj = d.obj;
-      game.hop(obj);
       wave(obj, game);
-      if (d.removable.list === 'cargo') services.sayName(d.removable.id);
-      else services.sfx('pling');
+      if (d.removable.list === 'cargo') {
+        game.hop(obj);
+        services.sayName(d.removable.id);
+      } else if (obj.userData.bell) {
+        // Glocke läuten
+        const b = obj.userData.bell;
+        game.tween(1.0, (t) => { b.rotation.z = Math.sin(t * Math.PI * 6) * 0.5 * (1 - t); });
+        services.sfx('bell');
+      } else {
+        game.hop(obj);
+        services.sfx('pling');
+      }
       return;
     }
     if (tab === 'paint') return paint(d.car, d.hit.object?.userData.paint ?? 'body');
     if (tab === 'decor') return addDecor(d.car, selected.decor.id);
-    if (tab === 'cargo') return addCargo(d.car, selected.cargo.id);
+    if (kindOf(tab) === 'cargo') return addCargo(d.car, selected.cargo.id);
     if (d.what === 'loco') return horn();
-    game.hop(train.cars[d.car]);
+    const car = train.cars[d.car];
+    if (car.userData.crane) {
+      // Kran schwenkt einmal herum
+      const c = car.userData.crane;
+      const r0 = c.rotation.y;
+      game.tween(1.6, (t) => { c.rotation.y = r0 + Math.sin(t * Math.PI) * 1.4; });
+      services.sfx('creak');
+      return;
+    }
+    if (car.userData.toyCars) {
+      car.userData.toyCars.forEach((tc, i) => setTimeout(() => game.hop(tc), i * 120));
+      services.sfx('carhonk');
+      return;
+    }
+    game.hop(car);
     services.sfx('klack');
     services.sayName(train.data.cars[d.car].type);
   }
@@ -430,7 +458,7 @@ export function createWorkshopMode(game) {
     const btn = items.children[list.indexOf(entry)];
     if (!btn) return;
     let target = tab === 'parts' ? train.cars.length - 1 : 0;
-    if (tab === 'cargo') target = Math.max(0, train.data.cars.findIndex((_, i) => hasRoom(i)));
+    if (kindOf(tab) === 'cargo') target = Math.max(0, train.data.cars.findIndex((_, i) => hasRoom(i)));
     const from = btn.getBoundingClientRect();
     const to = screenPos(train.cars[target]);
     hint.style.setProperty('--x0', `${from.left + from.width / 2}px`);
@@ -443,7 +471,7 @@ export function createWorkshopMode(game) {
       img.style.background = entry.hex;
       img.classList.add('pot');
     } else {
-      img.src = thumbs[thumbKey(tab, entry.id)];
+      img.src = thumbs[thumbKey(kindOf(tab), entry.id)];
       img.style.background = '';
       img.classList.remove('pot');
     }

@@ -1,6 +1,6 @@
 // Offline-Unterstützung: Mit Internet wird immer die neueste Fassung geladen (und gespeichert),
 // ohne Internet die gespeicherte. Neue Dateien in ASSETS eintragen.
-const VERSION = 'sigo-v3';
+const VERSION = 'sigo-v4';
 const ASSETS = [
   './',
   'index.html',
@@ -15,10 +15,13 @@ const ASSETS = [
   'js/i18n.js',
   'js/music.js',
   'js/settings.js',
+  'js/game/environment.js',
   'js/game/figures.js',
   'js/game/game.js',
+  'js/game/lamps.js',
   'js/game/textures.js',
   'js/game/thumbs.js',
+  'js/game/trackObjects.js',
   'js/game/track.js',
   'js/game/train.js',
   'js/game/trainModel.js',
@@ -26,6 +29,15 @@ const ASSETS = [
   'js/game/modes/workshop.js',
   'js/game/modes/draw.js',
   'js/game/modes/drive.js',
+  'sounds/frosch.mp3',
+  'sounds/hahn.mp3',
+  'sounds/huhn.mp3',
+  'sounds/hund.mp3',
+  'sounds/katze.mp3',
+  'sounds/kuh.mp3',
+  'sounds/schaf.mp3',
+  'sounds/schwein.mp3',
+  'sounds/voegel.mp3',
   'icons/icon-192.png',
   'icons/icon-512.png',
   'icons/icon-maskable-512.png',

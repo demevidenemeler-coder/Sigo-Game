@@ -6,6 +6,7 @@ import { RoundedBoxGeometry } from '../../vendor/RoundedBoxGeometry.js';
 import { partDef, isLoco } from '../catalog.js';
 import { buildFigure } from './figures.js';
 import { woodTexture } from './textures.js';
+import { lamp } from './lamps.js';
 
 const WHEEL_Z = 0.47; // Radmitte seitlich (liegt über der Schiene)
 
@@ -15,7 +16,7 @@ const shared = {
   metal: new THREE.MeshStandardMaterial({ color: '#c3beb5', roughness: 0.28, metalness: 0.85 }),
   dark: new THREE.MeshStandardMaterial({ color: '#2f2f2f', roughness: 0.5, metalness: 0.3 }),
   gold: new THREE.MeshStandardMaterial({ color: '#e3b341', roughness: 0.22, metalness: 0.9 }),
-  lamp: new THREE.MeshStandardMaterial({ color: '#fff6d8', emissive: '#ffd36b', emissiveIntensity: 1.4 }),
+  lamp: lamp(new THREE.MeshStandardMaterial({ color: '#fff6d8', emissive: '#ffd36b' }), 1.4, 3.5),
   hay: new THREE.MeshStandardMaterial({ color: '#e9c96b', roughness: 1 }),
   axle: new THREE.MeshStandardMaterial({ color: '#f2c832', roughness: 0.5 }),
 };
@@ -165,7 +166,7 @@ function buildDampf(car, mats) {
   car.userData.driver = driver;
 
   car.userData.steamPoint = new THREE.Vector3(1.18, 2.3, 0);
-  car.userData.decorY = { side: 1.05, top: 2.02, sideZ: 0.59, sideX: [-0.9, 0.2, 0.75, -0.9], topX: [-0.9, 0.2, -0.9, 0.2] };
+  car.userData.decorY = { side: 1.05, top: 2.02, sideZ: 0.59, sideX: [-0.9, 0.2, 0.75, -0.9], topX: [-0.9, 0.2, -0.9, 0.2], front: [1.47, 1.2] };
   return len;
 }
 
@@ -210,7 +211,7 @@ function buildElok(car, mats) {
   }
   panto.add(mesh(box(0.14, 0.04, 0.9, 0.01), shared.metal, 0, 0.42, 0));
   car.add(panto);
-  car.userData.decorY = { side: 1.3, top: 2.0, sideZ: 0.6, sideX: [-0.55, 0.55, 0, -0.55], topX: [-1.0, 0.8, -1.0, 0.8] };
+  car.userData.decorY = { side: 1.3, top: 2.0, sideZ: 0.6, sideX: [-0.55, 0.55, 0, -0.55], topX: [-1.0, 0.8, -1.0, 0.8], front: [1.42, 1.22] };
   return len;
 }
 
@@ -323,9 +324,261 @@ function buildTank(car, mats) {
   return len;
 }
 
+// Führerhaus aus Einzelteilen mit offenen Seitenfenstern und Lokführer
+function openCab(car, mats, cx, w = 0.96, d = 1.16, y0 = 0.8) {
+  for (const s of [1, -1]) {
+    car.add(mesh(box(w, 0.55, 0.08, 0.03), mats.body, cx, y0 + 0.26, s * (d / 2 - 0.04), 'body'));
+    for (const px of [cx + w / 2 - 0.05, cx - w / 2 + 0.05]) car.add(mesh(box(0.1, 0.56, 0.08, 0.03), mats.body, px, y0 + 0.8, s * (d / 2 - 0.04), 'body'));
+  }
+  for (const sx of [1, -1]) car.add(mesh(box(0.08, 1.12, d, 0.03), mats.body, cx + sx * (w / 2 - 0.01), y0 + 0.54, 0, 'body'));
+  for (const z of [0.25, -0.25]) car.add(mesh(box(0.03, 0.3, 0.3, 0.04), shared.window, cx + w / 2 + 0.03, y0 + 0.85, z));
+  car.add(mesh(box(w - 0.06, 0.05, d - 0.16, 0.02), shared.dark, cx, y0, 0));
+  car.add(mesh(box(w + 0.28, 0.12, d + 0.2, 0.06), mats.roof, cx, y0 + 1.15, 0, 'roof'));
+  const driver = buildFigure('fahrer');
+  driver.scale.setScalar(0.95);
+  driver.position.set(cx, y0 + 0.22, 0.12);
+  driver.rotation.y = -Math.PI / 2;
+  car.add(driver);
+  car.userData.driver = driver;
+  car.userData.driverY = y0 + 0.22;
+}
+
+function buildDiesel(car, mats) {
+  const len = 3.0;
+  car.add(mesh(box(2.9, 0.22, 1.05, 0.04), mats.trim, 0, 0.62, 0, 'trim'));
+  couplers(car, len, 0.55);
+  bogie(car, 0.85, mats, 0.24);
+  bogie(car, -0.85, mats, 0.24);
+  // Langer Vorbau mit Lüftungsgittern und Geländer
+  car.add(mesh(box(1.75, 0.8, 0.8, 0.12), mats.body, 0.48, 1.13, 0, 'body'));
+  car.add(mesh(box(1.6, 0.06, 0.6, 0.02), mats.roof, 0.48, 1.55, 0, 'roof'));
+  for (const sd of [1, -1]) {
+    for (let i = 0; i < 6; i++) car.add(mesh(box(0.05, 0.4, 0.02), shared.dark, -0.05 + i * 0.2, 1.15, sd * 0.405));
+    car.add(mesh(cylX(0.016, 2.6, 6), shared.metal, 0.05, 1.18, sd * 0.56));
+    for (const x of [-1.2, -0.3, 0.6, 1.3]) car.add(mesh(cyl(0.014, 0.014, 0.45, 6), shared.metal, x, 0.95, sd * 0.56));
+  }
+  // Warnstreifen vorne
+  for (let i = 0; i < 4; i++) {
+    const st = mesh(box(0.03, 0.08, 0.5), mats.roof, 1.36, 0.85 + i * 0.12, 0, 'roof');
+    st.rotation.x = i % 2 ? 0.5 : -0.5;
+    car.add(st);
+  }
+  car.add(mesh(cylX(0.07, 0.04, 16), shared.lamp, 1.37, 1.38, 0.25));
+  car.add(mesh(cylX(0.07, 0.04, 16), shared.lamp, 1.37, 1.38, -0.25));
+  car.add(mesh(cyl(0.07, 0.08, 0.25, 12), shared.dark, 0.75, 1.64, 0));
+  openCab(car, mats, -0.85, 1.0, 1.16, 0.74);
+  car.userData.exhaustPoint = new THREE.Vector3(0.75, 1.85, 0);
+  car.userData.decorY = { side: 1.15, top: 1.95, sideZ: 0.6, sideX: [-0.85, 0.3, 0.9, -0.85], topX: [-0.85, 0.3, -0.85, 0.3], front: [1.38, 1.1] };
+  return len;
+}
+
+function buildSchnell(car, mats) {
+  const len = 3.4;
+  car.add(mesh(box(3.0, 0.2, 0.95, 0.04), shared.dark, -0.1, 0.6, 0));
+  couplers(car, len, 0.55);
+  bogie(car, 0.9, mats, 0.22);
+  bogie(car, -1.05, mats, 0.22);
+  // Stromlinien-Körper mit langer Nase
+  car.add(mesh(box(2.5, 1.12, 1.15, 0.3), mats.body, -0.45, 1.28, 0, 'body'));
+  const nose = mesh(sph(0.575), mats.body, 0.7, 1.22, 0, 'body');
+  nose.scale.set(1.75, 0.95, 1);
+  car.add(nose);
+  const shield = mesh(sph(0.4), shared.window, 1.02, 1.48, 0);
+  shield.scale.set(1.3, 0.5, 1.2);
+  car.add(shield);
+  for (const sd of [1, -1]) {
+    car.add(mesh(box(2.3, 0.22, 0.03, 0.05), shared.window, -0.45, 1.5, sd * 0.585));
+    car.add(mesh(box(2.4, 0.09, 0.03, 0.03), mats.roof, -0.45, 1.02, sd * 0.585, 'roof'));
+    car.add(mesh(box(2.7, 0.3, 0.05, 0.04), mats.body, -0.3, 0.72, sd * 0.5, 'body'));
+  }
+  const stripe = mesh(sph(0.58), mats.roof, 0.7, 1.05, 0, 'roof');
+  stripe.scale.set(1.76, 0.1, 1.01);
+  car.add(stripe);
+  for (const z of [0.28, -0.28]) car.add(mesh(sph(0.06), shared.lamp, 1.55, 1.0, z));
+  car.add(mesh(box(0.5, 0.1, 0.4, 0.03), shared.dark, -0.9, 1.88, 0));
+  const arm = cached('pantoS', () => new THREE.BoxGeometry(0.45, 0.03, 0.03));
+  for (const rz of [0.7, -0.7]) {
+    const a = mesh(arm, shared.metal, -0.9, 2.0, 0);
+    a.rotation.z = rz;
+    car.add(a);
+  }
+  car.add(mesh(box(0.1, 0.03, 0.6, 0.01), shared.metal, -0.9, 2.16, 0));
+  car.userData.decorY = { side: 1.3, top: 1.86, sideZ: 0.6, sideX: [-1.2, -0.3, 0.4, -1.2], topX: [-1.3, 0, -1.3, 0], front: [1.62, 1.12] };
+  return len;
+}
+
+function buildZirkus(car, mats) {
+  const len = 2.6;
+  underframe(car, len, mats);
+  floor(car, len, mats);
+  // Käfig mit goldenen Stäben
+  for (let i = 0; i < 9; i++) {
+    for (const sd of [1, -1]) car.add(mesh(cyl(0.025, 0.025, 0.95, 8), shared.gold, -1.1 + i * 0.275, 1.33, sd * 0.52));
+  }
+  for (const sx of [1, -1]) car.add(mesh(box(0.1, 0.95, 1.1, 0.04), mats.body, sx * (len / 2 - 0.1), 1.33, 0, 'body'));
+  car.add(mesh(box(len, 0.16, 1.25, 0.05), mats.body, 0, 1.86, 0, 'body'));
+  car.add(mesh(box(len - 0.4, 0.14, 0.9, 0.07), mats.roof, 0, 1.98, 0, 'roof'));
+  for (let i = 0; i < 9; i++) {
+    for (const sd of [1, -1]) car.add(mesh(sph(0.06), mats.roof, -1.2 + i * 0.3, 1.74, sd * 0.62, 'roof'));
+  }
+  for (const sx of [1, -1]) {
+    car.add(mesh(cyl(0.02, 0.02, 0.5, 6), shared.metal, sx * 1.1, 2.3, 0));
+    const tri = new THREE.Shape();
+    tri.moveTo(0, 0);
+    tri.lineTo(0.3, -0.09);
+    tri.lineTo(0, -0.18);
+    const fl = mesh(cached('pennant', () => new THREE.ShapeGeometry(tri)), new THREE.MeshStandardMaterial({ color: sx > 0 ? '#3b7cc9' : '#4fa65a', side: THREE.DoubleSide }), sx * 1.1 + 0.01, 2.52, 0);
+    car.add(fl);
+  }
+  car.userData.cargoY = 0.86;
+  car.userData.slotX = [-0.5, 0.5];
+  car.userData.decorY = { side: 1.86, top: 2.05, sideZ: 0.64, sideX: [-0.6, 0.6, 0, -0.6], topX: [-0.6, 0.6, 0, -0.6] };
+  return len;
+}
+
+function buildSchluss(car, mats) {
+  const len = 2.5;
+  underframe(car, len, mats);
+  car.add(mesh(box(len - 0.1, 0.12, 1.15, 0.04), shared.dark, 0, 0.76, 0));
+  car.add(mesh(box(1.6, 1.0, 1.08, 0.08), mats.body, 0.1, 1.32, 0, 'body'));
+  for (const sd of [1, -1]) {
+    for (const x of [-0.35, 0.55]) car.add(mesh(box(0.32, 0.3, 0.03, 0.04), shared.window, x, 1.45, sd * 0.545));
+  }
+  car.add(mesh(box(1.95, 0.1, 1.3, 0.05), mats.roof, 0.1, 1.87, 0, 'roof'));
+  // Kanzel auf dem Dach
+  car.add(mesh(box(0.6, 0.4, 0.8, 0.05), mats.body, 0.1, 2.1, 0, 'body'));
+  for (const sd of [1, -1]) car.add(mesh(box(0.35, 0.18, 0.03, 0.03), shared.window, 0.1, 2.14, sd * 0.405));
+  car.add(mesh(box(0.75, 0.08, 0.95, 0.04), mats.roof, 0.1, 2.33, 0, 'roof'));
+  // Plattformen mit Geländer an beiden Enden
+  for (const sx of [1, -1]) {
+    const x = sx * (len / 2 - 0.12);
+    for (const z of [0.5, -0.5]) car.add(mesh(cyl(0.02, 0.02, 0.5, 6), shared.metal, x, 1.07, z));
+    car.add(mesh(cylZ(0.02, 1.0, 6), shared.metal, x, 1.3, 0));
+  }
+  car.add(mesh(sph(0.09), new THREE.MeshStandardMaterial({ color: '#ff6b5a', emissive: '#ff2a1a', emissiveIntensity: 1.2 }), -len / 2 + 0.05, 1.55, 0.35));
+  car.userData.cargoY = 0.82;
+  car.userData.slotX = [-1.0];
+  car.userData.decorY = { side: 1.15, top: 1.93, sideZ: 0.56, sideX: [0.1, -0.4, 0.6, 0.1], topX: [0.6, -0.4, 0.6, -0.4] };
+  return len;
+}
+
+function buildHolz(car, mats) {
+  const len = 2.6;
+  underframe(car, len, mats);
+  floor(car, len, mats);
+  for (const x of [-1.15, -0.38, 0.38, 1.15]) {
+    for (const z of [0.53, -0.53]) car.add(mesh(cyl(0.04, 0.045, 0.75, 8), mats.roof, x, 1.22, z, 'roof'));
+  }
+  const bark = new THREE.MeshStandardMaterial({ color: '#7a4b2a', roughness: 0.9 });
+  const cut = new THREE.MeshStandardMaterial({ color: '#e3c18f', roughness: 0.8 });
+  const logGeo = cached('log', () => new THREE.CylinderGeometry(0.16, 0.16, 2.3, 14).rotateZ(Math.PI / 2));
+  for (const [y, z] of [[1.02, -0.33], [1.02, 0], [1.02, 0.33], [1.29, -0.17], [1.29, 0.17], [1.56, 0]]) {
+    car.add(mesh(logGeo, [bark, cut, cut], 0, y, z));
+  }
+  car.userData.decorY = { side: 0.78, top: 1.72, sideZ: 0.6, sideX: [-0.75, 0, 0.75, -0.35], topX: [-0.8, 0.8, 0, -0.8] };
+  return len;
+}
+
+function buildKohle(car, mats) {
+  const len = 2.6;
+  underframe(car, len, mats);
+  floor(car, len, mats);
+  walls(car, len, 0.55, mats);
+  for (const x of [-0.8, 0, 0.8]) {
+    for (const z of [0.58, -0.58]) car.add(mesh(box(0.06, 0.56, 0.04, 0.01), mats.trim, x, 1.13, z, 'trim'));
+  }
+  const coal = new THREE.MeshStandardMaterial({ color: '#25272b', roughness: 0.6, metalness: 0.2 });
+  let seed = 3;
+  const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+  for (let i = 0; i < 26; i++) {
+    const x = (rnd() - 0.5) * 2.0;
+    const z = (rnd() - 0.5) * 0.85;
+    const h = 1.3 + (1 - Math.abs(x) / 1.1) * 0.25 + rnd() * 0.08;
+    const c = mesh(cached('coal', () => new THREE.IcosahedronGeometry(0.16, 0)), coal, x, h, z);
+    c.rotation.set(rnd() * 3, rnd() * 3, 0);
+    car.add(c);
+  }
+  car.userData.decorY = { side: 1.13, top: 1.45, sideZ: 0.6, sideX: [-0.4, 0.4, -1.0, 1.0], topX: [-1.1, 1.1, -1.1, 1.1] };
+  return len;
+}
+
+const TOY_CAR_COLORS = ['#e5484d', '#4fa65a', '#f2c832', '#8b5bb5'];
+function toyCar(color) {
+  const g = new THREE.Group();
+  const m = new THREE.MeshPhysicalMaterial({ color, roughness: 0.3, clearcoat: 1 });
+  g.add(mesh(box(0.8, 0.22, 0.48, 0.08), m, 0, 0.2, 0));
+  g.add(mesh(box(0.42, 0.2, 0.42, 0.08), m, -0.05, 0.38, 0));
+  for (const z of [0.215, -0.215]) g.add(mesh(box(0.3, 0.12, 0.02, 0.02), shared.window, -0.05, 0.39, z));
+  for (const x of [0.25, -0.25]) {
+    for (const z of [0.22, -0.22]) g.add(mesh(cylZ(0.09, 0.08, 12), shared.tire, x, 0.09, z));
+  }
+  return g;
+}
+
+function buildAuto(car, mats) {
+  const len = 2.6;
+  underframe(car, len, mats);
+  car.add(mesh(box(len - 0.1, 0.08, 1.1, 0.03), mats.body, 0, 0.76, 0, 'body'));
+  car.add(mesh(box(len - 0.1, 0.06, 1.1, 0.03), mats.body, 0, 1.45, 0, 'body'));
+  for (const x of [-1.2, 0, 1.2]) {
+    for (const z of [0.52, -0.52]) car.add(mesh(box(0.06, 0.72, 0.06, 0.02), mats.roof, x, 1.1, z, 'roof'));
+  }
+  for (const z of [0.52, -0.52]) car.add(mesh(cylX(0.02, len - 0.1, 6), mats.roof, 0, 1.75, z, 'roof'));
+  car.userData.toyCars = [];
+  [[-0.6, 0.8], [0.6, 0.8], [-0.6, 1.48], [0.6, 1.48]].forEach(([x, y], i) => {
+    const c = toyCar(TOY_CAR_COLORS[i]);
+    c.position.set(x, y, 0);
+    car.add(c);
+    car.userData.toyCars.push(c);
+  });
+  car.userData.decorY = { side: 1.1, top: 1.8, sideZ: 0.6, sideX: [-0.6, 0.6, 0, -0.6], topX: [-1.2, 1.2, 0, -1.2] };
+  return len;
+}
+
+function buildKran(car, mats) {
+  const len = 2.6;
+  underframe(car, len, mats);
+  floor(car, len, mats);
+  const turret = new THREE.Group();
+  turret.position.set(0.2, 0.86, 0);
+  turret.add(mesh(cyl(0.38, 0.42, 0.14, 24), mats.roof, 0, 0.07, 0, 'roof'));
+  turret.add(mesh(box(0.75, 0.6, 0.7, 0.06), mats.body, -0.1, 0.45, 0, 'body'));
+  for (const z of [0.36, -0.36]) turret.add(mesh(box(0.3, 0.25, 0.02, 0.03), shared.window, 0.05, 0.55, z));
+  turret.add(mesh(box(0.4, 0.4, 0.6, 0.04), shared.dark, -0.55, 0.36, 0));
+  // Ausleger (Gitter) mit Haken
+  const boom = new THREE.Group();
+  boom.position.set(0.2, 0.55, 0);
+  boom.rotation.z = 0.6;
+  for (const z of [0.12, -0.12]) boom.add(mesh(box(1.6, 0.06, 0.05, 0.01), mats.body, 0.8, 0, z, 'body'));
+  for (let i = 0; i < 6; i++) {
+    const d = mesh(box(0.05, 0.3, 0.05, 0.01), mats.body, 0.15 + i * 0.27, 0, 0, 'body');
+    d.rotation.x = Math.PI / 2;
+    d.rotation.z = 0.6;
+    boom.add(d);
+  }
+  turret.add(boom);
+  const tip = new THREE.Vector3(0.2 + Math.cos(0.6) * 1.6, 0.55 + Math.sin(0.6) * 1.6, 0);
+  const rope = mesh(cyl(0.012, 0.012, 0.7, 4), shared.dark, tip.x, tip.y - 0.35, 0);
+  turret.add(rope);
+  const hook = mesh(cached('hook', () => new THREE.TorusGeometry(0.07, 0.022, 6, 12, Math.PI * 1.4)), shared.metal, tip.x, tip.y - 0.74, 0);
+  turret.add(hook);
+  car.add(turret);
+  car.userData.crane = turret;
+  car.userData.decorY = { side: 0.78, top: 1.65, sideZ: 0.6, sideX: [-0.75, 0, 0.75, -0.35], topX: [-0.15, -1.0, -0.15, -1.0] };
+  return len;
+}
+
 const BUILDERS = {
   dampf: buildDampf,
+  diesel: buildDiesel,
   elok: buildElok,
+  schnell: buildSchnell,
+  zirkus: buildZirkus,
+  schluss: buildSchluss,
+  holz: buildHolz,
+  kohle: buildKohle,
+  auto: buildAuto,
+  kran: buildKran,
   personen: buildPersonen,
   gueter: buildGueter,
   tier: buildTier,
@@ -367,14 +620,61 @@ const decorMats = {
   herz: new THREE.MeshPhysicalMaterial({ color: '#e5484d', roughness: 0.3, clearcoat: 1 }),
   petal: new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.6 }),
   center: new THREE.MeshStandardMaterial({ color: '#f2b705' }),
-  bulb: new THREE.MeshStandardMaterial({ color: '#fff6d0', emissive: '#ffc94d', emissiveIntensity: 1.4 }),
+  bulb: lamp(new THREE.MeshStandardMaterial({ color: '#fff6d0', emissive: '#ffc94d' }), 1.4, 3.5),
   flag: new THREE.MeshStandardMaterial({ color: '#e5484d', side: THREE.DoubleSide }),
   string: new THREE.MeshBasicMaterial({ color: '#777777' }),
+  eyeWhite: new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.3 }),
+  cheek: new THREE.MeshStandardMaterial({ color: '#f59aa5', roughness: 0.6 }),
 };
+
+// Freundliches Gesicht (schaut nach +x, also nach vorne)
+function faceDecor() {
+  const g = new THREE.Group();
+  const white = decorMats.eyeWhite;
+  for (const z of [0.16, -0.16]) {
+    const e = mesh(sph(0.1), white, 0, 0.1, z);
+    e.scale.x = 0.5;
+    g.add(e, mesh(sph(0.05), shared.dark, 0.045, 0.09, z * 0.95));
+    g.add(mesh(sph(0.018), white, 0.07, 0.11, z * 0.95 + 0.01));
+    const cheek = mesh(sph(0.06), decorMats.cheek, 0, -0.06, z * 1.55);
+    cheek.scale.set(0.3, 0.7, 1);
+    g.add(cheek);
+  }
+  const smile = mesh(cached('smileBig', () => new THREE.TorusGeometry(0.13, 0.025, 8, 20, Math.PI)), shared.dark, 0.02, -0.04, 0);
+  smile.rotation.set(Math.PI, Math.PI / 2, 0);
+  g.add(smile);
+  return g;
+}
+
+// Lichterkette: bunte Lämpchen, die funkeln
+const BULB_COLORS = ['#ff5a5a', '#ffd34d', '#5ad1ff', '#7dff7a', '#ff8ce6'];
+function lightString(len) {
+  const g = new THREE.Group();
+  const n = Math.max(4, Math.round(len / 0.3));
+  g.add(mesh(cylX(0.008, len, 4), shared.dark, 0, 0, 0));
+  g.userData.bulbs = [];
+  for (let i = 0; i < n; i++) {
+    const c = BULB_COLORS[i % BULB_COLORS.length];
+    const b = mesh(sph(0.045), new THREE.MeshStandardMaterial({ color: c, emissive: c, emissiveIntensity: 1 }), -len / 2 + (i + 0.5) * (len / n), -0.05 - (i % 2) * 0.02, 0);
+    g.add(b);
+    g.userData.bulbs.push(b);
+  }
+  return g;
+}
 
 // Schmuck für die Wagenseite (wird auf beiden Seiten angebracht)
 export function sideDecor(kind) {
   const g = new THREE.Group();
+  if (kind === 'gesicht') {
+    const f = faceDecor();
+    f.rotation.y = -Math.PI / 2;
+    g.add(f);
+    return g;
+  }
+  if (kind === 'lichterkette') {
+    g.add(lightString(0.9));
+    return g;
+  }
   if (kind === 'stern') {
     g.add(mesh(cached('stern', () => extrude(starShape(0.24, 0.1))), decorMats.stern));
   } else if (kind === 'herz') {
@@ -407,6 +707,19 @@ export function topDecor(kind, index = 0) {
     const flag = mesh(cached('flag', () => new THREE.ShapeGeometry(tri)), decorMats.flag, 0.02, 0.78, 0);
     g.add(flag);
     g.userData.flag = flag;
+  } else if (kind === 'glocke') {
+    g.add(mesh(cyl(0.02, 0.02, 0.35, 6), shared.metal, 0, 0.17, 0));
+    const bell = new THREE.Group();
+    bell.position.y = 0.42;
+    bell.add(mesh(cyl(0.06, 0.17, 0.22, 20), shared.gold, 0, -0.08, 0));
+    bell.add(mesh(sph(0.04), shared.gold, 0, -0.22, 0));
+    g.add(bell);
+    g.userData.bell = bell;
+  } else if (kind === 'regenbogen') {
+    ['#e5484d', '#ee8a2b', '#f2c832', '#4fa65a', '#3b7cc9', '#8b5bb5'].forEach((c, i) => {
+      g.add(mesh(cached(`rb${i}`, () => new THREE.TorusGeometry(0.55 - i * 0.06, 0.03, 8, 24, Math.PI)),
+        new THREE.MeshStandardMaterial({ color: c, roughness: 0.4 }), 0, 0.02, 0));
+    });
   } else if (kind === 'ballon') {
     const color = BALLOON_COLORS[index % BALLOON_COLORS.length];
     const b = mesh(sph(0.28), new THREE.MeshPhysicalMaterial({ color, roughness: 0.2, clearcoat: 1 }), 0, 1.35, 0);
@@ -417,13 +730,26 @@ export function topDecor(kind, index = 0) {
   return g;
 }
 
-export const isTopDecor = (kind) => kind === 'fahne' || kind === 'ballon';
+export const isTopDecor = (kind) => ['fahne', 'ballon', 'glocke', 'regenbogen'].includes(kind);
 
 function addDecor(car) {
   const d = car.userData.decorY;
   car.userData.data.decor.forEach((kind, i) => {
     let item;
-    if (isTopDecor(kind)) {
+    const len = car.userData.length;
+    if (kind === 'gesicht') {
+      item = faceDecor();
+      const [fx, fy] = d.front ?? [len / 2 + 0.03, d.side];
+      item.position.set(fx, fy, 0);
+    } else if (kind === 'lichterkette') {
+      item = new THREE.Group();
+      for (const side of [1, -1]) {
+        const l = lightString(len - 0.3);
+        l.position.set(0, d.top - 0.04, side * (d.sideZ + 0.04));
+        item.add(l);
+        item.userData.bulbs = [...(item.userData.bulbs ?? []), ...l.userData.bulbs];
+      }
+    } else if (isTopDecor(kind)) {
       item = topDecor(kind, i);
       item.position.set(d.topX[i % d.topX.length], d.top, 0);
     } else {
@@ -445,16 +771,17 @@ function addDecor(car) {
 
 // ---------- Ladung: 3D-Figuren ----------
 
-const SLOT_X = [-0.72, 0, 0.72];
+const SLOTS = { 3: [-0.72, 0, 0.72], 2: [-0.5, 0.5], 1: [0] };
 
 function addCargo(car) {
   const def = partDef(car.userData.data.type);
   if (!def.slots) return;
+  const slotX = car.userData.slotX ?? SLOTS[def.slots];
   car.userData.data.cargo.forEach((id, i) => {
-    if (i >= SLOT_X.length) return;
+    if (i >= slotX.length) return;
     const fig = buildFigure(id);
     fig.scale.setScalar(0.95);
-    fig.position.set(SLOT_X[i], car.userData.cargoY, 0);
+    fig.position.set(slotX[i], car.userData.cargoY, 0);
     fig.userData.baseY = car.userData.cargoY;
     fig.userData.phase = i * 1.7;
     fig.userData.removable = { list: 'cargo', index: i, id };
@@ -482,9 +809,49 @@ export function buildCar(data) {
   car.userData.length = BUILDERS[data.type](car, mats);
   addDecor(car);
   addCargo(car);
+  addMud(car);
+  applyDirt(car);
   car.traverse((o) => { o.userData.car ??= car; });
   car.userData.car = car;
   return car;
+}
+
+// Weltposition von Sitzplatz Nr. index (für einsteigende Fahrgäste)
+export function slotWorldPosition(car, index) {
+  const def = partDef(car.userData.data.type);
+  const slotX = car.userData.slotX ?? SLOTS[def.slots] ?? [0];
+  return car.localToWorld(new THREE.Vector3(slotX[Math.min(index, slotX.length - 1)], car.userData.cargoY ?? 0.9, 0));
+}
+
+// ---------- Schmutz ----------
+
+const MUD = new THREE.Color('#6b4a2b');
+const mudMat = new THREE.MeshStandardMaterial({ color: '#5e4027', roughness: 1 });
+
+function addMud(car) {
+  const len = car.userData.length;
+  const z = car.userData.decorY.sideZ + 0.02;
+  const spots = [];
+  let seed = len * 1000;
+  const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+  for (let i = 0; i < 8; i++) {
+    const side = i % 2 ? 1 : -1;
+    const m = mesh(sph(0.12), mudMat, (rnd() - 0.5) * (len - 0.6), 0.72 + rnd() * 0.35, side * z);
+    m.scale.set(1 + rnd(), 0.6 + rnd() * 0.5, 0.25);
+    m.visible = false;
+    m.castShadow = false;
+    car.add(m);
+    spots.push(m);
+  }
+  car.userData.mud = spots;
+}
+
+// Farbe + Schmutzgrad anwenden (nach Anmalen, Fahren, Waschen)
+export function applyDirt(car) {
+  const data = car.userData.data;
+  const d = Math.max(0, Math.min(1, data.dirt ?? 0));
+  for (const g of ['body', 'roof']) car.userData.mats[g].color.set(data.paint[g]).lerp(MUD, d * 0.6);
+  car.userData.mud.forEach((m, i) => { m.visible = i < Math.round(d * 8); });
 }
 
 export function disposeCar(car) {
@@ -517,6 +884,7 @@ export function animateCar(car, time, distanceDelta, moving) {
       b.position.y = 1.35 + Math.sin(time * 2 + item.id) * 0.06;
       b.position.x = moving ? -0.15 : 0;
     }
+    if (item.userData.bulbs) item.userData.bulbs.forEach((b, i) => { b.material.emissiveIntensity = 0.6 + Math.abs(Math.sin(time * 3 + i * 1.3)) * 1.2; });
     const f = item.userData.flag;
     if (f) f.rotation.y = Math.sin(time * (moving ? 12 : 3)) * (moving ? 0.35 : 0.15);
   }
@@ -527,7 +895,7 @@ export function animateCar(car, time, distanceDelta, moving) {
     s.position.y = s.userData.baseY + hop;
   }
   const driver = car.userData.driver;
-  if (driver) driver.position.y = 1.02 + Math.sin(time * (moving ? 8 : 1.5)) * 0.012;
+  if (driver) driver.position.y = (car.userData.driverY ?? 1.02) + Math.sin(time * (moving ? 8 : 1.5)) * 0.012;
 }
 
 // Winken (Lokführer, Kind) – für Rückmeldung beim Antippen

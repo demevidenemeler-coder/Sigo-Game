@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import { RoomEnvironment } from '../../vendor/RoomEnvironment.js';
 import { buildCar, sideDecor, topDecor, isTopDecor } from './trainModel.js';
 import { buildFigure } from './figures.js';
+import { buildTrackObjectPreview } from './trackObjects.js';
 import { newCar } from '../catalog.js';
 
 const VIEWS = {
@@ -10,16 +11,22 @@ const VIEWS = {
   figure: { size: [160, 160], fov: 30, pos: [0.6, 0.75, 2.1], look: [0, 0.36, 0] },
   sideDecor: { size: [160, 160], fov: 30, pos: [0.2, 0.25, 1.3], look: [0, 0, 0] },
   topDecor: { size: [160, 160], fov: 30, pos: [0.4, 1.0, 3.4], look: [0.1, 0.9, 0] },
+  build: { size: [200, 160], fov: 40, pos: [9, 10, 12], look: [0, 0.8, 1.2] },
 };
 
 function objectFor(kind, id) {
   if (kind === 'parts') return { obj: buildCar(newCar(id)), view: 'car' };
   if (kind === 'cargo') return { obj: buildFigure(id), view: 'figure' };
+  if (kind === 'build') return { obj: buildTrackObjectPreview(id), view: 'build' };
   return isTopDecor(id) ? { obj: topDecor(id, 1), view: 'topDecor' } : { obj: sideDecor(id), view: 'sideDecor' };
 }
 
-// items: [{ kind: 'parts'|'cargo'|'decor', id }] → { 'kind:id': dataURL }
+const cache = {};
+
+// items: [{ kind: 'parts'|'cargo'|'decor'|'build', id }] → { 'kind:id': dataURL } (zwischengespeichert)
 export function renderThumbnails(items) {
+  items = items.filter(({ kind, id }) => !cache[`${kind}:${id}`]);
+  if (!items.length) return cache;
   const canvas = document.createElement('canvas');
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, preserveDrawingBuffer: true });
   renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -32,7 +39,7 @@ export function renderThumbnails(items) {
   sun.position.set(5, 10, 8);
   scene.add(sun);
 
-  const out = {};
+  const out = cache;
   for (const { kind, id } of items) {
     const { obj, view } = objectFor(kind, id);
     const v = VIEWS[view];

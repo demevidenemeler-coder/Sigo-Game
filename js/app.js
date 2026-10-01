@@ -2,9 +2,12 @@ import {
   loadSettings, saveSettings, loadSession, saveSession, loadTrain, saveTrain, loadTrack, saveTrack,
 } from './settings.js';
 import { LANGUAGES, setLanguage, lang, speechLang, t, nameOf, soundWordOf } from './i18n.js';
-import { unlockAudio, playSound, speak, stopSpeaking, voiceInfo, setChannelVolume } from './audio.js';
+import {
+  unlockAudio, playSound, speak, stopSpeaking, voiceInfo, setChannelVolume, animalSound, hasAnimalSound,
+  preloadSamples, ANIMAL_SAMPLE_NAMES,
+} from './audio.js';
 import { Music } from './music.js';
-import { defaultTrain } from './catalog.js';
+import { defaultTrain, upgradeTrain } from './catalog.js';
 import { defaultTrackPoints } from './game/track.js';
 import { Game } from './game/game.js';
 
@@ -36,15 +39,27 @@ function sfx(name) {
   return settings.sounds ? playSound(name) : Promise.resolve();
 }
 
-// Name sagen, bei Tieren und Leuten danach das Lautwort („Kuh … Muuh“)
+// Tiere: erst der echte Laut, dann der Name („Muuuh … Kuh“).
+// Andere Dinge: Name, danach ggf. ein Ausruf („Kind … Juhu!“)
 async function sayName(id) {
   const my = ++speechToken;
   stopSpeaking();
+  if (settings.sounds && hasAnimalSound(id)) {
+    await animalSound(id);
+    if (my !== speechToken) return;
+    await say(nameOf(id));
+    return;
+  }
   await say(nameOf(id));
   const word = soundWordOf(id);
   if (word && my === speechToken && settings.sounds) {
     await speak(word, { lang: speechLang(), rate: settings.speechRate, pitch: 1.5 });
   }
+}
+
+// Nur das Tiergeräusch (z. B. Tiere auf der Weide), ohne Namen
+function animalCall(id) {
+  if (settings.sounds) animalSound(id);
 }
 
 function sayText(text) {
@@ -58,9 +73,9 @@ function sayText(text) {
 const game = new Game({
   canvas: document.getElementById('scene'),
   ui: document.getElementById('ui'),
-  trainData: loadTrain() ?? defaultTrain(),
-  trackPoints: loadTrack(),
-  services: { say: sayText, sayName, sfx, t, saveTrain, saveTrack, soundsOn: () => settings.sounds },
+  trainData: upgradeTrain(loadTrain() ?? defaultTrain()),
+  trackData: loadTrack(),
+  services: { say: sayText, sayName, animalCall, sfx, t, saveTrain, saveTrack, soundsOn: () => settings.sounds },
 });
 
 function el(tag, className, text) {
@@ -154,6 +169,7 @@ function showStart() {
   play.type = 'button';
   play.addEventListener('click', () => {
     unlockAudio();
+    preloadSamples(ANIMAL_SAMPLE_NAMES);
     goFullscreen();
     startPlaying();
   });
@@ -258,6 +274,7 @@ function showSettings() {
     button(t('resetTrack'), 'big secondary', () => {
       const pts = defaultTrackPoints();
       game.land.track.setPoints(pts);
+      [...game.land.objects.items].forEach((it) => game.land.objects.remove(it));
       game.land.clearAroundTrack();
       saveTrack(null);
       sfx('poof');

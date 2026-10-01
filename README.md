@@ -8,39 +8,47 @@ Ohne Punkte, ohne Zeitdruck, ohne Werbung, ohne Internet – und mit eingebautem
 ## Die drei Bereiche (Knöpfe oben links)
 
 ### 🛠️ Werkstatt
-Unten ist eine Leiste mit vier Fächern (beim Antippen wird das Fach genannt):
+Unten ist eine Leiste mit sechs Fächern (beim Antippen wird das Fach genannt). Die Leiste lässt sich seitlich wischen.
 
-| Fach | Was passiert |
+| Fach | Inhalt |
 |---|---|
-| 🚃 Wagen | Lok antippen → Lok wird getauscht. Wagen antippen → wird hinten angehängt (max. 5). Oder auf den Zug ziehen → wird an dieser Stelle eingereiht. |
-| 🎨 Farben | Farbtopf wählen, dann ein Teil des Zugs antippen (Kessel, Dach, Räder …) – oder den Topf direkt auf den Zug ziehen. |
-| ⭐ Schmuck | Stern, Herz, Blume, Lampe, Fähnchen, Luftballon – antippen oder auf einen Wagen ziehen. |
-| 🐄 Mitfahrer | Kuh, Schwein, Schaf, Hund, Katze, Ente, Teddy, Kind, Oma, Kiste, Geschenk, Apfel – antippen (steigt in den nächsten freien Wagen) oder auf einen Wagen ziehen. |
+| 🚃 Loks und Wagen | **Loks:** Dampflok, Diesellok, E-Lok, Schnellzug. **Wagen:** Personen-, Güter-, Tier-, Flach-, Zirkus-, Schluss-, Tank-, Holz-, Kohle-, Kranwagen, Autotransporter (max. 6) |
+| 🎨 Farben | 10 Farben – Topf wählen, dann ein Teil antippen (Kessel, Dach, Räder …) oder den Topf auf den Zug ziehen |
+| ⭐ Schmuck | Gesicht, Stern, Herz, Blume, Lampe, Lichterkette, Glocke, Fähnchen, Luftballon, Regenbogen |
+| 🐄 Tiere | Kuh, Schwein, Schaf, Pferd, Hund, Katze, Huhn, Hahn, Ente, Hase, Frosch, Löwe, Elefant, Giraffe, Pinguin |
+| 🧸 Mitfahrer | Kind, Papa, Oma, Teddy, Ball, Kiste, Geschenk, Milchkanne, Apfel |
 
 **Ziehen:** Beim Ziehen leuchtet ein Ring unter dem Wagen, auf dem es landen wird – man muss nicht genau treffen.
-**Wegnehmen:** Mitfahrer, Schmuck oder Wagen vom Zug **in die Leiste ziehen** → weg. Auf einen anderen Wagen ziehen → umsetzen. Wagen lassen sich so auch umsortieren.
-**Antippen am Zug** ist immer harmlos: Tiere sagen ihren Namen und ihr Geräusch, der Lokführer winkt und pfeift.
+**Wegnehmen:** Mitfahrer, Schmuck oder Wagen vom Zug **in die Leiste ziehen** → weg. Auf einen anderen Wagen ziehen → umsetzen.
+**Antippen am Zug** ist immer harmlos: Tiere machen ihr (echtes) Geräusch und werden benannt, der Lokführer winkt und pfeift,
+der Kran schwenkt, die Glocke läutet, die Spielzeugautos hupen.
 **Zeige-Hand:** Passiert eine Weile nichts, zeigt eine Hand, wie man etwas auf den Zug zieht.
 
-Alles wird laut benannt („Tierwagen“, „Lila“, „Kuh … Muuh“). Der Tankwagen nimmt keine Mitfahrer –
-er hüpft nur kurz (Fehlerkontrolle ohne Fehlerton).
-
-### ✏️ Strecke malen
-Mit dem Finger eine Linie auf die Wiese (innerhalb des Holzzauns) malen. Daraus werden automatisch Schienen:
-- Der Kreis schließt sich von selbst.
-- Zu kleine Kreise werden vergrößert, damit der Zug passt; ein gerader Strich wird zum Oval.
-- Bäume, Blumen und Häuser, die im Weg stehen, verschwinden.
+### 🛤️ Strecke bauen
+- Mit dem Finger eine Linie auf die Wiese (innerhalb des Holzzauns) malen → Schienen. Der Kreis schließt sich von selbst.
+- Unten in der Leiste: **Bahnhof, Tunnel, Brücke, Waschanlage, Tankstelle, Bahnübergang**.
+  Antippen → setzt sich an eine freie Stelle. Ziehen → rastet an der Strecke ein.
+  Gesetzte Dinge lassen sich entlang der Strecke verschieben; in die Leiste ziehen = weg.
 
 ### 🚂 Fahren
-- Großer grüner Knopf ▶ = losfahren / ⏸ anhalten
-- 📯 = pfeifen/hupen (auch: Zug antippen) – der Lokführer winkt
-- 🎥 = Kamera fährt neben dem Zug mit
-- Tiere auf der Weide antippen → sie rufen; Bäume und Häuser antippen → sie wackeln
-- Geräusche: „tschu-tschu“ im Takt der Räder, „ta-tamm“ an jedem Schienenstoß, Rollen, Zischen beim Anhalten
-- Rund um das Spielfeld: Teich mit Enten, Bauernhof mit Weide, Windmühle, Dorf, Wald auf den Hügeln
+- ▶ = losfahren / ⏸ anhalten · 📯 = pfeifen · 🎥 = Kamera fährt mit · unten links: 🌙/☀️ Tag & Nacht, Wetter (Sonne, Regen, Schnee)
+- **Bahnhof:** Der Zug hält von selbst („Bahnhof! Wer steigt ein?“). Wartende antippen → hüpfen in den Zug.
+  Mitfahrer im Zug antippen → steigen aus. ▶ blinkt = weiterfahren.
+- **Tankstelle:** Steht eine an der Strecke, brauchen Dampflok (Kohle 🪨 + Wasser 💧) und Diesellok (Diesel ⛽) Vorräte – Anzeige oben links.
+  Ist etwas knapp, hält der Zug dort. Wasserturm, Kohlebunker oder Zapfsäule antippen → füllt auf. Leer = der Zug schleicht nur noch.
+  E-Lok und Schnellzug brauchen nichts (fahren mit Strom).
+- **Waschanlage:** Der Zug wird beim Fahren schmutzig (bei Regen schneller). In der Waschanlage drehen sich die Bürsten, es schäumt – blitzsauber.
+- **Tunnel:** drinnen wird es dunkel, die Lampen gehen an, die Pfeife hallt.
+- **Brücke:** über einen Fluss (manchmal springt ein Fisch); die Schienenstöße klingen hohl.
+- **Bahnübergang:** Schranke geht zu, Licht blinkt, Glocke bimmelt, die Autos warten. Autos antippen → hupen.
+- Tiere auf der Weide antippen → sie rufen; Bäume und Häuser wackeln.
+- Jede Lok fährt anders schnell (Schnellzug am schnellsten).
+
+**Tiergeräusche** sind echte Aufnahmen (gemeinfrei, CC0 – Quellen in `sounds/QUELLEN.md`) für Kuh, Schwein, Schaf,
+Hund, Katze, Huhn, Hahn und Frosch. Ente, Pferd, Löwe, Elefant und Pinguin sind nachgebaut (keine freien Aufnahmen erreichbar).
 
 Leise Xylophon-Musik läuft im Hintergrund (im Eltern-Bereich abschaltbar).
-Zug und Strecke bleiben gespeichert – beim nächsten Mal ist alles wieder da.
+Zug, Strecke und alles an der Strecke bleiben gespeichert.
 
 ## Eltern-Bereich
 
@@ -103,7 +111,11 @@ js/game/textures.js        Per Code gezeichnete Texturen (Holz, Gras, Schotter, 
 js/game/train.js           Zug anordnen / auf Strecke setzen
 js/game/track.js           Aus Fingerstrich wird Schienenstrecke
 js/game/world.js           Werkstatt und Landschaft
-js/game/modes/*.js         Werkstatt, Malen, Fahren
+js/game/trackObjects.js    Bahnhof, Tunnel, Brücke, Waschanlage, Tankstelle, Bahnübergang
+js/game/environment.js     Tag/Nacht, Regen, Schnee, Tunnel-Dunkelheit
+js/game/lamps.js           Lampen, die nachts heller leuchten
+sounds/                    Tiergeräusche (MP3, CC0) + QUELLEN.md
+js/game/modes/*.js         Werkstatt, Strecke bauen, Fahren
 sw.js                      Offline-Speicher (neue Dateien in ASSETS eintragen)
 ```
 
@@ -118,7 +130,7 @@ sw.js                      Offline-Speicher (neue Dateien in ASSETS eintragen)
 - Selbstkreuzende Strecken (Acht) sind erlaubt, aber es gibt keine Brücke – der Zug fährt „durch“ die Kreuzung.
 
 ## Ideen für später
-- Bahnhof: Zug hält an, Fahrgäste steigen ein/aus
-- Tunnel und Brücke zum Hinsetzen
-- Weichen / zwei Züge
-- Eigene Fotos als Fahrgäste, selbst eingesprochene Tierlaute
+- Lieferaufträge mit Kran (Kisten am Bauernhof abholen)
+- Landschaft selbst gestalten (Bäume, Häuser, Tiere setzen)
+- Eigene Fotos als Fahrgäste, selbst eingesprochene Laute
+- Weichen / zwei Züge (eher für ältere Kinder)

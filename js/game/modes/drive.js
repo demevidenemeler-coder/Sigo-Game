@@ -2,8 +2,6 @@
 //
 // Mechaniken:
 // - Bahnhof: Zug hält, Wartende antippen → steigen ein; Mitfahrer antippen → steigen aus. ▶ = weiterfahren.
-// - Tankstelle (nur wenn eine steht): Dampflok braucht Kohle + Wasser, Diesellok Diesel. Leer → Zug schleicht.
-//   Ist der Vorrat knapp, hält der Zug an der Tankstelle; Wasserturm/Kohlebunker/Zapfsäule antippen füllt auf.
 // - Waschanlage: Der Zug wird beim Fahren schmutzig (bei Regen schneller) und hier wieder sauber.
 // - Tunnel: dunkel, Lampen an, Pfeife hallt. Brücke: Schienenstöße klingen hohl.
 // - Bahnübergang: Schranke zu, Blinklicht, Glocke, Autos warten.
@@ -20,7 +18,6 @@ const JOINT = 5; // Abstand der Schienenstöße
 const CHUFF = (2 * Math.PI * 0.36) / 4; // vier Dampfstöße pro Umdrehung des Treibrads
 const ACCENT = [1, 0.55, 0.8, 0.55];
 const BRAKE = 1.6; // Bremsverzögerung beim Halten
-const FUEL_ICONS = { kohle: '🪨', wasser: '💧', diesel: '⛽' };
 // Die Knöpfe zeigen immer den AKTUELLEN Zustand (nicht den nächsten)
 const WEATHERS = [['sonne', '🌤️'], ['regen', '🌧️'], ['schnee', '❄️']];
 const WAITING_IDS = ['kind', 'oma', 'papa', 'hund', 'katze', 'teddy', 'hase', 'pinguin', 'schaf', 'ente', 'pferd', 'huhn', 'kuh', 'frosch'];
@@ -78,7 +75,6 @@ export function createDriveMode(game) {
   let down = null;
   let braking = null;
   let stoppedAt = null;
-  let emptySaid = false;
   let washedSome = false;
   let saveTimer = 0;
   let weather = 0;
@@ -89,8 +85,6 @@ export function createDriveMode(game) {
   const side = new THREE.Vector3();
 
   const locoDef = () => partDef(train.data.cars[0].type);
-  const fuelActive = () => objects.count('tankstelle') > 0 && locoDef().fuel.length > 0;
-  const fuel = () => train.data.cars[0].fuel;
   const signed = (a, b) => {
     const L = track.length;
     return ((((a - b) % L) + L * 1.5) % L) - L / 2;
@@ -101,8 +95,6 @@ export function createDriveMode(game) {
   controls.className = 'drive-controls hidden';
   const envControls = document.createElement('div');
   envControls.className = 'env-controls hidden';
-  const gauges = document.createElement('div');
-  gauges.className = 'fuel-gauges hidden';
 
   const btn = (parent, cls, icon, onTap) => {
     const b = document.createElement('button');
@@ -142,35 +134,12 @@ export function createDriveMode(game) {
     weatherBtn.textContent = WEATHERS[weather][1];
     services.sayName(WEATHERS[weather][0]);
   });
-  game.ui.append(controls, envControls, gauges);
+  game.ui.append(controls, envControls);
 
   function updateGo() {
     goBtn.textContent = d.target > 0 ? '⏸' : '▶';
     goBtn.classList.toggle('stop', d.target > 0);
     goBtn.classList.toggle('waiting', !!stoppedAt && d.target === 0);
-  }
-
-  function updateGauges() {
-    const show = fuelActive();
-    gauges.classList.toggle('hidden', !show);
-    if (!show) return;
-    const need = locoDef().fuel;
-    if (gauges.dataset.kinds !== need.join()) {
-      gauges.dataset.kinds = need.join();
-      gauges.replaceChildren(...need.map((f) => {
-        const row = document.createElement('div');
-        row.className = 'gauge';
-        row.dataset.fuel = f;
-        row.innerHTML = `<span class="gauge-icon">${FUEL_ICONS[f]}</span><span class="gauge-bar"><i></i></span>`;
-        return row;
-      }));
-    }
-    for (const row of gauges.children) {
-      const v = fuel()[row.dataset.fuel];
-      const bar = row.querySelector('i');
-      bar.style.width = `${Math.round(v * 100)}%`;
-      row.classList.toggle('low', v < 0.25);
-    }
   }
 
   function horn() {
@@ -225,13 +194,11 @@ export function createDriveMode(game) {
 
   function stopPointFor(item) {
     if (item.type === 'bahnhof') return item.s + 3;
-    if (item.type === 'tankstelle') return item.s + 1.6;
     return null;
   }
 
   function wantsStop(item) {
     if (item.type === 'bahnhof') return true;
-    if (item.type === 'tankstelle') return fuelActive() && locoDef().fuel.some((f) => fuel()[f] < 0.6);
     return false;
   }
 
@@ -246,9 +213,6 @@ export function createDriveMode(game) {
       // Wer zu diesem Bahnhof (dieser Farbe) wollte, steigt von selbst aus
       if (hasArrivals(item)) setTimeout(() => deliverNext(item, 0), 700);
       else setTimeout(() => services.say(services.t('station')), 600);
-    } else {
-      services.sfx('bell');
-      services.say(services.t('fuelEmpty'));
     }
   }
 
@@ -369,46 +333,6 @@ export function createDriveMode(game) {
     game.saveTrain();
   }
 
-  // ---------- Tanken ----------
-
-  function refuel(item, kind) {
-    const p = item.parts;
-    if (kind === 'wasser') {
-      game.tween(0.5, (t) => { p.spout.rotation.y = 0.9 * (1 - t); }, () => {
-        p.stream.visible = true;
-        services.sfx('gurgle');
-        setTimeout(() => services.sfx('gurgle'), 800);
-        setTimeout(() => {
-          p.stream.visible = false;
-          game.tween(0.5, (t) => { p.spout.rotation.y = 0.9 * t; });
-        }, 1700);
-      });
-    } else if (kind === 'kohle') {
-      services.sfx('coal');
-      p.coalBits.forEach((c, i) => {
-        c.visible = true;
-        const x = (Math.random() - 0.5) * 0.4;
-        game.tween(0.6 + i * 0.05, (t) => c.position.set(x, 1.75 - t * 1.0, 1.0 + t * 1.4), () => { c.visible = false; });
-      });
-    } else {
-      game.hop(p.pump);
-      services.sfx('gurgle');
-    }
-    if (stoppedAt !== item || !locoDef().fuel.includes(kind)) return;
-    const start = fuel()[kind];
-    game.tween(1.6, (t) => {
-      fuel()[kind] = start + (1 - start) * t;
-    }, () => {
-      if (locoDef().fuel.every((f) => fuel()[f] > 0.99)) {
-        services.sfx('chime');
-        services.say(services.t('fuelFull'));
-        emptySaid = false;
-        goBtn.classList.add('waiting');
-      }
-      game.saveTrain();
-    });
-  }
-
   function screenDist(o, x, y) {
     const v = o.getWorldPosition(new THREE.Vector3());
     v.y += 0.6;
@@ -430,6 +354,24 @@ export function createDriveMode(game) {
       }
     }
     return best;
+  }
+
+  // ---------- Zeige-Hand ----------
+  // Steht der Zug: auf ▶ zeigen. Am Bahnhof: erst auf einen Wartenden (einsteigen), dann auf ▶.
+  // Beim Fahren nach einer Weile: Wetter, Tag/Nacht oder Pfeife zeigen.
+  let hintStep = 0;
+  function showHint() {
+    const step = hintStep++;
+    if (stoppedAt?.type === 'bahnhof' && stoppedAt.waiting.length && step % 2 === 0) {
+      const v = stoppedAt.waiting[0].getWorldPosition(new THREE.Vector3());
+      v.y += 0.6;
+      v.project(game.camera);
+      const x = ((v.x + 1) / 2) * window.innerWidth;
+      const y = ((1 - v.y) / 2) * window.innerHeight;
+      if (x > 0 && x < window.innerWidth && y > 0 && y < window.innerHeight) return game.hint.tap(x, y);
+    }
+    if (d.target === 0) return game.hint.tapElement(goBtn);
+    game.hint.tapElement([weatherBtn, nightBtn, controls.querySelector('.horn')][step % 3]);
   }
 
   // ---------- Pro Bild ----------
@@ -527,7 +469,6 @@ export function createDriveMode(game) {
 
   function speedCap() {
     let cap = locoDef().speed;
-    if (fuelActive() && locoDef().fuel.some((f) => fuel()[f] <= 0.001)) cap = Math.min(cap, 1.1);
     for (const it of objects.items) {
       if (it.type !== 'waschanlage') continue;
       const rel = signed(d.s, it.s);
@@ -564,14 +505,12 @@ export function createDriveMode(game) {
       stoppedAt = null;
       braking = null;
       updateGo();
-      updateGauges();
       if (follow) followCamera();
       else overviewCamera();
     },
     exit() {
       controls.classList.add('hidden');
       envControls.classList.add('hidden');
-      gauges.classList.add('hidden');
       d.target = 0;
       d.speed = 0;
       wasMoving = false;
@@ -593,6 +532,7 @@ export function createDriveMode(game) {
     },
     update(dt) {
       track.update(dt); // falls die Schienen noch „wachsen“
+      if (game.hint.due(d.target === 0 ? 6000 : 18000)) showHint();
       const cap = speedCap();
       const want = d.target > 0 && !stoppedAt ? cap : 0;
 
@@ -660,7 +600,7 @@ export function createDriveMode(game) {
       wasMoving = moving;
       puffs.update(dt);
 
-      // Schmutz und Vorräte
+      // Schmutz
       if (moving) {
         const dirtRate = (env.weather === 'regen' ? 2.2 : env.weather === 'schnee' ? 1.5 : 1) / 450;
         for (const c of train.cars) {
@@ -669,20 +609,12 @@ export function createDriveMode(game) {
           data.dirt = Math.min(1, (data.dirt ?? 0) + ds * dirtRate);
           if (Math.floor(data.dirt * 8) !== old) applyDirt(c);
         }
-        if (fuelActive()) {
-          for (const f of locoDef().fuel) fuel()[f] = Math.max(0, fuel()[f] - ds / 650);
-          if (!emptySaid && locoDef().fuel.some((f) => fuel()[f] <= 0.001)) {
-            emptySaid = true;
-            services.say(services.t('fuelEmpty'));
-          }
-        }
         saveTimer += dt;
         if (saveTimer > 6) {
           saveTimer = 0;
           game.saveTrain();
         }
       }
-      updateGauges();
 
       if (follow) followCamera();
       else overviewCamera();
@@ -708,13 +640,10 @@ export function createDriveMode(game) {
           return alight(hitIndex, fig.userData.removable, fig);
         }
       }
-      // Steht der Zug am Bahnhof/an der Tankstelle: Tipp in der Nähe zählt (für kleine Finger)
-      if (stoppedAt && !hitCargo) {
-        const list = stoppedAt.type === 'bahnhof' ? stoppedAt.waiting : [stoppedAt.parts.tower, stoppedAt.parts.bunker, stoppedAt.parts.pump];
-        const near = list.length ? nearestOnScreen(list, e.clientX, e.clientY) : null;
-        if (near && screenDist(near, e.clientX, e.clientY) < 130) {
-          return stoppedAt.type === 'bahnhof' ? board(near, stoppedAt) : refuel(stoppedAt, near.userData.action);
-        }
+      // Steht der Zug am Bahnhof: Tipp in der Nähe einer wartenden Figur zählt (für kleine Finger)
+      if (stoppedAt?.type === 'bahnhof' && !hitCargo && stoppedAt.waiting.length) {
+        const near = nearestOnScreen(stoppedAt.waiting, e.clientX, e.clientY);
+        if (near && screenDist(near, e.clientX, e.clientY) < 130) return board(near, stoppedAt);
       }
       if (!hit) {
         if (game.pickCar(e.clientX, e.clientY)) horn();
@@ -741,7 +670,6 @@ export function createDriveMode(game) {
       if (item) {
         const action = owner?.userData.action;
         if (action === 'board') return board(owner, owner.userData.item);
-        if (action === 'wasser' || action === 'kohle' || action === 'diesel') return refuel(item, action);
         if (action === 'hupen') {
           game.hop(owner);
           return services.sfx('carhonk');
@@ -750,11 +678,6 @@ export function createDriveMode(game) {
         if (item.type === 'bahnhof' && stoppedAt === item && item.waiting.length) {
           const fig = nearestOnScreen(item.waiting, e.clientX, e.clientY);
           return board(fig, item);
-        }
-        // Tankstelle: Tipp irgendwo → das nächstgelegene Teil (Wasserturm, Kohle, Zapfsäule)
-        if (item.type === 'tankstelle') {
-          const parts = [item.parts.tower, item.parts.bunker, item.parts.pump];
-          return refuel(item, nearestOnScreen(parts, e.clientX, e.clientY).userData.action);
         }
         game.hop(item.obj);
         services.sayName(item.type);

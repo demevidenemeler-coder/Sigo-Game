@@ -7,6 +7,7 @@ import { partDef, isLoco, STATION_COLORS } from '../catalog.js';
 import { buildFigure, setBubble } from './figures.js';
 import { woodTexture } from './textures.js';
 import { lamp } from './lamps.js';
+import { wheelDecalMaterial } from './wheelStyles.js';
 
 const WHEEL_Z = 0.47; // Radmitte seitlich (liegt über der Schiene)
 
@@ -43,27 +44,46 @@ function mesh(geometry, material, x = 0, y = 0, z = 0, paint = null) {
 
 // ---------- Räder, Drehgestelle, Kupplungen ----------
 
-// Rad mit Speichen; Achse entlang z. Dreht sich um seine z-Achse.
+// Rad; Achse entlang z. Dreht sich um seine z-Achse.
+// Scheibe in der Radfarbe (anmalbar), darauf das Radmuster (Speichen, Stern, Herz …).
 function wheel(car, x, r, mats, { spokes = 6, pin = 0 } = {}) {
   const w = new THREE.Group();
   w.position.set(x, r, 0);
   const width = 0.12;
+  const style = car.userData.data?.wheelStyle ?? 'speichen';
+  const decal = wheelDecalMaterial(style);
   for (const side of [1, -1]) {
     const wz = side * WHEEL_Z;
-    w.add(mesh(cylZ(r, width), shared.tire, 0, 0, wz));
-    w.add(mesh(cylZ(r * 0.8, width + 0.02), mats.roof, 0, 0, wz, 'roof'));
-    for (let i = 0; i < spokes; i++) {
-      const s = mesh(cached(`spoke${r}`, () => new THREE.BoxGeometry(r * 1.5, 0.045, width + 0.04)), shared.dark, 0, 0, wz);
-      s.rotation.z = (i / spokes) * Math.PI;
-      w.add(s);
+    w.add(mesh(cylZ(r, width), shared.tire, 0, 0, wz, 'wheel'));
+    w.add(mesh(cylZ(r * 0.84, width + 0.02), mats.wheel, 0, 0, wz, 'wheel'));
+    if (decal) {
+      const d = mesh(cached(`wd${r}`, () => new THREE.CircleGeometry(r * 0.82, 32)), decal, 0, 0, wz + side * (width / 2 + 0.012), 'wheel');
+      if (side < 0) d.rotation.y = Math.PI;
+      d.castShadow = false;
+      w.add(d);
+    } else {
+      for (let i = 0; i < spokes; i++) {
+        const s = mesh(cached(`spoke${r}`, () => new THREE.BoxGeometry(r * 1.5, 0.045, width + 0.04)), shared.dark, 0, 0, wz, 'wheel');
+        s.rotation.z = (i / spokes) * Math.PI;
+        w.add(s);
+      }
+      w.add(mesh(cylZ(r * 0.22, width + 0.06), shared.metal, 0, 0, wz, 'wheel'));
     }
-    w.add(mesh(cylZ(r * 0.22, width + 0.06), shared.metal, 0, 0, wz));
     if (pin) w.add(mesh(cylZ(0.04, 0.1), shared.metal, pin, 0, wz + side * 0.09));
   }
   w.userData.r = r;
   car.add(w);
   car.userData.wheels.push(w);
   return w;
+}
+
+// Ein einzelnes Rad als Vorschaubild für die Leiste
+export function buildWheelPreview(style, color = '#e5484d') {
+  const holder = new THREE.Group();
+  holder.userData = { data: { wheelStyle: style }, wheels: [] };
+  wheel(holder, 0, 0.5, { wheel: paintMaterial(color, 0.4) });
+  holder.position.y = -0.5;
+  return holder;
 }
 
 function bogie(car, x, mats, r = 0.22) {
@@ -807,6 +827,9 @@ function addDecor(car) {
 // ---------- Ladung: 3D-Figuren ----------
 
 const SLOTS = { 3: [-0.72, 0, 0.72], 2: [-0.5, 0.5], 1: [0] };
+// Mitfahrer stehen etwas erhöht und sind etwas größer – gut zu sehen und leicht mit dem Finger zu greifen
+const CARGO_LIFT = 0.14;
+const CARGO_SCALE = 1.12;
 
 function addCargo(car) {
   const def = partDef(car.userData.data.type);
@@ -815,9 +838,9 @@ function addCargo(car) {
   car.userData.data.cargo.forEach((id, i) => {
     if (i >= slotX.length) return;
     const fig = buildFigure(id);
-    fig.scale.setScalar(0.95);
-    fig.position.set(slotX[i], car.userData.cargoY, 0);
-    fig.userData.baseY = car.userData.cargoY;
+    fig.scale.setScalar(CARGO_SCALE);
+    fig.position.set(slotX[i], car.userData.cargoY + CARGO_LIFT, 0);
+    fig.userData.baseY = car.userData.cargoY + CARGO_LIFT;
     fig.userData.phase = i * 1.7;
     fig.userData.removable = { list: 'cargo', index: i, id };
     const dest = car.userData.data.dest?.[i];
@@ -841,6 +864,7 @@ export function buildCar(data) {
     body: paintMaterial(data.paint.body, 0.35),
     roof: paintMaterial(data.paint.roof, 0.45),
     trim: new THREE.MeshStandardMaterial({ color: data.paint.trim, roughness: 0.45, metalness: 0.3 }),
+    wheel: paintMaterial(data.paint.wheel ?? data.paint.roof, 0.4),
   };
   car.userData.mats = mats;
   car.userData.length = BUILDERS[data.type](car, mats);
@@ -857,7 +881,7 @@ export function buildCar(data) {
 export function slotWorldPosition(car, index) {
   const def = partDef(car.userData.data.type);
   const slotX = car.userData.slotX ?? SLOTS[def.slots] ?? [0];
-  return car.localToWorld(new THREE.Vector3(slotX[Math.min(index, slotX.length - 1)], car.userData.cargoY ?? 0.9, 0));
+  return car.localToWorld(new THREE.Vector3(slotX[Math.min(index, slotX.length - 1)], (car.userData.cargoY ?? 0.9) + CARGO_LIFT, 0));
 }
 
 // ---------- Schmutz ----------

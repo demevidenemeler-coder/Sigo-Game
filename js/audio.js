@@ -1,6 +1,8 @@
-// Alle Geräusche werden live mit der Web Audio API erzeugt (keine Dateien, funktioniert offline).
+// Geräusche werden live mit der Web Audio API erzeugt; Tierlaute teils als Aufnahme (sounds/), teils nachgebaut.
 // Drei Kanäle: Effekte, Motor (Dampf, Rollen, Schienenstöße) und Musik – getrennt regelbar.
 // Sprache kommt aus der Sprachausgabe des Geräts (speechSynthesis).
+
+import { renderAnimal, SYNTH_ANIMALS } from './animalSynth.js';
 
 let ctx = null;
 let sfxBus = null;
@@ -108,7 +110,19 @@ export async function playSample(name, { gain = 1, rate = 1 } = {}) {
 
 // Tierlaute: echte Aufnahme, wenn vorhanden, sonst nachgebaut
 const ANIMAL_SAMPLES = { kuh: 'kuh', katze: 'katze', hund: 'hund', hahn: 'hahn', huhn: 'huhn', schwein: 'schwein', schaf: 'schaf', frosch: 'frosch' };
-const ANIMAL_SYNTH = { ente: 'quack', pferd: 'neigh', loewe: 'roar', elefant: 'trumpet', pinguin: 'squawk' };
+// Tiere ohne freie Aufnahme: Stimm-Synthese (animalSynth.js), einmal berechnet und dann zwischengespeichert
+const ANIMAL_SYNTH = Object.fromEntries(SYNTH_ANIMALS.map((id) => [id, id]));
+const synthBuffers = new Map();
+function synthBuffer(id) {
+  if (!synthBuffers.has(id)) {
+    const c = ac();
+    const data = renderAnimal(id, c.sampleRate);
+    const buf = c.createBuffer(1, data.length, c.sampleRate);
+    buf.copyToChannel(data, 0);
+    synthBuffers.set(id, buf);
+  }
+  return synthBuffers.get(id);
+}
 export const ANIMAL_SAMPLE_NAMES = [...Object.values(ANIMAL_SAMPLES), 'voegel'];
 
 export function hasAnimalSound(id) {
@@ -118,7 +132,15 @@ export function hasAnimalSound(id) {
 export async function animalSound(id) {
   if (ANIMAL_SAMPLES[id]) return playSample(ANIMAL_SAMPLES[id], { gain: id === 'schwein' ? 0.6 : 0.9 });
   if (ANIMAL_SYNTH[id]) {
-    await playSound(ANIMAL_SYNTH[id]);
+    const c = ac();
+    const buf = synthBuffer(id);
+    const src = c.createBufferSource();
+    src.buffer = buf;
+    const g = c.createGain();
+    g.gain.value = 0.75;
+    src.connect(g).connect(sfxBus);
+    src.start();
+    await new Promise((r) => setTimeout(r, buf.duration * 1000));
     return true;
   }
   return false;
@@ -256,59 +278,6 @@ const SOUNDS = {
 };
 
 Object.assign(SOUNDS, {
-  quack(t) {
-    for (const dt of [0, 0.28]) {
-      const o = tone('sawtooth', 520, t + dt, 0.01, 0.17, 0.35, filter('bandpass', 1300, 4));
-      o.frequency.exponentialRampToValueAtTime(330, t + dt + 0.16);
-    }
-  },
-  neigh(t) {
-    // Wiehern: hoch einsetzend, zitternd abfallend
-    const bp = filter('bandpass', 1600, 2);
-    const o = tone('sawtooth', 950, t, 0.03, 1.0, 0.35, bp);
-    o.frequency.exponentialRampToValueAtTime(420, t + 1.0);
-    const lfo = ctx.createOscillator();
-    const lg = ctx.createGain();
-    lfo.frequency.value = 16;
-    lg.gain.value = 70;
-    lfo.connect(lg).connect(o.frequency);
-    lfo.start(t);
-    lfo.stop(t + 1.1);
-    noise(t + 1.05, 0.25, 0.3, 'lowpass', 900);
-  },
-  roar(t) {
-    const lp = lowpass(700);
-    const o = tone('sawtooth', 95, t, 0.15, 1.2, 0.6, lp);
-    o.frequency.linearRampToValueAtTime(70, t + 1.2);
-    const n = noise(t, 1.3, 0.35, 'lowpass', 900);
-    const lfo = ctx.createOscillator();
-    const lg = ctx.createGain();
-    lfo.frequency.value = 28;
-    lg.gain.value = 0.25;
-    lfo.connect(lg).connect(n.gain.gain);
-    lfo.start(t);
-    lfo.stop(t + 1.4);
-  },
-  trumpet(t) {
-    // Elefant: Törööö
-    const bp = filter('bandpass', 1000, 1.5);
-    const o = tone('sawtooth', 380, t, 0.08, 1.1, 0.4, bp);
-    o.frequency.linearRampToValueAtTime(560, t + 0.35);
-    o.frequency.linearRampToValueAtTime(500, t + 1.1);
-    const lfo = ctx.createOscillator();
-    const lg = ctx.createGain();
-    lfo.frequency.value = 7;
-    lg.gain.value = 18;
-    lfo.connect(lg).connect(o.frequency);
-    lfo.start(t);
-    lfo.stop(t + 1.2);
-  },
-  squawk(t) {
-    for (const dt of [0, 0.22, 0.44]) {
-      const o = tone('square', 620, t + dt, 0.01, 0.16, 0.18, filter('bandpass', 1400, 3));
-      o.frequency.exponentialRampToValueAtTime(480, t + dt + 0.15);
-    }
-  },
   dieselhorn(t) {
     const lp = lowpass(2200);
     for (const f of [440, 554, 659]) tone('sawtooth', f, t, 0.04, 1.0, 0.14, lp);
@@ -378,7 +347,7 @@ Object.assign(SOUNDS, {
   },
 });
 
-const SOUND_LENGTH = { neigh: 1.3, roar: 1.4, trumpet: 1.2, quack: 0.5, squawk: 0.7, dingdong: 2.0, whistle: 1.6, elhorn: 1.2, chime: 1.2, poof: 0.4, pop: 0.2, hiss: 1.4 };
+const SOUND_LENGTH = { dingdong: 2.0, whistle: 1.6, elhorn: 1.2, chime: 1.2, poof: 0.4, pop: 0.2, hiss: 1.4 };
 
 // Spielt ein Geräusch; das Promise endet ungefähr, wenn es verklungen ist.
 export function playSound(name) {

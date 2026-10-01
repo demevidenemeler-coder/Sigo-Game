@@ -107,18 +107,23 @@ export function gravelTexture() {
 
 // Wasser: sanfte Wellenlinien
 export function waterTexture() {
-  return make('water', 256, (g, n) => {
+  // Sanfte, breite Glanzbögen (keine dünnen Linien – die flimmern von oben)
+  return make('water2', 256, (g, n) => {
     const r = rand(9);
     g.fillStyle = '#6bb6d9';
     g.fillRect(0, 0, n, n);
-    for (let i = 0; i < 40; i++) {
-      g.strokeStyle = `rgba(255,255,255,${0.15 + r() * 0.2})`;
-      g.lineWidth = 2;
+    g.filter = 'blur(2px)';
+    for (let i = 0; i < 22; i++) {
+      g.strokeStyle = `rgba(255,255,255,${0.1 + r() * 0.1})`;
+      g.lineWidth = 5;
       const x = r() * n;
       const y = r() * n;
-      g.beginPath();
-      g.arc(x, y, 8 + r() * 10, Math.PI * 1.1, Math.PI * 1.9);
-      g.stroke();
+      for (const [dx, dy] of [[0, 0], [n, 0], [-n, 0], [0, n], [0, -n]]) {
+        g.beginPath();
+        g.arc(x + dx, y + dy, 14 + r() * 12, Math.PI * 1.15, Math.PI * 1.85);
+        g.stroke();
+      }
     }
+    g.filter = 'none';
   });
 }

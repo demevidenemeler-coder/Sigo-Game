@@ -15,6 +15,7 @@ Unten: oben eine Reihe Fächer (mit Beschriftung), darunter große Karten – mi
 | 🚂 Loks | Dampflok, Diesellok, E-Lok, Schnellzug |
 | 🚃 Wagen | Personen-, Güter-, Tier-, Flach-, Zirkus-, Schluss-, Tank-, Holz-, Kohle-, Kranwagen, Autotransporter (max. 6) |
 | 🎨 Farben | 10 Farben – Topf wählen, dann ein Teil antippen (Kessel, Dach, Räder …) oder den Topf auf den Zug ziehen |
+| 🛞 Räder | 12 verspielte Radmuster (Speichen, Stern, Herz, Blume, Punkte, Regenbogen, Sonne, Spirale, Lachgesicht, Donut, Ball, Zahnrad) + Farbtöpfe nur für die Räder |
 | ⭐ Schmuck | Gesicht, Stern, Herz, Blume, Lampe, Lichterkette, Glocke, Fähnchen, Luftballon, Regenbogen |
 | 🐄 Tiere | Kuh, Schwein, Schaf, Pferd, Hund, Katze, Huhn, Hahn, Ente, Hase, Frosch, Löwe, Elefant, Giraffe, Pinguin |
 | 🧸 Mitfahrer | Kind, Papa, Oma, Teddy, Ball, Kiste, Geschenk, Milchkanne, Apfel |
@@ -29,7 +30,11 @@ antippen, dann bekommt es das erste Tier, das es mag. Mag das Tier das Futter, m
 und es ruft. Mag es das Futter nicht, schüttelt es den Kopf („Bäh!“), das Futter fällt herunter, eine **Denkblase zeigt das
 Lieblingsfutter** und dieses wackelt in der Leiste. Kein Scheitern – nur ein Hinweis. (Kuh/Schaf: Heu, Hase: Karotte,
 Katze/Pinguin: Fisch, Hund: Knochen, Löwe: Fleisch, Hühner/Ente: Körner, Frosch: Fliege, Giraffe: Blätter …)
-**Zeige-Hand:** Passiert eine Weile nichts, zeigt eine Hand, wie man etwas auf den Zug zieht.
+**Zeige-Hand:** Bei jedem neuen Fach macht eine Hand einmal vor, wie man etwas auf den Zug zieht. Passiert eine Weile
+nichts, zeigt sie abwechselnd: vormachen → ein noch nicht besuchtes Fach → den Fahren-Knopf. Auch beim Bauen (Stift, Kreis
+vormalen, Bahnhof an die Strecke ziehen), Fahren (▶, Wartende, Wetter) und Waschen (Eimer) zeigt sie, was geht.
+Nach ein paar Hinweisen ohne Reaktion ist Ruhe, bis wieder getippt wird.
+**Mitfahrer greifen:** Wer neben ein Tier tippt (z. B. auf den Zaun), greift das Tier – nicht den ganzen Wagen.
 
 ### 🧽 Waschen
 - Ein Wagen ganz nah. **Mit dem Finger (Schwamm) über den Matsch wischen** → es schäumt und quietscht,
@@ -48,7 +53,7 @@ Katze/Pinguin: Fisch, Hund: Knochen, Löwe: Fleisch, Hühner/Ente: Körner, Fros
 - **Brücke, Tunnel und Bahnübergang entstehen von selbst**, wo die gemalte Strecke Fluss, Berg oder Straße kreuzt –
   auch bei schrägen oder gebogenen Linien (die Brücke folgt der Kurve). Die Stimme sagt an, was entstanden ist
   („Eine Brücke über den Fluss!“).
-- In der Leiste: **Bahnhof (bis zu 4, je rot / blau / gelb / grün), Waschanlage, Tankstelle**.
+- In der Leiste: **Bahnhof (bis zu 4, je rot / blau / gelb / grün) und Waschanlage**.
   Antippen → setzt sich an eine freie Stelle. Ziehen → rastet an der Strecke ein.
   Gesetzte Dinge lassen sich entlang der Strecke verschieben; in die Leiste ziehen = weg.
   Auf Brücken, in Tunneln und auf Bahnübergängen kann nichts stehen.
@@ -60,9 +65,6 @@ Katze/Pinguin: Fisch, Hund: Knochen, Löwe: Fleisch, Hühner/Ente: Körner, Fros
 - **Fahrgäste mit Ziel:** Gibt es mindestens zwei Bahnhöfe, zeigt jeder Wartende eine **Sprechblase in einer Bahnhofsfarbe**.
   Er fährt mit und **steigt am Bahnhof dieser Farbe von selbst aus** („Danke!“) und geht ins Bahnhofshaus.
   Farben zuordnen statt Punkte zählen – kein Druck, nichts kann falsch gemacht werden.
-- **Tankstelle:** Steht eine an der Strecke, brauchen Dampflok (Kohle 🪨 + Wasser 💧) und Diesellok (Diesel ⛽) Vorräte – Anzeige oben links.
-  Ist etwas knapp, hält der Zug dort. Wasserturm, Kohlebunker oder Zapfsäule antippen → füllt auf. Leer = der Zug schleicht nur noch.
-  E-Lok und Schnellzug brauchen nichts (fahren mit Strom).
 - **Waschanlage:** Der Zug wird beim Fahren schmutzig (bei Regen schneller). In der Waschanlage drehen sich die Bürsten, es schäumt – blitzsauber.
 - **Tunnel:** drinnen wird es dunkel, die Lampen gehen an, die Pfeife hallt.
 - **Musik-Brücke:** Die Brücken haben bunte Xylophon-Stäbe (tief = rot und breit, hoch = lila und schmal).
@@ -78,7 +80,9 @@ Katze/Pinguin: Fisch, Hund: Knochen, Löwe: Fleisch, Hühner/Ente: Körner, Fros
 - Jede Lok fährt anders schnell (Schnellzug am schnellsten).
 
 **Tiergeräusche** sind echte Aufnahmen (gemeinfrei, CC0 – Quellen in `sounds/QUELLEN.md`) für Kuh, Schwein, Schaf,
-Hund, Katze, Huhn, Hahn und Frosch. Ente, Pferd, Löwe, Elefant und Pinguin sind nachgebaut (keine freien Aufnahmen erreichbar).
+Hund, Katze, Huhn, Hahn und Frosch. Löwe, Elefant, Pferd, Ente und Pinguin sind per Stimm-Synthese nachgebaut
+(`js/animalSynth.js`: Stimmpulse mit Zittern + Atem + Formanten), weil keine freien Aufnahmen erreichbar waren.
+Eigene Aufnahmen (MP3) lassen sich in `sounds/` ablegen und in `js/audio.js` (ANIMAL_SAMPLES) eintragen.
 
 Leise Xylophon-Musik läuft im Hintergrund (im Eltern-Bereich abschaltbar).
 Zug, Strecke und alles an der Strecke bleiben gespeichert.
@@ -146,11 +150,14 @@ js/game/track.js           Aus Fingerstrich wird Schienenstrecke
 js/game/world.js           Werkstatt und Landschaft
 js/game/features.js        Feste Landschaft: Fluss, Landstraße mit Verkehr, Berge
 js/game/crossings.js       Automatische Brücken, Tunnel, Bahnübergänge
-js/game/trackObjects.js    Bahnhof (farbig), Waschanlage, Tankstelle
+js/game/trackObjects.js    Bahnhof (farbig), Waschanlage
 js/game/environment.js     Tag/Nacht, Regen, Schnee, Tunnel-Dunkelheit, nasser Boden, liegender Schnee
 js/game/weatherFx.js       Wetterfolgen: Pfützen, Spritzen, Regenbogen, Schneemänner
 js/game/foods.js           Futter-Modelle
 js/game/feeding.js         Tiere füttern (Fressen, Kopfschütteln, Denkblase)
+js/game/wheelStyles.js     Radmuster
+js/game/hint.js            Zeige-Hand
+js/animalSynth.js          Nachgebaute Tierstimmen
 js/game/lamps.js           Lampen, die nachts heller leuchten
 sounds/                    Tiergeräusche (MP3, CC0) + QUELLEN.md
 js/game/modes/*.js         Werkstatt, Waschen, Strecke bauen, Fahren

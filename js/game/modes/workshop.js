@@ -12,31 +12,34 @@ import { renderThumbnails } from '../thumbs.js';
 import { createTray } from '../tray.js';
 import { wave, applyDirt } from '../trainModel.js';
 import { createFeeder } from '../feeding.js';
+import { WHEEL_STYLES } from '../wheelStyles.js';
 
 const TABS = [
   { id: 'locos', icon: '🚂', say: 'tabLocos' },
   { id: 'wagons', icon: '🚃', say: 'tabWagons' },
   { id: 'paint', icon: '🎨', say: 'tabPaint' },
   { id: 'decor', icon: '⭐', say: 'tabDecor' },
+  { id: 'wheels', icon: '🛞', say: 'tabWheels' },
   { id: 'animals', icon: '🐄', say: 'tabAnimals' },
   { id: 'passengers', icon: '🧸', say: 'tabPassengers' },
   { id: 'food', icon: '🥕', say: 'tabFood' },
 ];
-const LISTS = { locos: LOCOS, wagons: WAGONS, paint: COLORS, decor: DECOR, animals: ANIMALS, passengers: PASSENGERS, food: FOODS };
+const LISTS = { locos: LOCOS, wagons: WAGONS, paint: COLORS, decor: DECOR, wheels: WHEEL_STYLES.map((id) => ({ id })), animals: ANIMALS, passengers: PASSENGERS, food: FOODS };
 // Tiere und Mitfahrer sind beides „Ladung“
 const kindOf = (tab) => {
   if (tab === 'animals' || tab === 'passengers') return 'cargo';
   if (tab === 'locos' || tab === 'wagons') return 'parts';
+  if (tab === 'wheels') return 'wheel';
   return tab;
 };
-const IDLE_HINT_MS = 12000;
+const IDLE_HINT_MS = 9000;
 
 export function createWorkshopMode(game) {
   const { services } = game;
   const train = game.train;
   const ws = game.workshop;
   let tab = 'wagons';
-  const selected = { paint: COLORS[0], decor: DECOR[0], cargo: CARGO[0], food: FOODS[0] };
+  const selected = { paint: COLORS[0], wheelpaint: COLORS[0], decor: DECOR[0], cargo: CARGO[0], food: FOODS[0], wheel: { id: 'speichen' } };
   const feeder = createFeeder(game, services);
   let lastCar = 0;
   let thumbs = null;
@@ -44,7 +47,6 @@ export function createWorkshopMode(game) {
   let active = false;
   let highlighted = null;
   let lastInteraction = performance.now();
-  let hintsShown = 0;
 
   // ---------- Leiste unten ----------
 
@@ -58,10 +60,6 @@ export function createWorkshopMode(game) {
   });
   const items = tray.items;
 
-  const hint = document.createElement('div');
-  hint.className = 'hint-hand hidden';
-  hint.innerHTML = '<img alt=""><span class="hand">👆</span>';
-  game.ui.append(hint);
 
   const thumbKey = (kind, id) => `${kind}:${id}`;
 
@@ -69,7 +67,7 @@ export function createWorkshopMode(game) {
     const b = document.createElement('button');
     b.type = 'button';
     b.className = `tray-item ${kind}`;
-    if (kind === 'paint') {
+    if (kind === 'paint' || kind === 'wheelpaint') {
       const pot = document.createElement('span');
       pot.className = 'pot';
       pot.style.background = entry.hex;
@@ -89,9 +87,15 @@ export function createWorkshopMode(game) {
   function showTab(id) {
     tab = id;
     tray.setActiveTab(id);
-    tray.setItems(LISTS[id].map((e) => itemButton(kindOf(id), e)));
+    const buttons = LISTS[id].map((e) => itemButton(kindOf(id), e));
+    // Im Räder-Fach gibt es auch Farbtöpfe – die malen nur die Räder an
+    if (id === 'wheels') buttons.push(...COLORS.map((c) => itemButton('wheelpaint', c)));
+    tray.setItems(buttons);
     items.dataset.kind = id;
     hideHint();
+    visited.add(id);
+    // Neues Fach: einmal kurz vormachen, wie es geht
+    if (active && !demoShown.has(id)) setTimeout(() => { if (tab === id && !game.hint.playing) demo(); }, 1300);
     requestAnimationFrame(updateInset);
   }
 
@@ -188,7 +192,7 @@ export function createWorkshopMode(game) {
       const targetKind = kind === 'parts' ? (isLoco(entry.id) ? 'loco' : 'wagon-add') : kind;
       const move = (ev) => {
         if (!ghost && Math.hypot(ev.clientX - sx, ev.clientY - sy) > 10) {
-          ghost = makeGhost(kind === 'paint' ? entry.hex : thumbs[thumbKey(kind, entry.id)]);
+          ghost = makeGhost(kind === 'paint' || kind === 'wheelpaint' ? entry.hex : thumbs[thumbKey(kind, entry.id)]);
           if (kind !== 'parts') select(kind, entry, button);
         }
         if (!ghost) return;
@@ -227,8 +231,12 @@ export function createWorkshopMode(game) {
     if (kind === 'paint') {
       services.sfx('plop');
       services.sayName(entry.id);
+    } else if (kind === 'wheelpaint') {
+      paintWheels(Math.min(lastCar, train.cars.length - 1), entry.hex, entry.id);
     } else if (kind === 'decor') {
       addDecor(Math.min(lastCar, train.cars.length - 1), entry.id);
+    } else if (kind === 'wheel') {
+      setWheels(Math.min(lastCar, train.cars.length - 1), entry.id);
     } else if (kind === 'food') {
       // Antippen: das erste Tier, das es mag – sonst das erste Tier (das zeigt dann, was es lieber mag)
       const list = feeder.eaters();
@@ -252,6 +260,8 @@ export function createWorkshopMode(game) {
       return paint(target, group);
     }
     if (kind === 'decor') return addDecor(target, entry.id);
+    if (kind === 'wheel') return setWheels(target, entry.id);
+    if (kind === 'wheelpaint') return paintWheels(target, entry.hex, entry.id);
     if (kind === 'cargo') return addCargo(target, entry.id);
   }
 
@@ -259,10 +269,34 @@ export function createWorkshopMode(game) {
 
   let press = null;
 
+  // Mitfahrer in Fingernähe (Bildschirm-Abstand) – damit man ein Tier greift und nicht den ganzen Wagen
+  function cargoNear(x, y, maxDist = 75) {
+    let best = null;
+    let bestD = maxDist;
+    const v = new THREE.Vector3();
+    train.cars.forEach((car, index) => {
+      for (const fig of car.userData.cargoItems) {
+        fig.getWorldPosition(v);
+        v.y += 0.35;
+        v.project(game.camera);
+        const d = Math.hypot(((v.x + 1) / 2) * window.innerWidth - x, ((1 - v.y) / 2) * window.innerHeight - y);
+        if (d < bestD) {
+          bestD = d;
+          best = { fig, index };
+        }
+      }
+    });
+    return best;
+  }
+
   function startTrainDrag(e) {
     const hit = game.pickCar(e.clientX, e.clientY);
     if (!hit) return null;
     const owner = hit.object?.userData.owner;
+    if (!owner?.userData.removable) {
+      const near = cargoNear(e.clientX, e.clientY);
+      if (near) return { what: 'item', car: near.index, removable: near.fig.userData.removable, obj: near.fig, hit };
+    }
     const removable = owner?.userData.removable;
     if (removable) return { what: 'item', car: hit.index, removable, obj: owner, hit };
     if (hit.index > 0) return { what: 'wagon', car: hit.index, obj: train.cars[hit.index], hit };
@@ -286,7 +320,7 @@ export function createWorkshopMode(game) {
     const data = train.data;
     if (isLoco(type)) {
       const old = data.cars[0];
-      data.cars[0] = { ...newCar(type), decor: old.decor, paint: old.type === type ? old.paint : { ...partDef(type).paint } };
+      data.cars[0] = { ...newCar(type), decor: old.decor, wheelStyle: old.wheelStyle, paint: old.type === type ? old.paint : { ...partDef(type).paint } };
       train.rebuild();
       relayout();
       game.popIn(train.cars[0]);
@@ -338,11 +372,35 @@ export function createWorkshopMode(game) {
     const hex = selected.paint.hex;
     train.data.cars[index].paint[group] = hex;
     if (group === 'trim') train.cars[index].userData.mats.trim.color.set(hex);
+    else if (group === 'wheel') train.cars[index].userData.mats.wheel.color.set(hex);
     else applyDirt(train.cars[index]);
     game.hop(train.cars[index]);
     game.saveTrain();
     services.sfx('splash');
     services.sayName(selected.paint.id);
+  }
+
+  // Radmuster für alle Räder eines Wagens; die Räder drehen sich zur Freude einmal schnell
+  function setWheels(index, style) {
+    train.data.cars[index].wheelStyle = style;
+    const car = train.rebuildCar(index);
+    lastCar = index;
+    game.tween(0.9, (t) => { for (const w of car.userData.wheels) w.rotation.z = -t * Math.PI * 4; });
+    game.hop(car);
+    game.saveTrain();
+    services.sfx('pling');
+    services.sayName(style);
+  }
+
+  function paintWheels(index, hex, id) {
+    train.data.cars[index].paint.wheel = hex;
+    const car = train.cars[index];
+    car.userData.mats.wheel.color.set(hex);
+    lastCar = index;
+    game.tween(0.6, (t) => { for (const w of car.userData.wheels) w.rotation.z = -t * Math.PI * 2; });
+    game.saveTrain();
+    services.sfx('splash');
+    services.sayName(id);
   }
 
   function addDecor(index, kind) {
@@ -476,6 +534,7 @@ export function createWorkshopMode(game) {
     }
     if (tab === 'paint') return paint(d.car, d.hit.object?.userData.paint ?? 'body');
     if (tab === 'decor') return addDecor(d.car, selected.decor.id);
+    if (tab === 'wheels') return setWheels(d.car, selected.wheel.id);
     if (kindOf(tab) === 'cargo') return addCargo(d.car, selected.cargo.id);
     if (tab === 'food' && d.what === 'wagon') {
       const fig = train.cars[d.car].userData.cargoItems.find((f) => LIKES[f.userData.figure]);
@@ -502,46 +561,48 @@ export function createWorkshopMode(game) {
   }
 
   // ---------- Zeige-Hand ----------
+  // Reihenfolge, wenn eine Weile nichts passiert: vormachen (im offenen Fach) → ein noch nicht
+  // besuchtes Fach zeigen → (später) zum Fahren-Knopf zeigen. Neues Fach: einmal sofort vormachen.
+
+  const visited = new Set();
+  const demoShown = new Set();
+  let hintStep = 0;
 
   function touched() {
     lastInteraction = performance.now();
-    hideHint();
   }
 
   function hideHint() {
-    hint.classList.add('hidden');
-    hint.classList.remove('play');
+    game.hint.hide();
   }
 
-  function showHint() {
+  function demo() {
     if (!active || busy) return;
     const list = LISTS[tab];
     const entry = list[0];
-    const btn = items.children[list.indexOf(entry)];
+    const btn = items.children[0];
     if (!btn) return;
     let target = tab === 'wagons' ? train.cars.length - 1 : 0;
     if (kindOf(tab) === 'cargo') target = Math.max(0, train.data.cars.findIndex((_, i) => hasRoom(i)));
     if (tab === 'food') target = Math.max(0, train.data.cars.findIndex((c) => c.cargo.some((id) => LIKES[id])));
+    if (tab === 'wheels' || tab === 'decor') target = Math.min(1, train.cars.length - 1);
+    btn.scrollIntoView({ inline: 'nearest', block: 'nearest' });
     const from = btn.getBoundingClientRect();
     const to = screenPos(train.cars[target]);
-    hint.style.setProperty('--x0', `${from.left + from.width / 2}px`);
-    hint.style.setProperty('--y0', `${from.top + from.height / 2}px`);
-    hint.style.setProperty('--x1', `${to.x}px`);
-    hint.style.setProperty('--y1', `${to.y}px`);
-    const img = hint.querySelector('img');
-    if (tab === 'paint') {
-      img.removeAttribute('src');
-      img.style.background = entry.hex;
-      img.classList.add('pot');
-    } else {
-      img.src = thumbs[thumbKey(kindOf(tab), entry.id)];
-      img.style.background = '';
-      img.classList.remove('pot');
+    const img = tab === 'paint' ? entry.hex : thumbs[thumbKey(kindOf(tab), entry.id)];
+    game.hint.drag(from.left + from.width / 2, from.top + from.height / 2, to.x, to.y, img);
+    demoShown.add(tab);
+  }
+
+  function showHint() {
+    if (!active || busy) return;
+    const step = hintStep++ % 3;
+    if (step === 1) {
+      const next = TABS.find((t) => !visited.has(t.id));
+      if (next) return game.hint.tapElement(tray.root.querySelector(`.tab[data-tab="${next.id}"]`));
     }
-    hint.classList.remove('hidden', 'play');
-    void hint.offsetWidth;
-    hint.classList.add('play');
-    hintsShown++;
+    if (step === 2 && hintStep > 4) return game.hint.tapElement(game.modeBar.querySelector('[data-mode="drive"]'));
+    demo();
   }
 
   // ---------- Kamera ----------
@@ -561,6 +622,7 @@ export function createWorkshopMode(game) {
           ...DECOR.map((d) => ({ kind: 'decor', id: d.id })),
           ...CARGO.map((c) => ({ kind: 'cargo', id: c.id })),
           ...FOODS.map((f) => ({ kind: 'food', id: f.id })),
+          ...WHEEL_STYLES.map((id) => ({ kind: 'wheel', id })),
         ]);
       }
       active = true;
@@ -572,7 +634,7 @@ export function createWorkshopMode(game) {
       game.setBottomInset(tray.height());
       fitTrain(!game.cam.initialized);
       game.cam.initialized = true;
-      lastInteraction = performance.now() - (hintsShown === 0 ? IDLE_HINT_MS - 2500 : 0);
+
     },
     exit() {
       active = false;
@@ -586,10 +648,7 @@ export function createWorkshopMode(game) {
       train.animate(dt, 0, false);
       feeder.update(dt);
       if (ws.highlight.visible) ws.highlight.material.opacity = 0.6 + Math.sin(game.time * 8) * 0.3;
-      if (performance.now() - lastInteraction > IDLE_HINT_MS) {
-        lastInteraction = performance.now();
-        showHint();
-      }
+      if (game.hint.due(IDLE_HINT_MS)) showHint();
     },
     onResize() {
       requestAnimationFrame(updateInset);

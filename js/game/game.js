@@ -11,6 +11,7 @@ import { createDrawMode } from './modes/draw.js';
 import { createDriveMode } from './modes/drive.js';
 import { createWashMode } from './modes/wash.js';
 import { WeatherFx } from './weatherFx.js';
+import { Hint } from './hint.js';
 
 const MODE_ICONS = { workshop: '🛠️', wash: '🧽', draw: '🛤️', drive: '🚂' };
 const SUN_OFFSET = new THREE.Vector3(12, 24, 14);
@@ -55,6 +56,7 @@ export class Game {
     this.land.clearAroundTrack();
     this.drive = { s: 0, speed: 0, target: 0 };
     this.weatherFx = new WeatherFx(this);
+    this.hint = new Hint(this.ui);
 
     this.modes = {
       workshop: createWorkshopMode(this),
@@ -114,6 +116,13 @@ export class Game {
     const sun = this.scene === this.land.scene ? this.land.sun : this.workshop.sun;
     sun.target.position.copy(this.cam.look);
     sun.position.copy(this.cam.look).add(SUN_OFFSET);
+    // Nahgrenze der Kamera mitwachsen lassen: viel genauere Tiefe → kein Flackern flacher Flächen aus der Ferne
+    const camDist = this.cam.pos.distanceTo(this.cam.look);
+    const near = THREE.MathUtils.clamp(camDist * 0.04, 0.1, 6);
+    if (Math.abs(near - this.camera.near) > this.camera.near * 0.1) {
+      this.camera.near = near;
+      this.camera.updateProjectionMatrix();
+    }
     if (this.scene.fog) {
       // Nebel nur in der Ferne, egal wie weit die Kamera weg ist
       const dist = this.cam.pos.distanceTo(this.cam.look);
@@ -158,6 +167,7 @@ export class Game {
 
   setMode(name, { silent = false } = {}) {
     if (this.modeName === name) return;
+    this.hint?.hide();
     this.mode?.exit();
     this.modeName = name;
     this.mode = this.modes[name];

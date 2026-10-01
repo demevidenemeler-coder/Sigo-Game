@@ -288,7 +288,9 @@ export function createLandscape() {
   const grass = grassTexture().clone();
   grass.repeat.set(66, 66);
   grass.needsUpdate = true;
-  const ground = new THREE.Mesh(groundGeo, new THREE.MeshStandardMaterial({ map: grass, color: '#d3e3c0', vertexColors: true, roughness: 1 }));
+  // Der Boden wird beim Tiefentest leicht nach hinten geschoben, damit Fluss, Straße und Schotter
+  // nie mit ihm „kämpfen“ (sonst flackert es oder Teile verschwinden – besonders auf Tablets).
+  const ground = new THREE.Mesh(groundGeo, new THREE.MeshStandardMaterial({ map: grass, color: '#d3e3c0', vertexColors: true, roughness: 1, polygonOffset: true, polygonOffsetFactor: 4, polygonOffsetUnits: 4 }));
   ground.receiveShadow = true;
   scene.add(ground);
 

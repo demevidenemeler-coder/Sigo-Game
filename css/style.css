@@ -243,6 +243,38 @@ button {
 
 .drive-btn.go.waiting { animation: attention 1.2s ease-in-out infinite; box-shadow: 0 0 0 8px rgba(79, 166, 90, 0.35), 0 6px 16px var(--shadow); }
 
+/* Zeige-Hand (hint.js) */
+.hint2 {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 45;
+  pointer-events: none !important;
+}
+.hint2-hand {
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-family: var(--emoji);
+  font-size: min(15vmin, 96px);
+  line-height: 1;
+  translate: -38% -6%;
+  filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.35));
+}
+.hint2-carry { position: absolute; left: 0; top: 0; translate: -50% -80%; }
+.hint2-carry img { width: calc(var(--item) * 1.15); height: calc(var(--item) * 1.15); object-fit: contain; opacity: 0.9; }
+.hint2-carry .pot { display: block; width: calc(var(--item) * 0.7); height: calc(var(--item) * 0.7); border-radius: 50%; box-shadow: 0 0 0 4px #fff; }
+.hint2-ring {
+  position: fixed;
+  width: min(18vmin, 110px);
+  height: min(18vmin, 110px);
+  border-radius: 50%;
+  border: 6px solid #ffffff;
+  box-shadow: 0 0 0 4px rgba(255, 143, 171, 0.7), 0 0 18px rgba(255, 255, 255, 0.8);
+  z-index: 44;
+  pointer-events: none !important;
+}
+
 /* Regenbogen nach dem Regen: weicher Bogen über dem Bild */
 .rainbow {
   position: fixed;
@@ -310,43 +342,7 @@ button {
 }
 .env-controls .drive-btn { width: min(12vmin, 80px); font-size: min(6vmin, 38px); }
 
-/* Vorräte der Lok (nur wenn eine Tankstelle steht) */
-.fuel-gauges {
-  position: fixed;
-  left: calc(14px + env(safe-area-inset-left));
-  top: calc(min(15vmin, 84px) + 26px + env(safe-area-inset-top));
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 10px 12px;
-  background: rgba(255, 250, 242, 0.85);
-  border-radius: 18px;
-  box-shadow: 0 4px 12px var(--shadow);
-}
-.gauge { display: flex; align-items: center; gap: 8px; }
-.gauge-icon { font-family: var(--emoji); font-size: 26px; }
-.gauge-bar { width: min(22vmin, 140px); height: 16px; border-radius: 8px; background: #e6dccb; overflow: hidden; }
-.gauge-bar i { display: block; height: 100%; background: #4fa65a; border-radius: 8px; transition: width 0.3s; }
-.gauge.low .gauge-bar i { background: #d9463b; }
-.gauge.low { animation: attention 1s ease-in-out infinite; }
-
 /* ---------- Mal-Hinweis ---------- */
-.draw-hint {
-  position: fixed;
-  left: 50%;
-  top: 50%;
-  width: 0;
-  height: 0;
-  pointer-events: none !important;
-}
-.draw-hint .hand {
-  position: absolute;
-  font-family: var(--emoji);
-  font-size: min(14vmin, 90px);
-  animation: circle 2s linear infinite;
-  filter: drop-shadow(0 6px 8px var(--shadow));
-}
-
 /* ---------- Eltern-Knopf ---------- */
 #parent-btn {
   position: fixed;

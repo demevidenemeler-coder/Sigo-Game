@@ -137,23 +137,31 @@ export function createFeatures(scene) {
   const water = waterTexture().clone();
   water.repeat.set(1, 1);
   water.needsUpdate = true;
-  group.add(ribbon(river, RIVER_WIDTH + 1.6, 0.018, new THREE.MeshStandardMaterial({ color: '#d9c9a0', roughness: 1 })));
-  const waterMesh = ribbon(river, RIVER_WIDTH, 0.03, new THREE.MeshStandardMaterial({ map: water, roughness: 0.1, metalness: 0.1 }), 0, RIVER_WIDTH);
+  group.add(ribbon(river, RIVER_WIDTH + 1.6, 0.02, new THREE.MeshStandardMaterial({ color: '#d9c9a0', roughness: 1, polygonOffset: true, polygonOffsetFactor: 2, polygonOffsetUnits: 2 })));
+  const waterMesh = ribbon(river, RIVER_WIDTH, 0.05, new THREE.MeshStandardMaterial({ map: water, roughness: 0.1, metalness: 0.1 }), 0, RIVER_WIDTH);
   group.add(waterMesh);
 
   // Straße mit Randlinien und Mittelstreifen
-  group.add(ribbon(road, ROAD_WIDTH, 0.04, new THREE.MeshStandardMaterial({ color: '#6b6f75', roughness: 0.9 })));
+  group.add(ribbon(road, ROAD_WIDTH, 0.04, new THREE.MeshStandardMaterial({ color: '#6b6f75', roughness: 0.9, polygonOffset: true, polygonOffsetFactor: 2, polygonOffsetUnits: 2 })));
   const white = new THREE.MeshStandardMaterial({ color: '#f5f1ea', roughness: 0.8 });
-  group.add(ribbon(road, 0.1, 0.045, white, 1.45), ribbon(road, 0.1, 0.045, white, -1.45));
+  group.add(ribbon(road, 0.1, 0.055, white, 1.45), ribbon(road, 0.1, 0.055, white, -1.45));
+  // Mittelstreifen als eine einzige Instanz-Gruppe (statt hunderter Einzelteile)
   const dashGeo = new THREE.PlaneGeometry(0.1, 1.0).rotateX(-Math.PI / 2);
-  for (let t = 0; t < roadS.length; t += 2.2) {
-    const p = road.getPointAt(t / roadS.length);
-    const tg = road.getTangentAt(t / roadS.length);
-    const d = new THREE.Mesh(dashGeo, white);
-    d.position.set(p.x, 0.047, p.z);
-    d.rotation.y = Math.atan2(tg.x, tg.z);
-    group.add(d);
+  const dashCount = Math.floor(roadS.length / 2.2);
+  const dashes = new THREE.InstancedMesh(dashGeo, white, dashCount);
+  const dm = new THREE.Matrix4();
+  const dq = new THREE.Quaternion();
+  const up = new THREE.Vector3(0, 1, 0);
+  const one = new THREE.Vector3(1, 1, 1);
+  for (let i = 0; i < dashCount; i++) {
+    const u = (i * 2.2) / roadS.length;
+    const p = road.getPointAt(u);
+    const tg = road.getTangentAt(u);
+    dq.setFromAxisAngle(up, Math.atan2(tg.x, tg.z));
+    dashes.setMatrixAt(i, dm.compose(new THREE.Vector3(p.x, 0.055, p.z), dq, one));
   }
+  dashes.receiveShadow = true;
+  group.add(dashes);
 
   // Straßenbrücke über den Fluss (Fluss und Straße liegen fest, also einmal berechnen)
   const rb = intersections(roadS.pts, riverS.pts, false)[0];
@@ -225,7 +233,7 @@ export function createFeatures(scene) {
 
   // Verkehr: Autos fahren die ganze Straße entlang; vor geschlossenen Schranken halten sie
   function updateTraffic(dt, crossings = []) {
-    water.offset.y -= dt * 0.12;
+    water.offset.y -= dt * 0.06;
     const L = roadS.length;
     const p = new THREE.Vector3();
     const tg = new THREE.Vector3();

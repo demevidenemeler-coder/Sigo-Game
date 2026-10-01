@@ -3,7 +3,7 @@
 // - ✏️ Stift auswählen und eine Linie malen → daraus werden Schienen (Kreis schließt sich von selbst).
 //   Danach schaltet der Stift wieder ab, damit die Strecke nicht aus Versehen überschrieben wird.
 // - Brücken, Tunnel und Bahnübergänge entstehen von selbst, wo die Strecke Fluss, Berg oder Straße kreuzt.
-// - Bahnhof, Waschanlage, Tankstelle aus der Leiste an die Strecke ziehen oder antippen.
+// - Bahnhof und Waschanlage aus der Leiste an die Strecke ziehen oder antippen.
 // - Gesetzte Dinge entlang der Strecke verschieben; in die Leiste ziehen = wegnehmen.
 
 import * as THREE from 'three';
@@ -13,7 +13,7 @@ import { TRACK_OBJECTS } from '../../catalog.js';
 import { renderThumbnails } from '../thumbs.js';
 import { createTray } from '../tray.js';
 
-const TAP_SOUND = { bahnhof: 'dingdong', waschanlage: 'scrub', tankstelle: 'gurgle' };
+const TAP_SOUND = { bahnhof: 'dingdong', waschanlage: 'scrub' };
 const VIEW_DIR = new THREE.Vector3(0, 1, 0.3); // fast senkrecht von oben
 const MIN_HALF = 10;
 const MAX_HALF = WORLD_BOUNDS.x + 8;
@@ -34,10 +34,7 @@ export function createDrawMode(game) {
   const pointers = new Map();
   const view = { x: 0, z: 0, half: MAX_HALF };
 
-  const hint = document.createElement('div');
-  hint.className = 'draw-hint hidden';
-  hint.innerHTML = '<span class="hand">👆</span>';
-  game.ui.append(hint);
+  let hintStep = 0;
 
   // ---------- Leiste ----------
   const tray = createTray(game.ui, { extraClass: 'build-tray' });
@@ -47,12 +44,39 @@ export function createDrawMode(game) {
   function setPencil(on) {
     pencil = on;
     pencilBtn?.classList.toggle('selected', on);
-    if (on) {
-      hint.classList.remove('hidden');
-      setTimeout(() => hint.classList.add('hidden'), 3500);
-    } else {
-      hint.classList.add('hidden');
+    if (on) setTimeout(() => pencil && !drawing && showDrawDemo(), 400);
+    else game.hint.hide();
+  }
+
+  // Zeige-Hand: malt einen Kreis vor (Stift an) bzw. zeigt auf den Stift / zieht einen Bahnhof an die Strecke
+  function showDrawDemo() {
+    const cx = window.innerWidth / 2;
+    const cy = Math.min(window.innerHeight / 2, tray.top() - 40) - 20;
+    const r = Math.min(window.innerWidth, tray.top()) * 0.28;
+    const pts = [];
+    for (let i = 0; i <= 24; i++) {
+      const a = Math.PI + (i / 24) * Math.PI * 2;
+      pts.push([cx + Math.cos(a) * r * 1.3, cy + Math.sin(a) * r]);
     }
+    game.hint.path(pts);
+  }
+
+  function showHint() {
+    if (pencil) return showDrawDemo();
+    const step = hintStep++ % 3;
+    if (step === 1 && tray.items.children[1]) {
+      // Bahnhof aus der Leiste an die Strecke ziehen
+      const btn = tray.items.children[1];
+      const r = btn.getBoundingClientRect();
+      const f = land.track.frameAt(land.track.length * 0.25).p.clone().project(game.camera);
+      const tx = ((f.x + 1) / 2) * window.innerWidth;
+      const ty = ((1 - f.y) / 2) * window.innerHeight;
+      if (tx > 0 && tx < window.innerWidth && ty > 0 && ty < tray.top()) {
+        return game.hint.drag(r.left + r.width / 2, r.top + r.height / 2, tx, ty, btn.querySelector('img')?.src);
+      }
+    }
+    if (step === 2 && hintStep > 3) return game.hint.tapElement(game.modeBar.querySelector('[data-mode="drive"]'));
+    game.hint.tapElement(pencilBtn);
   }
 
   function buildTray() {
@@ -246,7 +270,7 @@ export function createDrawMode(game) {
     },
     exit() {
       active = false;
-      hint.classList.add('hidden');
+      game.hint.hide();
       tray.hide();
       game.setBottomInset(0);
       pointers.clear();
@@ -261,6 +285,7 @@ export function createDrawMode(game) {
     },
     update(dt) {
       if (land.track.update(dt)) services.sfx('klack');
+      if (!drawing && !pinch && game.hint.due(8000)) showHint();
       train.animate(dt, 0, false);
     },
     wheel(e) {
@@ -271,7 +296,7 @@ export function createDrawMode(game) {
     },
     pointerDown(e) {
       pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
-      hint.classList.add('hidden');
+      game.hint.hide();
       if (pointers.size === 2) return startPinch();
       if (pointers.size > 2) return;
       const item = pickItem(e.clientX, e.clientY);

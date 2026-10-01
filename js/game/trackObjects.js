@@ -1,4 +1,4 @@
-// Dinge an der Strecke: Bahnhof, Tunnel, Brücke, Waschanlage, Tankstelle, Bahnübergang.
+// Dinge an der Strecke: Bahnhof und Waschanlage (Brücke, Tunnel, Bahnübergang entstehen automatisch, siehe crossings.js).
 // Jedes Objekt sitzt an einer Stelle s der Strecke und dreht sich mit ihr.
 // Lokale Koordinaten: x = entlang der Schienen, z = seitlich (Gleismitte bei z = 0).
 
@@ -197,72 +197,15 @@ function buildWaschanlage(item) {
   }
 }
 
-// ---------- Tankstelle ----------
-
-function buildTankstelle(item) {
-  const g = item.obj;
-  // Wasserturm
-  const tower = new THREE.Group();
-  tower.position.set(-1.2, 0, 2.7);
-  for (const [x, z] of [[0.6, 0.6], [-0.6, 0.6], [0.6, -0.6], [-0.6, -0.6]]) add(tower, new THREE.CylinderGeometry(0.07, 0.09, 2.4, 8), mat('#5c3b22'), x, 1.2, z);
-  add(tower, new THREE.CylinderGeometry(1.0, 1.0, 1.4, 20), new THREE.MeshStandardMaterial({ map: woodTexture('#b98553', 'tower'), roughness: 0.8 }), 0, 3.1, 0);
-  add(tower, new THREE.ConeGeometry(1.15, 0.7, 20), mat('#8a3b31', 0.6), 0, 4.15, 0);
-  const spout = new THREE.Group();
-  spout.position.set(0, 2.8, -0.9);
-  add(spout, new THREE.CylinderGeometry(0.1, 0.1, 1.6, 10), mat('#3a3a3a', 0.4, 0.5), 0, 0, -0.7).rotation.x = Math.PI / 2;
-  const stream = add(spout, new THREE.CylinderGeometry(0.08, 0.1, 1.6, 10), new THREE.MeshStandardMaterial({ color: '#6bb6d9', transparent: true, opacity: 0.8 }), 0, -0.8, -1.45);
-  stream.visible = false;
-  spout.rotation.y = 0.9;
-  tower.add(spout);
-  tower.userData.action = 'wasser';
-  tower.traverse((o) => { o.userData.owner = tower; });
-  g.add(tower);
-  item.parts.spout = spout;
-  item.parts.stream = stream;
-  item.parts.tower = tower;
-  // Kohlebunker mit Rutsche
-  const bunker = new THREE.Group();
-  bunker.position.set(1.2, 0, -2.6);
-  add(bunker, rbox(1.8, 1.8, 1.6, 0.05), new THREE.MeshStandardMaterial({ map: woodTexture('#8a5a33', 'bunker'), roughness: 0.9 }), 0, 0.9, 0);
-  const coal = mat('#25272b', 0.6, 0.2);
-  for (let i = 0; i < 10; i++) add(bunker, new THREE.IcosahedronGeometry(0.2, 0), coal, (Math.random() - 0.5) * 1.3, 1.85 + Math.random() * 0.15, (Math.random() - 0.5) * 1.1);
-  const chute = add(bunker, new THREE.BoxGeometry(0.6, 0.08, 1.4), mat('#6b6f75', 0.4, 0.5), 0, 1.6, 1.2);
-  chute.rotation.x = 0.5;
-  item.parts.coalBits = [];
-  for (let i = 0; i < 10; i++) {
-    const c = add(bunker, new THREE.IcosahedronGeometry(0.1, 0), coal, 0, 0, 0);
-    c.visible = false;
-    item.parts.coalBits.push(c);
-  }
-  bunker.userData.action = 'kohle';
-  bunker.traverse((o) => { o.userData.owner = bunker; });
-  g.add(bunker);
-  item.parts.bunker = bunker;
-  // Dieselzapfsäule
-  const pump = new THREE.Group();
-  pump.position.set(1.6, 0, 2.3);
-  add(pump, rbox(0.6, 1.4, 0.45, 0.08), mat('#d9463b', 0.4), 0, 0.7, 0);
-  add(pump, new THREE.BoxGeometry(0.4, 0.3, 0.02), lamp(new THREE.MeshStandardMaterial({ color: '#e8f4ff', emissive: '#9fd0ff' }), 0.4, 1.5), 0, 1.05, -0.23);
-  add(pump, new THREE.TorusGeometry(0.25, 0.03, 6, 16, Math.PI), mat('#2b2b2b'), 0.32, 0.8, 0).rotation.z = -Math.PI / 2;
-  pump.userData.action = 'diesel';
-  pump.traverse((o) => { o.userData.owner = pump; });
-  g.add(pump);
-  item.parts.pump = pump;
-}
-
-// ---------- Bahnübergang ----------
-
 const BUILDERS = {
   bahnhof: buildBahnhof,
   waschanlage: buildWaschanlage,
-  tankstelle: buildTankstelle,
 };
 
 // Freizuhaltende Bereiche (für Bäume/Blumen), in lokalen Koordinaten: [x, z, Radius]
 const FOOTPRINTS = {
   bahnhof: [[0, 2.5, 5]],
   waschanlage: [[0, 0, 3]],
-  tankstelle: [[-1.2, 2.7, 2.5], [1.2, -2.6, 2.5], [1.6, 2.3, 1.5]],
 };
 
 // Vorschau-Modell für die Leiste (ohne Strecke)

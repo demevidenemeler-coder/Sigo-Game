@@ -1,7 +1,7 @@
 // Vorschaubilder für die Werkstatt-Leiste, gerendert aus den echten 3D-Modellen.
 import * as THREE from 'three';
 import { RoomEnvironment } from '../../vendor/RoomEnvironment.js';
-import { buildCar, sideDecor, topDecor, isTopDecor } from './trainModel.js';
+import { buildCar, sideDecor, topDecor, isTopDecor, buildWheelPreview } from './trainModel.js';
 import { buildFigure } from './figures.js';
 import { buildFood } from './foods.js';
 import { buildTrackObjectPreview } from './trackObjects.js';
@@ -10,6 +10,7 @@ import { newCar } from '../catalog.js';
 const VIEWS = {
   car: { size: [240, 160], fov: 30, pos: [2.6, 2.8, 6.4], look: [0, 1.0, 0] },
   figure: { size: [160, 160], fov: 30, pos: [0.6, 0.75, 2.1], look: [0, 0.36, 0] },
+  wheel: { size: [160, 160], fov: 30, pos: [0.35, 0.3, 2.3], look: [0, 0, 0.3] },
   food: { size: [160, 160], fov: 30, pos: [0.35, 0.65, 1.25], look: [0, 0.15, 0] },
   sideDecor: { size: [160, 160], fov: 30, pos: [0.2, 0.25, 1.3], look: [0, 0, 0] },
   topDecor: { size: [160, 160], fov: 30, pos: [0.4, 1.0, 3.4], look: [0.1, 0.9, 0] },
@@ -20,6 +21,7 @@ function objectFor(kind, id) {
   if (kind === 'parts') return { obj: buildCar(newCar(id)), view: 'car' };
   if (kind === 'cargo') return { obj: buildFigure(id), view: 'figure' };
   if (kind === 'food') return { obj: buildFood(id), view: 'food' };
+  if (kind === 'wheel') return { obj: buildWheelPreview(id), view: 'wheel' };
   if (kind === 'build') return { obj: buildTrackObjectPreview(id), view: 'build' };
   return isTopDecor(id) ? { obj: topDecor(id, 1), view: 'topDecor' } : { obj: sideDecor(id), view: 'sideDecor' };
 }

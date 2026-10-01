@@ -1,11 +1,10 @@
 // Alles, was man in Werkstatt und Landschaft benutzen kann. Namen stehen in i18n.js.
 
-// fuel: welche Vorräte die Lok braucht (nur relevant, wenn eine Tankstelle an der Strecke steht)
 export const LOCOS = [
-  { id: 'dampf', speed: 4.5, fuel: ['kohle', 'wasser'], horn: 'whistle', paint: { body: '#d9463b', roof: '#3a3a3a', trim: '#2f2f2f' } },
-  { id: 'diesel', speed: 5, fuel: ['diesel'], horn: 'dieselhorn', paint: { body: '#f2c832', roof: '#d9463b', trim: '#2f2f2f' } },
-  { id: 'elok', speed: 5.5, fuel: [], horn: 'elhorn', paint: { body: '#3b7cc9', roof: '#e8e4dc', trim: '#2f2f2f' } },
-  { id: 'schnell', speed: 7, fuel: [], horn: 'elhorn', paint: { body: '#f5f1ea', roof: '#d9463b', trim: '#3a3a3a' } },
+  { id: 'dampf', speed: 4.5, horn: 'whistle', paint: { body: '#d9463b', roof: '#3a3a3a', trim: '#2f2f2f' } },
+  { id: 'diesel', speed: 5, horn: 'dieselhorn', paint: { body: '#f2c832', roof: '#d9463b', trim: '#2f2f2f' } },
+  { id: 'elok', speed: 5.5, horn: 'elhorn', paint: { body: '#3b7cc9', roof: '#e8e4dc', trim: '#2f2f2f' } },
+  { id: 'schnell', speed: 7, horn: 'elhorn', paint: { body: '#f5f1ea', roof: '#d9463b', trim: '#3a3a3a' } },
 ];
 
 export const WAGONS = [
@@ -69,7 +68,6 @@ export const isEater = (id) => id in LIKES;
 export const TRACK_OBJECTS = [
   { id: 'bahnhof', span: 9, max: 4 },
   { id: 'waschanlage', span: 6, max: 1 },
-  { id: 'tankstelle', span: 7, max: 1 },
 ];
 
 // Bahnhofsfarben: Fahrgäste zeigen in einer Sprechblase, zu welchem Bahnhof sie wollen
@@ -93,8 +91,7 @@ export function isLoco(type) {
 
 export function newCar(type) {
   const def = partDef(type);
-  const car = { type, paint: { ...def.paint }, decor: [], cargo: [], dest: [], dirt: 0 };
-  if (isLoco(type)) car.fuel = { kohle: 1, wasser: 1, diesel: 1 };
+  const car = { type, paint: { ...def.paint, wheel: def.paint.wheel ?? def.paint.roof }, decor: [], cargo: [], dest: [], dirt: 0, wheelStyle: 'speichen' };
   return car;
 }
 
@@ -127,10 +124,12 @@ export function spliceCargo(car, index) {
 export function upgradeTrain(data) {
   for (const c of data.cars) {
     c.dirt ??= 0;
+    c.paint.wheel ??= c.paint.roof;
+    c.wheelStyle ??= 'speichen';
     c.dest ??= [];
     c.dest.length = c.cargo.length;
     for (let i = 0; i < c.dest.length; i++) c.dest[i] ??= null;
-    if (isLoco(c.type)) c.fuel ??= { kohle: 1, wasser: 1, diesel: 1 };
+    delete c.fuel;
   }
   return data;
 }

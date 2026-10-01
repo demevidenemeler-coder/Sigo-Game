@@ -343,6 +343,8 @@ export function createWashMode(game) {
     },
     update(dt) {
       if (!active) return;
+      // Alles sauber? Dann zeigt die Hand auf den Eimer (Matsch!)
+      if (!splats.length && !busy && game.hint.due(5000)) game.hint.tapElement(mudBtn);
       // Schwamm zeigt, was zu tun ist: liegt er still, wackelt er über dem Wagen
       if (!rub) {
         spongeHome();

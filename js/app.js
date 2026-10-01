@@ -7,6 +7,8 @@ import {
   preloadSamples, ANIMAL_SAMPLE_NAMES,
 } from './audio.js';
 import { Music } from './music.js';
+import { loadRecordings, hasRecording, playRecording } from './recordings.js';
+import { showVoiceStudio, PHRASE_KEYS, keys as recKeys } from './voiceStudio.js';
 import { defaultTrain, upgradeTrain } from './catalog.js';
 import { defaultTrackPoints } from './game/track.js';
 import { Game } from './game/game.js';
@@ -20,8 +22,17 @@ setLanguage(settings.language);
 
 let speechToken = 0;
 
+// Eigene Aufnahmen (Eltern-Bereich) haben Vorrang vor der Computerstimme
+loadRecordings();
+function phraseKeyOf(text) {
+  const L = lang();
+  return PHRASE_KEYS.find((k) => t(k) === text && hasRecording(recKeys.phrase(L, k)));
+}
+
 async function say(text, opts = {}) {
   if (!settings.voice) return;
+  const pk = phraseKeyOf(text);
+  if (pk && (await playRecording(recKeys.phrase(lang(), pk)))) return;
   await speak(text, { lang: speechLang(), rate: settings.speechRate, ...opts });
 }
 
@@ -44,13 +55,13 @@ function sfx(name) {
 async function sayName(id) {
   const my = ++speechToken;
   stopSpeaking();
-  if (settings.sounds && hasAnimalSound(id)) {
-    await animalSound(id);
+  if (settings.sounds && (hasRecording(recKeys.call(id)) || hasAnimalSound(id))) {
+    await callOf(id);
     if (my !== speechToken) return;
-    await say(nameOf(id));
+    await sayWord(id);
     return;
   }
-  await say(nameOf(id));
+  await sayWord(id);
   const word = soundWordOf(id);
   if (word && my === speechToken && settings.sounds) {
     await speak(word, { lang: speechLang(), rate: settings.speechRate, pitch: 1.5 });
@@ -58,8 +69,19 @@ async function sayName(id) {
 }
 
 // Nur das Tiergeräusch (z. B. Tiere auf der Weide), ohne Namen
+async function callOf(id) {
+  if (await playRecording(recKeys.call(id))) return;
+  await animalSound(id);
+}
+
 function animalCall(id) {
-  if (settings.sounds) animalSound(id);
+  if (settings.sounds) callOf(id);
+}
+
+// Name eines Dings: eigene Aufnahme, sonst Computerstimme
+async function sayWord(id) {
+  if (settings.voice && (await playRecording(recKeys.name(lang(), id)))) return;
+  await say(nameOf(id));
 }
 
 function sayText(text) {
@@ -75,7 +97,7 @@ const game = new Game({
   ui: document.getElementById('ui'),
   trainData: upgradeTrain(loadTrain() ?? defaultTrain()),
   trackData: loadTrack(),
-  services: { say: sayText, sayName, animalCall, sfx, t, saveTrain, saveTrack, soundsOn: () => settings.sounds },
+  services: { say: sayText, sayName, animalCall, sfx, t, saveTrain, saveTrack, soundsOn: () => settings.sounds, bedDone: () => finishBedtime() },
 });
 
 function el(tag, className, text) {
@@ -112,6 +134,7 @@ const isResting = () => session.restUntil && Date.now() < session.restUntil;
 function resetSession() {
   session = { playedMs: 0, restUntil: 0 };
   saveSession(session);
+  game.setSessionDusk(0);
 }
 
 let lastTick = Date.now();
@@ -122,13 +145,24 @@ setInterval(() => {
   if (document.body.dataset.screen !== 'game' || document.hidden) return;
   session.playedMs += delta;
   if (Math.round(session.playedMs / 1000) % 10 === 0) saveSession(session);
+  // Die letzten 3 Minuten: Abendstimmung (kündigt das Spielende sanft an)
+  const limit = settings.playMinutes * 60_000;
+  game.setSessionDusk(limit >= 300_000 ? Math.min(1, Math.max(0, (session.playedMs - (limit - 180_000)) / 180_000)) : 0);
   if (settings.playMinutes > 0 && session.playedMs >= settings.playMinutes * 60_000) endSession();
 }, 1000);
 
+// Spielzeit um: erst bringt das Kind den Zug ins Bett (bed.js), danach kommt der Ruhe-Bildschirm
+let bedtimeActive = false;
 function endSession() {
+  if (bedtimeActive) return;
+  bedtimeActive = true;
+  game.setMode('bed', { silent: true });
+}
+
+function finishBedtime() {
+  bedtimeActive = false;
   session.restUntil = Date.now() + settings.restMinutes * 60_000;
   saveSession(session);
-  sayText(t('tired'));
   showRest();
 }
 
@@ -180,6 +214,11 @@ function showStart() {
 function startPlaying() {
   hideOverlay();
   game.start();
+  // Nach dem Schlafen (oder wenn die Eltern weiterspielen lassen): zurück in die Werkstatt
+  if (game.modeName === 'bed') {
+    bedtimeActive = false;
+    game.setMode('workshop', { silent: true });
+  }
   if (!game.modeName) game.setMode('workshop');
   else {
     game.refreshMode(); // falls in den Einstellungen Zug oder Strecke zurückgesetzt wurden
@@ -282,6 +321,7 @@ function showSettings() {
     }),
   );
   page.append(resets);
+  page.append(row(t('voiceStudio'), button(t('voiceStudioOpen'), 'big secondary vs-open', () => openStudio()), t('voiceStudioShort')));
 
   const actions = el('div', 'set-actions');
   actions.append(
@@ -293,6 +333,10 @@ function showSettings() {
   );
   page.append(actions);
   showOverlay('settings', page);
+}
+
+function openStudio() {
+  showVoiceStudio({ el, button, t, nameOf, soundWord: soundWordOf, lang, show: showOverlay, sfx, onBack: showSettings });
 }
 
 // 3 Sekunden gedrückt halten öffnet den Eltern-Bereich

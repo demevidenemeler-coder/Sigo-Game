@@ -78,7 +78,7 @@ export function createDriveMode(game) {
   let washedSome = false;
   let saveTimer = 0;
   let weather = 0;
-  let night = false;
+  let timeOfDay = 0;
   const crossingBell = new Map();
   const tmp = new THREE.Vector3();
   const fwd = new THREE.Vector3();
@@ -122,11 +122,13 @@ export function createDriveMode(game) {
     }
     updateGo();
   });
+  // Tageszeit: 🌞 Tag → 🌇 Abend → 🌙 Nacht → wieder Tag (weicher Übergang im Himmel)
+  const TIMES = [['tag', '🌞'], ['abend', '🌇'], ['nacht', '🌙']];
   const nightBtn = btn(envControls, 'env', '🌞', () => {
-    night = !night;
-    env.setNight(night);
-    nightBtn.textContent = night ? '🌙' : '🌞';
-    services.sayName(night ? 'nacht' : 'tag');
+    timeOfDay = (timeOfDay + 1) % TIMES.length;
+    env.setTime(TIMES[timeOfDay][0]);
+    nightBtn.textContent = TIMES[timeOfDay][1];
+    services.sayName(TIMES[timeOfDay][0]);
   });
   const weatherBtn = btn(envControls, 'env', WEATHERS[0][1], () => {
     weather = (weather + 1) % WEATHERS.length;

@@ -62,7 +62,7 @@ Nach ein paar Hinweisen ohne Reaktion ist Ruhe, bis wieder getippt wird.
   Auf Brücken, in Tunneln und auf Bahnübergängen kann nichts stehen.
 
 ### 🚂 Fahren
-- ▶ = losfahren / ⏸ anhalten · 📯 = pfeifen · 🎥 = Kamera fährt mit · unten links: 🌞/🌙 Tag & Nacht, 🌤️/🌧️/❄️ Wetter – die Knöpfe zeigen immer den aktuellen Zustand
+- ▶ = losfahren / ⏸ anhalten · 📯 = pfeifen · 🎥 = Kamera fährt mit · unten links: 🌞 → 🌇 → 🌙 Tag / Abend / Nacht (weicher Übergang, Abendrot, Sonne wandert), 🌤️/🌧️/❄️ Wetter – die Knöpfe zeigen immer den aktuellen Zustand
 - **Bahnhof:** Der Zug hält von selbst („Bahnhof! Wer steigt ein?“). Wartende antippen → hüpfen in den Zug.
   Mitfahrer im Zug antippen → steigen aus. ▶ blinkt = weiterfahren.
 - **Fahrgäste mit Ziel:** Gibt es mindestens zwei Bahnhöfe, zeigt jeder Wartende eine **Sprechblase in einer Bahnhofsfarbe**.
@@ -85,10 +85,19 @@ Nach ein paar Hinweisen ohne Reaktion ist Ruhe, bis wieder getippt wird.
 **Tiergeräusche** sind echte Aufnahmen (gemeinfrei, CC0 – Quellen in `sounds/QUELLEN.md`) für Kuh, Schwein, Schaf,
 Hund, Katze, Huhn, Hahn und Frosch. Löwe, Elefant, Pferd, Ente und Pinguin sind per Stimm-Synthese nachgebaut
 (`js/animalSynth.js`: Stimmpulse mit Zittern + Atem + Formanten), weil keine freien Aufnahmen erreichbar waren.
-Eigene Aufnahmen (MP3) lassen sich in `sounds/` ablegen und in `js/audio.js` (ANIMAL_SAMPLES) eintragen.
+Besser: im Eltern-Bereich unter **Eigene Stimme** selbst einsprechen – die eigene Aufnahme hat immer Vorrang (Mikrofon-Erlaubnis nötig).
+Eigene Aufnahmen (MP3) lassen sich auch in `sounds/` ablegen und in `js/audio.js` (ANIMAL_SAMPLES) eintragen.
 
 Leise Xylophon-Musik läuft im Hintergrund (im Eltern-Bereich abschaltbar).
 Zug, Strecke und alles an der Strecke bleiben gespeichert.
+
+## Schlafenszeit (Spielende)
+
+Ist die Spielzeit um, wird der Zug nicht einfach abgeschaltet: In den letzten 3 Minuten wird es im Spiel langsam Abend
+(warmes Licht), dann bringt das Kind den Zug **ins Bett** – eine bunte Decke liegt bereit, **irgendwo auf den Bildschirm
+tippen und zum Zug ziehen** (oder einfach loslassen), und der Zug wird zugedeckt. Die Lampe wird dunkel, eine Spieluhr spielt
+ein Wiegenlied, leises Schnarchen, kleine „Z“ steigen auf – „Gute Nacht, kleiner Zug!“ Danach folgt der Ruhe-Bildschirm.
+Tut das Kind nichts, deckt sich der Zug nach einer Weile von selbst zu. So wird aus „Zeit ist um“ ein Ritual.
 
 ## Eltern-Bereich
 
@@ -102,6 +111,7 @@ Zug, Strecke und alles an der Strecke bleiben gespeichert.
 | Stimme / Sprechtempo / Geräusche | an / normal / an |
 | Musik / Musik-Lautstärke | an / mittel |
 | Zug zurücksetzen, Strecke zurücksetzen | – |
+| **Eigene Stimme** | Tierlaute, Namen und Sätze selbst einsprechen (🎙 / ▶ / 🗑) – Aufnahmen bleiben auf dem Gerät |
 
 Ist die Spielzeit um, sagt die App „Der Zug ist müde …“ und der Zug schläft (Mond-Bildschirm).
 Erst nach der Pause – oder über den Eltern-Bereich – geht es weiter.
@@ -161,6 +171,10 @@ js/game/feeding.js         Tiere füttern (Fressen, Kopfschütteln, Denkblase)
 js/game/wheelStyles.js     Radmuster
 js/game/hint.js            Zeige-Hand
 js/animalSynth.js          Nachgebaute Tierstimmen
+js/recordings.js           Eigene Aufnahmen (Mikrofon, IndexedDB)
+js/voiceStudio.js          Eltern-Bereich „Eigene Stimme“
+js/game/bedroom.js         Schlafzimmer-Szene
+js/game/modes/bed.js       Zug ins Bett bringen
 js/game/lamps.js           Lampen, die nachts heller leuchten
 sounds/                    Tiergeräusche (MP3, CC0) + QUELLEN.md
 js/game/modes/*.js         Werkstatt, Waschen, Strecke bauen, Fahren

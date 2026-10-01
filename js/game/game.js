@@ -10,15 +10,19 @@ import { createWorkshopMode } from './modes/workshop.js';
 import { createDrawMode } from './modes/draw.js';
 import { createDriveMode } from './modes/drive.js';
 import { createWashMode } from './modes/wash.js';
+import { createBedMode } from './modes/bed.js';
+import { createBedroom } from './bedroom.js';
 import { WeatherFx } from './weatherFx.js';
 import { Hint } from './hint.js';
 
 const MODE_ICONS = { workshop: '🛠️', wash: '🧽', draw: '🛤️', drive: '🚂' };
 const SUN_OFFSET = new THREE.Vector3(12, 24, 14);
 // Achsen des Sonnenlichts (zum Einrasten der Schattenkarte)
-const SUN_DIR = SUN_OFFSET.clone().normalize();
-const SUN_RIGHT = new THREE.Vector3(0, 1, 0).cross(SUN_DIR).normalize();
-const SUN_UP = SUN_DIR.clone().cross(SUN_RIGHT).normalize();
+const WARM = new THREE.Color('#ffb36b');
+const WARM_BG = new THREE.Color('#e9b98c');
+const SUN_DIR = new THREE.Vector3();
+const SUN_RIGHT = new THREE.Vector3();
+const SUN_UP = new THREE.Vector3();
 const SNAP = new THREE.Vector3();
 
 export class Game {
@@ -46,10 +50,11 @@ export class Game {
     this.tweens = [];
 
     this.workshop = createWorkshop();
+    this.bedroom = createBedroom();
     this.land = createLandscape();
-    for (const sc of [this.workshop.scene, this.land.scene]) {
+    for (const sc of [this.workshop.scene, this.bedroom.scene, this.land.scene]) {
       sc.environment = this.envMap;
-      sc.environmentIntensity = 0.55;
+      sc.environmentIntensity = sc.userData.envIntensity ?? 0.55;
     }
     this.time = 0;
     this.env = new Environment(this.land);
@@ -62,12 +67,17 @@ export class Game {
     this.drive = { s: 0, speed: 0, target: 0 };
     this.weatherFx = new WeatherFx(this);
     this.hint = new Hint(this.ui);
+    // Abendglanz: warmer Schleier über dem Bild (Abend im Spiel und kurz vor Spielende)
+    this.glow = document.createElement('div');
+    this.glow.className = 'dusk-glow';
+    this.ui.prepend(this.glow);
 
     this.modes = {
       workshop: createWorkshopMode(this),
       draw: createDrawMode(this),
       drive: createDriveMode(this),
       wash: createWashMode(this),
+      bed: createBedMode(this),
     };
     this.mode = null;
     this.modeName = null;
@@ -107,9 +117,19 @@ export class Game {
       this.env.update(dt, this.cam.look, this.train.loco, this.services.soundsOn());
       this.weatherFx.update(dt, this.cam.look);
       this.renderer.toneMappingExposure = 1.05 - 0.4 * this.env.night;
+      this.glow.style.opacity = (this.env.dusk * 0.42).toFixed(3);
     } else {
+      this.glow.style.opacity = this.current === this.workshop ? ((this.sessionDusk ?? 0) * 0.4).toFixed(3) : 0;
       this.weatherFx.hideOverlay();
-      this.renderer.toneMappingExposure = 1.05;
+      // Zimmer: gegen Spielende wird das Licht langsam warm und gedämpft (wie Abendsonne durchs Fenster)
+      const d = this.sessionDusk ?? 0;
+      const w = this.current === this.workshop ? this.workshop : null;
+      if (w) {
+        w.sun.color.set('#ffffff').lerp(WARM, d * 0.85);
+        this.scene.userData.hemi.color.set('#fff7ea').lerp(WARM, d * 0.6);
+        this.scene.background.set('#f1e6d3').lerp(WARM_BG, d);
+      }
+      this.renderer.toneMappingExposure = this.current === this.workshop ? 1.05 - 0.12 * d : 1.1;
     }
     this.stepTweens(dt);
     const k = 1 - Math.exp(-dt * 3.5);
@@ -118,19 +138,22 @@ export class Game {
     this.camera.position.copy(this.cam.pos);
     this.camera.lookAt(this.cam.look);
     // Die Sonne (und damit der scharfe Schattenbereich) folgt dem Blickpunkt
-    const sun = this.scene === this.land.scene ? this.land.sun : this.workshop.sun;
-    // Auf das Schatten-Raster einrasten: sonst „schwimmen“ die Schattenkanten bei jeder Kamerabewegung (Flimmern)
+    const sun = this.current.sun;
+    // Sonnenrichtung (wandert mit der Tageszeit). Die Schattenkarte rastet auf ihr Raster ein:
+    // sonst „schwimmen“ die Schattenkanten bei jeder Kamerabewegung (Flimmern).
+    const onLand = this.scene === this.land.scene;
+    const offset = onLand ? this.env.sunOffset : SUN_OFFSET;
+    SUN_DIR.copy(offset).normalize();
+    SUN_RIGHT.set(0, 1, 0).cross(SUN_DIR).normalize();
+    SUN_UP.copy(SUN_DIR).cross(SUN_RIGHT).normalize();
     const sc = sun.shadow.camera;
     const texel = (sc.right - sc.left) / sun.shadow.mapSize.x;
     const look = this.cam.look;
-    const a = SUN_RIGHT.dot(look);
-    const b = SUN_UP.dot(look);
-    const c = SUN_DIR.dot(look);
-    const snapped = SNAP.copy(SUN_RIGHT).multiplyScalar(Math.round(a / texel) * texel)
-      .addScaledVector(SUN_UP, Math.round(b / texel) * texel)
-      .addScaledVector(SUN_DIR, c);
+    const snapped = SNAP.copy(SUN_RIGHT).multiplyScalar(Math.round(SUN_RIGHT.dot(look) / texel) * texel)
+      .addScaledVector(SUN_UP, Math.round(SUN_UP.dot(look) / texel) * texel)
+      .addScaledVector(SUN_DIR, SUN_DIR.dot(look));
     sun.target.position.copy(snapped);
-    sun.position.copy(snapped).add(SUN_OFFSET);
+    sun.position.copy(snapped).add(offset);
     // Nahgrenze der Kamera mitwachsen lassen: viel genauere Tiefe → kein Flackern flacher Flächen aus der Ferne
     const camDist = this.cam.pos.distanceTo(this.cam.look);
     const near = THREE.MathUtils.clamp(camDist * 0.04, 0.1, 6);
@@ -176,6 +199,12 @@ export class Game {
     this.tweens = keep.concat(this.tweens);
   }
 
+  // 0..1: so weit ist die Spielzeit fast um (Abendstimmung im Spiel)
+  setSessionDusk(v) {
+    this.sessionDusk = v;
+    this.env.sessionDusk = v;
+  }
+
   tween(dur, fn, done) {
     this.tweens.push({ t: 0, dur, fn, done });
   }
@@ -197,7 +226,8 @@ export class Game {
   }
 
   useScene(which) {
-    const target = which === 'workshop' ? this.workshop : this.land;
+    const target = { workshop: this.workshop, bed: this.bedroom }[which] ?? this.land;
+    this.current = target;
     this.scene = target.scene;
     target.trainAnchor.add(this.train.group);
   }

@@ -14,6 +14,12 @@ const MOODS = {
   schnee: { skyTop: C('#a9c0d6'), skyBottom: C('#eef2f5'), hemi: 1.35, sun: 1.6, sunColor: C('#f2f6ff'), env: 0.5 },
 };
 const WET = new THREE.Color('#3f6b3a');
+const WARM_TINT = new THREE.Color('#d98a3d');
+// Abendrot: tiefstehende, warme Sonne, oranger Horizont, violett-blauer Himmel oben
+const DUSK = { skyTop: C('#4d5aa8'), skyBottom: C('#ffae78'), hemi: 0.95, sun: 1.9, sunColor: C('#ffa45a'), env: 0.35 };
+// Sonnenstand: tagsüber hoch, abends flach (lange, weiche Schatten)
+const SUN_DAY = new THREE.Vector3(12, 24, 14);
+const SUN_DUSK = new THREE.Vector3(34, 9, 12);
 const NIGHT = { skyTop: C('#071330'), skyBottom: C('#22345e'), hemi: 0.22, sun: 0.4, sunColor: C('#8fa6ff'), env: 0.12 };
 
 function dotTexture() {
@@ -33,8 +39,12 @@ export class Environment {
   constructor(land) {
     this.land = land;
     const scene = land.scene;
-    this.night = 0;
-    this.nightTarget = 0;
+    this.tod = 0; // Tageszeit: 0 = Tag, 0.5 = Abend, 1 = Nacht (fließender Übergang)
+    this.userTod = 0; // vom Kind gewählt (Knopf)
+    this.sessionDusk = 0; // 0..1: in den letzten Minuten der Spielzeit wird es von selbst Abend
+    this.night = 0; // Dunkelheit 0..1 (nur zwischen Abend und Nacht)
+    this.dusk = 0; // Abendrot-Stärke 0..1
+    this.sunOffset = SUN_DAY.clone();
     this.weather = 'sonne';
     this.rain = 0;
     this.snow = 0;
@@ -88,7 +98,11 @@ export class Environment {
   }
 
   setNight(on) {
-    this.nightTarget = on ? 1 : 0;
+    this.setTime(on ? 'nacht' : 'tag');
+  }
+
+  setTime(name) {
+    this.userTod = { tag: 0, abend: 0.5, nacht: 1 }[name] ?? 0;
   }
 
   setWeather(w) {
@@ -101,7 +115,13 @@ export class Environment {
 
   update(dt, look, loco, soundOn) {
     const k = 1 - Math.exp(-dt * 1.2);
-    this.night += (this.nightTarget - this.night) * k;
+    // Tageszeit gleitet langsam und gleichmäßig (ca. 4–5 Sekunden zwischen den Stufen)
+    const todTarget = Math.max(this.userTod, 0.5 * this.sessionDusk);
+    const step = (todTarget - this.tod) * (1 - Math.exp(-dt * 0.9));
+    this.tod += Math.sign(step) * Math.min(Math.abs(step) + 0.0005, Math.abs(todTarget - this.tod));
+    const t = this.tod;
+    this.night = THREE.MathUtils.clamp((t - 0.5) * 2, 0, 1);
+    this.dusk = t <= 0.5 ? t * 2 : 1 - (t - 0.5) * 2;
     // Einblenden sanft, Ausblenden zügig (damit z. B. bei Sonne keine Flocken nachrieseln)
     const fast = 1 - Math.exp(-dt * 4);
     const rainT = this.weather === 'regen' ? 1 : 0;
@@ -126,7 +146,10 @@ export class Environment {
       const lerp = (a, b, t) => (a.clone ? a.lerp(b, t) : a + (b - a) * t);
       v = lerp(v, MOODS.regen[key], this.rain);
       v = lerp(v, MOODS.schnee[key], this.snow * (1 - this.rain));
-      v = lerp(v, NIGHT[key], this.night);
+      // Tageszeit: Tag → Abendrot → Nacht
+      const dusk = DUSK[key].clone ? DUSK[key].clone() : DUSK[key];
+      if (t <= 0.5) v = lerp(v, dusk, t * 2);
+      else v = lerp(dusk, NIGHT[key], (t - 0.5) * 2);
       return v;
     };
     const L = this.land;
@@ -135,24 +158,29 @@ export class Environment {
     L.sky.uniforms.bottom.value.copy(mix('skyBottom'));
     L.scene.fog.color.copy(L.sky.uniforms.bottom.value);
     L.hemi.intensity = mix('hemi') * dark;
-    L.hemi.color.set('#fff7ea').lerp(C('#6f86c9'), this.night);
-    L.hemi.groundColor.set('#8fa877').lerp(C('#2a3550'), this.night);
+    const tint = (day, dusk, night) => (t <= 0.5 ? C(day).lerp(C(dusk), t * 2) : C(dusk).lerp(C(night), (t - 0.5) * 2));
+    L.hemi.color.copy(tint('#fff7ea', '#ffd2a6', '#6f86c9'));
+    L.hemi.groundColor.copy(tint('#8fa877', '#8c7a63', '#2a3550'));
+    // Sonne: tiefer und weicher am Abend
+    this.sunOffset.copy(t <= 0.5 ? SUN_DAY.clone().lerp(SUN_DUSK, t * 2) : SUN_DUSK.clone().lerp(SUN_DAY, (t - 0.5) * 2));
+    L.sun.shadow.intensity = 1 - 0.38 * this.dusk;
     L.sun.intensity = mix('sun') * dark;
     L.sun.color.copy(mix('sunColor'));
     L.scene.environmentIntensity = mix('env') * dark;
 
-    this.stars.material.opacity = this.night * (1 - this.rain * 0.8);
-    this.moon.material.opacity = this.night * (1 - this.rain * 0.7);
+    this.stars.material.opacity = THREE.MathUtils.smoothstep(t, 0.55, 1) * (1 - this.rain * 0.8);
+    this.moon.material.opacity = THREE.MathUtils.smoothstep(t, 0.6, 1) * (1 - this.rain * 0.7);
 
     // Lampen: nachts und im Tunnel hell
-    const glow = Math.max(this.night, this.tunnel);
+    // Lampen gehen schon im Abendrot an
+    const glow = Math.max(THREE.MathUtils.smoothstep(t, 0.3, 0.75), this.tunnel);
     for (const m of lamps) m.emissiveIntensity = m.userData.lampDay + (m.userData.lampNight - m.userData.lampDay) * glow;
 
     // Schnee färbt Wiese und Bäume weiß (leichtes Eigenleuchten, damit auch die grüne Grastextur weiß wirkt)
     // Nasser Boden wird etwas dunkler und satter
     const cover = Math.max(this.snowCover, this.snow * 0.3);
     for (const { m, base: c } of this.snowables) {
-      m.color.copy(c).lerp(WET, this.wet * 0.22).lerp(C('#ffffff'), cover * 0.7);
+      m.color.copy(c).lerp(WET, this.wet * 0.22).lerp(WARM_TINT, this.dusk * 0.14).lerp(C('#ffffff'), cover * 0.7);
       m.emissive.setScalar(cover * 0.5 * (1 - this.night * 0.8));
     }
 

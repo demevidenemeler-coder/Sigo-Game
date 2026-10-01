@@ -315,6 +315,32 @@ Object.assign(SOUNDS, {
   sparkle(t) {
     [1568, 1976, 2349, 3136].forEach((f, i) => tone('sine', f, t + i * 0.07, 0.002, 0.3, 0.12));
   },
+  snore(t) {
+    // Leises, langsames Atmen: Einatmen (steigend), Ausatmen (fallend)
+    const a = noise(t, 1.5, 0.22, 'lowpass', 260, sfxBus, 0.6);
+    a.filter.frequency.setValueAtTime(220, t);
+    a.filter.frequency.linearRampToValueAtTime(520, t + 0.9);
+    a.filter.frequency.linearRampToValueAtTime(240, t + 1.6);
+    const o = tone('triangle', 62, t + 1.0, 0.25, 0.9, 0.07, lowpass(300));
+    o.frequency.linearRampToValueAtTime(52, t + 2.0);
+  },
+  lullaby(t) {
+    // Spieluhr: ein Wiegenlied (nach Brahms), langsam und weich
+    const N = { D4: 293.66, E4: 329.63, F4: 349.23, G4: 392, A4: 440, B4: 493.88, C5: 523.25 };
+    const beat = 0.82;
+    const song = [
+      ['E4', 0.5], ['E4', 0.5], ['G4', 2], ['E4', 0.5], ['E4', 0.5], ['G4', 2], ['E4', 1], ['G4', 1], ['C5', 1], ['B4', 1.5], ['A4', 0.5], ['A4', 1], ['G4', 2],
+      ['D4', 0.5], ['E4', 0.5], ['F4', 2], ['D4', 0.5], ['E4', 0.5], ['F4', 2], ['D4', 1], ['F4', 1], ['B4', 1], ['A4', 1.5], ['G4', 0.5], ['G4', 1], ['C5', 3],
+    ];
+    let at = t + 0.2;
+    for (const [n, len] of song) {
+      const f = N[n];
+      tone('sine', f, at, 0.004, 1.3, 0.2);
+      tone('sine', f * 2.76, at, 0.002, 0.25, 0.045);
+      tone('sine', f * 5.4, at, 0.001, 0.08, 0.015);
+      at += len * beat;
+    }
+  },
   squeak(t) {
     // Schwamm quietscht auf dem Lack
     const o = tone('sine', 1150 + Math.random() * 300, t, 0.01, 0.12, 0.12);

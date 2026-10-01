@@ -243,6 +243,16 @@ button {
 
 .drive-btn.go.waiting { animation: attention 1.2s ease-in-out infinite; box-shadow: 0 0 0 8px rgba(79, 166, 90, 0.35), 0 6px 16px var(--shadow); }
 
+/* Abendglanz: warmer Verlauf von oben (Abendrot) */
+.dusk-glow {
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255, 140, 60, 0.85) 0%, rgba(255, 120, 90, 0.35) 55%, rgba(120, 60, 140, 0.25) 100%);
+  mix-blend-mode: soft-light;
+  pointer-events: none !important;
+  opacity: 0;
+}
+
 /* Zeige-Hand (hint.js) */
 .hint2 {
   position: fixed;
@@ -419,6 +429,18 @@ body[data-screen="settings"] #parent-btn { display: none; }
 .set-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 24px; }
 .big { background: var(--accent); color: #fffaf2; font-weight: 600; padding: 16px 22px; }
 .big.secondary { background: var(--tile); color: var(--ink); }
+
+/* Eigene Stimme (Eltern-Bereich) */
+.warn { color: #b3402f; font-weight: 600; }
+.vs-group { margin: 12px 0; background: rgba(255, 255, 255, 0.5); border-radius: 16px; padding: 4px 14px; }
+.vs-group > summary { cursor: pointer; padding: 14px 4px; font-weight: 700; font-size: 18px; }
+.vs-row { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-top: 1px solid rgba(74, 63, 53, 0.1); }
+.vs-label { flex: 1; min-width: 0; }
+.vs-mark { color: #3f9a4a; font-weight: 800; width: 1.2em; text-align: center; }
+.vs-btn { width: 48px; height: 48px; border-radius: 14px; background: var(--tile); box-shadow: 0 2px 6px var(--shadow); font-family: var(--emoji); font-size: 22px; touch-action: manipulation; }
+.vs-btn:disabled { opacity: 0.3; }
+.vs-row.recording .vs-rec { background: #e5484d; animation: attention 0.8s ease-in-out infinite; }
+.vs-row.has .vs-label { font-weight: 600; }
 
 /* ---------- Hochformat: Leiste stapeln ---------- */
 @media (orientation: portrait) {

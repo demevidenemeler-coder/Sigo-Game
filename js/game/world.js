@@ -434,6 +434,7 @@ export function createLandscape() {
   scene.add(track.group);
   const objects = new TrackObjects(scene, track);
   // Brücken, Tunnel, Bahnübergänge entstehen automatisch, wo die Strecke Fluss, Berg oder Straße kreuzt
+  let landRef = null; // wird am Ende gesetzt (für Zusatz-Freiflächen, z. B. die Nebenstrecke)
   const crossings = new Crossings(scene, features, track);
   objects.reserved = () => crossings.zones();
   objects.blocked = (x, z) => features.blocked(x, z, 0.5);
@@ -470,7 +471,7 @@ export function createLandscape() {
 
   function clearAroundTrack() {
     const trackDist = distanceGrid(track.samples.map(([x, z]) => [x, z, 0, 4]));
-    const fpDist = distanceGrid([...objects.footprints(), ...crossings.footprints()].map(([x, z, r]) => [x, z, r, 2]));
+    const fpDist = distanceGrid([...objects.footprints(), ...crossings.footprints(), ...(landRef?.extraFootprints ?? [])].map(([x, z, r]) => [x, z, r, 2]));
     for (const o of scenery) {
       const r = o.userData.kind === 'house' ? 2.8 : 2.0;
       o.visible = trackDist(o.position.x, o.position.z) > r && fpDist(o.position.x, o.position.z) > 1;
@@ -527,5 +528,6 @@ export function createLandscape() {
   const snowables = [ground.material, tufts.material];
   for (const [k, m] of matCache) if (/^#(5fae5a|4f9a4f|76b95e|3f8a4a)/.test(k)) snowables.push(m);
 
-  return { scene, sun, hemi: scene.userData.hemi, sky: skyMat, snowables, track, objects, features, crossings, trainAnchor, scenery, tappable, clearAroundTrack, animate, ground, animated };
+  landRef = { scene, sun, hemi: scene.userData.hemi, sky: skyMat, snowables, track, objects, features, crossings, trainAnchor, scenery, tappable, clearAroundTrack, animate, ground, animated, extraFootprints: [] };
+  return landRef;
 }

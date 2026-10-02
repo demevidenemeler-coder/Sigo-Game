@@ -14,6 +14,7 @@ import { createBedMode } from './modes/bed.js';
 import { createBedroom } from './bedroom.js';
 import { WeatherFx } from './weatherFx.js';
 import { Hint } from './hint.js';
+import { SideTrain } from './sideTrain.js';
 
 const MODE_ICONS = { workshop: '🛠️', wash: '🧽', draw: '🛤️', drive: '🚂' };
 const SUN_OFFSET = new THREE.Vector3(12, 24, 14);
@@ -67,6 +68,7 @@ export class Game {
     this.drive = { s: 0, speed: 0, target: 0 };
     this.weatherFx = new WeatherFx(this);
     this.hint = new Hint(this.ui);
+    this.sideTrain = new SideTrain(this);
     // Abendglanz: warmer Schleier über dem Bild (Abend im Spiel und kurz vor Spielende)
     this.glow = document.createElement('div');
     this.glow.className = 'dusk-glow';
@@ -116,6 +118,7 @@ export class Game {
       this.land.animate(dt, this.time);
       this.env.update(dt, this.cam.look, this.train.loco, this.services.soundsOn());
       this.weatherFx.update(dt, this.cam.look);
+      this.sideTrain.update(dt);
       this.renderer.toneMappingExposure = 1.05 - 0.4 * this.env.night;
       this.glow.style.opacity = (this.env.dusk * 0.42).toFixed(3);
     } else {

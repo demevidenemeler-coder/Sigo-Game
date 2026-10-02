@@ -5,6 +5,7 @@ const KEYS = {
   session: 'sigo.session.v2',
   train: 'sigo.train.v1',
   track: 'sigo.track.v1',
+  heard: 'sigo.heard.v1',
 };
 
 export const DEFAULT_SETTINGS = {
@@ -16,6 +17,7 @@ export const DEFAULT_SETTINGS = {
   music: true,
   musicVolume: 0.5,
   speechRate: 0.85,
+  voiceMode: 'sparse', // 'sparse' = Wörter nur bei Neuem, 'always' = immer
 };
 
 function read(key) {
@@ -46,3 +48,7 @@ export const saveTrain = (t) => write(KEYS.train, t);
 
 export const loadTrack = () => read(KEYS.track);
 export const saveTrack = (points) => write(KEYS.track, points);
+
+// Wie oft wurde etwas schon gesagt (für „weniger Worte, mehr Geräusche“)
+export const loadHeard = () => read(KEYS.heard) ?? {};
+export const saveHeard = (h) => write(KEYS.heard, h);

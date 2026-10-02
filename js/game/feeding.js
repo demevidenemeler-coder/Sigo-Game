@@ -89,8 +89,9 @@ export function createFeeder(game, services) {
     return best;
   }
 
-  // Ungefähre Mundposition: Tiere schauen nach +x, Menschen zur Kamera
+  // Mundposition in der Welt (dort fliegt das Futter hin)
   function mouthOf(fig) {
+    if (fig.userData.mouthHolder) return fig.userData.mouthHolder.getWorldPosition(new THREE.Vector3());
     const b = fig.userData.box;
     const id = fig.userData.figure;
     const local = HUMANS.includes(id)
@@ -100,6 +101,11 @@ export function createFeeder(game, services) {
   }
 
   // Beim Ziehen: das Tier, das gleich gefüttert wird, wird etwas größer („Oh, für mich?“)
+  function setMouth(fig, v) {
+    fig.userData.mouthV = v;
+    fig.userData.setMouth?.(v);
+  }
+
   function setTarget(fig) {
     if (fig === target) return;
     const old = target;
@@ -135,7 +141,7 @@ export function createFeeder(game, services) {
   }
 
   // fig füttern. thumbs: Vorschaubilder (für die Denkblase). onRefuse(lieblingsfutter) z. B. für einen Hinweis in der Leiste
-  function feed(fig, foodId, { thumbs, from, onRefuse } = {}) {
+  function feed(fig, foodId, { thumbs, from, onRefuse, onDone } = {}) {
     if (!fig || fig.userData.eating) return;
     setTarget(null);
     const id = fig.userData.figure;
@@ -150,13 +156,14 @@ export function createFeeder(game, services) {
     services.sfx('whoosh');
     // Futter fliegt zum Mund
     game.tween(0.45, (t) => {
+      setMouth(fig, Math.max(fig.userData.mouthV ?? 0, Math.min(1, t * 2.2))); // Mund geht weit auf, das Futter kommt
       food.position.lerpVectors(start, mouth, t);
       food.position.y += Math.sin(t * Math.PI) * 0.5 - 0.12 * t;
       food.rotation.y = t * 3;
-    }, () => (likes ? eat(fig, food, foodId) : refuse(fig, food, foodId, thumbs, onRefuse)));
+    }, () => (likes ? eat(fig, food, foodId, onDone) : refuse(fig, food, foodId, thumbs, onRefuse, onDone)));
   }
 
-  function eat(fig, food, foodId) {
+  function eat(fig, food, foodId, onDone) {
     const id = fig.userData.figure;
     const base = fig.userData.feedBase ?? fig.scale.x;
     let bite = 0;
@@ -166,32 +173,37 @@ export function createFeeder(game, services) {
       crumbs(food.getWorldPosition(new THREE.Vector3()), FOOD_COLOR[foodId]);
       const s0 = food.scale.x;
       // Kauen: Figur wird kurz breiter und flacher
-      game.tween(0.26, (t) => {
+      game.tween(0.34, (t) => {
         const k = Math.sin(t * Math.PI);
+        // Mampf: Mund klappt auf und zu (Biss 1: schließt sich um das Futter, Biss 3: lächelt)
+        setMouth(fig, 0.15 + 0.85 * Math.abs(Math.cos(t * Math.PI * 1.5)) * (1 - t * 0.5));
         fig.scale.set(base * (1 + k * 0.08), base * (1 - k * 0.08), base * (1 + k * 0.08));
         food.scale.setScalar(Math.max(0.001, s0 - (0.9 / 3) * t));
       }, () => {
         if (bite < 3) return nextBite();
         game.scene.remove(food);
         fig.scale.setScalar(base);
+        game.tween(0.4, (t) => setMouth(fig, (fig.userData.mouthV ?? 0) * (1 - t)));
         hearts(mouthOf(fig).add(new THREE.Vector3(0, 0.3, 0)));
         game.hop(fig);
         services.sfx('chime');
         services.animalCall(id);
         setTimeout(() => services.say(services.t('yummy')), 900);
         fig.userData.eating = false;
+        setTimeout(() => onDone?.(), 1400);
       });
     };
     nextBite();
   }
 
-  function refuse(fig, food, foodId, thumbs, onRefuse) {
+  function refuse(fig, food, foodId, thumbs, onRefuse, onDone) {
     const id = fig.userData.figure;
     const fav = LIKES[id][0];
     const r0 = fig.rotation.y;
     services.sfx('nope');
     services.say(services.t('noThanks'));
-    // Kopfschütteln
+    // Mund presst sich zu, Kopfschütteln
+    game.tween(0.3, (t) => setMouth(fig, (fig.userData.mouthV ?? 0) * (1 - t)));
     game.tween(0.8, (t) => { fig.rotation.y = r0 + Math.sin(t * Math.PI * 4) * 0.45 * (1 - t); }, () => { fig.rotation.y = r0; });
     // Futter fällt herunter und verschwindet
     const p0 = food.position.clone();
@@ -218,9 +230,23 @@ export function createFeeder(game, services) {
     }
     onRefuse?.(fav);
     setTimeout(() => { fig.userData.eating = false; }, 900);
+    setTimeout(() => onDone?.(), 2200);
   }
 
-  function update(dt) {
+  // hungry = true (Futter-Fach): alle Tiere sperren abwechselnd den Mund auf – „Gib mir Futter!“.
+  // Das Tier unter dem Finger macht den Mund ganz weit auf.
+  function update(dt, hungry = false) {
+    const time = game.time;
+    for (const f of eaters()) {
+      const u = f.userData;
+      if (u.eating) continue;
+      u.hungerPhase ??= Math.random() * 6.3;
+      let goal = 0;
+      if (f === target) goal = 0.85 + 0.15 * Math.sin(time * 9);
+      else if (hungry) goal = Math.max(0, Math.min(1, Math.sin(time * 3.3 + u.hungerPhase) * 1.9));
+      const cur = u.mouthV ?? 0;
+      if (cur !== goal) setMouth(f, cur + (goal - cur) * Math.min(1, dt * 16));
+    }
     for (let i = fx.length - 1; i >= 0; i--) {
       const f = fx[i];
       f.life -= dt / (f.kind === 'heart' ? 1.6 : 0.9);

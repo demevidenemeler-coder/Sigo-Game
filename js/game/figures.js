@@ -424,6 +424,88 @@ const BUILD = {
 // Tiere drehen den Kopf zur Kamera ein wenig, damit man die Gesichter sieht
 const TURN = Object.fromEntries(['kuh', 'schwein', 'schaf', 'hund', 'katze', 'ente', 'pferd', 'huhn', 'hahn', 'hase', 'frosch', 'loewe', 'elefant', 'giraffe', 'pinguin'].map((id) => [id, id === 'pinguin' ? 1.0 : 0.35]));
 
+// ---------- Münder (gehen auf und zu: Füttern) ----------
+
+// Mensch/Teddy schauen zur Kamera (+z): [x, y, z, Größe]
+const MOUTH_HUMAN = { kind: [0, 0.595, 0.15, 0.036], oma: [0, 0.62, 0.14, 0.034], papa: [0, 0.765, 0.157, 0.042], teddy: [0, 0.485, 0.178, 0.04] };
+// Tiere: Größe der Mundöffnung
+const MOUTH_SIZE = {
+  kuh: 0.062, schwein: 0.052, schaf: 0.046, pferd: 0.07, hund: 0.05, katze: 0.04, huhn: 0.034, hahn: 0.038, ente: 0.05,
+  hase: 0.034, frosch: 0.06, loewe: 0.07, elefant: 0.062, giraffe: 0.05, pinguin: 0.04,
+};
+const mouthAnchors = new Map();
+const MOUTH_MAT = new THREE.MeshStandardMaterial({ color: '#5a1620', roughness: 0.7 });
+const TONGUE_MAT = new THREE.MeshStandardMaterial({ color: '#f07a8c', roughness: 0.6 });
+const unit = new THREE.SphereGeometry(1, 16, 12);
+
+// Vorderster Punkt des Tiers (Schnauze/Schnabel): dort sitzt der Mund
+function animalAnchor(g, id) {
+  if (mouthAnchors.has(id)) return mouthAnchors.get(id);
+  const T = TURN[id] ?? 0.35;
+  const dir = new THREE.Vector3(Math.cos(T), 0, Math.sin(T));
+  const pts = [];
+  const v = new THREE.Vector3();
+  g.updateMatrixWorld(true);
+  g.traverse((o) => {
+    if (!o.isMesh) return;
+    const a = o.geometry.attributes.position;
+    for (let i = 0; i < a.count; i++) pts.push(v.fromBufferAttribute(a, i).applyMatrix4(o.matrixWorld).clone());
+  });
+  const proj = pts.map((p) => p.dot(dir));
+  const pmax = Math.max(...proj);
+  const cluster = pts.filter((_, i) => proj[i] > pmax - 0.06);
+  const c = new THREE.Vector3();
+  let minY = Infinity;
+  let maxY = -Infinity;
+  for (const p of cluster) {
+    c.add(p);
+    minY = Math.min(minY, p.y);
+    maxY = Math.max(maxY, p.y);
+  }
+  c.divideScalar(cluster.length);
+  c.y = minY + (maxY - minY) * 0.42;
+  const out = { pos: c, dir };
+  mouthAnchors.set(id, out);
+  return out;
+}
+
+function addMouth(g, id) {
+  const human = MOUTH_HUMAN[id];
+  const size = human ? human[3] : MOUTH_SIZE[id] * 1.3;
+  if (!size) return;
+  const holder = new THREE.Group();
+  const mouth = new THREE.Mesh(unit, MOUTH_MAT);
+  const tongue = new THREE.Mesh(unit, TONGUE_MAT);
+  holder.add(mouth, tongue);
+  if (human) {
+    holder.position.set(human[0], human[1], human[2]);
+  } else {
+    const a = animalAnchor(g, id);
+    holder.position.copy(a.pos).addScaledVector(a.dir, 0.002);
+    holder.rotation.y = -Math.atan2(a.dir.z, a.dir.x); // +x des Mundes zeigt nach vorne
+  }
+  holder.visible = false;
+  g.add(holder);
+  const set = (open) => {
+    const o = THREE.MathUtils.clamp(open, 0, 1);
+    holder.visible = o > 0.04;
+    if (!holder.visible) return;
+    if (human) {
+      mouth.scale.set(size * (0.55 + 0.45 * o), size * 0.9 * o, size * 0.35);
+      tongue.scale.set(size * 0.4, size * 0.22 * o, size * 0.2);
+      tongue.position.set(0, -size * 0.45 * o, size * 0.1);
+    } else {
+      // von der Seite gesehen: eine dunkle Öffnung an der Schnauzenspitze, die sich nach unten und vorne aufmacht
+      mouth.scale.set(size * (0.35 + 0.35 * o), size * 1.05 * o, size * 0.85 * (0.5 + 0.5 * o));
+      mouth.position.set(size * 0.1, -size * 0.15 * o, 0);
+      tongue.scale.set(size * 0.32, size * 0.2 * o, size * 0.4);
+      tongue.position.set(size * 0.1, -size * 0.62 * o, 0);
+    }
+  };
+  g.userData.setMouth = set;
+  g.userData.mouthHolder = holder;
+}
+
 export function buildFigure(id) {
   const g = new THREE.Group();
   const inner = new THREE.Group();
@@ -435,6 +517,7 @@ export function buildFigure(id) {
   g.updateMatrixWorld(true);
   g.userData.box = new THREE.Box3().setFromObject(g);
   g.userData.top = g.userData.box.max.y;
+  addMouth(g, id);
   return g;
 }
 

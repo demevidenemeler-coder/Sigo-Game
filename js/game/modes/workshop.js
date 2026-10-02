@@ -86,6 +86,8 @@ export function createWorkshopMode(game) {
 
   function showTab(id) {
     tab = id;
+    feedFocus = null;
+    lastEaterCount = -1;
     tray.setActiveTab(id);
     const buttons = LISTS[id].map((e) => itemButton(kindOf(id), e));
     // Im Räder-Fach gibt es auch Farbtöpfe – die malen nur die Räder an
@@ -467,7 +469,18 @@ export function createWorkshopMode(game) {
       const p = fig.getWorldPosition(new THREE.Vector3());
       from = game.raycaster.ray.at(game.raycaster.ray.origin.distanceTo(p) * 0.85, new THREE.Vector3());
     }
-    feeder.feed(fig, foodId, { thumbs, from, onRefuse: hintFood });
+    // Beim Füttern fährt die Kamera noch näher an das Tier heran und danach wieder zurück
+    feedFocus = fig;
+    fitTrain(false);
+    feeder.feed(fig, foodId, {
+      thumbs,
+      from,
+      onRefuse: hintFood,
+      onDone: () => {
+        if (feedFocus === fig) feedFocus = null;
+        if (active) fitTrain(false);
+      },
+    });
   }
 
   // Lieblingsfutter in der Leiste wackelt kurz (und wird sichtbar gescrollt)
@@ -607,7 +620,28 @@ export function createWorkshopMode(game) {
 
   // ---------- Kamera ----------
 
+  // Futter-Fach: die Kamera fährt dicht an die Tiere heran (damit man die Münder sieht).
+  // focus = ein Tier, das gerade gefüttert wird: noch näher.
+  let feedFocus = null;
+  let lastEaterCount = -1;
+  function fitFood(instant) {
+    const figs = feeder.eaters();
+    if (!figs.length) return false;
+    const v = new THREE.Vector3();
+    const box = new THREE.Box3();
+    for (const f of figs) box.expandByPoint(f.getWorldPosition(v));
+    let center = box.getCenter(new THREE.Vector3());
+    let half = Math.max(2.7, (box.max.x - box.min.x) / 2 + 1.6);
+    if (feedFocus) {
+      center = feedFocus.getWorldPosition(new THREE.Vector3());
+      half = 1.9;
+    }
+    game.fit(new THREE.Vector3(center.x, 1.35, 0), half, 1.55, new THREE.Vector3(0.18, 0.3, 1), instant);
+    return true;
+  }
+
   function fitTrain(instant) {
+    if (tab === 'food' && fitFood(instant)) return;
     const L = train.length;
     game.fit(new THREE.Vector3(0, 1.15, 0), L / 2 + 1.6, 2.0, new THREE.Vector3(0.3, 0.45, 1), instant);
   }
@@ -646,7 +680,13 @@ export function createWorkshopMode(game) {
     },
     update(dt) {
       train.animate(dt, 0, false);
-      feeder.update(dt);
+      feeder.update(dt, tab === 'food');
+      // Tiere kommen dazu oder gehen: Kamera im Futter-Fach neu ausrichten
+      const eaterCount = tab === 'food' ? feeder.eaters().length : -1;
+      if (eaterCount !== lastEaterCount) {
+        lastEaterCount = eaterCount;
+        if (tab === 'food') fitTrain(false);
+      }
       if (ws.highlight.visible) ws.highlight.material.opacity = 0.6 + Math.sin(game.time * 8) * 0.3;
       if (game.hint.due(IDLE_HINT_MS)) showHint();
     },

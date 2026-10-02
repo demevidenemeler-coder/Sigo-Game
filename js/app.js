@@ -1,5 +1,5 @@
 import {
-  loadSettings, saveSettings, loadSession, saveSession, loadTrain, saveTrain, loadTrack, saveTrack,
+  loadSettings, saveSettings, loadSession, saveSession, loadTrain, saveTrain, loadTrack, saveTrack, loadHeard, saveHeard,
 } from './settings.js';
 import { LANGUAGES, setLanguage, lang, speechLang, t, nameOf, soundWordOf } from './i18n.js';
 import {
@@ -29,6 +29,34 @@ function phraseKeyOf(text) {
   return PHRASE_KEYS.find((k) => t(k) === text && hasRecording(recKeys.phrase(L, k)));
 }
 
+// ---- Weniger Worte, mehr Geräusche ----
+// Ein Dreijähriger hört weg, wenn alles kommentiert wird. Deshalb wird jedes Wort/jeder Satz nur bei den ersten
+// Malen gesprochen (und danach ab und zu zur Erinnerung); dazwischen sorgen Geräusche für die Rückmeldung.
+// Zwischen zwei Sprechern liegt immer eine Pause. Eltern können im Eltern-Bereich auf „immer“ stellen.
+const SPEAK_FIRST = 2; // so oft wird ein Wort zu Beginn gesprochen
+const REMIND_EVERY = 9; // danach jedes 9. Mal
+const MIN_GAP_MS = 2600; // Mindestabstand zwischen zwei gesprochenen Dingen
+const ALWAYS_KEYS = ['bedtime', 'goodNight']; // wichtige Sätze (Schlafenszeit) immer sprechen
+let heard = loadHeard();
+let heardTimer = null;
+let lastSpokenAt = 0;
+let lastSfxAt = 0;
+
+function shouldSpeak(key, always = false) {
+  if (always || settings.voiceMode === 'always') {
+    lastSpokenAt = Date.now();
+    return true;
+  }
+  if (Date.now() - lastSpokenAt < MIN_GAP_MS) return false;
+  const n = heard[key] ?? 0;
+  const yes = n < SPEAK_FIRST || n % REMIND_EVERY === 0;
+  heard[key] = n + 1;
+  clearTimeout(heardTimer);
+  heardTimer = setTimeout(() => saveHeard(heard), 2500);
+  if (yes) lastSpokenAt = Date.now();
+  return yes;
+}
+
 async function say(text, opts = {}) {
   if (!settings.voice) return;
   const pk = phraseKeyOf(text);
@@ -47,6 +75,7 @@ function applySound() {
 }
 
 function sfx(name) {
+  lastSfxAt = Date.now();
   return settings.sounds ? playSound(name) : Promise.resolve();
 }
 
@@ -55,16 +84,18 @@ function sfx(name) {
 async function sayName(id) {
   const my = ++speechToken;
   stopSpeaking();
-  if (settings.sounds && (hasRecording(recKeys.call(id)) || hasAnimalSound(id))) {
-    await callOf(id);
-    if (my !== speechToken) return;
+  const hasCall = settings.sounds && (hasRecording(recKeys.call(id)) || hasAnimalSound(id));
+  if (hasCall) await callOf(id); // der Tierlaut kommt immer
+  if (my !== speechToken) return;
+  const speak1 = shouldSpeak(`name:${id}`);
+  if (speak1) {
     await sayWord(id);
-    return;
-  }
-  await sayWord(id);
-  const word = soundWordOf(id);
-  if (word && my === speechToken && settings.sounds) {
-    await speak(word, { lang: speechLang(), rate: settings.speechRate, pitch: 1.5 });
+    const word = !hasCall && soundWordOf(id);
+    if (word && my === speechToken && settings.sounds) {
+      await speak(word, { lang: speechLang(), rate: settings.speechRate, pitch: 1.5 });
+    }
+  } else if (!hasCall && Date.now() - lastSfxAt > 500) {
+    sfx('pop'); // kein Wort, aber eine Rückmeldung zum Antippen
   }
 }
 
@@ -85,6 +116,8 @@ async function sayWord(id) {
 }
 
 function sayText(text) {
+  const key = PHRASE_KEYS.find((k) => t(k) === text) ?? text;
+  if (!shouldSpeak(`phrase:${key}`, ALWAYS_KEYS.includes(key))) return Promise.resolve();
   ++speechToken;
   stopSpeaking();
   return say(text);
@@ -289,6 +322,8 @@ function showSettings() {
   const voiceName = voiceInfo(speechLang());
   page.append(row(t('voice'), choice(onOff, settings.voice, (v) => update({ voice: v })),
     voiceName ? t('voiceOk', { name: voiceName }) : t('voiceMissing')));
+  page.append(row(t('voiceMode'), choice([['sparse', t('voiceSparse')], ['always', t('voiceAlways')]], settings.voiceMode,
+    (v) => update({ voiceMode: v })), t('voiceModeHint')));
   page.append(row(t('speechRate'), choice([[0.7, t('slow')], [0.85, t('normal')]], settings.speechRate,
     (v) => update({ speechRate: v }))));
   page.append(row(t('sounds'), choice(onOff, settings.sounds, (v) => update({ sounds: v }))));

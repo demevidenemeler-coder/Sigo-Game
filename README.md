@@ -25,9 +25,11 @@ Unten: oben eine Reihe Fächer (mit Beschriftung), darunter große Karten – mi
 **Wegnehmen:** Mitfahrer, Schmuck oder Wagen vom Zug **in die Leiste ziehen** → weg. Auf einen anderen Wagen ziehen → umsetzen.
 **Antippen am Zug** ist immer harmlos: Tiere machen ihr (echtes) Geräusch und werden benannt, der Lokführer winkt und pfeift,
 der Kran schwenkt, die Glocke läutet, die Spielzeugautos hupen.
-**Tiere füttern (Fach 🥕):** Futter auf ein Tier im Zug ziehen (das Tier wird größer: „Für mich?“) – oder Futter
+**Tiere füttern (Fach 🥕):** Die Kamera fährt dicht an die Tiere heran, und **alle Tiere sperren abwechselnd den Mund auf und zu**
+(„Gib mir Futter!“). Futter auf ein Tier ziehen (es wird größer, der Mund geht ganz weit auf: „Für mich?“; beim Füttern
+fährt die Kamera noch näher heran) – oder Futter
 antippen, dann bekommt es das erste Tier, das es mag. Mag das Tier das Futter, mampft es in drei Bissen, Herzchen steigen auf
-und es ruft. Mag es das Futter nicht, schüttelt es den Kopf („Bäh!“), das Futter fällt herunter, eine **Denkblase zeigt das
+und es ruft – beim Mampfen klappt der Mund dreimal auf und zu. Mag es das Futter nicht, presst es den Mund zu, schüttelt es den Kopf („Bäh!“), das Futter fällt herunter, eine **Denkblase zeigt das
 Lieblingsfutter** und dieses wackelt in der Leiste. Kein Scheitern – nur ein Hinweis. (Kuh/Schaf: Heu, Hase: Karotte,
 Katze/Pinguin: Fisch, Hund: Knochen, Löwe: Fleisch, Hühner/Ente: Körner, Frosch: Fliege, Giraffe: Blätter …)
 **Zeige-Hand:** Bei jedem neuen Fach macht eine Hand einmal vor, wie man etwas auf den Zug zieht. Passiert eine Weile
@@ -79,6 +81,9 @@ Nach ein paar Hinweisen ohne Reaktion ist Ruhe, bis wieder getippt wird.
   Danach schmilzt alles langsam – das Schmelzwasser gibt wieder Pfützen.
 - **Bahnübergang:** Kommt der Zug, gehen die Schranken zu, Licht blinkt, Glocke bimmelt – die Autos auf der Landstraße halten und warten.
   Autos antippen → hupen.
+- **Zugbegegnung:** Auf einer kleinen Nebenstrecke fährt ein zweiter Zug (blaue Lok, rosa Wagen mit Hase und Katze) im Kreis.
+  Kommt der Zug des Kindes in seine Nähe, **winken sich beide Lokführer und Fahrgäste zu und hupen**. Die Nebenstrecke sucht
+  sich selbst einen freien Platz nahe der Strecke und verschwindet, wenn kein Platz da ist. Antippen → winkt und hupt.
 - Tiere auf der Weide antippen → sie rufen; Bäume und Häuser wackeln.
 - Jede Lok fährt anders schnell (Schnellzug am schnellsten).
 
@@ -90,6 +95,13 @@ Eigene Aufnahmen (MP3) lassen sich auch in `sounds/` ablegen und in `js/audio.js
 
 Leise Xylophon-Musik läuft im Hintergrund (im Eltern-Bereich abschaltbar).
 Zug, Strecke und alles an der Strecke bleiben gespeichert.
+
+## Weniger Worte, mehr Geräusche
+
+Wenn alles kommentiert wird, hört ein Kind irgendwann weg. Deshalb wird jedes Wort und jeder Satz nur bei den **ersten beiden
+Malen** gesprochen (danach nur noch jedes 9. Mal zur Erinnerung); dazwischen antworten Geräusche (Tierlaute, Klacken, Plopp).
+Zwischen zwei gesprochenen Dingen liegt immer eine Pause von mindestens 2,6 Sekunden. Die Schlafenszeit-Sätze werden immer
+gesprochen. Im Eltern-Bereich lässt sich das auf „Immer“ stellen.
 
 ## Schlafenszeit (Spielende)
 
@@ -109,6 +121,7 @@ Tut das Kind nichts, deckt sich der Zug nach einer Weile von selbst zu. So wird 
 | Spielzeit (10 / 15 / 20 / 30 Min. / unbegrenzt) | 15 Min. |
 | Pause danach | 30 Min. |
 | Stimme / Sprechtempo / Geräusche | an / normal / an |
+| **Wie oft sprechen?** | Nur bei Neuem (empfohlen) / Immer |
 | Musik / Musik-Lautstärke | an / mittel |
 | Zug zurücksetzen, Strecke zurücksetzen | – |
 | **Eigene Stimme** | Tierlaute, Namen und Sätze selbst einsprechen (🎙 / ▶ / 🗑) – Aufnahmen bleiben auf dem Gerät |
@@ -170,6 +183,7 @@ js/game/foods.js           Futter-Modelle
 js/game/feeding.js         Tiere füttern (Fressen, Kopfschütteln, Denkblase)
 js/game/wheelStyles.js     Radmuster
 js/game/hint.js            Zeige-Hand
+js/game/sideTrain.js       Zugbegegnung (zweiter Zug auf Nebenstrecke)
 js/animalSynth.js          Nachgebaute Tierstimmen
 js/recordings.js           Eigene Aufnahmen (Mikrofon, IndexedDB)
 js/voiceStudio.js          Eltern-Bereich „Eigene Stimme“

@@ -156,6 +156,12 @@ export function createDriveMode(game) {
     const pts = track.points;
     const xs = pts.map((p) => p[0]);
     const zs = pts.map((p) => p[1]);
+    // Die Nebenstrecke mit dem zweiten Zug soll mit ins Bild
+    const side = game.sideTrain?.center;
+    if (side) {
+      xs.push(side[0] - 8.5, side[0] + 8.5);
+      zs.push(side[1] - 5.5, side[1] + 5.5);
+    }
     const cx = (Math.max(...xs) + Math.min(...xs)) / 2;
     const cz = (Math.max(...zs) + Math.min(...zs)) / 2;
     const hw = (Math.max(...xs) - Math.min(...xs)) / 2 + 5;
@@ -699,6 +705,7 @@ export function createDriveMode(game) {
       // 3) Landschaft: Tiere rufen, Bäume wackeln
       let o = obj;
       while (o.parent && !land.tappable.includes(o)) o = o.parent;
+      if (o.userData.kind === 'sidecar') return game.sideTrain.tap();
       if (o.userData.kind === 'snowman') return game.weatherFx.tapSnowman(o);
       if (o.userData.kind === 'puddle') return game.weatherFx.tapPuddle(o);
       if (!land.tappable.includes(o)) return;

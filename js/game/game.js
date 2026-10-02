@@ -32,10 +32,11 @@ export class Game {
     this.ui = ui;
     this.services = services; // say, sayName, sfx, saveTrain, saveTrack
     this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
-    this.pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
+    this.pixelRatio = Math.min(window.devicePixelRatio || 1, 1.5); // höher bringt auf Tablets kaum Schärfe, kostet aber viel
     this.renderer.setPixelRatio(this.pixelRatio);
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    this.renderer.shadowMap.autoUpdate = false; // wird pro Bild gezielt angestoßen (siehe tick)
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.renderer.toneMapping = THREE.NeutralToneMapping;
     this.renderer.toneMappingExposure = 1.05;
@@ -48,6 +49,7 @@ export class Game {
     this.cam = { pos: new THREE.Vector3(8, 10, 20), look: new THREE.Vector3(), tPos: new THREE.Vector3(8, 10, 20), tLook: new THREE.Vector3() };
     this.bottomInset = 0;
     this.raycaster = new THREE.Raycaster();
+    this.raycaster.layers.enableAll(); // auch die unsichtbaren Original-Objekte (Instanz-Bäume) antippen
     this.tweens = [];
 
     this.workshop = createWorkshop();
@@ -95,7 +97,23 @@ export class Game {
 
   // ---------- Ablauf ----------
 
+  // Shader aller Bereiche einmal im Voraus übersetzen – sonst ruckelt es beim ersten Betreten (Fahren, Bett …)
+  warmUp() {
+    if (this.warmed) return;
+    this.warmed = true;
+    const r = this.renderer;
+    const jobs = [this.land.scene, this.bedroom.scene, this.workshop.scene];
+    const next = () => {
+      const sc = jobs.shift();
+      if (!sc) return;
+      const p = r.compileAsync ? r.compileAsync(sc, this.camera) : Promise.resolve(r.compile(sc, this.camera));
+      p.catch(() => {}).then(() => setTimeout(next, 50));
+    };
+    setTimeout(next, 300);
+  }
+
   start() {
+    this.warmUp();
     if (this.running) return;
     this.running = true;
     this.last = performance.now();
@@ -170,21 +188,39 @@ export class Game {
       this.scene.fog.near = dist + 40;
       this.scene.fog.far = dist + 170;
     }
+    // Schatten: von nah jedes Bild, von weit weg (Vogelperspektive) nur jedes 3. Bild – dort sieht man den Unterschied nicht
+    this.frameNo = (this.frameNo ?? 0) + 1;
+    const far = this.cam.pos.distanceTo(this.cam.look) > 45;
+    this.renderer.shadowMap.needsUpdate = !far || this.frameNo % 3 === 0;
     this.renderer.render(this.scene, this.camera);
     requestAnimationFrame(this.tick);
   }
 
   // Läuft es zu langsam, wird die Auflösung stufenweise gesenkt
+  // Läuft es zu langsam, wird stufenweise gespart: erst Auflösung, dann Schattenqualität, zuletzt Schatten aus.
   adaptQuality(frameTime) {
     if (frameTime > 0.5) return; // Tab war im Hintergrund
     this.frameTimes.push(frameTime);
     if (this.frameTimes.length < 90) return;
-    const avg = this.frameTimes.reduce((a, b) => a + b, 0) / this.frameTimes.length;
+    const sorted = this.frameTimes.slice().sort((a, b) => a - b);
     this.frameTimes = [];
-    if (avg > 1 / 40 && this.pixelRatio > 1) {
+    const typical = sorted[Math.floor(sorted.length * 0.75)]; // 75 % der Bilder sind schneller
+    if (typical < 1 / 45) return;
+    this.qualityStep = (this.qualityStep ?? 0) + 1;
+    if (this.pixelRatio > 1) {
       this.pixelRatio = Math.max(1, this.pixelRatio - 0.25);
       this.renderer.setPixelRatio(this.pixelRatio);
       this.resize();
+    } else if (!this.shadowsReduced) {
+      this.shadowsReduced = true;
+      for (const s of [this.land.sun, this.workshop.sun]) {
+        s.shadow.mapSize.set(1024, 1024);
+        s.shadow.map?.dispose();
+        s.shadow.map = null;
+      }
+    } else if (typical > 1 / 30 && this.renderer.shadowMap.enabled) {
+      this.renderer.shadowMap.enabled = false;
+      for (const sc of [this.land.scene, this.workshop.scene, this.bedroom.scene]) sc.traverse((o) => { if (o.material) [].concat(o.material).forEach((m) => { m.needsUpdate = true; }); });
     }
   }
 

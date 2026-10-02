@@ -5,6 +5,7 @@
 import * as THREE from 'three';
 import { RoundedBoxGeometry } from '../../vendor/RoundedBoxGeometry.js';
 import { woodTexture } from './textures.js';
+import { mergeStatic } from './merge.js';
 
 const mats = new Map();
 function mat(color, roughness = 0.6) {
@@ -518,6 +519,8 @@ export function buildFigure(id) {
   g.userData.box = new THREE.Box3().setFromObject(g);
   g.userData.top = g.userData.box.max.y;
   addMouth(g, id);
+  // Leistung: unbewegliche Teile zusammenfassen (Winke-Arm und Mund bleiben beweglich)
+  mergeStatic(g, (o) => o === g.userData.waveArm || o === g.userData.mouthHolder);
   return g;
 }
 

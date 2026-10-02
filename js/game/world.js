@@ -8,6 +8,7 @@ import { TrackObjects } from './trackObjects.js';
 import { Crossings } from './crossings.js';
 import { createFeatures } from './features.js';
 import { lamp } from './lamps.js';
+import { mergeStatic, ProxyInstancer } from './merge.js';
 import { woodTexture, grassTexture, waterTexture } from './textures.js';
 
 // Spielfeld, auf dem gemalt werden kann (halbe Breite / halbe Tiefe)
@@ -271,7 +272,7 @@ export function createLandscape() {
   const animated = [];
 
   // Boden mit Hügeln und Grastextur
-  const groundGeo = new THREE.PlaneGeometry(520, 520, 200, 200);
+  const groundGeo = new THREE.PlaneGeometry(520, 520, 130, 130);
   groundGeo.rotateX(-Math.PI / 2);
   const pos = groundGeo.attributes.position;
   const colors = [];
@@ -489,6 +490,7 @@ export function createLandscape() {
   // Tiere grasen, Enten schwimmen, Windmühle dreht sich, Wolken ziehen
   const tmp = new THREE.Vector3();
   function animate(dt, time) {
+    landRef.proxies.update();
     objects.animate(dt, time);
     crossings.animate(dt, time);
     features.updateTraffic(dt, crossings.crossings);
@@ -528,6 +530,12 @@ export function createLandscape() {
   const snowables = [ground.material, tufts.material];
   for (const [k, m] of matCache) if (/^#(5fae5a|4f9a4f|76b95e|3f8a4a)/.test(k)) snowables.push(m);
 
-  landRef = { scene, sun, hemi: scene.userData.hemi, sky: skyMat, snowables, track, objects, features, crossings, trainAnchor, scenery, tappable, clearAroundTrack, animate, ground, animated, extraFootprints: [] };
+  // ---- Leistung: unbewegliche Teile zusammenfassen, Bäume auf dem Spielfeld als Instanzen zeichnen ----
+  for (const a of animated) if (a.kind === 'cloud') mergeStatic(a.obj);
+  const proxies = new ProxyInstancer(scene, scenery);
+  const keepSet = new Set([...scenery, ...tappable, ...animated.map((a) => a.obj), ...features.cars,
+    track.group, objects.group, crossings.group, trainAnchor, ground]);
+  mergeStatic(scene, (o) => keepSet.has(o) || o.isLight || o.isInstancedMesh, { cell: 90, dedupe: true });
+  landRef = { proxies, scene, sun, hemi: scene.userData.hemi, sky: skyMat, snowables, track, objects, features, crossings, trainAnchor, scenery, tappable, clearAroundTrack, animate, ground, animated, extraFootprints: [] };
   return landRef;
 }

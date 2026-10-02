@@ -1,6 +1,6 @@
 // Offline-Unterstützung: Mit Internet wird immer die neueste Fassung geladen (und gespeichert),
 // ohne Internet die gespeicherte. Neue Dateien in ASSETS eintragen.
-const VERSION = 'sigo-v12';
+const VERSION = 'sigo-v13';
 const ASSETS = [
   './',
   'index.html',
@@ -39,6 +39,7 @@ const ASSETS = [
   'js/game/wheelStyles.js',
   'js/game/hint.js',
   'js/game/sideTrain.js',
+  'js/game/merge.js',
   'js/animalSynth.js',
   'js/recordings.js',
   'js/voiceStudio.js',

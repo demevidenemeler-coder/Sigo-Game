@@ -3,6 +3,7 @@
 // Auf der Straße fahren ständig Autos; an geschlossenen Schranken warten sie.
 
 import * as THREE from 'three';
+import { mergeStatic } from './merge.js';
 import { RoundedBoxGeometry } from '../../vendor/RoundedBoxGeometry.js';
 import { waterTexture } from './textures.js';
 import { lamp } from './lamps.js';
@@ -64,7 +65,7 @@ function ribbon(curve, width, y, material, offset = 0, uvLen = 4) {
 function mountain(m) {
   const g = new THREE.Group();
   g.position.set(m.x, 0, m.z);
-  const geo = new THREE.IcosahedronGeometry(1, 5);
+  const geo = new THREE.IcosahedronGeometry(1, 4);
   const pos = geo.attributes.position;
   const colors = [];
   const grass = new THREE.Color('#6fae55');
@@ -190,12 +191,13 @@ export function createFeatures(scene) {
 
   // Autos auf der Straße (beide Richtungen)
   const cars = [];
-  const CARS = 12;
+  const CARS = 9;
   for (let i = 0; i < CARS; i++) {
     const c = roadCar(CAR_COLORS[i % CAR_COLORS.length]);
     c.userData.t = (i / CARS) * roadS.length;
     c.userData.dir = i % 2 ? 1 : -1;
     c.userData.speed = 3 + (i % 3) * 0.6;
+    mergeStatic(c);
     group.add(c);
     cars.push(c);
   }

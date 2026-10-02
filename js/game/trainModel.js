@@ -8,6 +8,7 @@ import { buildFigure, setBubble } from './figures.js';
 import { woodTexture } from './textures.js';
 import { lamp } from './lamps.js';
 import { wheelDecalMaterial } from './wheelStyles.js';
+import { mergeStatic, disposeMerged } from './merge.js';
 
 const WHEEL_Z = 0.47; // Radmitte seitlich (liegt über der Schiene)
 
@@ -872,6 +873,7 @@ export function buildCar(data) {
   addCargo(car);
   addMud(car);
   applyDirt(car);
+  mergeCar(car);
   car.traverse((o) => { o.userData.car ??= car; });
   car.userData.car = car;
   return car;
@@ -915,7 +917,20 @@ export function applyDirt(car) {
   car.userData.mud.forEach((m, i) => { m.visible = i < Math.round(d * 8); });
 }
 
+// Leistung: unbewegliche Teile eines Wagens je Material zu einem Mesh zusammenfassen.
+// Einzeln bleiben alles, was sich bewegt, ausgetauscht oder angetippt wird.
+function mergeCar(car) {
+  const u = car.userData;
+  for (const w of u.wheels) mergeStatic(w);
+  const keep = new Set([...u.wheels, ...u.decorItems, ...u.cargoItems, ...(u.mud ?? []), ...(u.toyCars ?? [])]);
+  if (u.driver) keep.add(u.driver);
+  if (u.crane) keep.add(u.crane);
+  for (const r of u.rods?.sides ?? []) for (const k of ['coupling', 'main', 'piston']) if (r[k]) keep.add(r[k]);
+  mergeStatic(car, (o) => keep.has(o) || o.userData.bell || o.userData.flag || o.userData.balloon);
+}
+
 export function disposeCar(car) {
+  disposeMerged(car);
   Object.values(car.userData.mats ?? {}).forEach((m) => m.dispose());
 }
 

@@ -184,6 +184,7 @@ js/game/feeding.js         Tiere füttern (Fressen, Kopfschütteln, Denkblase)
 js/game/wheelStyles.js     Radmuster
 js/game/hint.js            Zeige-Hand
 js/game/sideTrain.js       Zugbegegnung (zweiter Zug auf Nebenstrecke)
+js/game/merge.js           Leistung: Teile zusammenfassen, Instanzen
 js/animalSynth.js          Nachgebaute Tierstimmen
 js/recordings.js           Eigene Aufnahmen (Mikrofon, IndexedDB)
 js/voiceStudio.js          Eltern-Bereich „Eigene Stimme“
@@ -203,7 +204,9 @@ sw.js                      Offline-Speicher (neue Dateien in ASSETS eintragen)
 ## Ehrliche Grenzen
 
 - Einige Tierlaute (Ente, Pferd, Löwe, Elefant, Pinguin) sind nachgebaut und klingen künstlich.
-- Die Grafik ist auf neuere Tablets ausgelegt; ruckelt es, senkt die App automatisch die Auflösung.
+- Die Grafik ist auf neuere Tablets ausgelegt. Damit es flüssig läuft: unbewegliche Teile werden zu wenigen großen Teilen
+  zusammengefasst, Bäume als Instanzen gezeichnet, Schatten aus der Vogelperspektive seltener berechnet und alle Shader beim
+  Start vorab übersetzt. Ruckelt es trotzdem, senkt die App stufenweise selbst: Auflösung → Schattenqualität → Schatten aus.
 - Selbstkreuzende Strecken (Acht) sind erlaubt, aber dort entsteht keine Brücke – der Zug fährt „durch“ die Kreuzung.
 - Malt man sehr viel an Fluss oder Straße entlang, werden Brücke/Übergang sehr lang und es bleibt wenig Platz für Bahnhöfe („Alles voll!“).
 

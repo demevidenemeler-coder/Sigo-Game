@@ -10,6 +10,7 @@ import { createFeatures } from './features.js';
 import { lamp } from './lamps.js';
 import { mergeStatic, ProxyInstancer } from './merge.js';
 import { decorateWorkshop } from './workshopDeco.js';
+import { Ambient } from './ambient.js';
 import { woodTexture, waterTexture } from './textures.js';
 import { paintGround, groundMaterial } from './groundPaint.js';
 import {
@@ -455,6 +456,7 @@ export function createLandscape() {
 
   // Dorf: Häuser im Kreis um den Platz (zum Platz gedreht), Kirche, Brunnen, Bänke, Laternen, Dorflinde
   const V = LAYOUT.village;
+  const chimneys = [];
   occupied.push([V.x, V.z, 13]);
   put(well(), V.x, V.z);
   const ring = [[-150, 9], [-118, 9.5], [-62, 9.2], [-28, 9], [8, 9.4], [150, 9], [118, 9.5]];
@@ -463,10 +465,15 @@ export function createLandscape() {
     const x = V.x + Math.cos(a) * r;
     const z = V.z + Math.sin(a) * r * 0.85;
     if (!free(x, z, 1.5)) return;
-    const h = house(rand, i % 3 === 1);
+    const big = i % 3 === 1;
+    const h = house(rand, big);
     h.scale.setScalar(1.05);
     // Haustür (lokal +z) zeigt zum Platz
     put(h, x, z, Math.atan2(V.x - x, V.z - z));
+    if (i % 2 === 0) {
+      h.updateMatrixWorld(true);
+      chimneys.push({ obj: h, pos: new THREE.Vector3((big ? 2.6 : 1.9) * 0.26, 2.4, -0.28).applyMatrix4(h.matrixWorld), phase: rand() });
+    }
   });
   {
     const x = V.x + 7;
@@ -494,6 +501,18 @@ export function createLandscape() {
   put(fb, F.x - 1, F.z - 4.8, 0.12);
   for (const [dx, dz] of [[4.5, -2.5], [5.3, -0.8], [4.8, 2.4]]) put(hayBale(rand), F.x + dx, F.z + dz, rand() * 3);
   put(tractor(), F.x - 3.6, F.z + 2.4, 0.6);
+  // Hühner und ein Hahn laufen auf dem Hof herum
+  const yardAnimals = [];
+  for (const id of ['huhn', 'huhn', 'hahn', 'huhn']) {
+    const a = buildFigure(id);
+    a.scale.setScalar(1.5);
+    a.position.set(F.x + (rand() - 0.5) * 4, 0, F.z + (rand() - 0.5) * 3);
+    scene.add(a);
+    animated.push({ kind: 'graze', obj: a, area: { x: F.x + 0.5, z: F.z + 0.5, w: 3.2, d: 2.4 }, target: a.position.clone(), wait: rand() * 2, quick: true });
+    tappable.push(a);
+    yardAnimals.push(a);
+  }
+
   // Kleine Weide neben dem Hof mit grasenden Tieren
   const paddockArea = { x: F.x + 11.5, z: F.z - 4.5, w: 3.2, d: 2.6 };
   const paddock = new THREE.Group();
@@ -657,10 +676,11 @@ export function createLandscape() {
   const tufts = new THREE.InstancedMesh(tuftGeometry(), new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 1, vertexColors: true }), tuftData.length);
   tufts.receiveShadow = true;
 
-  const props = [{ mesh: petals, data: flowerData }, { mesh: centers, data: flowerData }, { mesh: tufts, data: tuftData },
+  const props = [{ mesh: petals, data: flowerData, thinnable: true }, { mesh: centers, data: flowerData, thinnable: true }, { mesh: tufts, data: tuftData, thinnable: true },
     ...cropProps(rand, (x, z) => features.blocked(x, z, 0.3))];
   for (const { mesh } of props) scene.add(mesh);
   const m4 = new THREE.Matrix4();
+  const ambient = new Ambient(scene, { meadows: LAYOUT.meadows, chimneys, rand });
 
   // Wolken
   for (let i = 0; i < 18; i++) {
@@ -711,6 +731,14 @@ export function createLandscape() {
     };
   }
 
+  // Schwache Geräte: jede zweite Blume / jedes zweite Grasbüschel weglassen
+  let thin = false;
+  function setThin(on) {
+    if (thin === on) return;
+    thin = on;
+    clearAroundTrack();
+  }
+
   function clearAroundTrack() {
     const trackDist = distanceGrid(track.samples.map(([x, z]) => [x, z, 0, 4]));
     const fpDist = distanceGrid([...objects.footprints(), ...crossings.footprints(), ...(landRef?.extraFootprints ?? [])].map(([x, z, r]) => [x, z, r, 2]));
@@ -719,9 +747,10 @@ export function createLandscape() {
       o.visible = trackDist(o.position.x, o.position.z) > r && fpDist(o.position.x, o.position.z) > 1;
     }
     for (const a of farmAnimals) a.visible = paddock.visible;
-    for (const { mesh, data } of props) {
+    for (const a of yardAnimals) a.visible = fb.visible;
+    for (const { mesh, data, thinnable } of props) {
       data.forEach((d, i) => {
-        const s = trackDist(d.x, d.z) > 1.3 && fpDist(d.x, d.z) > 0 ? d.s : 0;
+        const s = trackDist(d.x, d.z) > 1.3 && fpDist(d.x, d.z) > 0 && !(thin && thinnable && i % 2) ? d.s : 0;
         m4.makeRotationY(d.r).scale(new THREE.Vector3(s, s, s)).setPosition(d.x, d.y * s, d.z);
         mesh.setMatrixAt(i, m4);
       });
@@ -733,6 +762,7 @@ export function createLandscape() {
   const tmp = new THREE.Vector3();
   function animate(dt, time) {
     landRef.proxies.update();
+    ambient.update(dt, time);
     objects.animate(dt, time);
     crossings.animate(dt, time);
     features.updateTraffic(dt, crossings.crossings);
@@ -753,11 +783,11 @@ export function createLandscape() {
         tmp.copy(a.target).sub(a.obj.position);
         const d = tmp.length();
         if (d < 0.1) {
-          a.wait = 2 + Math.random() * 5;
+          a.wait = a.quick ? 0.6 + Math.random() * 2 : 2 + Math.random() * 5;
           a.target.set(a.area.x + (Math.random() - 0.5) * (a.area.w * 2 - 2), 0, a.area.z + (Math.random() - 0.5) * (a.area.d * 2 - 2));
           continue;
         }
-        const step = Math.min(d, dt * 0.6);
+        const step = Math.min(d, dt * (a.quick ? 1.1 : 0.6));
         a.obj.position.addScaledVector(tmp.normalize(), step);
         const want = Math.atan2(-tmp.z, tmp.x);
         let diff = want - a.obj.rotation.y;
@@ -777,6 +807,6 @@ export function createLandscape() {
   const keepSet = new Set([...scenery, ...tappable, ...animated.map((a) => a.obj), ...features.cars,
     track.group, objects.group, crossings.group, trainAnchor, ground]);
   mergeStatic(scene, (o) => keepSet.has(o) || o.isLight || o.isInstancedMesh, { cell: 90, dedupe: true });
-  landRef = { proxies, scene, sun, hemi: scene.userData.hemi, sky: skyMat, snowables, track, objects, features, crossings, trainAnchor, scenery, tappable, clearAroundTrack, animate, ground, animated, extraFootprints: [] };
+  landRef = { proxies, scene, sun, hemi: scene.userData.hemi, sky: skyMat, snowables, track, objects, features, crossings, trainAnchor, scenery, tappable, clearAroundTrack, setThin, animate, ground, animated, ambient, extraFootprints: [] };
   return landRef;
 }

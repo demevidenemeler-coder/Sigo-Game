@@ -68,6 +68,8 @@ export function createDriveMode(game) {
   const rolling = new RollingSound();
   const washLoop = new NoiseLoop('bandpass', 1300, 0.6);
   let follow = false;
+  // Mitfahr-Kamera mit dem Finger schwenken: um den Zug herum (yaw) und etwas höher/tiefer (tilt)
+  const orbit = { yaw: 0, tilt: 0, idle: 99, dragging: false, last: null };
   let chuffAcc = 0;
   let chuffBeat = 0;
   let exhaustAcc = 0;
@@ -83,6 +85,7 @@ export function createDriveMode(game) {
   const tmp = new THREE.Vector3();
   const fwd = new THREE.Vector3();
   const side = new THREE.Vector3();
+  const UP = new THREE.Vector3(0, 1, 0);
 
   const locoDef = () => partDef(train.data.cars[0].type);
   const signed = (a, b) => {
@@ -105,10 +108,23 @@ export function createDriveMode(game) {
     parent.append(b);
     return b;
   };
+  let orbitHintShown = 0;
   const camBtn = btn(controls, 'cam', '🎥', () => {
     follow = !follow;
     camBtn.classList.toggle('active', follow);
     services.sfx('pop');
+    orbit.yaw = 0;
+    orbit.tilt = 0;
+    // Die ersten Male zeigt die Hand: Man kann mit dem Finger um den Zug herum schauen
+    if (follow && orbitHintShown < 2) {
+      orbitHintShown++;
+      setTimeout(() => {
+        if (!follow) return;
+        const w = window.innerWidth;
+        const h = window.innerHeight;
+        game.hint.drag(w * 0.62, h * 0.45, w * 0.32, h * 0.45);
+      }, 1400);
+    }
   });
   btn(controls, 'horn', '📯', horn);
   const goBtn = btn(controls, 'go', '▶', () => {
@@ -182,7 +198,12 @@ export function createDriveMode(game) {
     // Am Bahnhof schwenkt die Kamera auf die andere Seite: Zug vorne, Bahnsteig dahinter
     const dist = stoppedAt?.type === 'bahnhof' ? (stoppedAt.flipped ? 11 : -11) : 9;
     // flach genug, dass oben Himmel und ferne Hügel zu sehen sind (Tiefe), hoch genug für den Überblick
-    game.cam.tPos.copy(tmp).addScaledVector(fwd, 3).addScaledVector(side, dist).add(new THREE.Vector3(0, stoppedAt ? 5.2 : 3.5, 0));
+    const off = new THREE.Vector3().addScaledVector(fwd, 3).addScaledVector(side, dist);
+    off.applyAxisAngle(UP, orbit.yaw);
+    const k = 1 + orbit.tilt * 0.25; // höher = etwas weiter weg
+    off.multiplyScalar(k);
+    off.y = (stoppedAt ? 5.2 : 3.5) + orbit.tilt * 3.2;
+    game.cam.tPos.copy(tmp).add(off);
     game.cam.tLook.copy(tmp).addScaledVector(fwd, -2).add(new THREE.Vector3(0, 1.3, 0));
   }
 
@@ -658,14 +679,41 @@ export function createDriveMode(game) {
         }
       }
 
+      // Nach einer Weile ohne Finger schwenkt die Kamera langsam zurück (man verliert den Zug nie)
+      orbit.idle += dt;
+      if (orbit.idle > 7) {
+        const back = 1 - Math.exp(-dt * 0.5);
+        orbit.yaw = Math.atan2(Math.sin(orbit.yaw), Math.cos(orbit.yaw)) * (1 - back);
+        orbit.tilt *= 1 - back;
+      }
       if (follow) followCamera();
       else overviewCamera();
       clearView(dt, follow);
     },
     pointerDown(e) {
       down = { x: e.clientX, y: e.clientY };
+      orbit.last = { x: e.clientX, y: e.clientY };
+      orbit.dragging = false;
+    },
+    pointerMove(e) {
+      if (!follow || !down || !orbit.last) return;
+      const dx = e.clientX - orbit.last.x;
+      const dy = e.clientY - orbit.last.y;
+      orbit.last = { x: e.clientX, y: e.clientY };
+      if (!orbit.dragging && Math.hypot(e.clientX - down.x, e.clientY - down.y) < 18) return;
+      orbit.dragging = true;
+      orbit.yaw -= (dx / window.innerWidth) * Math.PI * 1.6;
+      orbit.tilt = THREE.MathUtils.clamp(orbit.tilt + (dy / window.innerHeight) * 2.2, -0.45, 1);
+      orbit.idle = 0;
+      game.hint.touched?.();
     },
     pointerUp(e, cancelled) {
+      orbit.last = null;
+      if (orbit.dragging) {
+        orbit.dragging = false;
+        down = null;
+        return;
+      }
       if (cancelled || !down || Math.hypot(e.clientX - down.x, e.clientY - down.y) > 18) return;
       down = null;
       const targets = [objects.group, land.crossings.group, ...train.cars, ...land.tappable.filter((o) => o.visible)];

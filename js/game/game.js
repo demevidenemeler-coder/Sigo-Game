@@ -135,6 +135,7 @@ export class Game {
     if (this.scene === this.land.scene) {
       this.land.animate(dt, this.time);
       this.env.update(dt, this.cam.look, this.train.loco, this.services.soundsOn());
+      this.land.ambient.night = this.env.night;
       this.weatherFx.update(dt, this.cam.look);
       this.sideTrain.update(dt);
       this.renderer.toneMappingExposure = 0.98 - 0.36 * this.env.night;
@@ -211,6 +212,10 @@ export class Game {
       this.pixelRatio = Math.max(1, this.pixelRatio - 0.25);
       this.renderer.setPixelRatio(this.pixelRatio);
       this.resize();
+    } else if (!this.propsThinned) {
+      // weniger Blumen und Grasbüschel (sieht man kaum, spart aber viel)
+      this.propsThinned = true;
+      this.land.setThin(true);
     } else if (!this.shadowsReduced) {
       this.shadowsReduced = true;
       for (const s of [this.land.sun, this.workshop.sun]) {

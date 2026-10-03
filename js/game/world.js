@@ -9,7 +9,13 @@ import { Crossings } from './crossings.js';
 import { createFeatures } from './features.js';
 import { lamp } from './lamps.js';
 import { mergeStatic, ProxyInstancer } from './merge.js';
-import { woodTexture, grassTexture, waterTexture } from './textures.js';
+import { decorateWorkshop } from './workshopDeco.js';
+import { woodTexture, waterTexture } from './textures.js';
+import { paintGround, groundMaterial } from './groundPaint.js';
+import {
+  LAYOUT, zonePaint, cropProps, church, well, hayBale, tractor, bench, lantern, contactShadow, tuftGeometry, flowerGeometries, colored,
+  gableRoof, gableFill,
+} from './zones.js';
 
 // Spielfeld, auf dem gemalt werden kann (halbe Breite / halbe Tiefe)
 export const WORLD_BOUNDS = { x: 78, z: 50 }; // groß, damit lange Strecken mit vielen Bahnhöfen Platz haben
@@ -107,6 +113,8 @@ export function createWorkshop() {
     r.castShadow = true;
   }
 
+  decorateWorkshop(scene);
+
   const trainAnchor = new THREE.Group();
   trainAnchor.position.y = RAIL_TOP;
   scene.add(trainAnchor);
@@ -126,28 +134,69 @@ export function createWorkshop() {
 
 // ---------- Landschaft: Bausteine ----------
 
+// Laub: Eckfarben machen es unten/innen dunkler (wirkt plastisch, ohne teure Nachbearbeitung)
+const leafMats = new Map();
+function leafMat(color) {
+  if (!leafMats.has(color)) leafMats.set(color, new THREE.MeshStandardMaterial({ color, roughness: 0.85, vertexColors: true }));
+  return leafMats.get(color);
+}
+const leafGeo = new Map();
+function leaf(key, make) {
+  if (!leafGeo.has(key)) leafGeo.set(key, colored(make(), '#ffffff', 0.62));
+  return leafGeo.get(key);
+}
+const GREENS = ['#5fae5a', '#4f9a4f', '#76b95e', '#3f8a4a', '#86c25a'];
+
 function tree(kind, rand) {
   const g = new THREE.Group();
   const trunkColor = kind === 'birke' ? '#ece8df' : '#8a5a33';
-  add(g, new THREE.CylinderGeometry(0.14, 0.2, 1, 8), mat(trunkColor), 0, 0.5, 0);
-  const greens = ['#5fae5a', '#4f9a4f', '#76b95e', '#3f8a4a'];
-  const leaf = mat(greens[Math.floor(rand() * greens.length)], 0.9);
+  add(g, new THREE.CylinderGeometry(0.13, 0.2, 1, 8), mat(trunkColor), 0, 0.5, 0);
+  if (kind === 'birke') {
+    for (const y of [0.3, 0.55, 0.8]) add(g, new THREE.BoxGeometry(0.1, 0.04, 0.3), mat('#3a3a3a'), 0, y, 0, false);
+  }
+  const leafM = leafMat(GREENS[Math.floor(rand() * GREENS.length)]);
   if (kind === 'tanne') {
-    for (let i = 0; i < 3; i++) add(g, new THREE.ConeGeometry(0.9 - i * 0.22, 1.1, 10), leaf, 0, 1.2 + i * 0.6, 0);
+    const dark = leafMat(rand() > 0.5 ? '#3f8a4a' : '#4a9450');
+    for (let i = 0; i < 3; i++) add(g, leaf(`t${i}`, () => new THREE.ConeGeometry(0.95 - i * 0.24, 1.15, 9)), dark, 0, 1.2 + i * 0.62, 0);
   } else {
-    add(g, new THREE.IcosahedronGeometry(0.85, 1), leaf, 0, 1.6, 0);
-    add(g, new THREE.IcosahedronGeometry(0.6, 1), leaf, 0.45, 1.35, 0.2);
-    add(g, new THREE.IcosahedronGeometry(0.55, 1), leaf, -0.4, 1.45, -0.2);
+    add(g, leaf('r0', () => new THREE.SphereGeometry(0.88, 11, 8)), leafM, 0, 1.65, 0);
+    add(g, leaf('r1', () => new THREE.SphereGeometry(0.62, 9, 6)), leafM, 0.48, 1.38, 0.22);
+    add(g, leaf('r2', () => new THREE.SphereGeometry(0.56, 9, 6)), leafM, -0.42, 1.48, -0.22);
+    add(g, leaf('r3', () => new THREE.SphereGeometry(0.5, 9, 6)), leafM, 0.05, 2.15, 0.1);
     if (kind === 'apfel') {
-      for (let i = 0; i < 7; i++) {
-        const a = rand() * Math.PI * 2;
-        const y = 1.3 + rand() * 0.7;
-        add(g, new THREE.SphereGeometry(0.09, 8, 6), mat('#e5484d', 0.4), Math.cos(a) * 0.82, y, Math.sin(a) * 0.82);
+      const apple = new THREE.SphereGeometry(0.1, 8, 6);
+      for (let i = 0; i < 8; i++) {
+        const a = (i / 8) * Math.PI * 2 + rand() * 0.4;
+        const y = 1.3 + rand() * 0.8;
+        add(g, apple, mat('#e5484d', 0.4), Math.cos(a) * 0.86, y, Math.sin(a) * 0.86, false);
       }
     }
   }
+  g.add(contactShadow(kind === 'tanne' ? 1.15 : 1.3));
   g.scale.setScalar(0.85 + rand() * 0.5);
   g.userData.kind = 'tree';
+  return g;
+}
+
+// Busch: niedrig und rund, manchmal mit Beeren
+function bush(rand) {
+  const g = new THREE.Group();
+  const leafM = leafMat(GREENS[Math.floor(rand() * GREENS.length)]);
+  add(g, leaf('b0', () => new THREE.SphereGeometry(0.55, 9, 6)), leafM, 0, 0.42, 0);
+  add(g, leaf('b1', () => new THREE.SphereGeometry(0.42, 8, 6)), leafM, 0.45, 0.32, 0.15);
+  add(g, leaf('b2', () => new THREE.SphereGeometry(0.4, 8, 6)), leafM, -0.42, 0.3, -0.1);
+  if (rand() < 0.4) {
+    const berry = new THREE.SphereGeometry(0.06, 6, 4);
+    const col = rand() < 0.5 ? '#e5484d' : '#8b5bb5';
+    for (let i = 0; i < 7; i++) {
+      const a = rand() * Math.PI * 2;
+      add(g, berry, mat(col, 0.4), Math.cos(a) * 0.55, 0.35 + rand() * 0.35, Math.sin(a) * 0.5, false);
+    }
+  }
+  g.add(contactShadow(0.95, 0.32));
+  g.scale.setScalar(0.8 + rand() * 0.5);
+  g.userData.kind = 'tree';
+  g.userData.clearR = 1.4;
   return g;
 }
 
@@ -155,35 +204,52 @@ const windowMat = lamp(new THREE.MeshStandardMaterial({ color: '#9fc6e6', emissi
 
 function house(rand, big = false) {
   const g = new THREE.Group();
-  const walls = ['#f2c7a5', '#f7f1e3', '#d8e6f0', '#f5d98b', '#f0c9c9'];
-  const roofs = ['#c8453a', '#8a5a33', '#4f6d8a', '#6e8a4f'];
+  const walls = ['#f2c7a5', '#f7f1e3', '#d8e6f0', '#f5d98b', '#f0c9c9', '#cfe5c4'];
+  const roofs = ['#c8453a', '#d9663b', '#4f6d8a', '#8b5bb5', '#3f8a6a'];
   const w = big ? 2.6 : 1.9;
-  add(g, new RoundedBoxGeometry(w, 1.4, 1.6, 2, 0.06), mat(walls[Math.floor(rand() * walls.length)]), 0, 0.7, 0);
-  const roof = add(g, new THREE.CylinderGeometry(0.01, 1.2, w + 0.3, 3, 1), mat(roofs[Math.floor(rand() * roofs.length)], 0.6), 0, 1.75, 0);
-  roof.rotation.z = Math.PI / 2;
-  roof.rotation.y = Math.PI / 2;
-  roof.scale.set(0.95, 1, 0.6);
-  add(g, new THREE.BoxGeometry(0.3, 0.6, 0.3), mat('#9a6b4a'), w * 0.25, 2.1, -0.2);
-  add(g, new THREE.BoxGeometry(0.42, 0.7, 0.05), mat('#8a5a33'), 0, 0.35, 0.81);
+  const d = 1.6;
+  const wallM = mat(walls[Math.floor(rand() * walls.length)]);
+  add(g, new RoundedBoxGeometry(w, 1.4, d, 2, 0.06), wallM, 0, 0.7, 0);
+  add(g, gableFill(w, d, 0.95), wallM, 0, 1.4, 0);
+  add(g, gableRoof(w, d, 0.95), mat(roofs[Math.floor(rand() * roofs.length)], 0.55), 0, 1.38, 0);
+  add(g, new RoundedBoxGeometry(0.3, 0.7, 0.3, 2, 0.04), mat('#b07a5a'), w * 0.26, 2.0, -0.28);
+  // Tür mit Stufe und Klinke
+  add(g, new RoundedBoxGeometry(0.46, 0.76, 0.08, 2, 0.03), mat(rand() > 0.5 ? '#8a5a33' : '#3b7cc9', 0.6), 0, 0.4, d / 2 + 0.01);
+  add(g, new THREE.SphereGeometry(0.035, 6, 4), mat('#f2c832', 0.3), 0.14, 0.4, d / 2 + 0.06, false);
+  add(g, new THREE.BoxGeometry(0.62, 0.08, 0.22), mat('#b9b1a3'), 0, 0.04, d / 2 + 0.1, false);
+  const box = ['#e5484d', '#f08bb4', '#f5c53a', '#b58ad6'][Math.floor(rand() * 4)];
   for (const x of [-w * 0.3, w * 0.3]) {
-    add(g, new THREE.BoxGeometry(0.42, 0.38, 0.05), windowMat, x, 0.9, 0.81);
-    add(g, new THREE.BoxGeometry(0.5, 0.06, 0.08), mat('#ffffff'), x, 0.68, 0.83);
+    add(g, new THREE.BoxGeometry(0.5, 0.46, 0.05), mat('#ffffff', 0.6), x, 0.92, d / 2 + 0.005, false);
+    add(g, new THREE.BoxGeometry(0.4, 0.36, 0.05), windowMat, x, 0.92, d / 2 + 0.02, false);
+    // Blumenkasten
+    add(g, new THREE.BoxGeometry(0.48, 0.1, 0.14), mat('#8a5a33'), x, 0.66, d / 2 + 0.08, false);
+    add(g, new THREE.BoxGeometry(0.44, 0.08, 0.1), mat(box, 0.6), x, 0.74, d / 2 + 0.08, false);
   }
+  const cs = contactShadow(1, 0.32);
+  cs.scale.set(w * 0.75, 1, 1.25);
+  g.add(cs);
   g.userData.kind = 'house';
   return g;
 }
 
 function barn() {
   const g = new THREE.Group();
-  add(g, new RoundedBoxGeometry(4.5, 3, 3.5, 2, 0.08), mat('#c8453a'), 0, 1.5, 0);
-  const roof = add(g, new THREE.CylinderGeometry(0.01, 2.4, 4.8, 3, 1), mat('#5a4a42', 0.6), 0, 3.6, 0);
-  roof.rotation.z = Math.PI / 2;
-  roof.scale.set(0.95, 1, 0.7);
-  roof.rotation.y = Math.PI / 2;
-  add(g, new THREE.BoxGeometry(1.6, 2, 0.1), mat('#f7f1e3'), 0, 1, 1.76);
-  add(g, new THREE.BoxGeometry(1.4, 1.8, 0.12), mat('#a33a31'), 0, 0.95, 1.77);
+  const red = mat('#c8453a');
+  add(g, new RoundedBoxGeometry(4.5, 3, 3.5, 2, 0.08), red, 0, 1.5, 0);
+  // First quer (über die Breite), Tor vorne
+  const rg = new THREE.Group();
+  rg.rotation.y = Math.PI / 2;
+  rg.position.y = 2.98;
+  add(rg, gableFill(3.5, 4.5, 1.9), red, 0, 0, 0);
+  add(rg, gableRoof(3.5, 4.5, 1.9, 0.3), mat('#5a4a42', 0.6), 0, -0.02, 0);
+  g.add(rg);
+  add(g, new THREE.BoxGeometry(1.8, 2.1, 0.1), mat('#f7f1e3'), 0, 1.05, 1.76);
+  add(g, new THREE.BoxGeometry(1.55, 1.9, 0.12), mat('#a33a31'), 0, 0.95, 1.77);
+  for (const r of [0.8, -0.8]) add(g, new THREE.BoxGeometry(0.1, 2.3, 0.13), mat('#f7f1e3'), 0, 0.95, 1.78).rotation.z = r;
+  add(g, new THREE.CylinderGeometry(0.35, 0.35, 0.08, 16).rotateX(Math.PI / 2), mat('#f7f1e3'), 0, 3.6, 1.77);
   // Silo
   add(g, new THREE.CylinderGeometry(0.9, 0.9, 5, 20), mat('#d9d4c8', 0.5), 3.2, 2.5, -0.4);
+  for (const y of [1.2, 2.5, 3.8]) add(g, new THREE.CylinderGeometry(0.92, 0.92, 0.08, 20), mat('#b9b1a3', 0.5), 3.2, y, -0.4, false);
   add(g, new THREE.SphereGeometry(0.9, 20, 10, 0, Math.PI * 2, 0, Math.PI / 2), mat('#4f6d8a', 0.5), 3.2, 5, -0.4);
   return g;
 }
@@ -286,17 +352,15 @@ export function createLandscape() {
   }
   groundGeo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
   groundGeo.computeVertexNormals();
-  const grass = grassTexture().clone();
-  grass.repeat.set(66, 66);
-  grass.needsUpdate = true;
-  // Der Boden wird beim Tiefentest leicht nach hinten geschoben, damit Fluss, Straße und Schotter
-  // nie mit ihm „kämpfen“ (sonst flackert es oder Teile verschwinden – besonders auf Tablets).
-  const ground = new THREE.Mesh(groundGeo, new THREE.MeshStandardMaterial({ map: grass, color: '#d3e3c0', vertexColors: true, roughness: 1, polygonOffset: true, polygonOffsetFactor: 4, polygonOffsetUnits: 4 }));
-  ground.receiveShadow = true;
-  scene.add(ground);
-
   // Fluss, Landstraße und Berge (fest in der Landschaft)
   const features = createFeatures(scene);
+
+  // Gemalter Boden: Wiesenflecken, Feldwege, Dorfplatz, Felder (+ feine Halm-Struktur)
+  // Der Boden wird beim Tiefentest leicht nach hinten geschoben, damit Fluss, Straße und Schotter
+  // nie mit ihm „kämpfen“ (sonst flackert es oder Teile verschwinden – besonders auf Tablets).
+  const ground = new THREE.Mesh(groundGeo, groundMaterial(paintGround(zonePaint(), features), { polygonOffset: true, polygonOffsetFactor: 4, polygonOffsetUnits: 4 }));
+  ground.receiveShadow = true;
+  scene.add(ground);
 
   // Zaun um das Spielfeld
   const fence = new THREE.Group();
@@ -374,52 +438,229 @@ export function createLandscape() {
     scene.add(t);
   }
 
-  // Bäume und Büsche auf dem Spielfeld (verschwinden, wo Schienen liegen)
+  // ---- Gestaltete Bereiche auf dem Spielfeld (verschwinden, wo Schienen liegen) ----
   const scenery = [];
-  for (let i = 0; i < 260; i++) {
-    const x = (rand() * 2 - 1) * (FENCE.x + 6);
-    const z = (rand() * 2 - 1) * (FENCE.z + 4);
-    if (Math.hypot(x - pond.position.x, (z - pond.position.z) * 1.2) < 8) continue;
-    if (Math.abs(x - farm.position.x) < 7 && Math.abs(z - farm.position.z) < 6) continue;
-    if (Math.abs(x - pasture.x) < 7 && Math.abs(z - pasture.z) < 7) continue;
-    if (features.blocked(x, z, 2)) continue;
-    const kinds = ['rund', 'tanne', 'birke', 'apfel'];
-    const obj = rand() > 0.9 ? house(rand) : tree(kinds[Math.floor(rand() * kinds.length)], rand);
+  const free = (x, z, pad = 2) => !features.blocked(x, z, pad);
+  const put = (obj, x, z, rotY = 0) => {
     obj.position.set(x, 0, z);
-    obj.rotation.y = rand() * Math.PI * 2;
+    obj.rotation.y = rotY;
     obj.userData.baseScale = obj.scale.x;
     scene.add(obj);
     scenery.push(obj);
     tappable.push(obj);
+    return obj;
+  };
+  const occupied = []; // [x, z, r]: hier keine Einzelbäume oder Blumen
+  const isFree = (x, z, r) => occupied.every(([ox, oz, or]) => Math.hypot(ox - x, oz - z) > or + r);
+
+  // Dorf: Häuser im Kreis um den Platz (zum Platz gedreht), Kirche, Brunnen, Bänke, Laternen, Dorflinde
+  const V = LAYOUT.village;
+  occupied.push([V.x, V.z, 13]);
+  put(well(), V.x, V.z);
+  const ring = [[-150, 9], [-118, 9.5], [-62, 9.2], [-28, 9], [8, 9.4], [150, 9], [118, 9.5]];
+  ring.forEach(([deg, r], i) => {
+    const a = THREE.MathUtils.degToRad(deg);
+    const x = V.x + Math.cos(a) * r;
+    const z = V.z + Math.sin(a) * r * 0.85;
+    if (!free(x, z, 1.5)) return;
+    const h = house(rand, i % 3 === 1);
+    h.scale.setScalar(1.05);
+    // Haustür (lokal +z) zeigt zum Platz
+    put(h, x, z, Math.atan2(V.x - x, V.z - z));
+  });
+  {
+    const x = V.x + 7;
+    const z = V.z + 7.2;
+    if (free(x, z, 2)) put(church(), x, z, -0.25);
+  }
+  {
+    const linde = tree('rund', rand);
+    linde.scale.setScalar(1.35);
+    put(linde, V.x - 3.2, V.z - 2.6);
+  }
+  for (const [dx, dz, ry] of [[2.6, -3.4, 0.2], [-3.6, 2.8, 2.4]]) put(bench(), V.x + dx, V.z + dz, ry);
+  for (const [dx, dz] of [[4.6, 0.6], [-4.6, -0.6], [0.4, 4.4]]) put(lantern(), V.x + dx, V.z + dz);
+
+  // Bauernhof: Scheune mit Silo, Heuballen, Traktor
+  const F = LAYOUT.farm;
+  occupied.push([F.x, F.z, 10]);
+  const fb = barn();
+  fb.scale.setScalar(0.72);
+  fb.userData.kind = 'house';
+  fb.userData.clearR = 4.2;
+  const fbs = contactShadow(1, 0.3);
+  fbs.scale.set(3.6, 1, 2.8);
+  fb.add(fbs);
+  put(fb, F.x - 1, F.z - 4.8, 0.12);
+  for (const [dx, dz] of [[4.5, -2.5], [5.3, -0.8], [4.8, 2.4]]) put(hayBale(rand), F.x + dx, F.z + dz, rand() * 3);
+  put(tractor(), F.x - 3.6, F.z + 2.4, 0.6);
+  // Kleine Weide neben dem Hof mit grasenden Tieren
+  const paddockArea = { x: F.x + 11.5, z: F.z - 4.5, w: 3.2, d: 2.6 };
+  const paddock = new THREE.Group();
+  {
+    const { w, d } = paddockArea;
+    fenceLine(paddock, -w, -d, w, -d, rand);
+    fenceLine(paddock, -w, d, w, d, rand);
+    fenceLine(paddock, -w, -d, -w, d, rand);
+    fenceLine(paddock, w, -d, w, d, rand);
+  }
+  paddock.userData.kind = 'house';
+  paddock.userData.clearR = 4.6;
+  put(paddock, paddockArea.x, paddockArea.z);
+  occupied.push([paddockArea.x, paddockArea.z, 5]);
+  const farmAnimals = [];
+  for (const id of ['kuh', 'schwein', 'schaf']) {
+    const a = buildFigure(id);
+    a.scale.setScalar(1.7);
+    a.position.set(paddockArea.x + (rand() - 0.5) * 3, 0, paddockArea.z + (rand() - 0.5) * 2);
+    scene.add(a);
+    animated.push({ kind: 'graze', obj: a, area: { ...paddockArea, w: paddockArea.w - 0.6, d: paddockArea.d - 0.6 }, target: a.position.clone(), wait: rand() * 3 });
+    tappable.push(a);
+    farmAnimals.push(a);
   }
 
-  // Blumen und Grasbüschel (viele, deshalb als Instanzen)
-  const flowerCount = 5200;
-  const flowers = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(0.12, 0), new THREE.MeshStandardMaterial({ roughness: 0.8 }), flowerCount);
-  const tuftCount = 9000;
-  const tufts = new THREE.InstancedMesh(new THREE.ConeGeometry(0.1, 0.45, 4), mat('#5d9e48', 1), tuftCount);
-  const flowerColors = ['#ffffff', '#f5c53a', '#f08bb4', '#b58ad6', '#e5484d'].map((c) => new THREE.Color(c));
-  const props = [];
-  const m4 = new THREE.Matrix4();
-  const place = (list, count, y, scaleMin, scaleRange) => {
-    for (let i = 0; i < count; i++) {
-      const x = (rand() * 2 - 1) * (FENCE.x + 10);
-      const z = (rand() * 2 - 1) * (FENCE.z + 8);
-      if (features.blocked(x, z, 0.3)) continue;
-      list.push({ x, z, y, s: scaleMin + rand() * scaleRange, r: rand() * Math.PI });
+  // Felder (die Pflanzen kommen als Instanzen weiter unten)
+  for (const f of LAYOUT.fields) occupied.push([f.x, f.z, Math.max(f.w, f.d) / 2 + 1]);
+
+  // Waldstücke: dichte Gruppen, innen Tannen, außen Laubbäume
+  for (const w of LAYOUT.forests) {
+    occupied.push([w.x, w.z, w.r + 1]);
+    for (let i = 0; i < w.n; i++) {
+      const a = rand() * Math.PI * 2;
+      const rr = Math.sqrt(rand()) * w.r;
+      const x = w.x + Math.cos(a) * rr;
+      const z = w.z + Math.sin(a) * rr * 0.85;
+      if (!free(x, z, 1.2)) continue;
+      const inner = rr < w.r * 0.55;
+      const t = tree(inner ? 'tanne' : rand() > 0.3 ? 'rund' : 'birke', rand);
+      t.scale.multiplyScalar(inner ? 1.25 : 1.05);
+      put(t, x, z, rand() * Math.PI * 2);
+    }
+  }
+
+  // Obstwiese: Apfelbäume in Reihen
+  const O = LAYOUT.orchard;
+  occupied.push([O.x, O.z, 8]);
+  for (let i = 0; i < O.cols; i++) {
+    for (let j = 0; j < O.rows; j++) {
+      const x = O.x + (i - (O.cols - 1) / 2) * O.gap + (rand() - 0.5) * 0.4;
+      const z = O.z + (j - (O.rows - 1) / 2) * O.gap + (rand() - 0.5) * 0.4;
+      if (free(x, z, 1.5)) put(tree('apfel', rand), x, z, rand() * Math.PI * 2);
+    }
+  }
+
+  // Kleine Baumgruppen (3–5 Bäume) und Büsche – füllen freie Wiesen, ohne unruhig zu wirken
+  for (let i = 0; i < 40; i++) {
+    const cx = (rand() * 2 - 1) * (FENCE.x - 5);
+    const cz = (rand() * 2 - 1) * (FENCE.z - 5);
+    if (!free(cx, cz, 4) || !isFree(cx, cz, 5)) continue;
+    occupied.push([cx, cz, 4.5]);
+    const n = 2 + Math.floor(rand() * 3);
+    const kind = rand() < 0.5 ? 'rund' : rand() < 0.5 ? 'tanne' : 'birke';
+    for (let k = 0; k < n; k++) {
+      const x = cx + (rand() - 0.5) * 4.5;
+      const z = cz + (rand() - 0.5) * 4.0;
+      if (free(x, z, 1.5)) put(tree(rand() < 0.75 ? kind : 'rund', rand), x, z, rand() * Math.PI * 2);
+    }
+    for (let k = 0; k < 2; k++) {
+      const x = cx + (rand() - 0.5) * 6;
+      const z = cz + (rand() - 0.5) * 6;
+      if (free(x, z, 1)) put(bush(rand), x, z, rand() * Math.PI * 2);
+    }
+  }
+  for (let i = 0; i < 60; i++) {
+    const x = (rand() * 2 - 1) * (FENCE.x - 2);
+    const z = (rand() * 2 - 1) * (FENCE.z - 2);
+    if (!free(x, z, 1.5) || !isFree(x, z, 1.5)) continue;
+    put(bush(rand), x, z, rand() * Math.PI * 2);
+    occupied.push([x, z, 1.5]);
+  }
+
+  // Ein paar einzelne Bäume verteilt (nicht zu viele: Ruhe im Bild)
+  for (let i = 0; i < 70; i++) {
+    const x = (rand() * 2 - 1) * (FENCE.x - 2);
+    const z = (rand() * 2 - 1) * (FENCE.z - 2);
+    if (!free(x, z, 2.5) || !isFree(x, z, 3)) continue;
+    const k = rand();
+    put(tree(k < 0.45 ? 'rund' : k < 0.7 ? 'tanne' : k < 0.85 ? 'birke' : 'apfel', rand), x, z, rand() * Math.PI * 2);
+    occupied.push([x, z, 2.5]);
+  }
+
+  // Blumen in Gruppen (Blumenwiesen) – als Instanzen
+  const fg = flowerGeometries();
+  const flowerData = [];
+  const flowerColors = ['#ffffff', '#f5c53a', '#f08bb4', '#b58ad6', '#e5484d', '#7fb2f0'].map((c) => new THREE.Color(c));
+  const flowerTint = [];
+  const cluster = (cx, cz, rad, n, colorIdx) => {
+    for (let i = 0; i < n; i++) {
+      const a = rand() * Math.PI * 2;
+      const rr = Math.sqrt(rand()) * rad;
+      const x = cx + Math.cos(a) * rr;
+      const z = cz + Math.sin(a) * rr;
+      if (features.blocked(x, z, 0.4)) continue;
+      flowerData.push({ x, z, y: 0, s: 0.9 + rand() * 0.6, r: rand() * Math.PI * 2 });
+      flowerTint.push(flowerColors[rand() < 0.93 ? colorIdx : Math.floor(rand() * flowerColors.length)]);
     }
   };
-  const flowerData = [];
+  const anyColor = () => Math.floor(rand() * flowerColors.length);
+  for (const [x, z, r] of LAYOUT.meadows) {
+    for (let k = 0; k < 5; k++) cluster(x + (rand() - 0.5) * r * 1.2, z + (rand() - 0.5) * r * 1.2, r * 0.4, Math.round(r * 9), anyColor());
+  }
+  for (let i = 0; i < 90; i++) {
+    const x = (rand() * 2 - 1) * (FENCE.x + 8);
+    const z = (rand() * 2 - 1) * (FENCE.z + 6);
+    if (isFree(x, z, 1)) cluster(x, z, 0.8 + rand() * 0.9, 8 + Math.floor(rand() * 10), anyColor());
+  }
+  for (const [deg] of ring) {
+    const a = THREE.MathUtils.degToRad(deg);
+    cluster(V.x + Math.cos(a) * 6.6, V.z + Math.sin(a) * 6.6 * 0.85, 0.8, 7, anyColor()); // Vorgärten
+  }
+  const petals = new THREE.InstancedMesh(fg.petals, new THREE.MeshStandardMaterial({ roughness: 0.7, vertexColors: true, side: THREE.DoubleSide }), flowerData.length);
+  const centers = new THREE.InstancedMesh(fg.center, new THREE.MeshStandardMaterial({ roughness: 0.7, vertexColors: true, side: THREE.DoubleSide }), flowerData.length);
+  flowerTint.forEach((c, i) => petals.setColorAt(i, c));
+  petals.receiveShadow = centers.receiveShadow = true;
+
+  // Grasbüschel: an Ufern, Straßenrand, Zaun, um Bäume und Felder; dazu locker verteilt
   const tuftData = [];
-  place(flowerData, flowerCount, 0.12, 0.7, 0.8);
-  place(tuftData, tuftCount, 0.2, 0.6, 1.0);
-  flowers.count = flowerData.length; // ausgelassene Stellen (Fluss, Straße, Berg) nicht zeichnen
-  tufts.count = tuftData.length;
-  flowerData.forEach((_, i) => flowers.setColorAt(i, flowerColors[i % flowerColors.length]));
-  flowers.receiveShadow = true;
+  const tuftAt = (x, z, sc = 1) => {
+    if (features.blocked(x, z, 0.2)) return;
+    tuftData.push({ x, z, y: 0, s: (0.7 + rand() * 0.7) * sc, r: rand() * Math.PI });
+  };
+  for (const [pts, off] of [[features.riverS.pts, features.riverWidth / 2 + 1.6], [features.roadS.pts, features.roadWidth / 2 + 1.0]]) {
+    for (let i = 1; i < pts.length - 1; i++) {
+      const { x, z } = pts[i];
+      const dx = pts[i + 1].x - pts[i - 1].x;
+      const dz = pts[i + 1].z - pts[i - 1].z;
+      const L = Math.hypot(dx, dz) || 1;
+      for (const sd of [1, -1]) {
+        if (rand() < 0.45) continue;
+        const o = off + rand() * 1.2;
+        tuftAt(x + (-dz / L) * o * sd, z + (dx / L) * o * sd, 1.1);
+      }
+    }
+  }
+  for (const o of scenery) for (let k = 0; k < 4; k++) tuftAt(o.position.x + (rand() - 0.5) * 3.2, o.position.z + (rand() - 0.5) * 3.2);
+  for (const f of LAYOUT.fields) {
+    for (let k = 0; k < 24; k++) {
+      const a = rand() * Math.PI * 2;
+      tuftAt(f.x + Math.cos(a) * (f.w / 2 + 0.9), f.z + Math.sin(a) * (f.d / 2 + 0.9));
+    }
+  }
+  for (const [x1, z1, x2, z2] of [[-FENCE.x, -FENCE.z, FENCE.x, -FENCE.z], [-FENCE.x, FENCE.z, FENCE.x, FENCE.z], [-FENCE.x, -FENCE.z, -FENCE.x, FENCE.z], [FENCE.x, -FENCE.z, FENCE.x, FENCE.z]]) {
+    const L = Math.hypot(x2 - x1, z2 - z1);
+    for (let d = 0; d < L; d += 0.9) {
+      const t = d / L;
+      tuftAt(x1 + (x2 - x1) * t + (rand() - 0.5) * 1.2, z1 + (z2 - z1) * t + (rand() - 0.5) * 1.2, 1.2);
+    }
+  }
+  for (let i = 0; i < 1800; i++) tuftAt((rand() * 2 - 1) * (FENCE.x + 10), (rand() * 2 - 1) * (FENCE.z + 8));
+  const tufts = new THREE.InstancedMesh(tuftGeometry(), new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 1, vertexColors: true }), tuftData.length);
   tufts.receiveShadow = true;
-  scene.add(flowers, tufts);
-  props.push({ mesh: flowers, data: flowerData }, { mesh: tufts, data: tuftData });
+
+  const props = [{ mesh: petals, data: flowerData }, { mesh: centers, data: flowerData }, { mesh: tufts, data: tuftData },
+    ...cropProps(rand, (x, z) => features.blocked(x, z, 0.3))];
+  for (const { mesh } of props) scene.add(mesh);
+  const m4 = new THREE.Matrix4();
 
   // Wolken
   for (let i = 0; i < 18; i++) {
@@ -474,9 +715,10 @@ export function createLandscape() {
     const trackDist = distanceGrid(track.samples.map(([x, z]) => [x, z, 0, 4]));
     const fpDist = distanceGrid([...objects.footprints(), ...crossings.footprints(), ...(landRef?.extraFootprints ?? [])].map(([x, z, r]) => [x, z, r, 2]));
     for (const o of scenery) {
-      const r = o.userData.kind === 'house' ? 2.8 : 2.0;
+      const r = o.userData.clearR ?? (o.userData.kind === 'house' ? 2.8 : 2.0);
       o.visible = trackDist(o.position.x, o.position.z) > r && fpDist(o.position.x, o.position.z) > 1;
     }
+    for (const a of farmAnimals) a.visible = paddock.visible;
     for (const { mesh, data } of props) {
       data.forEach((d, i) => {
         const s = trackDist(d.x, d.z) > 1.3 && fpDist(d.x, d.z) > 0 ? d.s : 0;
@@ -527,8 +769,7 @@ export function createLandscape() {
   }
 
   // Was bei Schnee weiß wird
-  const snowables = [ground.material, tufts.material];
-  for (const [k, m] of matCache) if (/^#(5fae5a|4f9a4f|76b95e|3f8a4a)/.test(k)) snowables.push(m);
+  const snowables = [ground.material, tufts.material, ...leafMats.values()];
 
   // ---- Leistung: unbewegliche Teile zusammenfassen, Bäume auf dem Spielfeld als Instanzen zeichnen ----
   for (const a of animated) if (a.kind === 'cloud') mergeStatic(a.obj);

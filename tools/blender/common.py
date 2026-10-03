@@ -65,6 +65,26 @@ def prim(kind, co, scale=(1, 1, 1), rot=(0, 0, 0), color='#ffffff', seg=16, **kw
         bmesh.ops.create_cone(bm, cap_ends=True, segments=seg, radius1=1, radius2=kw.get('r2', 0), depth=1)
     elif kind == 'cyl':
         bmesh.ops.create_cone(bm, cap_ends=True, segments=seg, radius1=1, radius2=1, depth=1)
+    elif kind == 'torus':
+        # Ring in der xy-Ebene (Radius 1, Dicke kw['minor']), optional nur ein Bogen (kw['arc'] in Bogenmaß)
+        minor = kw.get('minor', 0.25)
+        arc = kw.get('arc', math.tau)
+        start = kw.get('start', 0.0)
+        ring = seg
+        tube = 8
+        verts = []
+        for i in range(ring + 1):
+            a = start + arc * i / ring
+            row = []
+            for j in range(tube):
+                b = math.tau * j / tube
+                r = 1 + minor * math.cos(b)
+                row.append(bm.verts.new((r * math.cos(a), r * math.sin(a), minor * math.sin(b))))
+            verts.append(row)
+        for i in range(ring):
+            for j in range(tube):
+                bm.faces.new((verts[i][j], verts[i + 1][j], verts[i + 1][(j + 1) % tube], verts[i][(j + 1) % tube]))
+        bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
     me = bpy.data.meshes.new(kind)
     bm.to_mesh(me)
     bm.free()
@@ -97,6 +117,8 @@ def paint(obj, fn):
     me.color_attributes.active_color = attr
 
 def join(objs, name):
+    for o in bpy.context.scene.objects:
+        o.select_set(False)
     for o in objs:
         o.select_set(True)
     bpy.context.view_layer.objects.active = objs[0]

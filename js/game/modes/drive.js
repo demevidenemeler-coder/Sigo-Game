@@ -181,8 +181,40 @@ export function createDriveMode(game) {
     loco.getWorldPosition(tmp);
     // Am Bahnhof schwenkt die Kamera auf die andere Seite: Zug vorne, Bahnsteig dahinter
     const dist = stoppedAt?.type === 'bahnhof' ? (stoppedAt.flipped ? 11 : -11) : 9;
-    game.cam.tPos.copy(tmp).addScaledVector(fwd, 3).addScaledVector(side, dist).add(new THREE.Vector3(0, stoppedAt ? 6 : 4.5, 0));
-    game.cam.tLook.copy(tmp).addScaledVector(fwd, -2).add(new THREE.Vector3(0, 1, 0));
+    // flach genug, dass oben Himmel und ferne Hügel zu sehen sind (Tiefe), hoch genug für den Überblick
+    game.cam.tPos.copy(tmp).addScaledVector(fwd, 3).addScaledVector(side, dist).add(new THREE.Vector3(0, stoppedAt ? 5.2 : 3.5, 0));
+    game.cam.tLook.copy(tmp).addScaledVector(fwd, -2).add(new THREE.Vector3(0, 1.3, 0));
+  }
+
+  // Freie Sicht beim Mitfahren: Bäume und Häuser zwischen Kamera und Zug schrumpfen weich weg
+  const faded = new Map(); // Objekt → Sichtbarkeit 0..1
+  function clearView(dt, on) {
+    const k = 1 - Math.exp(-dt * 6);
+    const cx = game.cam.pos.x;
+    const cz = game.cam.pos.z;
+    train.loco.getWorldPosition(tmp);
+    const dx = tmp.x - cx;
+    const dz = tmp.z - cz;
+    const L2 = dx * dx + dz * dz || 1;
+    for (const o of land.scenery) {
+      let want = 1;
+      if (on && o.visible) {
+        const t = ((o.position.x - cx) * dx + (o.position.z - cz) * dz) / L2;
+        if (t > -0.05 && t < 0.9) {
+          const px = cx + dx * t - o.position.x;
+          const pz = cz + dz * t - o.position.z;
+          const r = (o.userData.clearR ?? (o.userData.kind === 'house' ? 2.8 : 1.8)) + 1.2;
+          if (px * px + pz * pz < r * r) want = 0;
+        }
+      }
+      const cur = faded.get(o) ?? 1;
+      if (want === 1 && cur === 1) continue;
+      const next = Math.abs(want - cur) < 0.02 ? want : cur + (want - cur) * k;
+      const base = o.userData.baseScale ?? 1;
+      o.scale.setScalar(base * Math.max(0.001, next));
+      if (next === 1) faded.delete(o);
+      else faded.set(o, next);
+    }
   }
 
   // ---------- Zug-Geometrie entlang der Strecke ----------
@@ -517,6 +549,8 @@ export function createDriveMode(game) {
       else overviewCamera();
     },
     exit() {
+      for (const o of faded.keys()) o.scale.setScalar(o.userData.baseScale ?? 1);
+      faded.clear();
       controls.classList.add('hidden');
       envControls.classList.add('hidden');
       d.target = 0;
@@ -626,6 +660,7 @@ export function createDriveMode(game) {
 
       if (follow) followCamera();
       else overviewCamera();
+      clearView(dt, follow);
     },
     pointerDown(e) {
       down = { x: e.clientX, y: e.clientY };

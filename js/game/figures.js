@@ -508,6 +508,12 @@ function addMouth(g, id) {
   g.userData.mouthHolder = holder;
 }
 
+// Bewegliche Arme der Blender-Figuren (Lage wie bei den gebauten Figuren)
+const WAVE_ARMS = {
+  kind: { pos: [-0.15, 0.47, 0], color: '#e5484d', rz: 0.5 },
+  fahrer: { pos: [0, 0.4, 0.13], color: '#2f5c9e', rx: -0.3 },
+};
+
 export function buildFigure(id) {
   const g = new THREE.Group();
   const inner = new THREE.Group();
@@ -517,6 +523,17 @@ export function buildFigure(id) {
     const m = new THREE.Mesh(model, MODEL_MATERIAL);
     m.castShadow = true;
     inner.add(m);
+    // Winke-Arm bleibt beweglich (nicht im Modell)
+    const arm = WAVE_ARMS[id];
+    if (arm) {
+      const g2 = new THREE.Group();
+      g2.position.set(...arm.pos);
+      part(g2, geo('armSoft', () => new THREE.CapsuleGeometry(0.036, 0.16, 4, 10)), arm.color, 0, 0.1, 0);
+      part(g2, sphere(0.042), SKIN, 0, 0.22, 0);
+      g2.rotation.set(arm.rx ?? 0, 0, arm.rz ?? 0);
+      inner.add(g2);
+      inner.userData.waveArm = g2;
+    }
   } else {
     BUILD[id](inner);
   }

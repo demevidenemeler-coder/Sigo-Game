@@ -219,12 +219,21 @@ sw.js                      Offline-Speicher (neue Dateien in ASSETS eintragen)
 
 ## Modelle aus Blender
 
-Einige Figuren kommen als fertige Modelle aus Blender (zuerst die Kuh). Sie sind weicher und
-schöner als die aus Grundformen gebauten und zeichnen sich mit einem einzigen Aufruf.
+Alle Tiere, der Teddy und die Menschen (Kind, Oma, Papa, Lokführer) kommen als fertige Modelle aus Blender:
+weich verschmolzene Körper mit scharf abgesetzten Teilen (Augen, Schnauzen, Flecken …), ein Teil pro Figur.
+Winke-Arme bleiben im Spiel beweglich; Münder (Füttern) setzt das Spiel automatisch an die Schnauze.
 
-- Skripte: `tools/blender/` (z. B. `kuh.py`), gemeinsame Helfer in `common.py`
+- Skript: `tools/blender/tiere.py` (alle Figuren), Helfer in `tools/blender/common.py`
 - Erzeugen ohne Blender-Oberfläche: `pip install bpy==4.2.0` (Python 3.11), dann
-  `python3 tools/blender/kuh.py [vorschau.png]`
-- Ergebnis: `models/<id>.sigm` (kleines eigenes Format: Ecken, Normalen, Eckfarben, Dreiecke)
-- Laden: `js/game/models.js` (`MODEL_IDS`); fehlt ein Modell, wird die alte Figur gebaut
+  `python3 tools/blender/tiere.py` (alle) oder `python3 tools/blender/tiere.py kuh hund` (einzelne)
+- Ergebnis: `models/<id>.sigm` (kleines eigenes Format: Ecken, Normalen, Eckfarben, Dreiecke; zusammen ~1,8 MB)
+- Laden: `js/game/models.js` (`MODEL_IDS`); fehlt ein Modell, wird die alte, gebaute Figur benutzt
 - Neue Modelldateien in `sw.js` (ASSETS) eintragen, damit sie offline funktionieren
+
+## Landschaft
+
+- `js/game/groundPaint.js`: gemalter Boden (Wiesenflecken, Feldwege, Dorfplatz, Felder) + feine Halm-Struktur
+- `js/game/zones.js`: Lage der Bereiche (Dorf, Hof, Felder, Waldstücke, Obstwiese, Blumenwiesen) und ihre Bauteile
+- `js/game/workshopDeco.js`: Spielzimmer-Werkstatt (Teppich, Sonnenflecken, Spielsachen)
+- Alles auf dem Spielfeld verschwindet weiterhin, wo Schienen gemalt werden; beim Mitfahren schrumpfen
+  Bäume/Häuser zwischen Kamera und Zug weich weg.

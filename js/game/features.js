@@ -65,33 +65,39 @@ function ribbon(curve, width, y, material, offset = 0, uvLen = 4) {
 function mountain(m) {
   const g = new THREE.Group();
   g.position.set(m.x, 0, m.z);
-  const geo = new THREE.IcosahedronGeometry(1, 4);
+  // weicher, runder Berg (Zeichentrick-Stil): Wiese unten, Fels in der Mitte, Schneemütze oben
+  const geo = new THREE.SphereGeometry(1, 56, 28, 0, Math.PI * 2, 0, Math.PI * 0.62);
   const pos = geo.attributes.position;
   const colors = [];
-  const grass = new THREE.Color('#6fae55');
-  const rock = new THREE.Color('#a39b8e');
-  const snow = new THREE.Color('#f4f4f2');
+  const grass = new THREE.Color('#5c9946');
+  const meadow = new THREE.Color('#6caa4f');
+  const rock = new THREE.Color('#a8a093');
+  const snow = new THREE.Color('#f7f7f4');
   for (let i = 0; i < pos.count; i++) {
     const v = new THREE.Vector3().fromBufferAttribute(pos, i);
-    const n = 1 + 0.09 * Math.sin(v.x * 8 + m.x) * Math.cos(v.z * 7) + 0.07 * Math.sin(v.y * 10 + v.x * 3);
+    const n = 1 + 0.06 * Math.sin(v.x * 5 + m.x) * Math.cos(v.z * 4.5) + 0.04 * Math.sin(v.y * 7 + v.x * 3 + m.z);
     v.multiplyScalar(n);
     pos.setXYZ(i, v.x, v.y, v.z);
-    let c = grass.clone().lerp(rock, THREE.MathUtils.smoothstep(v.y, 0.55, 0.8));
-    c = c.lerp(snow, THREE.MathUtils.smoothstep(v.y, 0.92, 0.98));
+    // Schneegrenze leicht wellig
+    const wave = 0.04 * Math.sin(Math.atan2(v.z, v.x) * 5 + m.x);
+    let c = meadow.clone().lerp(grass, THREE.MathUtils.smoothstep(v.y, 0.1, 0.45));
+    c = c.lerp(rock, THREE.MathUtils.smoothstep(v.y, 0.5 + wave, 0.66 + wave));
+    c = c.lerp(snow, THREE.MathUtils.smoothstep(v.y, 0.9 + wave, 0.93 + wave));
     colors.push(c.r, c.g, c.b);
   }
   geo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
   geo.computeVertexNormals();
-  const hill = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 1, flatShading: true }));
+  const hill = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.95 }));
   hill.scale.set(m.r, m.h, m.r);
   hill.position.y = -m.h * 0.12;
   hill.castShadow = true;
   hill.receiveShadow = true;
   g.add(hill);
-  for (let i = 0; i < 6; i++) {
-    const a = (i / 6) * Math.PI * 2 + m.x;
-    const rr = m.r * 0.55;
-    const y = m.h * 0.62;
+  for (let i = 0; i < 10; i++) {
+    const a = (i / 10) * Math.PI * 2 + m.x;
+    const k = i % 2 ? 0.62 : 0.76;
+    const rr = m.r * k;
+    const y = m.h * Math.sqrt(1 - k * k) - m.h * 0.12 - 0.1; // auf der Bergoberfläche
     const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.16, 0.6, 6), new THREE.MeshStandardMaterial({ color: '#8a5a33' }));
     trunk.position.set(Math.cos(a) * rr, y, Math.sin(a) * rr);
     const crown = new THREE.Mesh(new THREE.ConeGeometry(0.6, 1.4, 8), new THREE.MeshStandardMaterial({ color: '#3f8a4a', roughness: 0.9 }));

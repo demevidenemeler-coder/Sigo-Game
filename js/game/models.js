@@ -3,7 +3,7 @@
 
 import * as THREE from 'three';
 
-export const MODEL_IDS = ['kuh'];
+export const MODEL_IDS = ['kuh', 'schwein', 'schaf', 'hund', 'katze', 'ente', 'pferd', 'huhn', 'hahn', 'hase', 'frosch', 'loewe', 'elefant', 'giraffe', 'pinguin', 'teddy', 'kind', 'oma', 'papa', 'fahrer'];
 
 const geometries = new Map();
 

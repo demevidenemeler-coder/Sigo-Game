@@ -137,7 +137,7 @@ export class Game {
       this.env.update(dt, this.cam.look, this.train.loco, this.services.soundsOn());
       this.weatherFx.update(dt, this.cam.look);
       this.sideTrain.update(dt);
-      this.renderer.toneMappingExposure = 1.05 - 0.4 * this.env.night;
+      this.renderer.toneMappingExposure = 0.98 - 0.36 * this.env.night;
       this.glow.style.opacity = (this.env.dusk * 0.42).toFixed(3);
     } else {
       this.glow.style.opacity = this.current === this.workshop ? ((this.sessionDusk ?? 0) * 0.4).toFixed(3) : 0;

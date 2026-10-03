@@ -6,6 +6,7 @@ import * as THREE from 'three';
 import { RoundedBoxGeometry } from '../../vendor/RoundedBoxGeometry.js';
 import { woodTexture } from './textures.js';
 import { mergeStatic } from './merge.js';
+import { modelGeometry, MODEL_MATERIAL } from './models.js';
 
 const mats = new Map();
 function mat(color, roughness = 0.6) {
@@ -510,7 +511,15 @@ function addMouth(g, id) {
 export function buildFigure(id) {
   const g = new THREE.Group();
   const inner = new THREE.Group();
-  BUILD[id](inner);
+  const model = modelGeometry(id);
+  if (model) {
+    // Blender-Modell: ein einziges Teil (weicher, schöner, und billiger zu zeichnen)
+    const m = new THREE.Mesh(model, MODEL_MATERIAL);
+    m.castShadow = true;
+    inner.add(m);
+  } else {
+    BUILD[id](inner);
+  }
   inner.rotation.y = -(TURN[id] ?? 0);
   g.add(inner);
   g.userData.figure = id;

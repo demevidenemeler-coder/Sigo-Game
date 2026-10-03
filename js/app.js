@@ -12,6 +12,7 @@ import { showVoiceStudio, PHRASE_KEYS, keys as recKeys } from './voiceStudio.js'
 import { defaultTrain, upgradeTrain } from './catalog.js';
 import { defaultTrackPoints } from './game/track.js';
 import { Game } from './game/game.js';
+import { preloadModels } from './game/models.js';
 
 const overlay = document.getElementById('overlay');
 let settings = loadSettings();
@@ -125,6 +126,7 @@ function sayText(text) {
 
 // ---------- Spiel ----------
 
+await preloadModels(); // Blender-Modelle (klein, kommen offline aus dem Speicher)
 const game = new Game({
   canvas: document.getElementById('scene'),
   ui: document.getElementById('ui'),

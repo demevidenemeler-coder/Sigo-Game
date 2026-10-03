@@ -216,3 +216,15 @@ sw.js                      Offline-Speicher (neue Dateien in ASSETS eintragen)
 - Landschaft selbst gestalten (Bäume, Häuser, Tiere setzen)
 - Eigene Fotos als Fahrgäste, selbst eingesprochene Laute
 - Weichen / zwei Züge (eher für ältere Kinder)
+
+## Modelle aus Blender
+
+Einige Figuren kommen als fertige Modelle aus Blender (zuerst die Kuh). Sie sind weicher und
+schöner als die aus Grundformen gebauten und zeichnen sich mit einem einzigen Aufruf.
+
+- Skripte: `tools/blender/` (z. B. `kuh.py`), gemeinsame Helfer in `common.py`
+- Erzeugen ohne Blender-Oberfläche: `pip install bpy==4.2.0` (Python 3.11), dann
+  `python3 tools/blender/kuh.py [vorschau.png]`
+- Ergebnis: `models/<id>.sigm` (kleines eigenes Format: Ecken, Normalen, Eckfarben, Dreiecke)
+- Laden: `js/game/models.js` (`MODEL_IDS`); fehlt ein Modell, wird die alte Figur gebaut
+- Neue Modelldateien in `sw.js` (ASSETS) eintragen, damit sie offline funktionieren

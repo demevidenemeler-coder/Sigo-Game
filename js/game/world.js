@@ -166,7 +166,7 @@ const GREENS = ['#5fae5a', '#4f9a4f', '#76b95e', '#3f8a4a', '#86c25a'];
 const appleMat = new THREE.MeshStandardMaterial({ color: '#e5484d', roughness: 0.4 });
 appleMat.userData.seasonColors = { fruehling: '#ffffff', sommer: '#e5484d', herbst: '#e5484d', winter: '#e5484d' };
 
-function tree(kind, rand) {
+export function tree(kind, rand) {
   const g = new THREE.Group();
   const trunkColor = kind === 'birke' ? '#ece8df' : '#8a5a33';
   add(g, new THREE.CylinderGeometry(0.13, 0.2, 1, 8), mat(trunkColor), 0, 0.5, 0);

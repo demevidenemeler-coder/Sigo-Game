@@ -255,7 +255,11 @@ Marktstand → Apfel hüpft; Briefkasten → Brief fliegt. Dazu Bäckerei, Wimpe
 Katze auf dem Dach und ein Hund, der den Zug anbellt.
 **Feuerwehr** neben dem Dorfbahnhof (rote Wache mit Schlauchturm und Blaulicht): Antippen → Tatütata, das Rolltor
 fährt hoch, das Feuerwehrauto (mit Feuerwehrmann) fährt mit Blaulicht heraus, die Leiter geht hoch, Wasser marsch –
-dann fährt alles wieder zurück. Die Zeige-Hand zeigt einmal auf die Wache, solange sie noch nie angetippt wurde.
+dann fährt alles wieder zurück.
+**Katze auf dem Baum:** Neben der Wache sitzt eine Katze auf einem Ast und miaut, wenn der Zug vorbeikommt. Katze, Baum oder
+Wache antippen → die Feuerwehr rückt aus, dreht die Leiter zur Katze, richtet sie auf und fährt sie aus; die Katze springt
+in den Korb, fährt mit herunter, springt ab und freut sich. Nach etwa 45 Sekunden klettert sie wieder hinauf (nochmal!).
+Die Zeige-Hand zeigt zuerst auf die Katze (bis sie einmal gerettet wurde), dann auf die Wache (bis sie einmal benutzt wurde).
 **Ententeich** neben dem Dorf (nah an der Strecke) mit Schilf, Seerosen, Steg und drei Enten.
 
 ## Tiere rufen sich zu

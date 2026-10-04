@@ -604,14 +604,17 @@ export function fireTruck() {
     const m = new THREE.MeshStandardMaterial({ color: '#3d7bff', emissive: '#2f6bff', emissiveIntensity: 0.3, roughness: 0.3 });
     lights.push(add(g, new THREE.SphereGeometry(0.1, 12, 8), m, s * 0.35, 1.5, 0.95));
   }
-  // Leiter (Pivot hinten oben), liegt flach nach vorne
+  // Drehkranz mit Leiter (Pivot hinten oben), liegt flach nach vorne
+  const turn = new THREE.Group();
+  turn.position.set(0, 1.42, -1.1);
+  g.add(turn);
   const ladder = new THREE.Group();
-  ladder.position.set(0, 1.42, -1.1);
   add(ladder, new THREE.CylinderGeometry(0.16, 0.18, 0.16, 14), metal, 0, -0.04, 0);
   for (const s of [-1, 1]) add(ladder, new THREE.BoxGeometry(0.05, 0.06, 2.3), metal, s * 0.2, 0.06, 1.1);
   for (let i = 0; i < 8; i++) add(ladder, new THREE.BoxGeometry(0.4, 0.03, 0.03), metal, 0, 0.06, 0.1 + i * 0.29);
   add(ladder, new THREE.BoxGeometry(0.5, 0.25, 0.3), red, 0, 0.12, 2.25); // Korb
-  g.add(ladder);
+  turn.add(ladder);
+  g.userData.turn = turn;
   g.userData.ladder = ladder;
   g.userData.lights = lights;
   g.userData.tip = new THREE.Vector3(0, 0.3, 2.35); // in Leiter-Koordinaten

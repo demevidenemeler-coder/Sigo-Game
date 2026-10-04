@@ -5,6 +5,7 @@ import * as THREE from 'three';
 import { buildFigure } from './figures.js';
 import { wave } from './trainModel.js';
 import { FIRE, fireTruck } from './zones.js';
+import { tree } from './world.js';
 
 const WAVE_DIST = 17;
 const COOLDOWN = 18;
@@ -35,6 +36,7 @@ export class VillageLife {
 
     this.makePets();
     this.makeFire();
+    this.makeCatTree();
 
     // Schaukeln (zwei Sitze am Gestell, auf einem sitzt der Teddy)
     this.swings = [];
@@ -141,7 +143,53 @@ export class VillageLife {
     truck.userData.tap = 'fire';
   }
 
-  // Tatütata: Tor auf, Auto fährt heraus, Leiter hoch, Wasser marsch – und alles wieder zurück
+  // ---------- Katze auf dem Baum (neben der Feuerwache) ----------
+  makeCatTree() {
+    const st = this.land.village.fire;
+    if (!st) return;
+    const T = new THREE.Vector3(-4.6, 0, 3.0).applyAxisAngle(new THREE.Vector3(0, 1, 0), st.rotation.y).add(st.position);
+    const t = tree('rund', () => 0.5);
+    t.scale.setScalar(1.7);
+    t.position.copy(T);
+    t.rotation.y = st.rotation.y + Math.PI;
+    // dicker Ast, auf dem die Katze sitzt (zeigt zur Feuerwache)
+    const branch = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.08, 1.0, 7), new THREE.MeshStandardMaterial({ color: '#8a5a33', roughness: 0.9 }));
+    branch.position.set(-0.55, 1.15, 0.15);
+    branch.rotation.set(0.25, 0, Math.PI / 2 - 0.35);
+    branch.castShadow = true;
+    t.add(branch);
+    t.userData.tap = 'cat';
+    this.land.scene.add(t);
+    this.land.tappable.push(t);
+    t.updateMatrixWorld(true);
+    const perch = new THREE.Vector3(-1.02, 1.3, 0.3).applyMatrix4(t.matrixWorld);
+    const fig = buildFigure('katze');
+    fig.scale.setScalar(1.4);
+    fig.userData.baseScale = 1.4;
+    fig.userData.tap = 'cat';
+    fig.position.copy(perch);
+    fig.rotation.y = st.rotation.y + Math.PI / 2;
+    this.land.scene.add(fig);
+    this.land.tappable.push(fig);
+    this.cat = { tree: t, fig, perch, state: 'stuck', meow: 4, downTime: 0, rescued: false };
+  }
+
+  tapCat() {
+    const c = this.cat;
+    const g = this.game;
+    g.services.animalCall('katze');
+    if (c.state === 'stuck') setTimeout(() => this.fireAlarm(), 700); // die Feuerwehr kommt!
+    else if (c.state === 'down') g.hop(c.fig);
+  }
+
+  // Was die Zeige-Hand zeigen soll (noch nie gerettet → Katze, Wache noch nie benutzt → Wache)
+  hintTarget() {
+    if (this.cat?.state === 'stuck' && !this.cat.rescued && this.cat.fig.visible) return this.cat.fig;
+    if (this.fire && !this.fire.used && this.fire.root.visible) return this.fire.st;
+    return null;
+  }
+
+  // Tatütata: Tor auf, Auto fährt heraus – Katze retten (falls sie oben sitzt) oder Wasser marsch – und alles zurück
   fireAlarm() {
     const f = this.fire;
     if (!f || f.busy) return;
@@ -150,21 +198,120 @@ export class VillageLife {
     const g = this.game;
     const { door } = FIRE;
     const { truck } = f;
-    const ladder = truck.userData.ladder;
-    const out = f.home + 3.0;
+    const rescue = this.cat?.state === 'stuck';
+    const out = f.home + 3.2;
     g.services.sfx('siren');
-    f.flash = 9.5;
+    f.flash = rescue ? 15 : 9.5;
     const step = (dur, fn, next) => g.tween(dur, fn, next);
+    const back = () => step(1.8, (t) => { truck.position.z = out - (out - f.home) * t * t * (3 - 2 * t); }, () =>
+      step(0.7, (t) => { f.door.position.y = (1 - t) * door.h * 0.95; f.door.scale.y = 0.15 + t * 0.85; }, () => {
+        f.busy = false;
+      }));
     step(0.7, (t) => { f.door.position.y = t * door.h * 0.95; f.door.scale.y = 1 - t * 0.85; }, () =>
-      step(1.6, (t) => { truck.position.z = f.home + (out - f.home) * (1 - (1 - t) ** 2); }, () =>
-        step(0.8, (t) => { ladder.rotation.x = -0.75 * t; }, () => {
-          this.spray(2.2);
-          setTimeout(() => step(0.8, (t) => { ladder.rotation.x = -0.75 * (1 - t); }, () =>
-            step(1.8, (t) => { truck.position.z = out - (out - f.home) * t * t * (3 - 2 * t); }, () =>
-              step(0.7, (t) => { f.door.position.y = (1 - t) * door.h * 0.95; f.door.scale.y = 0.15 + t * 0.85; }, () => {
-                f.busy = false;
-              }))), 2400);
-        })));
+      step(1.6, (t) => { truck.position.z = f.home + (out - f.home) * (1 - (1 - t) ** 2); }, () => {
+        if (rescue) this.rescueCat(back);
+        else this.waterShow(back);
+      }));
+  }
+
+  waterShow(done) {
+    const g = this.game;
+    const ladder = this.fire.truck.userData.ladder;
+    g.tween(0.8, (t) => { ladder.rotation.x = -0.75 * t; }, () => {
+      this.spray(2.2);
+      setTimeout(() => g.tween(0.8, (t) => { ladder.rotation.x = -0.75 * (1 - t); }, done), 2400);
+    });
+  }
+
+  // Leiter zur Katze drehen, aufrichten und ausfahren; Katze springt in den Korb, fährt mit herunter und springt ab
+  rescueCat(done) {
+    const g = this.game;
+    const c = this.cat;
+    const { truck } = this.fire;
+    const turn = truck.userData.turn;
+    const ladder = truck.userData.ladder;
+    c.state = 'rescue';
+    truck.updateMatrixWorld(true);
+    const target = truck.worldToLocal(c.perch.clone().add(new THREE.Vector3(0, -0.3, 0))).sub(turn.position);
+    const yaw = Math.atan2(target.x, target.z);
+    const h = Math.hypot(target.x, target.z);
+    const pitch = Math.atan2(target.y, h);
+    const ext = Math.max(1, Math.hypot(h, target.y) / 2.3);
+    const tipWorld = () => {
+      ladder.updateMatrixWorld(true);
+      return new THREE.Vector3(0, 0.3, 2.25).applyMatrix4(ladder.matrixWorld);
+    };
+    const pose = (k) => {
+      turn.rotation.y = yaw * Math.min(1, k * 2);
+      const r = Math.max(0, k * 2 - 1);
+      ladder.rotation.x = -pitch * r;
+      ladder.scale.z = 1 + (ext - 1) * r;
+    };
+    g.tween(2.0, (t) => pose(t), () => {
+      // Katze springt in den Korb
+      const from = c.fig.position.clone();
+      const to = tipWorld();
+      g.services.animalCall('katze');
+      g.tween(0.5, (t) => {
+        c.fig.position.lerpVectors(from, to, t);
+        c.fig.position.y += Math.sin(t * Math.PI) * 0.5;
+      }, () => {
+        g.tween(2.0, (t) => {
+          pose(1 - t);
+          c.fig.position.copy(tipWorld());
+        }, () => {
+          // abspringen neben das Auto
+          const from2 = c.fig.position.clone();
+          const to2 = new THREE.Vector3(-1.7, 0, 1.1).applyMatrix4(truck.matrixWorld);
+          to2.y = 0;
+          g.tween(0.6, (t) => {
+            c.fig.position.lerpVectors(from2, to2, t);
+            c.fig.position.y += Math.sin(t * Math.PI) * 0.6;
+          }, () => {
+            c.state = 'down';
+            c.rescued = true;
+            c.downTime = 0;
+            g.hop(c.fig);
+            g.services.sfx('sparkle');
+            setTimeout(() => g.services.animalCall('katze'), 300);
+            done();
+          });
+        });
+      });
+    });
+  }
+
+  // Nach einer Weile klettert die Katze wieder auf den Baum
+  updateCat(dt, time) {
+    const c = this.cat;
+    if (!c) return;
+    const vis = this.fire.root.visible;
+    c.tree.visible = vis;
+    c.fig.visible = vis;
+    if (c.state === 'stuck') {
+      c.fig.position.y = c.perch.y + Math.abs(Math.sin(time * 1.3)) * 0.02;
+      // ab und zu miauen, wenn der Zug in der Nähe ist
+      c.meow -= dt;
+      const lp = this.game.train.loco?.getWorldPosition(new THREE.Vector3());
+      if (c.meow <= 0 && lp && this.game.modeName === 'drive' && lp.distanceTo(c.perch) < 22) {
+        c.meow = 11 + Math.random() * 5;
+        this.game.services.animalCall('katze');
+        this.game.hop(c.fig);
+      }
+    } else if (c.state === 'down' && !this.fire.busy) {
+      c.downTime += dt;
+      if (c.downTime > 45) {
+        c.state = 'climb';
+        const from = c.fig.position.clone();
+        this.game.tween(1.2, (t) => {
+          c.fig.position.lerpVectors(from, c.perch, t);
+          c.fig.position.y += Math.sin(t * Math.PI) * 0.8;
+        }, () => {
+          c.state = 'stuck';
+          c.meow = 3;
+        });
+      }
+    }
   }
 
   // Wasserstrahl aus der Leiterspitze: Tropfen im Bogen nach vorne
@@ -206,6 +353,7 @@ export class VillageLife {
     const at = (x, y, z) => new THREE.Vector3(x, y, z).applyMatrix4(o.matrixWorld);
     if (kind === 'house') return this.visitor(o);
     if (kind === 'fire') return this.fireAlarm();
+    if (kind === 'cat') return this.tapCat();
     if (kind === 'church') {
       g.services.sfx('churchbell');
       setTimeout(() => g.services.animalCall('storch'), 2400);
@@ -380,6 +528,7 @@ export class VillageLife {
       f.truck.userData.lights.forEach((l, i) => {
         l.material.emissiveIntensity = f.flash > 0 ? (Math.sin(time * 14 + i * Math.PI) > 0 ? 3.5 : 0.2) : 0.3;
       });
+      this.updateCat(dt, time);
     }
     for (const s of this.swings) {
       s.pivot.visible = s.frame.visible && s.frame.scale.x > 0.5;

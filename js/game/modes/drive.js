@@ -453,9 +453,9 @@ export function createDriveMode(game) {
       if (x > 0 && x < window.innerWidth && y > 0 && y < window.innerHeight) return game.hint.tap(x, y);
     }
     // Steht der Zug in der Nähe der Feuerwache und wurde sie noch nie angetippt: auf die Wache zeigen
-    const fire = game.village?.fire;
-    if (fire && !fire.used && fire.root.visible && step % 2 === 1) {
-      const v = fire.st.getWorldPosition(new THREE.Vector3());
+    const target = game.village?.hintTarget?.();
+    if (target && step % 2 === 1) {
+      const v = target.getWorldPosition(new THREE.Vector3());
       v.y += 1.5;
       v.project(game.camera);
       const x = ((v.x + 1) / 2) * window.innerWidth;

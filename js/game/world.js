@@ -136,10 +136,26 @@ export function createWorkshop() {
 // ---------- Landschaft: Bausteine ----------
 
 // Laub: Eckfarben machen es unten/innen dunkler (wirkt plastisch, ohne teure Nachbearbeitung)
+// Jahreszeiten-Farben je Laub-Grundfarbe (Frühling frisch, Herbst bunt, Winter bereift)
+const SEASON_LEAF = {
+  '#5fae5a': { fruehling: '#7cc95e', herbst: '#e8902e', winter: '#c9d6cc' },
+  '#4f9a4f': { fruehling: '#6bbf5a', herbst: '#d0582a', winter: '#bfcfc4' },
+  '#76b95e': { fruehling: '#93d46a', herbst: '#f2c23a', winter: '#d2ddd2' },
+  '#3f8a4a': { fruehling: '#5aaa52', herbst: '#b8462a', winter: '#b9cabe' },
+  '#86c25a': { fruehling: '#9ed66a', herbst: '#e8b23a', winter: '#d6e0d4' },
+};
 const leafMats = new Map();
-function leafMat(color) {
-  if (!leafMats.has(color)) leafMats.set(color, new THREE.MeshStandardMaterial({ color, roughness: 0.85, vertexColors: true }));
-  return leafMats.get(color);
+function leafMat(color, tag = '') {
+  const key = color + tag;
+  if (!leafMats.has(key)) {
+    const m = new THREE.MeshStandardMaterial({ color, roughness: 0.85, vertexColors: true });
+    const sc = { sommer: color, ...(SEASON_LEAF[color] ?? {}) };
+    if (tag === 'tanne') Object.assign(sc, { fruehling: color, herbst: color, winter: color }); // Tannen bleiben grün
+    if (tag === 'apfel') Object.assign(sc, { fruehling: ['#f7c3d6', '#fbe3ec', '#f4b0c8'][leafMats.size % 3] }); // Apfelblüte
+    m.userData.seasonColors = sc;
+    leafMats.set(key, m);
+  }
+  return leafMats.get(key);
 }
 const leafGeo = new Map();
 function leaf(key, make) {
@@ -147,6 +163,8 @@ function leaf(key, make) {
   return leafGeo.get(key);
 }
 const GREENS = ['#5fae5a', '#4f9a4f', '#76b95e', '#3f8a4a', '#86c25a'];
+const appleMat = new THREE.MeshStandardMaterial({ color: '#e5484d', roughness: 0.4 });
+appleMat.userData.seasonColors = { fruehling: '#ffffff', sommer: '#e5484d', herbst: '#e5484d', winter: '#e5484d' };
 
 function tree(kind, rand) {
   const g = new THREE.Group();
@@ -155,9 +173,9 @@ function tree(kind, rand) {
   if (kind === 'birke') {
     for (const y of [0.3, 0.55, 0.8]) add(g, new THREE.BoxGeometry(0.1, 0.04, 0.3), mat('#3a3a3a'), 0, y, 0, false);
   }
-  const leafM = leafMat(GREENS[Math.floor(rand() * GREENS.length)]);
+  const leafM = leafMat(GREENS[Math.floor(rand() * GREENS.length)], kind === 'apfel' ? 'apfel' : '');
   if (kind === 'tanne') {
-    const dark = leafMat(rand() > 0.5 ? '#3f8a4a' : '#4a9450');
+    const dark = leafMat(rand() > 0.5 ? '#3f8a4a' : '#4a9450', 'tanne');
     for (let i = 0; i < 3; i++) add(g, leaf(`t${i}`, () => new THREE.ConeGeometry(0.95 - i * 0.24, 1.15, 9)), dark, 0, 1.2 + i * 0.62, 0);
   } else {
     add(g, leaf('r0', () => new THREE.SphereGeometry(0.88, 11, 8)), leafM, 0, 1.65, 0);
@@ -169,7 +187,7 @@ function tree(kind, rand) {
       for (let i = 0; i < 8; i++) {
         const a = (i / 8) * Math.PI * 2 + rand() * 0.4;
         const y = 1.3 + rand() * 0.8;
-        add(g, apple, mat('#e5484d', 0.4), Math.cos(a) * 0.86, y, Math.sin(a) * 0.86, false);
+        add(g, apple, appleMat, Math.cos(a) * 0.86, y, Math.sin(a) * 0.86, false);
       }
     }
   }
@@ -457,6 +475,7 @@ export function createLandscape() {
   // Dorf: Häuser im Kreis um den Platz (zum Platz gedreht), Kirche, Brunnen, Bänke, Laternen, Dorflinde
   const V = LAYOUT.village;
   const chimneys = [];
+  let churchObj = null;
   occupied.push([V.x, V.z, 13]);
   put(well(), V.x, V.z);
   const ring = [[-150, 9], [-118, 9.5], [-62, 9.2], [-28, 9], [8, 9.4], [150, 9], [118, 9.5]];
@@ -478,7 +497,7 @@ export function createLandscape() {
   {
     const x = V.x + 7;
     const z = V.z + 7.2;
-    if (free(x, z, 2)) put(church(), x, z, -0.25);
+    if (free(x, z, 2)) churchObj = put(church(), x, z, -0.25);
   }
   {
     const linde = tree('rund', rand);
@@ -799,7 +818,9 @@ export function createLandscape() {
   }
 
   // Was bei Schnee weiß wird
-  const snowables = [ground.material, tufts.material, ...leafMats.values()];
+  ground.material.userData.seasonColors = { fruehling: '#f2fff0', sommer: '#ffffff', herbst: '#f3e3bb', winter: '#e9eef0' };
+  tufts.material.userData.seasonColors = { fruehling: '#ffffff', sommer: '#ffffff', herbst: '#e8d391', winter: '#d9e2da' };
+  const snowables = [ground.material, tufts.material, ...leafMats.values(), appleMat];
 
   // ---- Leistung: unbewegliche Teile zusammenfassen, Bäume auf dem Spielfeld als Instanzen zeichnen ----
   for (const a of animated) if (a.kind === 'cloud') mergeStatic(a.obj);
@@ -807,6 +828,6 @@ export function createLandscape() {
   const keepSet = new Set([...scenery, ...tappable, ...animated.map((a) => a.obj), ...features.cars,
     track.group, objects.group, crossings.group, trainAnchor, ground]);
   mergeStatic(scene, (o) => keepSet.has(o) || o.isLight || o.isInstancedMesh, { cell: 90, dedupe: true });
-  landRef = { proxies, scene, sun, hemi: scene.userData.hemi, sky: skyMat, snowables, track, objects, features, crossings, trainAnchor, scenery, tappable, clearAroundTrack, setThin, animate, ground, animated, ambient, extraFootprints: [] };
+  landRef = { proxies, scene, sun, hemi: scene.userData.hemi, sky: skyMat, snowables, track, objects, features, crossings, trainAnchor, scenery, tappable, clearAroundTrack, setThin, animate, ground, animated, ambient, church: churchObj, extraFootprints: [] };
   return landRef;
 }

@@ -70,6 +70,20 @@ export class Ambient {
     this.birds.frustumCulled = false;
     scene.add(this.birds);
 
+    // Fallendes Laub (Herbst) bzw. Blütenblätter (Frühling): rund um den Blickpunkt
+    this.season = 'sommer';
+    this.look = new THREE.Vector3();
+    this.leafCount = 140;
+    const leafGeo = new THREE.PlaneGeometry(0.22, 0.16);
+    this.leaves = new THREE.InstancedMesh(leafGeo, new THREE.MeshStandardMaterial({ side: THREE.DoubleSide, roughness: 0.8 }), this.leafCount);
+    this.leaves.frustumCulled = false;
+    this.leaves.visible = false;
+    this.leafData = Array.from({ length: this.leafCount }, () => ({
+      x: (rand() - 0.5) * 50, y: rand() * 12, z: (rand() - 0.5) * 40, spin: rand() * 6, sway: rand() * 6, speed: 0.5 + rand() * 0.5,
+    }));
+    this.leafPalette = null;
+    scene.add(this.leaves);
+
     // Rauch aus Schornsteinen: Wölkchen steigen, wachsen und lösen sich auf
     this.chimneys = chimneys; // [{ obj, pos: Vector3 }]
     this.puffsPer = 4;
@@ -140,6 +154,32 @@ export class Ambient {
         }
       }
       this.birds.instanceMatrix.needsUpdate = true;
+    }
+
+    // Fallendes Laub / Blüten
+    const falling = this.season === 'herbst' || this.season === 'fruehling';
+    this.leaves.visible = falling;
+    if (falling) {
+      if (this.leafPalette !== this.season) {
+        this.leafPalette = this.season;
+        const cols = this.season === 'herbst' ? ['#e8902e', '#d0582a', '#f2c23a', '#b8462a', '#a8703f'] : ['#f7c3d6', '#ffffff', '#fbe3ec', '#f4b0c8'];
+        this.leafData.forEach((_, i) => this.leaves.setColorAt(i, new THREE.Color(cols[i % cols.length])));
+        this.leaves.instanceColor.needsUpdate = true;
+      }
+      const L = this.look;
+      this.leafData.forEach((d, i) => {
+        d.y -= dt * d.speed;
+        if (d.y < 0.05) {
+          d.y = 9 + Math.random() * 4;
+          d.x = (Math.random() - 0.5) * 50;
+          d.z = (Math.random() - 0.5) * 40;
+        }
+        const x = L.x + d.x + Math.sin(time * 0.9 + d.sway) * 0.8;
+        const z = L.z + d.z + Math.cos(time * 0.7 + d.sway) * 0.5;
+        q.setFromEuler(e.set(time * 1.3 + d.spin, d.spin, Math.sin(time * 2 + d.sway) * 0.8));
+        this.leaves.setMatrixAt(i, m.compose(p.set(x, d.y, z), q, s.set(1, 1, 1)));
+      });
+      this.leaves.instanceMatrix.needsUpdate = true;
     }
 
     // Schornsteinrauch

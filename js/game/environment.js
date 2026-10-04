@@ -113,6 +113,17 @@ export class Environment {
     this.weather = w;
   }
 
+  // Jahreszeit: Laub, Gras und Boden bekommen ihre Farben; im Winter bleibt etwas Schnee liegen
+  setSeason(name) {
+    this.season = name;
+    for (const e of this.snowables) {
+      const sc = e.m.userData.seasonColors;
+      if (sc?.[name]) e.base.set(sc[name]);
+    }
+    if (name === 'winter') this.snowCover = Math.max(this.snowCover, 0.75);
+    this.land.ambient.season = name;
+  }
+
   setTunnel(inside) {
     this.tunnelTarget = inside ? 1 : 0;
   }
@@ -136,7 +147,8 @@ export class Environment {
     // Wetterfolgen: Schnee bleibt liegen und schmilzt langsam (bei Regen schneller); Schmelzwasser macht nass
     if (this.weather === 'schnee') this.snowCover = Math.min(1, this.snowCover + dt / 18);
     else {
-      const melt = Math.min(this.snowCover, dt / (this.weather === 'regen' ? 15 : 40));
+      const floor = this.season === 'winter' ? 0.75 : 0; // im Winter bleibt immer etwas Schnee liegen
+      const melt = Math.min(Math.max(0, this.snowCover - floor), dt / (this.weather === 'regen' ? 15 : 40));
       this.snowCover -= melt;
       this.wet = Math.min(1, this.wet + melt * 0.9);
     }

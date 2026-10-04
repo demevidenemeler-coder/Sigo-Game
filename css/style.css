@@ -463,3 +463,86 @@ body[data-screen="settings"] #parent-btn { display: none; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; }
 }
+
+/* ---------- Entdecker-Album ---------- */
+.album-btn {
+  position: fixed;
+  top: calc(12px + env(safe-area-inset-top));
+  right: calc(66px + env(safe-area-inset-right));
+  width: min(15vmin, 84px);
+  aspect-ratio: 1;
+  border-radius: 26%;
+  background: var(--tile);
+  box-shadow: 0 5px 14px var(--shadow);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 6;
+}
+.album-btn.hidden { display: none; }
+.album-btn .album-icon { font-family: var(--emoji); font-size: min(7vmin, 40px); line-height: 1; }
+.album-btn .album-count { font-size: min(2.6vmin, 15px); font-weight: 700; color: #7a5a3a; margin-top: 2px; }
+.album-btn.bump { animation: albumBump 0.6s ease; }
+@keyframes albumBump { 0% { transform: scale(1); } 40% { transform: scale(1.35) rotate(-8deg); } 100% { transform: scale(1); } }
+.sticker-fly {
+  position: fixed;
+  width: min(22vmin, 140px);
+  transform: translate(-50%, -50%) scale(0.4);
+  transition: left 0.8s cubic-bezier(.5, 0, .4, 1), top 0.8s cubic-bezier(.5, 0, .4, 1), transform 0.6s ease, opacity 0.8s;
+  pointer-events: none;
+  z-index: 30;
+  filter: drop-shadow(0 6px 10px rgba(0,0,0,0.25));
+}
+.album {
+  position: fixed;
+  inset: 0;
+  background: rgba(40, 30, 20, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 25;
+  padding: 16px;
+}
+.album-page {
+  position: relative;
+  background: #fff8ec;
+  border-radius: 28px;
+  box-shadow: 0 16px 40px rgba(0,0,0,0.3);
+  padding: min(4vmin, 28px);
+  max-width: 980px;
+  width: 100%;
+  max-height: 92vh;
+  overflow: auto;
+  border: 6px solid #e8c48a;
+}
+.album-title { text-align: center; font-size: min(6vmin, 34px); font-weight: 800; color: #7a5a3a; margin-bottom: 12px; letter-spacing: 0.05em; }
+.album-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: min(12vmin, 64px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--tile);
+  box-shadow: 0 4px 10px var(--shadow);
+  font-size: min(6vmin, 30px);
+}
+.album-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: min(2.5vmin, 16px); }
+.album-card {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 20px;
+  background: #efe3cf;
+  box-shadow: inset 0 0 0 3px #e2cfae;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.album-card img { width: 92%; }
+.album-card:not(.found) img { filter: brightness(0) opacity(0.22); }
+.album-card.found { background: #fffdf7; box-shadow: 0 4px 10px var(--shadow), inset 0 0 0 3px #f2c86b; }
+.album-card.wiggle { animation: albumBump 0.5s ease; }
+.album-where { position: absolute; bottom: 6%; right: 8%; font-family: var(--emoji); font-size: min(5vmin, 28px); opacity: 0.85; }
+@media (max-aspect-ratio: 1/1) { .album-grid { grid-template-columns: repeat(3, 1fr); } }

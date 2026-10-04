@@ -1,6 +1,6 @@
 // Offline-Unterstützung: Mit Internet wird immer die neueste Fassung geladen (und gespeichert),
 // ohne Internet die gespeicherte. Neue Dateien in ASSETS eintragen.
-const VERSION = 'sigo-v16';
+const VERSION = 'sigo-v17';
 const ASSETS = [
   './',
   'index.html',
@@ -45,6 +45,7 @@ const ASSETS = [
   'js/game/zones.js',
   'js/game/ambient.js',
   'js/game/beams.js',
+  'js/game/discover.js',
   'js/game/groundPaint.js',
   'models/kuh.sigm',
   'models/schwein.sigm',
@@ -66,6 +67,16 @@ const ASSETS = [
   'models/oma.sigm',
   'models/papa.sigm',
   'models/fahrer.sigm',
+  'models/fuchs.sigm',
+  'models/igel.sigm',
+  'models/eichhoernchen.sigm',
+  'models/storch.sigm',
+  'models/fisch.sigm',
+  'models/maulwurf.sigm',
+  'models/reh.sigm',
+  'models/eule.sigm',
+  'models/schnecke.sigm',
+  'models/biber.sigm',
   'js/animalSynth.js',
   'js/recordings.js',
   'js/voiceStudio.js',

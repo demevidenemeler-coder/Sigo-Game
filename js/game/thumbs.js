@@ -20,6 +20,20 @@ const VIEWS = {
 function objectFor(kind, id) {
   if (kind === 'parts') return { obj: buildCar(newCar(id)), view: 'car' };
   if (kind === 'cargo') return { obj: buildFigure(id), view: 'figure' };
+  if (kind === 'album') {
+    // Album: Tier auf gleiche Bildgröße gebracht (Schnecke so groß wie Storch), leicht zur Kamera gedreht
+    const f = buildFigure(id);
+    f.rotation.y = -0.5;
+    const box = new THREE.Box3().setFromObject(f);
+    const size = box.getSize(new THREE.Vector3());
+    const k = 0.95 / Math.max(size.x, size.y, size.z);
+    const g = new THREE.Group();
+    f.scale.setScalar(k);
+    const c = box.getCenter(new THREE.Vector3()).multiplyScalar(k);
+    f.position.set(-c.x, 0.4 - c.y, -c.z);
+    g.add(f);
+    return { obj: g, view: 'figure' };
+  }
   if (kind === 'food') return { obj: buildFood(id), view: 'food' };
   if (kind === 'wheel') return { obj: buildWheelPreview(id), view: 'wheel' };
   if (kind === 'build') return { obj: buildTrackObjectPreview(id), view: 'build' };

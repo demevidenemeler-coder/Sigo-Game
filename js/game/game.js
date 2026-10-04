@@ -15,6 +15,7 @@ import { createBedroom } from './bedroom.js';
 import { WeatherFx } from './weatherFx.js';
 import { Hint } from './hint.js';
 import { SideTrain } from './sideTrain.js';
+import { Discoveries } from './discover.js';
 
 const MODE_ICONS = { workshop: '🛠️', wash: '🧽', draw: '🛤️', drive: '🚂' };
 const SUN_OFFSET = new THREE.Vector3(12, 24, 14);
@@ -87,6 +88,7 @@ export class Game {
     this.modeName = null;
 
     this.buildModeBar();
+    this.discover = new Discoveries(this); // Entdecker-Album
     this.bindPointer();
     this.resize();
     window.addEventListener('resize', () => this.resize());
@@ -136,8 +138,10 @@ export class Game {
       this.land.animate(dt, this.time);
       this.env.update(dt, this.cam.look, this.train.loco, this.services.soundsOn());
       this.land.ambient.night = this.env.night;
+      this.land.ambient.look.copy(this.cam.look);
       this.weatherFx.update(dt, this.cam.look);
       this.sideTrain.update(dt);
+      this.discover.update(dt, this.time);
       this.renderer.toneMappingExposure = 0.98 - 0.36 * this.env.night;
       this.glow.style.opacity = (this.env.dusk * 0.42).toFixed(3);
     } else {
@@ -253,12 +257,21 @@ export class Game {
     this.tweens.push({ t: 0, dur, fn, done });
   }
 
+  // Jahreszeit: 'auto' (nach Kalender) oder fest
+  setSeason(choice = 'auto') {
+    const month = new Date().getMonth(); // 0 = Januar
+    const auto = [2, 3, 4].includes(month) ? 'fruehling' : [5, 6, 7].includes(month) ? 'sommer' : [8, 9, 10].includes(month) ? 'herbst' : 'winter';
+    this.season = choice === 'auto' ? auto : choice;
+    this.env.setSeason(this.season);
+  }
+
   setMode(name, { silent = false } = {}) {
     if (this.modeName === name) return;
     this.hint?.hide();
     this.mode?.exit();
     this.modeName = name;
     this.mode = this.modes[name];
+    this.discover?.onMode(name);
     this.modeBar.querySelectorAll('button').forEach((b) => b.classList.toggle('active', b.dataset.mode === name));
     this.mode.enter();
     if (!silent) this.services.say(this.services.t(name));

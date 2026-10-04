@@ -534,8 +534,10 @@ export function buildFigure(id) {
       inner.add(g2);
       inner.userData.waveArm = g2;
     }
-  } else {
+  } else if (BUILD[id]) {
     BUILD[id](inner);
+  } else {
+    part(inner, sphere(0.15), '#c9a06b', 0, 0.15, 0); // Modell fehlt (z. B. Download kaputt): kleiner Platzhalter
   }
   inner.rotation.y = -(TURN[id] ?? 0);
   g.add(inner);

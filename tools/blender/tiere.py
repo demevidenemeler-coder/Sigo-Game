@@ -508,6 +508,189 @@ def fahrer():
 
 ANIMALS.update({'kind': kind, 'oma': oma, 'papa': papa, 'fahrer': fahrer})
 
+
+# ---------- Entdecker-Tiere (versteckt in der Landschaft, für das Album) ----------
+
+def fuchs():
+    F, W, D = '#ee7d2f', '#fff6ec', '#3a2a22'
+    xs, ys = (0.12, -0.12), (0.06, -0.06)
+    parts = [body('fuchs', [
+        ('sphere', (0, 0, 0.3), (0.22, 0.11, 0.11), E),
+        ('sphere', (0.22, 0, 0.42), (0.12, 0.11, 0.11), E),
+        ('cone', (0.36, 0, 0.4), (0.06, 0.05, 0.13), (0, math.pi / 2, 0)),
+        *legs(xs, ys, 0.24, 0.032, 0.0),
+    ], F)]
+    parts.append(prim('sphere', (0.3, 0, 0.37), (0.08, 0.075, 0.045), color=W, seg=14))
+    parts.append(prim('sphere', (0.43, 0, 0.405), (0.02, 0.024, 0.02), color=D, seg=10))
+    parts += eyes(0.31, 0.055, 0.46, 0.022)
+    for s in (1, -1):
+        parts.append(prim('cone', (0.2, s * 0.065, 0.56), (0.05, 0.03, 0.09), rot=(-s * 0.2, 0, 0), color=F, seg=10))
+        parts.append(prim('cone', (0.205, s * 0.065, 0.555), (0.03, 0.015, 0.06), rot=(-s * 0.2, 0, 0), color=D, seg=8))
+    for x in xs:
+        for y in ys:
+            parts.append(prim('cyl', (x, y, 0.04), (0.035, 0.035, 0.08), color=D, seg=8))
+    parts.append(prim('sphere', (-0.3, 0, 0.38), (0.15, 0.08, 0.08), rot=(0, 0.6, 0), color=F, seg=16))
+    parts.append(prim('sphere', (-0.42, 0, 0.47), (0.06, 0.055, 0.055), color=W, seg=12))
+    return parts
+
+
+def igel():
+    SP, FACE, D = '#7a5a40', '#e9c9a0', '#2a1d14'
+    parts = [prim('sphere', (0.02, 0, 0.13), (0.17, 0.14, 0.12), color='#c49a72', seg=20)]
+    sp = blob('stacheln', [('sphere', (-0.02, 0, 0.15), (0.17, 0.15, 0.13), E)])
+    paint(sp, lambda p, n: SP)
+    parts.append(sp)
+    for i in range(70):
+        a = i * 2.39996
+        zt = 0.08 + 0.92 * (i + 0.5) / 70  # gleichmäßig über die obere Halbkugel
+        r = math.sqrt(max(0.0, 1 - zt * zt))
+        n = Vector((math.cos(a) * r, math.sin(a) * r, zt))
+        if n.x > 0.5:
+            continue  # Gesicht frei lassen
+        pos = (-0.02 + n.x * 0.17, n.y * 0.15, 0.15 + n.z * 0.13)
+        rot = Vector((0, 0, 1)).rotation_difference(n).to_euler()
+        parts.append(prim('cone', (pos[0] + n.x * 0.03, pos[1] + n.y * 0.03, pos[2] + n.z * 0.03), (0.024, 0.024, 0.08), rot=tuple(rot), color='#5a3f2c', seg=6))
+    parts.append(prim('sphere', (0.15, 0, 0.1), (0.08, 0.07, 0.06), color=FACE, seg=14))
+    parts.append(prim('sphere', (0.23, 0, 0.105), (0.018, 0.018, 0.018), color=D, seg=8))
+    parts += eyes(0.18, 0.04, 0.13, 0.015)
+    return parts
+
+
+def eichhoernchen():
+    F, W, D = '#c4622d', '#f6e3cc', '#3a2a22'
+    parts = [body('eichhoernchen', [
+        ('sphere', (0, 0, 0.16), (0.09, 0.08, 0.12), E),
+        ('sphere', (0.06, 0, 0.3), (0.075, 0.07, 0.07), E),
+    ], F)]
+    parts.append(prim('sphere', (0.04, 0, 0.15), (0.06, 0.06, 0.08), color=W, seg=14))
+    parts.append(prim('sphere', (0.13, 0, 0.29), (0.012, 0.015, 0.012), color=D, seg=8))
+    parts += eyes(0.11, 0.04, 0.32, 0.016)
+    for s in (1, -1):
+        parts.append(prim('cone', (0.04, s * 0.04, 0.39), (0.022, 0.015, 0.05), color=F, seg=8))
+        parts.append(prim('sphere', (0.08, s * 0.04, 0.2), (0.02, 0.018, 0.035), color=F, seg=8))
+    parts.append(prim('sphere', (0.1, 0, 0.2), (0.025, 0.025, 0.025), color='#8a5a33', seg=10))  # Nuss
+    parts.append(prim('torus', (-0.11, 0, 0.22), (0.12, 0.12, 0.12), rot=(math.pi / 2, 0, 0), color=F, seg=14, minor=0.42, arc=math.pi * 1.1, start=-math.pi * 0.55))
+    return parts
+
+
+def storch():
+    W, BLK, RED = '#fbfbf8', '#26262a', '#e5533d'
+    parts = [body('storch', [
+        ('sphere', (0, 0, 0.5), (0.17, 0.1, 0.11), E),
+        ('cyl', (0.11, 0, 0.66), (0.03, 0.03, 0.22), (0, 0.4, 0)),
+        ('sphere', (0.16, 0, 0.78), (0.055, 0.05, 0.05), E),
+    ], W)]
+    for s in (1, -1):
+        parts.append(prim('sphere', (-0.04, s * 0.085, 0.5), (0.15, 0.03, 0.07), rot=(0, 0.15, 0), color=BLK, seg=14))
+        parts.append(prim('cyl', (0.0, s * 0.04, 0.2), (0.012, 0.012, 0.4), color=RED, seg=6))
+        parts.append(prim('sphere', (0.03, s * 0.04, 0.01), (0.04, 0.025, 0.008), color=RED, seg=8))
+    parts.append(prim('cone', (0.29, 0, 0.77), (0.022, 0.018, 0.2), rot=(0, math.pi / 2 + 0.15, 0), color=RED, seg=8))
+    parts += eyes(0.19, 0.035, 0.8, 0.014)
+    parts.append(prim('cone', (-0.19, 0, 0.5), (0.05, 0.04, 0.1), rot=(0, -math.pi / 2, 0), color=BLK, seg=8))
+    return parts
+
+
+def fisch():
+    B, B2, FIN = '#3fa9e0', '#9bd7f5', '#f5b23a'
+    parts = [body('fisch', [
+        ('sphere', (0, 0, 0), (0.16, 0.06, 0.1), E),
+    ], B)]
+    parts.append(prim('sphere', (0.02, 0, -0.03), (0.12, 0.05, 0.06), color=B2, seg=14))
+    parts.append(prim('cone', (-0.2, 0, 0), (0.07, 0.015, 0.09), rot=(0, math.pi / 2, 0), color=FIN, seg=8))
+    parts.append(prim('cone', (0.0, 0, 0.11), (0.06, 0.012, 0.05), rot=(0, -0.3, 0), color=FIN, seg=8))
+    parts += eyes(0.1, 0.045, 0.025, 0.016)
+    for k in range(3):
+        parts.append(prim('sphere', (-0.03 + k * 0.05, 0.055, 0.0), (0.012, 0.006, 0.05), color='#2a86c0', seg=6))
+    return parts
+
+
+def maulwurf():
+    F, PINK = '#3d3a44', '#f4a9b8'
+    parts = [prim('sphere', (0, 0, 0.0), (0.22, 0.22, 0.09), color='#7a5236', seg=18)]  # Erdhügel
+    parts.append(body('maulwurf', [('sphere', (0, 0, 0.12), (0.09, 0.085, 0.1), E)], F))
+    parts.append(prim('sphere', (0.085, 0, 0.13), (0.03, 0.03, 0.025), color=PINK, seg=10))
+    for s in (1, -1):
+        parts.append(prim('sphere', (0.06, s * 0.045, 0.18), (0.012, 0.012, 0.012), color='#111111', seg=8))
+        parts.append(prim('sphere', (0.06, s * 0.09, 0.08), (0.035, 0.035, 0.012), rot=(s * 0.4, 0, 0), color=PINK, seg=10))  # Schaufelhände
+    parts.append(prim('sphere', (0.03, 0, 0.21), (0.03, 0.06, 0.012), color='#f5c53a', seg=10))  # Bauarbeiterhelm-Rand
+    parts.append(prim('sphere', (0.0, 0, 0.215), (0.06, 0.06, 0.035), color='#f5c53a', seg=12))
+    return parts
+
+
+def reh():
+    F, W, D = '#b9773f', '#f7ead6', '#3a2a22'
+    xs, ys = (0.12, -0.12), (0.055, -0.055)
+    parts = [body('reh', [
+        ('sphere', (0, 0, 0.45), (0.2, 0.1, 0.1), E),
+        ('cyl', (0.17, 0, 0.58), (0.04, 0.04, 0.2), (0, 0.35, 0)),
+        ('sphere', (0.23, 0, 0.7), (0.07, 0.06, 0.065), E),
+        ('sphere', (0.3, 0, 0.67), (0.05, 0.04, 0.04), E),
+        *legs(xs, ys, 0.38, 0.022, 0.0),
+    ], F)]
+    for (x, z, y) in [(0.0, 0.5, 0.09), (-0.08, 0.47, 0.09), (0.06, 0.45, 0.095), (0.0, 0.5, -0.09), (-0.09, 0.46, -0.09)]:
+        parts.append(prim('sphere', (x, y, z), (0.016, 0.01, 0.016), color=W, seg=8))  # Tupfen
+    parts.append(prim('sphere', (0.345, 0, 0.67), (0.016, 0.018, 0.015), color=D, seg=8))
+    parts += eyes(0.27, 0.045, 0.72, 0.02)
+    for s in (1, -1):
+        parts.append(prim('sphere', (0.2, s * 0.07, 0.77), (0.022, 0.045, 0.014), rot=(s * 0.5, 0, 0), color=F, seg=10))
+    parts.append(prim('sphere', (-0.2, 0, 0.5), (0.03, 0.025, 0.035), color=W, seg=8))
+    parts += hooves(xs, ys, 0.024, D, 0.04)
+    return parts
+
+
+def eule():
+    F, F2, BEAK, EYE = '#8a6a4a', '#d9c3a1', '#f2a02f', '#ffe08a'
+    parts = [body('eule', [
+        ('sphere', (0, 0, 0.17), (0.12, 0.12, 0.16), E),
+        ('sphere', (0, 0, 0.32), (0.11, 0.11, 0.09), E),
+    ], F)]
+    parts.append(prim('sphere', (0.05, 0, 0.15), (0.08, 0.09, 0.11), color=F2, seg=16))
+    for s in (1, -1):
+        parts.append(prim('sphere', (0.085, s * 0.045, 0.33), (0.025, 0.045, 0.045), color='#ffffff', seg=14))
+        parts.append(prim('sphere', (0.1, s * 0.045, 0.33), (0.018, 0.03, 0.03), color=EYE, seg=12))
+        parts.append(prim('sphere', (0.115, s * 0.045, 0.33), (0.01, 0.018, 0.018), color=DARK, seg=10))
+        parts.append(prim('cone', (0.0, s * 0.07, 0.42), (0.03, 0.02, 0.06), rot=(-s * 0.3, 0, 0), color=F, seg=8))
+        parts.append(prim('sphere', (-0.01, s * 0.115, 0.18), (0.06, 0.02, 0.1), color='#6e523a', seg=12))
+        parts.append(prim('sphere', (0.04, s * 0.04, 0.01), (0.03, 0.02, 0.01), color=BEAK, seg=8))
+    parts.append(prim('cone', (0.115, 0, 0.3), (0.016, 0.014, 0.04), rot=(0, math.pi / 2 + 0.5, 0), color=BEAK, seg=8))
+    return parts
+
+
+def schnecke():
+    B, SH, SH2 = '#b8d97a', '#d98a4a', '#f2c08a'
+    parts = [body('schnecke', [
+        ('sphere', (0.02, 0, 0.035), (0.16, 0.05, 0.035), E),
+        ('sphere', (0.14, 0, 0.08), (0.04, 0.035, 0.05), E),
+    ], B)]
+    parts.append(prim('sphere', (-0.03, 0, 0.12), (0.09, 0.06, 0.09), color=SH, seg=18))
+    parts.append(prim('torus', (-0.03, 0, 0.12), (0.05, 0.05, 0.05), rot=(math.pi / 2, 0, 0), color=SH2, seg=16, minor=0.25))
+    parts.append(prim('sphere', (-0.03, 0.0, 0.12), (0.02, 0.065, 0.02), color=SH2, seg=10))
+    for s in (1, -1):
+        parts.append(prim('cyl', (0.16, s * 0.02, 0.15), (0.006, 0.006, 0.06), rot=(-s * 0.3, 0.2, 0), color=B, seg=6))
+        parts.append(prim('sphere', (0.168, s * 0.03, 0.18), (0.014, 0.014, 0.014), color=DARK, seg=8))
+    return parts
+
+
+def biber():
+    F, F2, TAIL, TEETH = '#8a5a33', '#a8754a', '#5a4030', '#ffffff'
+    parts = [body('biber', [
+        ('sphere', (0, 0, 0.15), (0.17, 0.13, 0.14), E),
+        ('sphere', (0.15, 0, 0.24), (0.09, 0.085, 0.08), E),
+    ], F)]
+    parts.append(prim('sphere', (0.22, 0, 0.21), (0.05, 0.06, 0.04), color=F2, seg=12))
+    parts.append(prim('sphere', (0.265, 0, 0.225), (0.018, 0.022, 0.015), color='#2a1d14', seg=8))
+    parts.append(prim('sphere', (0.255, 0, 0.18), (0.012, 0.025, 0.02), color=TEETH, seg=8))
+    parts += eyes(0.21, 0.05, 0.27, 0.016)
+    for s in (1, -1):
+        parts.append(prim('sphere', (0.12, s * 0.075, 0.31), (0.02, 0.012, 0.02), color=F, seg=8))
+    parts.append(prim('sphere', (-0.2, 0, 0.04), (0.12, 0.07, 0.025), color=TAIL, seg=14))
+    parts.append(prim('cyl', (0.2, 0.1, 0.05), (0.02, 0.02, 0.22), rot=(math.pi / 2, 0, 0.3), color='#a0703f', seg=8))  # Stock
+    return parts
+
+
+ANIMALS.update({'fuchs': fuchs, 'igel': igel, 'eichhoernchen': eichhoernchen, 'storch': storch, 'fisch': fisch,
+                'maulwurf': maulwurf, 'reh': reh, 'eule': eule, 'schnecke': schnecke, 'biber': biber})
+
 if __name__ == '__main__':
     want = sys.argv[1:] or list(ANIMALS)
     for name in want:

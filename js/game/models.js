@@ -3,7 +3,9 @@
 
 import * as THREE from 'three';
 
-export const MODEL_IDS = ['kuh', 'schwein', 'schaf', 'hund', 'katze', 'ente', 'pferd', 'huhn', 'hahn', 'hase', 'frosch', 'loewe', 'elefant', 'giraffe', 'pinguin', 'teddy', 'kind', 'oma', 'papa', 'fahrer'];
+export const MODEL_IDS = ['kuh', 'schwein', 'schaf', 'hund', 'katze', 'ente', 'pferd', 'huhn', 'hahn', 'hase', 'frosch', 'loewe', 'elefant', 'giraffe', 'pinguin', 'teddy', 'kind', 'oma', 'papa', 'fahrer',
+  // Entdecker-Tiere (Album)
+  'fuchs', 'igel', 'eichhoernchen', 'storch', 'fisch', 'maulwurf', 'reh', 'eule', 'schnecke', 'biber'];
 
 const geometries = new Map();
 

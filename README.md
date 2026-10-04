@@ -230,6 +230,19 @@ Winke-Arme bleiben im Spiel beweglich; Münder (Füttern) setzt das Spiel automa
 - Laden: `js/game/models.js` (`MODEL_IDS`); fehlt ein Modell, wird die alte, gebaute Figur benutzt
 - Neue Modelldateien in `sw.js` (ASSETS) eintragen, damit sie offline funktionieren
 
+## Entdecker-Album
+
+Zehn Tiere verstecken sich in der Landschaft (Fuchs, Igel, Eichhörnchen, Storch auf der Kirche, Fisch im Fluss,
+Maulwurf, Reh, Eule – nur nachts –, Schnecke im Kohlfeld, Biber). Kleine Spuren sind immer zu sehen (Bau, Nest,
+Erdhügel, Damm …). Kommt der Zug nah, schaut das Tier heraus; Antippen → Sticker fliegt ins Album (📖 oben rechts,
+in Werkstatt und beim Fahren). Im Album: gefundene Tiere bunt, fehlende als Umriss mit Hinweis, wo man suchen kann.
+Code: `js/game/discover.js`, gespeichert in `localStorage` (`sigo.album.v1`).
+
+## Jahreszeiten
+
+„Wie draußen“ (nach Kalender) oder fest im Eltern-Bereich: Frühling (Apfelblüte, fallende Blütenblätter),
+Sommer, Herbst (bunte Bäume, fallendes Laub), Winter (bereifte Bäume, Schnee bleibt liegen).
+
 ## Landschaft
 
 - `js/game/groundPaint.js`: gemalter Boden (Wiesenflecken, Feldwege, Dorfplatz, Felder) + feine Halm-Struktur

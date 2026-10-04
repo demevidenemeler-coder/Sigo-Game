@@ -85,6 +85,7 @@ export const LANGUAGES = {
       voiceOk: 'Stimme gefunden: {name}',
       voiceMissing: 'Keine passende Stimme gefunden. Android: Einstellungen → Sprachausgabe → Sprachdaten für Deutsch installieren.',
       holdHint: 'Zum Öffnen 3 Sekunden gedrückt halten',
+      season: 'Jahreszeit', seasonAuto: 'Wie draußen', seasonHint: '„Wie draußen“ richtet sich nach dem Kalender: Frühling mit Blüten, Herbst mit bunten Blättern, Winter mit Schnee.',
     },
     names: {
       dampf: ['Dampflok'], diesel: ['Diesellok'], elok: ['E-Lok'], schnell: ['Schnellzug'],
@@ -104,6 +105,8 @@ export const LANGUAGES = {
       hahn: ['Hahn', 'Kikeriki'], ente: ['Ente', 'Quak, quak'], hase: ['Hase'], frosch: ['Frosch', 'Quak'],
       loewe: ['Löwe'], elefant: ['Elefant', 'Törööö'], giraffe: ['Giraffe'], pinguin: ['Pinguin'],
       kind: ['Kind', 'Juhu!'], papa: ['Papa', 'Hallo!'], oma: ['Oma', 'Hallo!'], teddy: ['Teddy'],
+      fuchs: ['Fuchs'], igel: ['Igel'], eichhoernchen: ['Eichhörnchen'], storch: ['Storch', 'Klapper, klapper'], maulwurf: ['Maulwurf'],
+      reh: ['Reh'], eule: ['Eule', 'Huhuu'], schnecke: ['Schnecke'], biber: ['Biber'],
       ball: ['Ball'], kiste: ['Kiste'], geschenk: ['Geschenk'], milch: ['Milchkanne'], apfel: ['Apfel'],
       bahnhof: ['Bahnhof'], tunnel: ['Tunnel'], bruecke: ['Brücke'], waschanlage: ['Waschanlage'],
       tankstelle: ['Tankstelle'], uebergang: ['Bahnübergang'],
@@ -194,6 +197,7 @@ export const LANGUAGES = {
       voiceOk: 'Voice found: {name}',
       voiceMissing: 'No matching voice found. Android: Settings → Text-to-speech → install voice data.',
       holdHint: 'Hold for 3 seconds to open',
+      season: 'Season', seasonAuto: 'Like outside', seasonHint: '“Like outside” follows the calendar: blossoms in spring, colorful leaves in autumn, snow in winter.',
     },
     names: {
       dampf: ['Steam engine'], diesel: ['Diesel engine'], elok: ['Electric engine'], schnell: ['Express train'],
@@ -213,6 +217,8 @@ export const LANGUAGES = {
       hahn: ['Rooster', 'Cock-a-doodle-doo'], ente: ['Duck', 'Quack, quack'], hase: ['Bunny'], frosch: ['Frog', 'Ribbit'],
       loewe: ['Lion'], elefant: ['Elephant', 'Toot'], giraffe: ['Giraffe'], pinguin: ['Penguin'],
       kind: ['Child', 'Yay!'], papa: ['Daddy', 'Hello!'], oma: ['Grandma', 'Hello!'], teddy: ['Teddy'],
+      fuchs: ['Fox'], igel: ['Hedgehog'], eichhoernchen: ['Squirrel'], storch: ['Stork', 'Clack, clack'], maulwurf: ['Mole'],
+      reh: ['Deer'], eule: ['Owl', 'Hoo hoo'], schnecke: ['Snail'], biber: ['Beaver'],
       ball: ['Ball'], kiste: ['Box'], geschenk: ['Present'], milch: ['Milk can'], apfel: ['Apple'],
       bahnhof: ['Station'], tunnel: ['Tunnel'], bruecke: ['Bridge'], waschanlage: ['Train wash'],
       tankstelle: ['Filling station'], uebergang: ['Level crossing'],

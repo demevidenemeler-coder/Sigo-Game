@@ -724,6 +724,8 @@ export function createDriveMode(game) {
       }
       if (cancelled || !down || Math.hypot(e.clientX - down.x, e.clientY - down.y) > 18) return;
       down = null;
+      // Entdecker-Tiere zuerst (sie sind klein und schauen nur kurz heraus)
+      if (game.discover.tap(e.clientX, e.clientY)) return;
       const targets = [objects.group, land.crossings.group, ...train.cars, ...land.tappable.filter((o) => o.visible)];
       const hit = game.pick(e.clientX, e.clientY, targets)[0];
       const hitOwner = hit?.object.userData.owner;

@@ -134,6 +134,7 @@ const game = new Game({
   trackData: loadTrack(),
   services: { say: sayText, sayName, animalCall, sfx, t, saveTrain, saveTrack, soundsOn: () => settings.sounds, bedDone: () => finishBedtime() },
 });
+game.setSeason(settings.season ?? 'auto');
 
 function el(tag, className, text) {
   const e = document.createElement(tag);
@@ -326,6 +327,8 @@ function showSettings() {
     voiceName ? t('voiceOk', { name: voiceName }) : t('voiceMissing')));
   page.append(row(t('voiceMode'), choice([['sparse', t('voiceSparse')], ['always', t('voiceAlways')]], settings.voiceMode,
     (v) => update({ voiceMode: v })), t('voiceModeHint')));
+  page.append(row(t('season'), choice([['auto', t('seasonAuto')], ['fruehling', '🌸'], ['sommer', '☀️'], ['herbst', '🍂'], ['winter', '⛄']],
+    settings.season ?? 'auto', (v) => { update({ season: v }); game.setSeason(v); }), t('seasonHint')));
   page.append(row(t('speechRate'), choice([[0.7, t('slow')], [0.85, t('normal')]], settings.speechRate,
     (v) => update({ speechRate: v }))));
   page.append(row(t('sounds'), choice(onOff, settings.sounds, (v) => update({ sounds: v }))));

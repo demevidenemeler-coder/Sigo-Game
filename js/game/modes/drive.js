@@ -126,7 +126,6 @@ export function createDriveMode(game) {
       }, 1400);
     }
   });
-  btn(controls, 'horn', '📯', horn);
   const goBtn = btn(controls, 'go', '▶', () => {
     if (d.target > 0) {
       d.target = 0;
@@ -432,7 +431,16 @@ export function createDriveMode(game) {
       if (x > 0 && x < window.innerWidth && y > 0 && y < window.innerHeight) return game.hint.tap(x, y);
     }
     if (d.target === 0) return game.hint.tapElement(goBtn);
-    game.hint.tapElement([weatherBtn, nightBtn, controls.querySelector('.horn')][step % 3]);
+    if (step % 3 === 2) {
+      // Hupen: auf die Lok tippen (die Hupe-Taste gibt es nicht mehr)
+      const v = train.loco.getWorldPosition(new THREE.Vector3());
+      v.y += 1;
+      v.project(game.camera);
+      const x = ((v.x + 1) / 2) * window.innerWidth;
+      const y = ((1 - v.y) / 2) * window.innerHeight;
+      if (x > 0 && x < window.innerWidth && y > 0 && y < window.innerHeight) return game.hint.tap(x, y);
+    }
+    game.hint.tapElement([weatherBtn, nightBtn][step % 2]);
   }
 
   // ---------- Pro Bild ----------

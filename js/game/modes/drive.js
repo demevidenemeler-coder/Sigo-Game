@@ -802,6 +802,7 @@ export function createDriveMode(game) {
       if (o.userData.kind === 'snowman') return game.weatherFx.tapSnowman(o);
       if (o.userData.kind === 'puddle') return game.weatherFx.tapPuddle(o);
       if (!land.tappable.includes(o)) return;
+      if (o.userData.tap) return game.village.tap(o); // Dorf zum Anfassen
       if (o.userData.figure) {
         game.hop(o);
         services.sayName(o.userData.figure);

@@ -32,6 +32,8 @@ export class VillageLife {
       return { ...w, fig };
     });
 
+    this.makePets();
+
     // Schaukeln (zwei Sitze am Gestell, auf einem sitzt der Teddy)
     this.swings = [];
     const frame = v.swing;
@@ -66,6 +68,126 @@ export class VillageLife {
     }
   }
 
+  // ---------- Haustiere: Hund vor der Hütte (bellt den Zug an), Katze auf dem Dach ----------
+  makePets() {
+    const v = this.land.village;
+    this.pets = [];
+    if (v.dogAt) {
+      const dog = buildFigure('hund');
+      dog.scale.setScalar(1.5);
+      dog.position.set(v.dogAt.x, 0, v.dogAt.z);
+      dog.rotation.y = Math.atan2(-(this.center.z - v.dogAt.z), this.center.x - v.dogAt.x);
+      this.land.scene.add(dog);
+      this.land.tappable.push(dog);
+      this.pets.push({ fig: dog, home: v.dogAt.obj, barks: true });
+    }
+    const roofHouse = v.houses.find((h) => h.i === 2) ?? v.houses[0];
+    if (roofHouse) {
+      roofHouse.obj.updateMatrixWorld(true);
+      const p = new THREE.Vector3(0.25, 2.3, 0.02).applyMatrix4(roofHouse.obj.matrixWorld);
+      const cat = buildFigure('katze');
+      cat.scale.setScalar(1.3);
+      cat.position.copy(p);
+      cat.rotation.y = roofHouse.obj.rotation.y + Math.PI / 2;
+      this.land.scene.add(cat);
+      this.land.tappable.push(cat);
+      this.pets.push({ fig: cat, home: roofHouse.obj, baseY: p.y });
+    }
+    this.barkCooldown = 0;
+  }
+
+  // ---------- Antippen im Dorf ----------
+  tap(o) {
+    const g = this.game;
+    const kind = o.userData.tap;
+    // kleines Wackeln für alles
+    const s0 = o.userData.baseScale ?? o.scale.x;
+    g.tween(0.4, (t) => {
+      const k = Math.sin(t * Math.PI);
+      o.scale.set(s0 * (1 - k * 0.08), s0 * (1 + k * 0.14), s0 * (1 - k * 0.08));
+    }, () => o.scale.setScalar(s0));
+    const at = (x, y, z) => new THREE.Vector3(x, y, z).applyMatrix4(o.matrixWorld);
+    if (kind === 'house') return this.visitor(o);
+    if (kind === 'church') {
+      g.services.sfx('churchbell');
+      setTimeout(() => g.services.animalCall('storch'), 2400);
+      return;
+    }
+    if (kind === 'well') {
+      g.services.sfx('splash');
+      return this.droplets(at(0, 0.7, 0), '#6fb6e8', 14);
+    }
+    if (kind === 'market') {
+      g.services.sfx('boing');
+      return this.flyThing(at(0, 1.1, 0.2), new THREE.SphereGeometry(0.11, 10, 8), ['#e5484d', '#f08a24', '#f2c832'][Math.floor(Math.random() * 3)], 2.2);
+    }
+    if (kind === 'mailbox') {
+      g.services.sfx('pling');
+      return this.flyThing(at(0, 1.1, 0), new THREE.BoxGeometry(0.26, 0.02, 0.18), '#ffffff', 3.2, true);
+    }
+  }
+
+  // Tür geht auf: jemand kommt heraus, winkt und geht wieder hinein
+  visitor(house) {
+    if (house.userData.visiting) return;
+    house.userData.visiting = true;
+    const g = this.game;
+    g.services.sfx('dingdong');
+    const id = ['kind', 'oma', 'papa', 'teddy'][Math.floor(Math.random() * 4)];
+    const fig = buildFigure(id);
+    house.updateMatrixWorld(true);
+    fig.position.copy(new THREE.Vector3(0, 0.02, 1.15).applyMatrix4(house.matrixWorld));
+    fig.rotation.y = house.rotation.y;
+    fig.scale.setScalar(0.001);
+    this.land.scene.add(fig);
+    g.tween(0.45, (t) => fig.scale.setScalar(1.5 * Math.max(0.001, Math.sin(t * Math.PI * 0.5) * (1 + Math.sin(t * Math.PI) * 0.15))), () => {
+      if (fig.userData.waveArm) wave(fig, g);
+      else g.hop(fig);
+      g.services.sayName(id);
+      setTimeout(() => {
+        g.tween(0.4, (t) => fig.scale.setScalar(1.5 * Math.max(0.001, 1 - t)), () => {
+          this.land.scene.remove(fig);
+          house.userData.visiting = false;
+        });
+      }, 2600);
+    });
+  }
+
+  // Ding fliegt im Bogen heraus (Apfel vom Markt, Brief aus dem Briefkasten)
+  flyThing(from, geo, color, height, spin = false) {
+    const m = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ color, roughness: 0.5, transparent: true }));
+    m.castShadow = true;
+    m.position.copy(from);
+    this.land.scene.add(m);
+    const dir = new THREE.Vector3(Math.random() - 0.5, 0, Math.random() - 0.5).normalize().multiplyScalar(1.2);
+    this.game.tween(1.1, (t) => {
+      m.position.set(from.x + dir.x * t, from.y + Math.sin(t * Math.PI) * height * (spin ? 1 : 0.6) - (spin ? 0 : t * from.y * 0.9), from.z + dir.z * t);
+      if (spin) m.rotation.set(t * 6, t * 9, 0);
+      m.material.opacity = t < 0.8 ? 1 : (1 - t) / 0.2;
+    }, () => {
+      this.land.scene.remove(m);
+      m.material.dispose();
+    });
+  }
+
+  droplets(at, color, n) {
+    const geo = this.dropGeo ??= new THREE.SphereGeometry(0.06, 6, 4);
+    for (let i = 0; i < n; i++) {
+      const m = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ color, roughness: 0.1, transparent: true }));
+      m.position.copy(at);
+      this.land.scene.add(m);
+      const a = (i / n) * Math.PI * 2;
+      const v = new THREE.Vector3(Math.cos(a) * 1.2, 2.4 + Math.random(), Math.sin(a) * 1.2);
+      this.game.tween(0.8, (t) => {
+        m.position.set(at.x + v.x * t, at.y + v.y * t - 4.5 * t * t, at.z + v.z * t);
+        m.material.opacity = 1 - t;
+      }, () => {
+        this.land.scene.remove(m);
+        m.material.dispose();
+      });
+    }
+  }
+
   // Liegen Schienen mitten durchs Dorf, gehen die Leute nach Hause
   layout() {
     const track = this.land.track;
@@ -83,6 +205,19 @@ export class VillageLife {
     for (const s of this.swings) {
       s.pivot.visible = s.frame.visible && s.frame.scale.x > 0.5;
       s.swing.rotation.x = Math.sin(time * 1.6 + s.phase) * s.amp; // vor und zurück (quer zum Balken)
+    }
+    // Haustiere: nur sichtbar, wenn ihr Zuhause steht; Katze atmet im Schlaf, Hund bellt den Zug an
+    const lp0 = this.game.train.loco?.getWorldPosition(new THREE.Vector3());
+    this.barkCooldown -= dt;
+    for (const p of this.pets) {
+      p.fig.visible = p.home.visible && p.home.scale.x > 0.5;
+      if (p.baseY != null) p.fig.scale.setScalar(1.3 * (1 + Math.sin(time * 1.5) * 0.02));
+      if (p.barks && p.fig.visible && lp0 && this.game.modeName === 'drive' && this.barkCooldown <= 0
+        && Math.hypot(lp0.x - p.fig.position.x, lp0.z - p.fig.position.z) < 15) {
+        this.barkCooldown = 16;
+        this.game.services.animalCall('hund');
+        this.game.hop(p.fig);
+      }
     }
     if (!this.enabled) return;
     const loco = this.game.train.loco;

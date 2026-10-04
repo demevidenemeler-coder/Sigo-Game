@@ -463,3 +463,73 @@ export function mailbox() {
   g.userData.clearR = 0.6;
   return g;
 }
+
+// Bäckerei-Schmuck (wird an ein Haus gehängt): gestreifte Markise, Brezel-Schild, Brote im Fenster
+export function bakeryExtras(w, d) {
+  const g = new THREE.Group();
+  const cols = ['#f2c832', '#ffffff'];
+  for (let i = 0; i < 6; i++) {
+    const s = add(g, new THREE.BoxGeometry(w / 6, 0.04, 0.55), mat(cols[i % 2], 0.6), -w / 2 + (i + 0.5) * (w / 6), 1.25, d / 2 + 0.25);
+    s.rotation.x = 0.35;
+  }
+  // Schild mit Brezel an einem Arm
+  add(g, new THREE.BoxGeometry(0.05, 0.05, 0.5), mat('#3a3a3a'), w / 2 - 0.1, 1.55, d / 2 + 0.25);
+  const pretzel = add(g, new THREE.TorusGeometry(0.16, 0.045, 8, 20), mat('#b8743a', 0.5), w / 2 - 0.1, 1.35, d / 2 + 0.45);
+  pretzel.rotation.y = Math.PI / 2;
+  add(g, new THREE.TorusGeometry(0.08, 0.04, 8, 16), mat('#b8743a', 0.5), w / 2 - 0.1, 1.38, d / 2 + 0.38).rotation.y = Math.PI / 2;
+  add(g, new THREE.TorusGeometry(0.08, 0.04, 8, 16), mat('#b8743a', 0.5), w / 2 - 0.1, 1.38, d / 2 + 0.52).rotation.y = Math.PI / 2;
+  // Brote auf dem Fensterbrett
+  for (const x of [-w * 0.3, w * 0.3]) {
+    for (let k = 0; k < 3; k++) add(g, new THREE.CapsuleGeometry(0.04, 0.08, 3, 8).rotateZ(Math.PI / 2), mat('#c98a45', 0.6), x - 0.12 + k * 0.12, 0.79, d / 2 + 0.1, false);
+  }
+  return g;
+}
+
+// Wimpelkette zwischen zwei Punkten (lokal: von (0,h,0) nach (len,h,0)), leicht durchhängend
+export function bunting(len, h = 2.4) {
+  const g = new THREE.Group();
+  const pts = [];
+  for (let i = 0; i <= 12; i++) {
+    const t = i / 12;
+    pts.push(new THREE.Vector3(t * len, h - Math.sin(t * Math.PI) * 0.45, 0));
+  }
+  const curve = new THREE.CatmullRomCurve3(pts);
+  add(g, new THREE.TubeGeometry(curve, 24, 0.012, 4, false), mat('#ffffff'), 0, 0, 0, false);
+  const cols = ['#e5484d', '#f2c832', '#3b7cc9', '#4fa65a', '#f08bb4', '#ee8a2b'];
+  const flag = new THREE.ConeGeometry(0.13, 0.32, 3);
+  const n = Math.max(4, Math.round(len / 0.45));
+  for (let i = 1; i < n; i++) {
+    const p = curve.getPoint(i / n);
+    const f = add(g, flag, mat(cols[i % cols.length], 0.6), p.x, p.y - 0.16, p.z, false);
+    f.rotation.x = Math.PI;
+    f.scale.z = 0.25;
+  }
+  g.userData.kind = 'tree';
+  g.userData.clearR = len / 2;
+  return g;
+}
+
+// Wäscheleine mit bunter Wäsche
+export function laundry() {
+  const g = new THREE.Group();
+  for (const x of [-1.1, 1.1]) add(g, new THREE.CylinderGeometry(0.04, 0.05, 1.5, 6), mat('#b98553'), x, 0.75, 0);
+  add(g, new THREE.CylinderGeometry(0.01, 0.01, 2.2, 4).rotateZ(Math.PI / 2), mat('#ffffff'), 0, 1.42, 0, false);
+  const items = [['#e5484d', 0.36, 0.42], ['#3b7cc9', 0.3, 0.5], ['#f2c832', 0.42, 0.34], ['#f08bb4', 0.28, 0.3]];
+  items.forEach(([c, w, h], i) => add(g, new THREE.BoxGeometry(w, h, 0.02), mat(c, 0.8), -0.75 + i * 0.5, 1.42 - h / 2, 0));
+  g.userData.kind = 'tree';
+  g.userData.clearR = 1.4;
+  return g;
+}
+
+// Hundehütte
+export function doghouse() {
+  const g = new THREE.Group();
+  add(g, new RoundedBoxGeometry(0.8, 0.55, 0.7, 2, 0.04), mat('#c94a3a'), 0, 0.28, 0);
+  add(g, gableRoof(0.8, 0.7, 0.35, 0.08), mat('#5a4a42', 0.6), 0, 0.55, 0);
+  add(g, gableFill(0.8, 0.7, 0.35), mat('#c94a3a'), 0, 0.56, 0);
+  add(g, new THREE.CircleGeometry(0.17, 14), mat('#2a1d14', 1), 0, 0.24, 0.355);
+  add(g, new THREE.TorusGeometry(0.1, 0.03, 6, 12), mat('#c9ccd1', 0.4), 0.3, 0.03, 0.55).rotation.x = Math.PI / 2; // Napf
+  g.userData.kind = 'tree';
+  g.userData.clearR = 1.0;
+  return g;
+}

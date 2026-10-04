@@ -297,6 +297,16 @@ Object.assign(SOUNDS, {
   coal(t) {
     for (let i = 0; i < 14; i++) noise(t + i * 0.06 + Math.random() * 0.03, 0.05, 0.3, 'bandpass', 600 + Math.random() * 1200, sfxBus, 2);
   },
+  // Kirchenglocken: tiefes „Bim-bam-bim-bam“
+  churchbell(t) {
+    [392, 330, 392, 330].forEach((f, i) => {
+      const at = t + i * 0.55;
+      tone('sine', f, at, 0.004, 1.8, 0.28);
+      tone('sine', f * 2.01, at, 0.003, 1.1, 0.1);
+      tone('sine', f * 2.76, at, 0.002, 0.6, 0.06);
+      tone('sine', f * 0.5, at, 0.01, 1.4, 0.1);
+    });
+  },
   xbell(t) {
     tone('sine', 1760, t, 0.002, 0.25, 0.18);
     tone('sine', 1760 * 2.4, t, 0.002, 0.1, 0.05);

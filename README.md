@@ -248,6 +248,9 @@ Sommer, Herbst (bunte Bäume, fallendes Laub), Winter (bereifte Bäume, Schnee b
 Häuser um den Platz mit Brunnen, Linde, Bänken, Laternen, Kirche (mit Storchennest), Marktstand, Gärten mit Hecken
 und Briefkästen, Spielplatz (Rutsche, Schaukel mit Teddy, Sandkasten). Oma, Papa und das Kind spazieren über den
 Platz und winken, wenn der Zug vorbeifährt (`js/game/village.js`).
+Zum Anfassen: Haus antippen → jemand kommt heraus und winkt; Kirche → Glocken; Brunnen → Platschen;
+Marktstand → Apfel hüpft; Briefkasten → Brief fliegt. Dazu Bäckerei, Wimpelketten, Wäscheleine,
+Katze auf dem Dach und ein Hund, der den Zug anbellt.
 
 ## Landschaft
 

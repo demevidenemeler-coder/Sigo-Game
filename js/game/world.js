@@ -15,7 +15,7 @@ import { woodTexture, waterTexture } from './textures.js';
 import { paintGround, groundMaterial } from './groundPaint.js';
 import {
   LAYOUT, zonePaint, cropProps, church, well, hayBale, tractor, bench, lantern, contactShadow, tuftGeometry, flowerGeometries, colored,
-  gableRoof, gableFill, marketStall, slide, swingFrame, sandbox, hedge, mailbox,
+  gableRoof, gableFill, marketStall, slide, swingFrame, sandbox, hedge, mailbox, bakeryExtras, bunting, laundry, doghouse,
 } from './zones.js';
 
 // Spielfeld, auf dem gemalt werden kann (halbe Breite / halbe Tiefe)
@@ -476,8 +476,9 @@ export function createLandscape() {
   const V = LAYOUT.village;
   const chimneys = [];
   let churchObj = null;
+  const villageHouses = [];
   occupied.push([V.x, V.z, 13]);
-  put(well(), V.x, V.z);
+  put(well(), V.x, V.z).userData.tap = 'well';
   const ring = [[-150, 9], [-118, 9.5], [-62, 9.2], [-28, 9], [8, 9.4], [150, 9], [118, 9.5]];
   ring.forEach(([deg, r], i) => {
     const a = THREE.MathUtils.degToRad(deg);
@@ -487,8 +488,11 @@ export function createLandscape() {
     const big = i % 3 === 1;
     const h = house(rand, big);
     h.scale.setScalar(1.05);
+    if (i === 4) h.add(bakeryExtras(big ? 2.6 : 1.9, 1.6)); // Bäckerei
+    h.userData.tap = 'house';
     // Haustür (lokal +z) zeigt zum Platz
     put(h, x, z, Math.atan2(V.x - x, V.z - z));
+    villageHouses.push({ obj: h, w: big ? 2.6 : 1.9, i });
     if (i % 2 === 0) {
       h.updateMatrixWorld(true);
       chimneys.push({ obj: h, pos: new THREE.Vector3((big ? 2.6 : 1.9) * 0.26, 2.4, -0.28).applyMatrix4(h.matrixWorld), phase: rand() });
@@ -497,7 +501,10 @@ export function createLandscape() {
   {
     const x = V.x + 7;
     const z = V.z + 7.2;
-    if (free(x, z, 2)) churchObj = put(church(), x, z, -0.25);
+    if (free(x, z, 2)) {
+      churchObj = put(church(), x, z, -0.25);
+      churchObj.userData.tap = 'church';
+    }
   }
   {
     const linde = tree('rund', rand);
@@ -509,7 +516,7 @@ export function createLandscape() {
   {
     const x = V.x + 2.6;
     const z = V.z + 2.7;
-    put(marketStall(), x, z, Math.atan2(V.x - x, V.z - z));
+    put(marketStall(), x, z, Math.atan2(V.x - x, V.z - z)).userData.tap = 'market';
   }
   // Gärten: Hecken hinter den Häusern, Briefkästen davor
   ring.forEach(([deg, r], i) => {
@@ -519,8 +526,34 @@ export function createLandscape() {
     if (i % 2 === 0 && free(hx, hz, 1)) put(hedge(3.2), hx, hz, -Math.atan2(Math.cos(a) * 0.85, -Math.sin(a)));
     const mx = V.x + Math.cos(a + 0.2) * (r - 1.8);
     const mz = V.z + Math.sin(a + 0.2) * (r - 1.8) * 0.85;
-    if (i % 3 === 0 && free(mx, mz, 0.5)) put(mailbox(), mx, mz, Math.atan2(V.x - mx, V.z - mz));
+    if (i % 3 === 0 && free(mx, mz, 0.5)) put(mailbox(), mx, mz, Math.atan2(V.x - mx, V.z - mz)).userData.tap = 'mailbox';
   });
+  // Wimpelketten zwischen den Laternen über dem Platz
+  {
+    const L = [[4.6, 0.6], [0.4, 4.4], [-4.6, -0.6]].map(([dx, dz]) => [V.x + dx, V.z + dz]);
+    for (const [[x1, z1], [x2, z2]] of [[L[0], L[1]], [L[1], L[2]]]) {
+      const len = Math.hypot(x2 - x1, z2 - z1);
+      put(bunting(len, 2.5), x1, z1, -Math.atan2(z2 - z1, x2 - x1)).userData.baseScale = 1;
+    }
+  }
+  // Wäscheleine im Garten, Hundehütte
+  let dogAt = null;
+  {
+    const [deg1, r1] = ring[1];
+    const a1 = THREE.MathUtils.degToRad(deg1);
+    const lx = V.x + Math.cos(a1) * (r1 + 3.6);
+    const lz = V.z + Math.sin(a1) * (r1 + 3.6) * 0.85;
+    if (free(lx, lz, 1)) put(laundry(), lx, lz, -a1 + Math.PI / 2);
+    const [deg5, r5] = ring[5];
+    const a5 = THREE.MathUtils.degToRad(deg5);
+    const dx = V.x + Math.cos(a5 + 0.25) * (r5 + 1.2);
+    const dz = V.z + Math.sin(a5 + 0.25) * (r5 + 1.2) * 0.85;
+    if (free(dx, dz, 1)) {
+      const dh = put(doghouse(), dx, dz, Math.atan2(V.x - dx, V.z - dz));
+      dogAt = { obj: dh, x: dx + (V.x - dx) * 0.12, z: dz + (V.z - dz) * 0.12 };
+    }
+  }
+
   // Spielplatz westlich vom Dorf: Rutsche, Schaukel, Sandkasten
   const P = { x: V.x - 13, z: V.z - 1 };
   occupied.push([P.x, P.z, 4.5]);
@@ -854,6 +887,6 @@ export function createLandscape() {
     track.group, objects.group, crossings.group, trainAnchor, ground]);
   mergeStatic(scene, (o) => keepSet.has(o) || o.isLight || o.isInstancedMesh, { cell: 90, dedupe: true });
   landRef = { proxies, scene, sun, hemi: scene.userData.hemi, sky: skyMat, snowables, track, objects, features, crossings, trainAnchor, scenery, tappable, clearAroundTrack, setThin, animate, ground, animated, ambient, church: churchObj,
-    village: { center: V, plaza: V.plaza, swing: swingFrameObj }, extraFootprints: [] };
+    village: { center: V, plaza: V.plaza, swing: swingFrameObj, houses: villageHouses, dogAt }, extraFootprints: [] };
   return landRef;
 }

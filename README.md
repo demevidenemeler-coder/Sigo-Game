@@ -13,13 +13,17 @@ Unten: oben eine Reihe Fächer (mit Beschriftung), darunter große Karten – mi
 | Fach | Inhalt |
 |---|---|
 | 🚂 Loks | Dampflok, Diesellok, E-Lok, Schnellzug |
-| 🚃 Wagen | Personen-, Güter-, Tier-, Flach-, Zirkus-, Schluss-, Tank-, Holz-, Kohle-, Kranwagen, Autotransporter (max. 6) |
+| 🚃 Wagen | Tierwagen zuerst: Tier-, Stall-, Hühner-, Teich-, Zoo-, Zirkuswagen; dann Personen-, Güter-, Rungen-, Milch-, Schluss-, Kranwagen, Autotransporter (max. 6) |
 | 🎨 Farben | 10 Farben – Topf wählen, dann ein Teil antippen (Kessel, Dach, Räder …) oder den Topf auf den Zug ziehen |
 | 🛞 Räder | 12 verspielte Radmuster (Speichen, Stern, Herz, Blume, Punkte, Regenbogen, Sonne, Spirale, Lachgesicht, Donut, Ball, Zahnrad) + Farbtöpfe nur für die Räder |
 | ⭐ Schmuck | Gesicht, Stern, Herz, Blume, Lampe, Lichterkette, Glocke, Fähnchen, Luftballon, Regenbogen |
 | 🐄 Tiere | Kuh, Schwein, Schaf, Pferd, Hund, Katze, Huhn, Hahn, Ente, Hase, Frosch, Löwe, Elefant, Giraffe, Pinguin |
 | 🧸 Mitfahrer | Kind, Papa, Oma, Teddy, Ball, Kiste, Geschenk, Milchkanne, Apfel |
 | 🥕 Futter | Heu, Karotte, Apfel, Banane, Körner, Fisch, Knochen, Fleisch, Blätter, Fliege |
+
+**Lieblingswagen:** Kommt ein Tier in „seinen“ Wagen (Ente/Frosch/Pinguin → Teichwagen, Huhn/Hahn → Hühnerwagen,
+Pferd/Kuh/Schwein/Schaf → Stall- oder Tierwagen, Löwe/Elefant/Giraffe → Zoowagen), freut es sich: Herzchen und ein Hüpfer.
+In alle anderen Wagen darf es trotzdem.
 
 **Ziehen:** Beim Ziehen leuchtet ein Ring unter dem Wagen, auf dem es landen wird – man muss nicht genau treffen.
 **Wegnehmen:** Mitfahrer, Schmuck oder Wagen vom Zug **in die Leiste ziehen** → weg. Auf einen anderen Wagen ziehen → umsetzen.

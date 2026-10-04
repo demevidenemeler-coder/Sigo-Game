@@ -266,5 +266,5 @@ export function createFeeder(game, services) {
     fx.length = 0;
   }
 
-  return { eaters, nearestEater, setTarget, feed, update, clear, screenOf };
+  return { eaters, nearestEater, setTarget, feed, update, clear, screenOf, hearts };
 }

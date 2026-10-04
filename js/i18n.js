@@ -92,8 +92,8 @@ export const LANGUAGES = {
     names: {
       dampf: ['Dampflok'], diesel: ['Diesellok'], elok: ['E-Lok'], schnell: ['Schnellzug'],
       personen: ['Personenwagen'], gueter: ['Güterwagen'], tier: ['Tierwagen'], flach: ['Flachwagen'],
-      zirkus: ['Zirkuswagen'], schluss: ['Schlusswagen'], tank: ['Tankwagen'], holz: ['Holzwagen'],
-      kohle: ['Kohlewagen'], auto: ['Autotransporter'], kran: ['Kranwagen'],
+      zirkus: ['Zirkuswagen'], schluss: ['Schlusswagen'], tank: ['Milchwagen'], stall: ['Stallwagen'], huehner: ['Hühnerwagen'],
+      teich: ['Teichwagen'], zoo: ['Zoowagen'], auto: ['Autotransporter'], kran: ['Kranwagen'],
       rot: ['Rot'], orange: ['Orange'], gelb: ['Gelb'], gruen: ['Grün'], blau: ['Blau'],
       lila: ['Lila'], rosa: ['Rosa'], weiss: ['Weiß'], schwarz: ['Schwarz'], braun: ['Braun'],
       gesicht: ['Gesicht'], stern: ['Stern'], herz: ['Herz'], blume: ['Blume'], lampe: ['Lampe'],
@@ -206,8 +206,8 @@ export const LANGUAGES = {
     names: {
       dampf: ['Steam engine'], diesel: ['Diesel engine'], elok: ['Electric engine'], schnell: ['Express train'],
       personen: ['Passenger car'], gueter: ['Freight car'], tier: ['Animal car'], flach: ['Flat car'],
-      zirkus: ['Circus car'], schluss: ['Caboose'], tank: ['Tank car'], holz: ['Log car'],
-      kohle: ['Coal car'], auto: ['Car carrier'], kran: ['Crane car'],
+      zirkus: ['Circus car'], schluss: ['Caboose'], tank: ['Milk car'], stall: ['Barn car'], huehner: ['Chicken car'],
+      teich: ['Pond car'], zoo: ['Zoo car'], auto: ['Car carrier'], kran: ['Crane car'],
       rot: ['Red'], orange: ['Orange'], gelb: ['Yellow'], gruen: ['Green'], blau: ['Blue'],
       lila: ['Purple'], rosa: ['Pink'], weiss: ['White'], schwarz: ['Black'], braun: ['Brown'],
       gesicht: ['Face'], stern: ['Star'], herz: ['Heart'], blume: ['Flower'], lampe: ['Lamp'],

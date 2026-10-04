@@ -9,14 +9,16 @@ export const LOCOS = [
 
 export const WAGONS = [
   { id: 'personen', slots: 3, paint: { body: '#f2c832', roof: '#8a5a33', trim: '#2f2f2f' } },
-  { id: 'gueter', slots: 3, paint: { body: '#8a5a33', roof: '#5c3b22', trim: '#2f2f2f' } },
   { id: 'tier', slots: 3, paint: { body: '#4fa65a', roof: '#f5f1ea', trim: '#2f2f2f' } },
-  { id: 'flach', slots: 3, paint: { body: '#ee8a2b', roof: '#5c3b22', trim: '#2f2f2f' } },
+  { id: 'stall', slots: 2, paint: { body: '#c8453a', roof: '#f5f1ea', trim: '#2f2f2f' } },
+  { id: 'huehner', slots: 2, paint: { body: '#f2c832', roof: '#d9463b', trim: '#8a5a33' } },
+  { id: 'teich', slots: 3, paint: { body: '#3b7cc9', roof: '#f5f1ea', trim: '#2f2f2f' } },
+  { id: 'zoo', slots: 2, paint: { body: '#ee8a2b', roof: '#4fa65a', trim: '#2f2f2f' } },
   { id: 'zirkus', slots: 2, paint: { body: '#d9463b', roof: '#f2c832', trim: '#2f2f2f' } },
+  { id: 'gueter', slots: 3, paint: { body: '#8a5a33', roof: '#5c3b22', trim: '#2f2f2f' } },
+  { id: 'flach', slots: 3, paint: { body: '#ee8a2b', roof: '#5c3b22', trim: '#2f2f2f' } },
+  { id: 'tank', slots: 0, paint: { body: '#f5f1ea', roof: '#3b7cc9', trim: '#2f2f2f' } },
   { id: 'schluss', slots: 1, paint: { body: '#c8453a', roof: '#3a3a3a', trim: '#2f2f2f' } },
-  { id: 'tank', slots: 0, paint: { body: '#f5f1ea', roof: '#8b5bb5', trim: '#2f2f2f' } },
-  { id: 'holz', slots: 0, paint: { body: '#5c3b22', roof: '#8a5a33', trim: '#2f2f2f' } },
-  { id: 'kohle', slots: 0, paint: { body: '#6b6f75', roof: '#3a3a3a', trim: '#2f2f2f' } },
   { id: 'auto', slots: 0, paint: { body: '#3b7cc9', roof: '#f5f1ea', trim: '#2f2f2f' } },
   { id: 'kran', slots: 0, paint: { body: '#f2c832', roof: '#3a3a3a', trim: '#2f2f2f' } },
 ];
@@ -78,6 +80,17 @@ export const STATION_COLORS = [
   { id: 'gruen', hex: '#4fa65a' },
 ];
 
+// Lieblingswagen: kommt ein Tier in „seinen“ Wagen, freut es sich (Herzchen + Tierlaut)
+export const HOME_WAGON = {
+  stall: ['pferd', 'kuh', 'schwein', 'schaf'],
+  tier: ['kuh', 'schwein', 'schaf', 'pferd'],
+  huehner: ['huhn', 'hahn'],
+  teich: ['ente', 'frosch', 'pinguin'],
+  zoo: ['loewe', 'elefant', 'giraffe'],
+  zirkus: ['loewe', 'elefant'],
+};
+export const isHomeWagon = (type, id) => (HOME_WAGON[type] ?? []).includes(id);
+
 export const MAX_WAGONS = 6;
 export const MAX_DECOR = 4;
 
@@ -122,7 +135,14 @@ export function spliceCargo(car, index) {
 
 // Ältere Spielstände ergänzen (neue Felder)
 export function upgradeTrain(data) {
+  // Holz- und Kohlewagen gibt es nicht mehr: werden zu Rungen- bzw. Güterwagen
+  const RETIRED = { holz: 'flach', kohle: 'gueter' };
   for (const c of data.cars) {
+    if (RETIRED[c.type]) {
+      const def = WAGONS.find((w) => w.id === RETIRED[c.type]);
+      c.type = def.id;
+      c.paint = { ...def.paint, wheel: def.paint.roof };
+    }
     c.dirt ??= 0;
     c.paint.wheel ??= c.paint.roof;
     c.wheelStyle ??= 'speichen';

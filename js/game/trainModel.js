@@ -255,23 +255,47 @@ function walls(car, len, h, mats, y0 = 0.86) {
   for (const s of [1, -1]) car.add(mesh(box(0.1, h, 1.1, 0.04), mats.body, s * (len / 2 - 0.1), y, 0, 'body'));
 }
 
+// Pufferbohle (rot) an beiden Enden – wie bei Spielzeugbahnen
+const bufferBeam = new THREE.MeshStandardMaterial({ color: '#d9463b', roughness: 0.45 });
+function endBeams(car, len, y = 0.6) {
+  for (const s of [1, -1]) car.add(mesh(box(0.08, 0.22, 1.0, 0.03), bufferBeam, s * (len / 2 - 0.06), y, 0));
+}
+
+// Farbiger Zierstreifen an beiden Seiten
+function sideBand(car, len, y, mats, z = 0.575, h = 0.07) {
+  for (const s of [1, -1]) car.add(mesh(box(len - 0.14, h, 0.03, 0.02), mats.roof, 0, y, s * z, 'roof'));
+}
+
+// Heu-Büschel (Ecken in Tierwagen)
+function hayTuft(car, x, y, z, s = 1) {
+  const h = mesh(sph(0.16 * s), shared.hay, x, y, z);
+  h.scale.set(1.3, 0.55, 1);
+  car.add(h);
+}
+
 function buildPersonen(car, mats) {
   const len = 2.6;
   underframe(car, len, mats);
+  endBeams(car, len);
   floor(car, len, mats);
-  walls(car, len, 0.4, mats);
+  walls(car, len, 0.42, mats);
+  sideBand(car, len, 0.98, mats);
   // Handlauf oben auf der Brüstung
-  for (const s of [1, -1]) car.add(mesh(cylX(0.035, len - 0.1, 10), mats.trim, 0, 1.28, s * 0.52, 'trim'));
-  // Pfosten und geschwungenes Dach
+  for (const s of [1, -1]) car.add(mesh(cylX(0.035, len - 0.1, 10), mats.trim, 0, 1.3, s * 0.52, 'trim'));
+  // Trittstufen an den Türen
+  for (const s of [1, -1]) for (const x of [len / 2 - 0.35, -(len / 2 - 0.35)]) car.add(mesh(box(0.34, 0.04, 0.12, 0.02), shared.dark, x, 0.66, s * 0.62));
+  // Pfosten und gewölbtes Dach
   for (const x of [len / 2 - 0.15, 0, -(len / 2 - 0.15)]) {
     for (const z of [0.5, -0.5]) car.add(mesh(cyl(0.04, 0.04, 1.05, 10), mats.trim, x, 1.8, z, 'trim'));
   }
-  car.add(mesh(box(len + 0.15, 0.1, 1.4, 0.05), mats.roof, 0, 2.33, 0, 'roof'));
-  car.add(mesh(box(len - 0.3, 0.12, 1.0, 0.06), mats.roof, 0, 2.42, 0, 'roof'));
+  const roof = mesh(cylX(0.78, len + 0.2, 28), mats.roof, 0, 2.2, 0, 'roof');
+  roof.scale.set(1, 0.26, 0.92);
+  car.add(roof);
+  car.add(mesh(box(len + 0.22, 0.06, 1.3, 0.03), mats.trim, 0, 2.22, 0, 'trim'));
   // Laternen an den Ecken
-  for (const x of [len / 2 - 0.15, -(len / 2 - 0.15)]) car.add(mesh(sph(0.06), shared.lamp, x, 2.2, 0.5));
+  for (const x of [len / 2 - 0.15, -(len / 2 - 0.15)]) car.add(mesh(sph(0.065), shared.lamp, x, 2.12, 0.5));
   car.userData.cargoY = 0.86;
-  car.userData.decorY = { side: 1.07, top: 2.48, sideZ: 0.58, sideX: [-0.8, 0.8, 0, -0.8], topX: [-0.7, 0.7, 0, -0.7] };
+  car.userData.decorY = { side: 1.07, top: 2.42, sideZ: 0.58, sideX: [-0.8, 0.8, 0, -0.8], topX: [-0.7, 0.7, 0, -0.7] };
   return len;
 }
 
@@ -279,20 +303,29 @@ function buildGueter(car, mats) {
   const len = 2.6;
   mats.body.map = woodTexture('#f3e7d6', 'wagon');
   underframe(car, len, mats);
+  endBeams(car, len);
   floor(car, len, mats);
-  walls(car, len, 0.62, mats);
+  walls(car, len, 0.46, mats);
+  // Eisenbeschläge und Kisten/Säcke in den Ecken
   for (const x of [-1.2, -0.4, 0.4, 1.2]) {
-    for (const z of [0.58, -0.58]) car.add(mesh(box(0.07, 0.64, 0.04, 0.01), mats.trim, x, 1.17, z, 'trim'));
+    for (const z of [0.58, -0.58]) car.add(mesh(box(0.07, 0.48, 0.04, 0.01), mats.trim, x, 1.09, z, 'trim'));
   }
-  for (const z of [0.58, -0.58]) car.add(mesh(box(len - 0.1, 0.06, 0.04, 0.01), mats.trim, 0, 1.47, z, 'trim'));
-  car.userData.cargoY = 1.22;
-  car.userData.decorY = { side: 1.17, top: 1.5, sideZ: 0.6, sideX: [-0.8, 0, 0.8, -0.8], topX: [-1.0, 1.0, -1.0, 1.0] };
+  for (const z of [0.58, -0.58]) car.add(mesh(box(len - 0.1, 0.06, 0.04, 0.01), mats.trim, 0, 1.3, z, 'trim'));
+  const crate = new THREE.MeshStandardMaterial({ color: '#d8a868', roughness: 0.8, map: woodTexture('#f3e7d6', 'crate') });
+  car.add(mesh(box(0.34, 0.3, 0.34, 0.03), crate, 1.0, 1.02, 0.25));
+  const sack = new THREE.MeshStandardMaterial({ color: '#efe3c4', roughness: 1 });
+  const sk = mesh(sph(0.17), sack, -1.02, 1.0, -0.26);
+  sk.scale.set(1, 0.85, 0.8);
+  car.add(sk);
+  car.userData.cargoY = 0.86;
+  car.userData.decorY = { side: 1.09, top: 1.34, sideZ: 0.6, sideX: [-0.8, 0, 0.8, -0.8], topX: [-1.0, 1.0, -1.0, 1.0] };
   return len;
 }
 
 function buildTier(car, mats) {
   const len = 2.6;
   underframe(car, len, mats);
+  endBeams(car, len);
   floor(car, len, mats);
   car.add(mesh(box(len - 0.3, 0.06, 0.95, 0.03), shared.hay, 0, 0.88, 0));
   // Latten mit Lücken – die Tiere schauen heraus
@@ -300,9 +333,18 @@ function buildTier(car, mats) {
     for (const s of [1, -1]) car.add(mesh(box(len - 0.1, 0.12, 0.08, 0.04), mats.body, 0, y, s * 0.52, 'body'));
   }
   for (const x of [len / 2 - 0.1, -(len / 2 - 0.1)]) car.add(mesh(box(0.1, 0.5, 1.1, 0.04), mats.body, x, 1.1, 0, 'body'));
+  // Eckpfosten mit runden Kappen
+  for (const x of [len / 2 - 0.1, -(len / 2 - 0.1)]) {
+    for (const s of [1, -1]) {
+      car.add(mesh(box(0.12, 0.62, 0.12, 0.04), mats.roof, x, 1.12, s * 0.53, 'roof'));
+      car.add(mesh(sph(0.08), mats.roof, x, 1.45, s * 0.53, 'roof'));
+    }
+  }
   for (const x of [-0.65, 0, 0.65]) {
     for (const s of [1, -1]) car.add(mesh(box(0.08, 0.56, 0.05, 0.02), mats.roof, x, 1.1, s * 0.56, 'roof'));
   }
+  hayTuft(car, 1.1, 0.95, 0.32);
+  hayTuft(car, -1.1, 0.95, -0.3, 0.9);
   car.userData.cargoY = 0.9;
   car.userData.decorY = { side: 1.11, top: 1.36, sideZ: 0.6, sideX: [-0.33, 0.33, -1.0, 1.0], topX: [-1.1, 1.1, -1.1, 1.1] };
   return len;
@@ -312,36 +354,231 @@ function buildFlach(car, mats) {
   const len = 2.6;
   mats.body.map = woodTexture('#f3e7d6', 'wagon');
   underframe(car, len, mats);
+  endBeams(car, len);
   floor(car, len, mats);
+  sideBand(car, len, 0.78, mats, 0.585, 0.1);
   for (const x of [-1.15, -0.38, 0.38, 1.15]) {
-    for (const z of [0.53, -0.53]) car.add(mesh(cyl(0.04, 0.045, 0.55, 8), mats.roof, x, 1.12, z, 'roof'));
+    for (const z of [0.53, -0.53]) {
+      car.add(mesh(cyl(0.04, 0.045, 0.55, 8), mats.roof, x, 1.12, z, 'roof'));
+      car.add(mesh(sph(0.055), mats.roof, x, 1.4, z, 'roof'));
+    }
   }
   car.userData.cargoY = 0.86;
   car.userData.decorY = { side: 0.78, top: 0.9, sideZ: 0.6, sideX: [-0.75, 0, 0.75, -0.35], topX: [-0.75, 0.75, 0, -0.75] };
   return len;
 }
 
+// Milchwagen: weißer Kessel mit Kuhflecken und einer großen Milchkanne obendrauf
+const cowSpot = new THREE.MeshStandardMaterial({ color: '#2b2b2b', roughness: 0.5 });
 function buildTank(car, mats) {
   const len = 2.6;
   underframe(car, len, mats);
+  endBeams(car, len);
   car.add(mesh(box(len - 0.1, 0.08, 1.1, 0.03), shared.dark, 0, 0.74, 0));
+  for (const x of [-0.75, 0.75]) car.add(mesh(box(0.3, 0.22, 0.9, 0.04), shared.dark, x, 0.86, 0));
   car.add(mesh(cylX(0.55, 2.0, 32), mats.body, 0, 1.33, 0, 'body'));
   for (const sx of [1, -1]) {
     const cap = mesh(sph(0.55), mats.body, sx * 1.0, 1.33, 0, 'body');
     cap.scale.set(0.35, 1, 1);
     car.add(cap);
   }
-  // Dom mit Deckel, Laufsteg, Leiter, Bänder
-  car.add(mesh(cyl(0.22, 0.26, 0.3), mats.roof, 0, 1.93, 0, 'roof'));
-  car.add(mesh(cyl(0.25, 0.25, 0.05), shared.metal, 0, 2.1, 0));
-  car.add(mesh(box(1.4, 0.04, 0.35, 0.01), shared.dark, 0, 1.9, 0));
+  // Kuhflecken (flach auf der Kesselwand)
+  for (const [x, a, s] of [[-0.6, 0.5, 1], [0.15, 1.2, 0.8], [0.7, 0.3, 1.1], [-0.15, -0.4, 0.9], [0.55, -1.1, 0.8], [-0.7, -1.3, 1], [0.1, 2.4, 1], [-0.5, 2.0, 0.7]]) {
+    const sp = mesh(sph(0.2 * s), cowSpot, x, 1.33 + Math.cos(a) * 0.53, Math.sin(a) * 0.53);
+    sp.scale.set(1.3, 1, 1);
+    sp.lookAt(new THREE.Vector3(x, 1.33 + Math.cos(a) * 2, Math.sin(a) * 2));
+    sp.scale.set(1.4, 1, 0.15);
+    car.add(sp);
+  }
   const band = cached('band', () => new THREE.TorusGeometry(0.56, 0.03, 8, 32).rotateY(Math.PI / 2));
-  for (const x of [-0.65, 0.65]) car.add(mesh(band, mats.roof, x, 1.33, 0, 'roof'));
+  for (const x of [-0.9, 0.9]) car.add(mesh(band, mats.roof, x, 1.33, 0, 'roof'));
+  // Milchkanne als Dom
+  car.add(mesh(cyl(0.24, 0.27, 0.36, 20), shared.metal, 0, 1.98, 0));
+  car.add(mesh(cyl(0.15, 0.24, 0.12, 20), shared.metal, 0, 2.22, 0));
+  car.add(mesh(cyl(0.16, 0.16, 0.08, 20), mats.roof, 0, 2.31, 0, 'roof'));
+  car.add(mesh(cached('canHandle', () => new THREE.TorusGeometry(0.1, 0.02, 6, 14, Math.PI)), shared.metal, 0, 2.36, 0));
+  // Leiter
   for (const s of [1, -1]) {
     for (const dz of [-0.12, 0.12]) car.add(mesh(cyl(0.015, 0.015, 1.1, 6), shared.metal, 0.35 + dz, 1.35, s * 0.6));
     for (let i = 0; i < 5; i++) car.add(mesh(cylX(0.012, 0.26, 6), shared.metal, 0.35, 0.9 + i * 0.22, s * 0.6));
   }
   car.userData.decorY = { side: 1.33, top: 2.12, sideZ: 0.57, sideX: [-0.35, -0.95, 0.9, -0.35], topX: [-0.9, 0.9, -0.9, 0.9] };
+  return len;
+}
+
+// Stallwagen: kleine rote Scheune hinten (mit weißem Kreuz-Tor), vorne ein Pferch mit Zaun
+function buildStall(car, mats) {
+  const len = 2.8;
+  underframe(car, len, mats);
+  endBeams(car, len);
+  floor(car, len, mats);
+  car.add(mesh(box(len - 0.3, 0.05, 0.95, 0.03), shared.hay, 0.2, 0.88, 0));
+  // Scheune
+  const bx = -0.88;
+  const bw = 0.95;
+  car.add(mesh(box(bw, 0.95, 1.1, 0.05), mats.body, bx, 1.33, 0, 'body'));
+  for (const s of [1, -1]) {
+    car.add(mesh(box(0.62, 0.62, 0.03, 0.02), mats.roof, bx, 1.24, s * 0.555, 'roof'));
+    for (const r of [0.78, -0.78]) {
+      const d = mesh(box(0.06, 0.82, 0.035, 0.01), mats.roof, bx, 1.24, s * 0.565, 'roof');
+      d.rotation.z = r;
+      car.add(d);
+    }
+    // Satteldach (zwei schräge Flächen)
+    const rf = mesh(box(bw + 0.2, 0.08, 0.72, 0.03), shared.dark, bx, 2.0, s * 0.3);
+    rf.rotation.x = s * 0.62;
+    car.add(rf);
+  }
+  car.add(mesh(cyl(0.12, 0.12, 0.04, 16).clone().rotateZ(Math.PI / 2), mats.roof, bx + bw / 2 + 0.01, 1.98, 0, 'roof'));
+  const gable = new THREE.Shape();
+  gable.moveTo(-0.55, 0);
+  gable.lineTo(0.55, 0);
+  gable.lineTo(0, 0.4);
+  gable.closePath();
+  const gGeo = cached('stallGable', () => new THREE.ExtrudeGeometry(gable, { depth: bw, bevelEnabled: false }).rotateY(Math.PI / 2).translate(-bw / 2, 0, 0));
+  car.add(mesh(gGeo, mats.body, bx, 1.8, 0, 'body'));
+  // Heuluke mit Heu
+  car.add(mesh(box(0.03, 0.18, 0.3, 0.02), shared.dark, bx + bw / 2 + 0.01, 1.92, 0));
+  hayTuft(car, bx + bw / 2 + 0.06, 1.86, 0, 0.8);
+  // Pferch: weißer Zaun
+  const fx0 = bx + bw / 2;
+  const fx1 = len / 2 - 0.08;
+  const fl = fx1 - fx0;
+  for (const s of [1, -1]) {
+    for (const y of [1.05, 1.3]) car.add(mesh(box(fl, 0.07, 0.05, 0.02), mats.roof, fx0 + fl / 2, y, s * 0.53, 'roof'));
+    for (let i = 0; i <= 3; i++) car.add(mesh(box(0.08, 0.6, 0.08, 0.03), mats.roof, fx0 + (fl * i) / 3, 1.13, s * 0.53, 'roof'));
+  }
+  for (const y of [1.05, 1.3]) car.add(mesh(box(0.05, 0.07, 1.06, 0.02), mats.roof, fx1, y, 0, 'roof'));
+  car.userData.cargoY = 0.88;
+  car.userData.slotX = [0.05, 0.85];
+  car.userData.decorY = { side: 1.33, top: 2.2, sideZ: 0.6, sideX: [-0.88, -0.88, -0.88, -0.88], topX: [-0.88, -0.88, -0.88, -0.88] };
+  return len;
+}
+
+// Hühnerwagen: Hühnerhaus auf Stelzen mit Rampe, Nest mit Eiern, Maschendraht-Zaun
+const eggMat = new THREE.MeshStandardMaterial({ color: '#fff7e6', roughness: 0.5 });
+function buildHuehner(car, mats) {
+  const len = 2.6;
+  underframe(car, len, mats);
+  endBeams(car, len);
+  floor(car, len, mats);
+  car.add(mesh(box(len - 0.3, 0.04, 0.95, 0.02), shared.hay, 0, 0.88, 0));
+  // Hühnerhaus vorne auf Stelzen
+  const hx = 0.78;
+  for (const dx of [-0.3, 0.3]) for (const z of [0.38, -0.38]) car.add(mesh(box(0.07, 0.4, 0.07, 0.02), mats.trim, hx + dx, 1.06, z, 'trim'));
+  car.add(mesh(box(0.8, 0.6, 0.9, 0.06), mats.body, hx, 1.56, 0, 'body'));
+  const roof = mesh(box(1.0, 0.07, 1.12, 0.03), mats.roof, hx, 1.94, 0, 'roof');
+  roof.rotation.z = -0.22;
+  car.add(roof);
+  for (const s of [1, -1]) {
+    car.add(mesh(cylZ(0.13, 0.03, 18), shared.dark, hx - 0.05, 1.56, s * 0.455));
+    // Nest mit Eiern seitlich am Haus
+    const nest = mesh(cyl(0.16, 0.11, 0.1, 14), shared.hay, hx + 0.18, 1.2, s * 0.56);
+    car.add(nest);
+    for (const dz of [-0.05, 0.06]) {
+      const egg = mesh(sph(0.055), eggMat, hx + 0.14 + dz, 1.29, s * 0.56 + dz * 0.5);
+      egg.scale.y = 1.3;
+      car.add(egg);
+    }
+  }
+  // Rampe mit Sprossen
+  const ramp = mesh(box(0.55, 0.04, 0.26, 0.01), mats.trim, hx - 0.62, 1.07, 0, 'trim');
+  ramp.rotation.z = -0.62;
+  car.add(ramp);
+  // Maschendraht-Zaun: viele dünne Stäbe
+  for (const s of [1, -1]) {
+    for (let i = 0; i < 10; i++) car.add(mesh(cyl(0.012, 0.012, 0.42, 4), shared.metal, -1.2 + i * 0.16, 1.07, s * 0.53));
+    car.add(mesh(cylX(0.02, 1.55, 6), mats.trim, -0.45, 1.29, s * 0.53, 'trim'));
+  }
+  car.add(mesh(box(0.08, 0.5, 1.1, 0.03), mats.trim, -(len / 2 - 0.1), 1.1, 0, 'trim'));
+  car.userData.cargoY = 0.86;
+  car.userData.slotX = [-0.75, -0.05];
+  car.userData.decorY = { side: 1.56, top: 2.05, sideZ: 0.5, sideX: [0.78, 0.78, 0.78, 0.78], topX: [0.6, 0.95, 0.6, 0.95] };
+  return len;
+}
+
+// Teichwagen: Wasserbecken mit Glaswänden, Seerosen und Schilf – für Enten, Frösche und Pinguine
+const glassMat = new THREE.MeshPhysicalMaterial({ color: '#d8f3ff', roughness: 0.05, transparent: true, opacity: 0.3, depthWrite: false });
+const waterMat = new THREE.MeshStandardMaterial({ color: '#3fa7e0', roughness: 0.15, transparent: true, opacity: 0.8 });
+const padMat = new THREE.MeshStandardMaterial({ color: '#4fa65a', roughness: 0.6 });
+const reedMat = new THREE.MeshStandardMaterial({ color: '#6c8f3a', roughness: 0.8 });
+const cattailMat = new THREE.MeshStandardMaterial({ color: '#7a4b2a', roughness: 0.8 });
+function buildTeich(car, mats) {
+  const len = 2.6;
+  underframe(car, len, mats);
+  endBeams(car, len);
+  floor(car, len, mats);
+  car.add(mesh(box(len - 0.3, 0.42, 0.92, 0.04), waterMat, 0, 1.06, 0));
+  // Steine am Grund (sieht man durchs Glas)
+  for (const [x, z, s] of [[-0.9, 0.25, 1], [0.4, -0.3, 0.8], [1.0, 0.2, 0.7]]) {
+    const st = mesh(sph(0.1 * s), shared.dark, x, 0.92, z);
+    st.scale.y = 0.6;
+    car.add(st);
+  }
+  // Glaswände mit farbigem Rahmen
+  for (const s of [1, -1]) car.add(mesh(box(len - 0.1, 0.58, 0.04, 0.02), glassMat, 0, 1.15, s * 0.52));
+  for (const s of [1, -1]) car.add(mesh(box(0.04, 0.58, 1.06, 0.02), glassMat, s * (len / 2 - 0.06), 1.15, 0));
+  for (const s of [1, -1]) {
+    car.add(mesh(box(len - 0.06, 0.07, 0.08, 0.03), mats.roof, 0, 1.46, s * 0.53, 'roof'));
+    for (const x of [len / 2 - 0.06, -(len / 2 - 0.06), 0]) car.add(mesh(box(0.08, 0.62, 0.08, 0.03), mats.roof, x, 1.15, s * 0.53, 'roof'));
+  }
+  for (const s of [1, -1]) car.add(mesh(box(0.08, 0.07, 1.1, 0.03), mats.roof, s * (len / 2 - 0.06), 1.46, 0, 'roof'));
+  // Seerosenblätter und eine Blüte
+  for (const [x, z] of [[-0.35, 0.28], [0.35, -0.25], [1.0, -0.28]]) {
+    const p = mesh(cyl(0.14, 0.14, 0.02, 16), padMat, x, 1.28, z);
+    car.add(p);
+  }
+  car.add(mesh(sph(0.05), new THREE.MeshStandardMaterial({ color: '#f7a8c8', roughness: 0.5 }), 0.35, 1.31, -0.25));
+  // Schilf in der Ecke
+  for (const [dx, dz, h] of [[0, 0, 0.6], [0.08, 0.06, 0.5], [-0.06, 0.07, 0.45]]) {
+    car.add(mesh(cyl(0.015, 0.02, h, 5), reedMat, -1.05 + dx, 1.28 + h / 2, -0.3 + dz));
+    car.add(mesh(cyl(0.035, 0.035, 0.12, 8), cattailMat, -1.05 + dx, 1.28 + h, -0.3 + dz));
+  }
+  car.userData.cargoY = 1.12;
+  car.userData.decorY = { side: 0.78, top: 1.5, sideZ: 0.6, sideX: [-0.7, 0.7, 0, -0.7], topX: [-0.7, 0.7, 0, -0.7] };
+  return len;
+}
+
+// Zoowagen: offener Wagen für große Tiere (Giraffe, Elefant, Löwe) mit Zebrastreifen-Geländer und Palme
+const zebraW = new THREE.MeshStandardMaterial({ color: '#f5f1ea', roughness: 0.5 });
+const zebraB = new THREE.MeshStandardMaterial({ color: '#2b2b2b', roughness: 0.5 });
+const palmTrunk = new THREE.MeshStandardMaterial({ color: '#9a6b3f', roughness: 0.9 });
+const palmLeaf = new THREE.MeshStandardMaterial({ color: '#3f9a4a', roughness: 0.6, side: THREE.DoubleSide });
+function buildZoo(car, mats) {
+  const len = 2.8;
+  underframe(car, len, mats);
+  endBeams(car, len);
+  floor(car, len, mats);
+  car.add(mesh(box(len - 0.3, 0.04, 0.95, 0.02), new THREE.MeshStandardMaterial({ color: '#e0c48a', roughness: 1 }), 0, 0.88, 0));
+  // Geländer mit Zebrastreifen-Pfosten
+  for (const s of [1, -1]) {
+    for (let i = 0; i < 9; i++) car.add(mesh(box(0.09, 0.42, 0.06, 0.02), i % 2 ? zebraB : zebraW, -1.25 + i * 0.3125, 1.07, s * 0.54));
+    car.add(mesh(cylX(0.035, len - 0.1, 8), mats.roof, 0, 1.3, s * 0.54, 'roof'));
+  }
+  for (const sx of [1, -1]) car.add(mesh(cylZ(0.035, 1.1, 8), mats.roof, sx * (len / 2 - 0.08), 1.3, 0, 'roof'));
+  // Palme in der Ecke
+  const px = len / 2 - 0.22;
+  const pz = -0.36;
+  for (let i = 0; i < 5; i++) {
+    const seg = mesh(cyl(0.05 - i * 0.004, 0.06 - i * 0.004, 0.2, 8), palmTrunk, px - i * 0.012, 0.98 + i * 0.19, pz);
+    car.add(seg);
+  }
+  const leafGeo = cached('palmLeaf', () => {
+    const g = new THREE.SphereGeometry(0.3, 10, 6, 0, Math.PI * 2, 0, Math.PI * 0.35);
+    g.scale(1.6, 0.6, 0.45);
+    return g;
+  });
+  for (let i = 0; i < 6; i++) {
+    const l = mesh(leafGeo, palmLeaf, px - 0.06, 1.88, pz);
+    l.rotation.set(0, (i / 6) * Math.PI * 2, 0.55);
+    l.position.x += Math.cos((i / 6) * Math.PI * 2) * 0.18;
+    l.position.z -= Math.sin((i / 6) * Math.PI * 2) * 0.18;
+    car.add(l);
+  }
+  car.add(mesh(sph(0.06), new THREE.MeshStandardMaterial({ color: '#7a5230' }), px - 0.02, 1.8, pz + 0.07));
+  car.userData.cargoY = 0.88;
+  car.userData.slotX = [-0.75, 0.3];
+  car.userData.decorY = { side: 0.78, top: 1.38, sideZ: 0.6, sideX: [-0.7, 0.7, 0, -0.7], topX: [-1.2, -0.3, -1.2, -0.3] };
   return len;
 }
 
@@ -483,46 +720,6 @@ function buildSchluss(car, mats) {
   return len;
 }
 
-function buildHolz(car, mats) {
-  const len = 2.6;
-  underframe(car, len, mats);
-  floor(car, len, mats);
-  for (const x of [-1.15, -0.38, 0.38, 1.15]) {
-    for (const z of [0.53, -0.53]) car.add(mesh(cyl(0.04, 0.045, 0.75, 8), mats.roof, x, 1.22, z, 'roof'));
-  }
-  const bark = new THREE.MeshStandardMaterial({ color: '#7a4b2a', roughness: 0.9 });
-  const cut = new THREE.MeshStandardMaterial({ color: '#e3c18f', roughness: 0.8 });
-  const logGeo = cached('log', () => new THREE.CylinderGeometry(0.16, 0.16, 2.3, 14).rotateZ(Math.PI / 2));
-  for (const [y, z] of [[1.02, -0.33], [1.02, 0], [1.02, 0.33], [1.29, -0.17], [1.29, 0.17], [1.56, 0]]) {
-    car.add(mesh(logGeo, [bark, cut, cut], 0, y, z));
-  }
-  car.userData.decorY = { side: 0.78, top: 1.72, sideZ: 0.6, sideX: [-0.75, 0, 0.75, -0.35], topX: [-0.8, 0.8, 0, -0.8] };
-  return len;
-}
-
-function buildKohle(car, mats) {
-  const len = 2.6;
-  underframe(car, len, mats);
-  floor(car, len, mats);
-  walls(car, len, 0.55, mats);
-  for (const x of [-0.8, 0, 0.8]) {
-    for (const z of [0.58, -0.58]) car.add(mesh(box(0.06, 0.56, 0.04, 0.01), mats.trim, x, 1.13, z, 'trim'));
-  }
-  const coal = new THREE.MeshStandardMaterial({ color: '#25272b', roughness: 0.6, metalness: 0.2 });
-  let seed = 3;
-  const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
-  for (let i = 0; i < 26; i++) {
-    const x = (rnd() - 0.5) * 2.0;
-    const z = (rnd() - 0.5) * 0.85;
-    const h = 1.3 + (1 - Math.abs(x) / 1.1) * 0.25 + rnd() * 0.08;
-    const c = mesh(cached('coal', () => new THREE.IcosahedronGeometry(0.16, 0)), coal, x, h, z);
-    c.rotation.set(rnd() * 3, rnd() * 3, 0);
-    car.add(c);
-  }
-  car.userData.decorY = { side: 1.13, top: 1.45, sideZ: 0.6, sideX: [-0.4, 0.4, -1.0, 1.0], topX: [-1.1, 1.1, -1.1, 1.1] };
-  return len;
-}
-
 const TOY_CAR_COLORS = ['#e5484d', '#4fa65a', '#f2c832', '#8b5bb5'];
 // Spielzeugauto, fast so breit wie der Wagen (wie bei echten Autotransportern im Kinderzimmer)
 function toyCar(color) {
@@ -631,8 +828,6 @@ const BUILDERS = {
   schnell: buildSchnell,
   zirkus: buildZirkus,
   schluss: buildSchluss,
-  holz: buildHolz,
-  kohle: buildKohle,
   auto: buildAuto,
   kran: buildKran,
   personen: buildPersonen,
@@ -640,6 +835,10 @@ const BUILDERS = {
   tier: buildTier,
   flach: buildFlach,
   tank: buildTank,
+  stall: buildStall,
+  huehner: buildHuehner,
+  teich: buildTeich,
+  zoo: buildZoo,
 };
 
 // ---------- Schmuck ----------

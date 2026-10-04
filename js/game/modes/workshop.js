@@ -7,7 +7,7 @@
 // - Eine Zeige-Hand zeigt, wie es geht, wenn eine Weile nichts passiert.
 
 import * as THREE from 'three';
-import { LOCOS, WAGONS, COLORS, DECOR, CARGO, ANIMALS, PASSENGERS, FOODS, LIKES, MAX_WAGONS, MAX_DECOR, newCar, partDef, isLoco, pushCargo, spliceCargo } from '../../catalog.js';
+import { LOCOS, WAGONS, COLORS, DECOR, CARGO, ANIMALS, PASSENGERS, FOODS, LIKES, MAX_WAGONS, MAX_DECOR, newCar, partDef, isLoco, pushCargo, spliceCargo, isHomeWagon } from '../../catalog.js';
 import { renderThumbnails } from '../thumbs.js';
 import { createTray } from '../tray.js';
 import { wave, applyDirt } from '../trainModel.js';
@@ -432,11 +432,20 @@ export function createWorkshopMode(game) {
     }
     pushCargo(train.data.cars[index], id, dest);
     const car = train.rebuildCar(index);
-    game.popIn(car.userData.cargoItems[car.userData.cargoItems.length - 1]);
+    const fig = car.userData.cargoItems[car.userData.cargoItems.length - 1];
+    game.popIn(fig);
     lastCar = index;
     game.saveTrain();
     services.sfx('pop');
     services.sayName(id);
+    // Im Lieblingswagen freut sich das Tier: Herzchen und ein Hüpfer
+    if (fig && isHomeWagon(train.data.cars[index].type, id)) {
+      setTimeout(() => {
+        feeder.hearts(fig.getWorldPosition(new THREE.Vector3()).add(new THREE.Vector3(0, 0.9, 0)));
+        game.hop(fig);
+        services.sfx('sparkle');
+      }, 450);
+    }
     return true;
   }
 

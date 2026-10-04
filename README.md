@@ -259,6 +259,10 @@ dann fährt alles wieder zurück.
 **Katze auf dem Baum:** Neben der Wache sitzt eine Katze auf einem Ast und miaut, wenn der Zug vorbeikommt. Katze, Baum oder
 Wache antippen → die Feuerwehr rückt aus, dreht die Leiter zur Katze, richtet sie auf und fährt sie aus; die Katze springt
 in den Korb, fährt mit herunter, springt ab und freut sich. Nach etwa 45 Sekunden klettert sie wieder hinauf (nochmal!).
+**Einsatzfahrt:** Beim Fahren rückt die Feuerwehr etwa alle 2,5–3,5 Minuten von selbst aus (erstmals nach ca. 50 Sekunden):
+Tor auf, über die gepflasterte Zufahrt auf die Landstraße, ein Stück die Straße entlang (hält an geschlossenen Schranken),
+wenden, zurück und rückwärts in die Halle. Die Autos fahren dabei an den Rand und bremsen (Rettungsgasse).
+Tatütata ertönt beim Ausrücken, beim Wenden und wenn der Zug in der Nähe ist (`js/game/firePatrol.js`).
 Die Zeige-Hand zeigt zuerst auf die Katze (bis sie einmal gerettet wurde), dann auf die Wache (bis sie einmal benutzt wurde).
 **Ententeich** neben dem Dorf (nah an der Strecke) mit Schilf, Seerosen, Steg und drei Enten.
 

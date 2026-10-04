@@ -6,6 +6,7 @@ import { buildFigure } from './figures.js';
 import { wave } from './trainModel.js';
 import { FIRE, fireTruck } from './zones.js';
 import { tree } from './world.js';
+import { FirePatrol } from './firePatrol.js';
 
 const WAVE_DIST = 17;
 const COOLDOWN = 18;
@@ -37,6 +38,7 @@ export class VillageLife {
     this.makePets();
     this.makeFire();
     this.makeCatTree();
+    this.patrol = new FirePatrol(this);
 
     // Schaukeln (zwei Sitze am Gestell, auf einem sitzt der Teddy)
     this.swings = [];
@@ -352,7 +354,10 @@ export class VillageLife {
     }, () => o.scale.setScalar(s0));
     const at = (x, y, z) => new THREE.Vector3(x, y, z).applyMatrix4(o.matrixWorld);
     if (kind === 'house') return this.visitor(o);
-    if (kind === 'fire') return this.fireAlarm();
+    if (kind === 'fire') {
+      if (this.fire?.patrol) return g.services.sfx('siren'); // unterwegs: Tatütata
+      return this.fireAlarm();
+    }
     if (kind === 'cat') return this.tapCat();
     if (kind === 'church') {
       g.services.sfx('churchbell');
@@ -529,6 +534,7 @@ export class VillageLife {
         l.material.emissiveIntensity = f.flash > 0 ? (Math.sin(time * 14 + i * Math.PI) > 0 ? 3.5 : 0.2) : 0.3;
       });
       this.updateCat(dt, time);
+      this.patrol.update(dt);
     }
     for (const s of this.swings) {
       s.pivot.visible = s.frame.visible && s.frame.scale.x > 0.5;

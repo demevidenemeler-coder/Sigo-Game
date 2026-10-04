@@ -251,9 +251,12 @@ export function createFeatures(scene) {
     const L = roadS.length;
     const p = new THREE.Vector3();
     const tg = new THREE.Vector3();
+    const em = api.emergency; // Feuerwehr im Einsatz: Autos in der Nähe fahren an den Rand und bremsen (Rettungsgasse)
     for (const c of cars) {
       const { dir } = c.userData;
-      let t = c.userData.t + dir * c.userData.speed * dt;
+      const near = em && Math.abs(em.t - c.userData.t) < 11;
+      c.userData.aside = THREE.MathUtils.clamp((c.userData.aside ?? 0) + (near ? dt * 2 : -dt), 0, 1);
+      let t = c.userData.t + dir * c.userData.speed * dt * (1 - 0.65 * c.userData.aside);
       for (const x of crossings) {
         if (!x.closed) continue;
         const stop = dir > 0 ? x.t0 - 1.4 : x.t1 + 1.4;
@@ -270,13 +273,14 @@ export function createFeatures(scene) {
       c.userData.t = t;
       road.getPointAt(t / L, p);
       road.getTangentAt(t / L, tg);
-      const lane = dir > 0 ? -0.8 : 0.8;
+      const lane = (dir > 0 ? -1 : 1) * (0.8 + 0.75 * c.userData.aside);
       c.position.set(p.x - tg.z * lane, 0.05, p.z + tg.x * lane);
       c.rotation.y = Math.atan2(-tg.z * dir, tg.x * dir);
     }
   }
 
-  return { group, river, road, riverS, roadS, cars, blocked, riverDist, roadNearest, updateTraffic, riverWidth: RIVER_WIDTH, roadWidth: ROAD_WIDTH };
+  const api = { group, river, road, riverS, roadS, cars, blocked, riverDist, roadNearest, updateTraffic, riverWidth: RIVER_WIDTH, roadWidth: ROAD_WIDTH, emergency: null };
+  return api;
 }
 
 // Schnittpunkte zweier Linienzüge (a darf geschlossen sein). Liefert Position und Länge entlang a und b.

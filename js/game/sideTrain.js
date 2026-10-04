@@ -8,6 +8,7 @@ import { Train } from './train.js';
 import { newCar } from '../catalog.js';
 import { wave } from './trainModel.js';
 import { WORLD_BOUNDS } from './world.js';
+import { makeBeam } from './beams.js';
 
 const RX = 8;
 const RZ = 4.6;
@@ -49,6 +50,10 @@ export class SideTrain {
       c.userData.kind = 'sidecar';
       this.land.tappable.push(c);
     }
+    // nachts Fernlicht auch beim zweiten Zug
+    const beam = makeBeam({ length: 8, width: 2.8, height: 0.9 });
+    beam.position.x = 1.5;
+    this.train.loco.add(beam);
     this.placed = false;
     this.center = null;
     this.s = 0;

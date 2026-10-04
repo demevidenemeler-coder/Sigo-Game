@@ -7,6 +7,7 @@ import { mergeStatic } from './merge.js';
 import { RoundedBoxGeometry } from '../../vendor/RoundedBoxGeometry.js';
 import { waterTexture } from './textures.js';
 import { lamp } from './lamps.js';
+import { makeBeam } from './beams.js';
 
 const RIVER_WIDTH = 5;
 const ROAD_WIDTH = 3.2;
@@ -127,6 +128,8 @@ function roadCar(color) {
     for (const z of [0.42, -0.42]) add(new THREE.CylinderGeometry(0.18, 0.18, 0.14, 14).rotateX(Math.PI / 2), new THREE.MeshStandardMaterial({ color: '#2a2a2a' }), x, 0.18, z);
   }
   for (const z of [0.25, -0.25]) add(new THREE.SphereGeometry(0.07, 8, 6), lamp(new THREE.MeshStandardMaterial({ color: '#fff6d8', emissive: '#ffd36b' }), 0.3, 2.5), 0.86, 0.4, z);
+  // Rücklichter (nachts rot leuchtend)
+  for (const z of [0.28, -0.28]) add(new THREE.BoxGeometry(0.04, 0.08, 0.16), lamp(new THREE.MeshStandardMaterial({ color: '#b3262b', emissive: '#ff3030' }), 0, 2.2), -0.86, 0.42, z);
   c.userData.action = 'hupen';
   c.traverse((o) => { o.userData.owner = c; });
   return c;
@@ -204,6 +207,9 @@ export function createFeatures(scene) {
     c.userData.dir = i % 2 ? 1 : -1;
     c.userData.speed = 3 + (i % 3) * 0.6;
     mergeStatic(c);
+    const beam = makeBeam({ length: 6, width: 2.2, height: 0.4, kind: 'car' });
+    beam.position.x = 0.86;
+    c.add(beam);
     group.add(c);
     cars.push(c);
   }

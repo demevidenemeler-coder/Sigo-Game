@@ -4,6 +4,8 @@
 
 import * as THREE from 'three';
 import { RoundedBoxGeometry } from '../../vendor/RoundedBoxGeometry.js';
+import { lamp } from './lamps.js';
+import { makeGlowPool } from './beams.js';
 
 // Lage der Bereiche (frei von Fluss, Straße, Bergen und der Start-Strecke)
 export const LAYOUT = {
@@ -271,11 +273,15 @@ export function bench() {
   return g;
 }
 
+// Laternenglas: tagsüber matt, nachts hell (gemeinsames Material, folgt der Tageszeit)
+const lanternGlass = lamp(new THREE.MeshStandardMaterial({ color: '#fff3c4', roughness: 0.3, emissive: '#ffcf70' }), 0.2, 3.0);
+
 export function lantern() {
   const g = new THREE.Group();
   add(g, new THREE.CylinderGeometry(0.05, 0.07, 2.2, 8), mat('#3a4a5a', 0.5), 0, 1.1, 0);
-  add(g, new THREE.CylinderGeometry(0.16, 0.12, 0.35, 8), mat('#fff3c4', 0.3, { emissive: '#ffcf70', emissiveIntensity: 0.4 }), 0, 2.35, 0);
+  add(g, new THREE.CylinderGeometry(0.16, 0.12, 0.35, 8), lanternGlass, 0, 2.35, 0);
   add(g, new THREE.ConeGeometry(0.24, 0.2, 8), mat('#3a4a5a', 0.5), 0, 2.62, 0);
+  g.add(makeGlowPool(2.0));
   g.userData.kind = 'tree';
   g.userData.clearR = 0.8;
   return g;

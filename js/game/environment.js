@@ -3,6 +3,7 @@
 
 import * as THREE from 'three';
 import { lamps } from './lamps.js';
+import { makeBeam, setBeamGlow } from './beams.js';
 import { NoiseLoop } from '../audio.js';
 
 const C = (c) => new THREE.Color(c);
@@ -90,6 +91,9 @@ export class Environment {
     // Scheinwerfer der Lok (nachts und im Tunnel)
     this.headlight = new THREE.SpotLight('#fff1c9', 0, 30, 0.55, 0.6, 1.2);
     scene.add(this.headlight, this.headlight.target);
+    // sichtbarer Lichtkegel der Lok (Fernlicht)
+    this.locoBeam = makeBeam({ length: 11, width: 3.4, height: 1.15 });
+    scene.add(this.locoBeam);
 
     this.rainSound = new NoiseLoop('bandpass', 2600, 0.4);
 
@@ -230,9 +234,16 @@ export class Environment {
       this.headlight.position.copy(front);
       this.headlight.target.position.copy(ahead);
       this.headlight.intensity = glow * 60;
+      // Kegel an der Lok-Spitze, in Fahrtrichtung
+      const base = loco.localToWorld(new THREE.Vector3(1.6, 0, 0));
+      this.locoBeam.position.set(base.x, 0, base.z);
+      this.locoBeam.quaternion.copy(loco.getWorldQuaternion(new THREE.Quaternion()));
+      this.locoBeam.userData.enabled = true;
     } else {
       this.headlight.intensity = 0;
+      this.locoBeam.userData.enabled = false;
     }
+    setBeamGlow(glow);
   }
 
   stopSounds() {

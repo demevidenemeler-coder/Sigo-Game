@@ -235,7 +235,8 @@ Winke-Arme bleiben im Spiel beweglich; Münder (Füttern) setzt das Spiel automa
 - `js/game/groundPaint.js`: gemalter Boden (Wiesenflecken, Feldwege, Dorfplatz, Felder) + feine Halm-Struktur
 - `js/game/zones.js`: Lage der Bereiche (Dorf, Hof, Felder, Waldstücke, Obstwiese, Blumenwiesen) und ihre Bauteile
 - `js/game/workshopDeco.js`: Spielzimmer-Werkstatt (Teppich, Sonnenflecken, Spielsachen)
-- `js/game/ambient.js`: Schmetterlinge über den Blumenwiesen, Vogelschwärme, Schornsteinrauch (nachts ruhig)
+- `js/game/ambient.js`: Schmetterlinge, Vogelschwärme, Schornsteinrauch; nachts Glühwürmchen
+- `js/game/beams.js`: nachts Fernlicht (Lichtkegel + Lichtfleck) für Lok, zweiten Zug und Autos, Lichtschein unter Laternen
 - Mitfahr-Kamera: mit dem Finger wischen = um den Zug herum schauen (hoch/runter geht auch);
   nach 7 Sekunden ohne Finger schwenkt sie langsam zurück
 - Schwache Geräte: die Qualitätsautomatik lässt zuerst jede zweite Blume / jedes zweite Grasbüschel weg

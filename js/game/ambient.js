@@ -56,6 +56,13 @@ export class Ambient {
     this.butterflies.frustumCulled = false;
     scene.add(this.butterflies);
 
+    // Glühwürmchen: nachts leuchtende Pünktchen über den Wiesen (gleiche Plätze wie die Schmetterlinge)
+    this.fireflies = new THREE.InstancedMesh(new THREE.SphereGeometry(0.05, 6, 4),
+      new THREE.MeshBasicMaterial({ color: '#fff27a', transparent: true, opacity: 0.95, fog: false }), this.flies.length * 2);
+    this.fireflies.frustumCulled = false;
+    this.fireflies.visible = false;
+    scene.add(this.fireflies);
+
     // Vögel: drei kleine Schwärme kreisen hoch oben
     this.flocks = [0, 1, 2].map((k) => ({ cx: (k - 1) * 45, cz: -10 + k * 12, r: 30 + k * 12, a: k * 2, speed: 0.05 + k * 0.015, h: 16 + k * 3 }));
     this.birdCount = this.flocks.length * 5;
@@ -91,6 +98,24 @@ export class Ambient {
         this.butterflies.setMatrixAt(i, m.compose(p.set(x, y, z), q, s));
       });
       this.butterflies.instanceMatrix.needsUpdate = true;
+    }
+
+    // Glühwürmchen
+    const glow = 1 - awake;
+    this.fireflies.visible = glow > 0.05;
+    if (this.fireflies.visible) {
+      this.flies.forEach((f, i) => {
+        for (let k = 0; k < 2; k++) {
+          const ph = f.phase + k * 3.7;
+          const x = f.cx + Math.cos(f.a * 0.6 + ph) * f.r * 1.1 + Math.sin(time * 0.7 + ph) * 0.8;
+          const z = f.cz + Math.sin(f.a * 0.6 + ph) * f.r * 0.9 + Math.cos(time * 0.5 + ph) * 0.8;
+          const y = 0.5 + f.h * 0.6 + Math.sin(time * 1.3 + ph) * 0.3;
+          const blink = Math.max(0, Math.sin(time * 2.2 + ph * 2)) * glow;
+          s.setScalar(0.4 + blink);
+          this.fireflies.setMatrixAt(i * 2 + k, m.compose(p.set(x, y, z), q.identity(), s));
+        }
+      });
+      this.fireflies.instanceMatrix.needsUpdate = true;
     }
 
     // Vögel (Formation: ein „V“ hinter dem Anführer)

@@ -5,7 +5,7 @@ anmalen, schmücken, beladen – dann mit dem Finger eine Strecke malen und losf
 
 Ohne Punkte, ohne Zeitdruck, ohne Werbung, ohne Internet – und mit eingebautem Ende.
 
-## Die vier Bereiche (Knöpfe oben links)
+## Die Bereiche (Knöpfe oben links)
 
 ### 🛠️ Werkstatt
 Unten: oben eine Reihe Fächer (mit Beschriftung), darunter große Karten – mit ◀ ▶ blättern (oder wischen).
@@ -37,8 +37,7 @@ und es ruft – beim Mampfen klappt der Mund dreimal auf und zu. Mag es das Futt
 Lieblingsfutter** und dieses wackelt in der Leiste. Kein Scheitern – nur ein Hinweis. (Kuh/Schaf: Heu, Hase: Karotte,
 Katze/Pinguin: Fisch, Hund: Knochen, Löwe: Fleisch, Hühner/Ente: Körner, Frosch: Fliege, Giraffe: Blätter …)
 **Zeige-Hand:** Bei jedem neuen Fach macht eine Hand einmal vor, wie man etwas auf den Zug zieht. Passiert eine Weile
-nichts, zeigt sie abwechselnd: vormachen → ein noch nicht besuchtes Fach → den Fahren-Knopf. Auch beim Bauen (Stift, Kreis
-vormalen, Bahnhof an die Strecke ziehen), Fahren (▶, Wartende, Wetter) und Waschen (Eimer) zeigt sie, was geht.
+nichts, zeigt sie abwechselnd: vormachen → ein noch nicht besuchtes Fach → den Fahren-Knopf. Auch beim Fahren (▶, Wartende, Wetter) und Waschen (Eimer) zeigt sie, was geht.
 Nach ein paar Hinweisen ohne Reaktion ist Ruhe, bis wieder getippt wird.
 **Mitfahrer greifen:** Wer neben ein Tier tippt (z. B. auf den Zaun), greift das Tier – nicht den ganzen Wagen.
 
@@ -50,22 +49,15 @@ Nach ein paar Hinweisen ohne Reaktion ist Ruhe, bis wieder getippt wird.
 - Liegt der Schwamm still, wackelt er über dem Wagen und zeigt, was zu tun ist.
 - Der Schmutz vom Fahren (Regen!) ist derselbe – hier oder in der Waschanlage an der Strecke wird er wieder sauber.
 
-### 🛤️ Strecke bauen
-- Sehr großes Spielfeld (Holzzaun) in einer festen Landschaft: **ein Fluss** quer durchs Land, **eine lange Landstraße**
-  mit ständigem Autoverkehr (mit eigener Straßenbrücke) und **drei Berge**.
-- **Ein Finger verschiebt die Ansicht, zwei Finger zoomen** (am Computer: Mausrad).
-- **✏️ Stift** antippen, dann mit dem Finger eine Linie malen → Schienen. Der Kreis schließt sich von selbst.
-  **Strecken-Aufräumer:** Kleine Schlaufen und Knäuel werden herausgeschnitten, höchstens eine Kreuzung (Acht) bleibt,
-  zu enge Zacken werden zu Kurven. Bei ganz wildem Gekritzel wird der Umriss zur Strecke. Nach ca. 320 m Strich ist die
-  Strecke automatisch fertig – so bleibt das Tablet flüssig.
-  Danach schaltet der Stift wieder ab – so wird die Strecke nicht aus Versehen überschrieben.
-- **Brücke, Tunnel und Bahnübergang entstehen von selbst**, wo die gemalte Strecke Fluss, Berg oder Straße kreuzt –
-  auch bei schrägen oder gebogenen Linien (die Brücke folgt der Kurve). Die Stimme sagt an, was entstanden ist
-  („Eine Brücke über den Fluss!“).
-- In der Leiste: **Bahnhof (bis zu 4, je rot / blau / gelb / grün) und Waschanlage**.
-  Antippen → setzt sich an eine freie Stelle. Ziehen → rastet an der Strecke ein.
-  Gesetzte Dinge lassen sich entlang der Strecke verschieben; in die Leiste ziehen = weg.
-  Auf Brücken, in Tunneln und auf Bahnübergängen kann nichts stehen.
+### 🛤️ Die große Strecke (fest)
+- Es gibt **keinen Zeichenmodus** mehr. Eine feste, große Strecke führt einmal durch die ganze Welt
+  (`js/game/route.js`): am **Dorf** mit Dorfbahnhof und Ententeich vorbei, südlich um den **Bauernhof** (Weide direkt
+  an der Strecke), über die Landstraße (Bahnübergang mit Schranke), über den **Fluss** (Musikbrücke), an der
+  **Waschanlage** vorbei, durch den **Berg** (Tunnel), an den **Feldern** entlang, an der **Obstwiese** vorbei,
+  noch einmal über Fluss und Straße und zurück ins Dorf.
+- **Vier feste Bahnhöfe:** rot = Dorf, blau = Obstwiese, gelb = Bauernhof, grün = Felder.
+- Brücken, Tunnel und Bahnübergänge entstehen automatisch dort, wo die Strecke Fluss, Berg oder Straße kreuzt.
+- Der zweite Zug fährt auf einer kleinen Schlaufe auf der Wiese innerhalb der großen Strecke.
 
 ### 🚂 Fahren
 - ▶ = losfahren / ⏸ anhalten · 📯 = pfeifen · 🎥 = Kamera fährt mit · unten links: 🌞 → 🌇 → 🌙 Tag / Abend / Nacht (weicher Übergang, Abendrot, Sonne wandert), 🌤️/🌧️/❄️ Wetter – die Knöpfe zeigen immer den aktuellen Zustand
@@ -132,7 +124,7 @@ Tut das Kind nichts, deckt sich der Zug nach einer Weile von selbst zu. So wird 
 | Stimme / Sprechtempo / Geräusche | an / normal / an |
 | **Wie oft sprechen?** | Nur bei Neuem (empfohlen) / Immer |
 | Musik / Musik-Lautstärke | an / mittel |
-| Zug zurücksetzen, Strecke zurücksetzen | – |
+| Zug zurücksetzen | – |
 | **Eigene Stimme** | Tierlaute, Namen und Sätze selbst einsprechen (🎙 / ▶ / 🗑) – Aufnahmen bleiben auf dem Gerät |
 
 Ist die Spielzeit um, sagt die App „Der Zug ist müde …“ und der Zug schläft (Mond-Bildschirm).
@@ -201,7 +193,8 @@ js/game/bedroom.js         Schlafzimmer-Szene
 js/game/modes/bed.js       Zug ins Bett bringen
 js/game/lamps.js           Lampen, die nachts heller leuchten
 sounds/                    Tiergeräusche (MP3, CC0) + QUELLEN.md
-js/game/modes/*.js         Werkstatt, Waschen, Strecke bauen, Fahren
+js/game/modes/*.js         Werkstatt, Waschen, Fahren, Schlafenszeit
+js/game/route.js           feste Strecke und Bahnhöfe
 js/game/tray.js            Leiste unten (Fächer + Karten mit Blätter-Pfeilen)
 sw.js                      Offline-Speicher (neue Dateien in ASSETS eintragen)
 ```
@@ -260,6 +253,13 @@ Platz und winken, wenn der Zug vorbeifährt (`js/game/village.js`).
 Zum Anfassen: Haus antippen → jemand kommt heraus und winkt; Kirche → Glocken; Brunnen → Platschen;
 Marktstand → Apfel hüpft; Briefkasten → Brief fliegt. Dazu Bäckerei, Wimpelketten, Wäscheleine,
 Katze auf dem Dach und ein Hund, der den Zug anbellt.
+**Ententeich** neben dem Dorf (nah an der Strecke) mit Schilf, Seerosen, Steg und drei Enten.
+
+## Tiere rufen sich zu
+
+Fährt ein Tier im Zug an seinen Artgenossen in der Landschaft vorbei (Kuh/Schaf/Schwein an der Weide, Huhn/Hahn am Hof,
+Ente am Dorfteich, Hund und Katze im Dorf), ruft erst das Tier draußen und hüpft, dann antwortet das Tier im Zug
+(`js/game/greetings.js`, pro Tierart höchstens alle 30 Sekunden).
 
 ## Landschaft
 
@@ -271,5 +271,5 @@ Katze auf dem Dach und ein Hund, der den Zug anbellt.
 - Mitfahr-Kamera: mit dem Finger wischen = um den Zug herum schauen (hoch/runter geht auch);
   nach 7 Sekunden ohne Finger schwenkt sie langsam zurück
 - Schwache Geräte: die Qualitätsautomatik lässt zuerst jede zweite Blume / jedes zweite Grasbüschel weg
-- Alles auf dem Spielfeld verschwindet weiterhin, wo Schienen gemalt werden; beim Mitfahren schrumpfen
+- Was der festen Strecke im Weg stünde, wird ausgeblendet; beim Mitfahren schrumpfen
   Bäume/Häuser zwischen Kamera und Zug weich weg.

@@ -4,7 +4,6 @@ import { RoomEnvironment } from '../../vendor/RoomEnvironment.js';
 import { buildCar, sideDecor, topDecor, isTopDecor, buildWheelPreview } from './trainModel.js';
 import { buildFigure } from './figures.js';
 import { buildFood } from './foods.js';
-import { buildTrackObjectPreview } from './trackObjects.js';
 import { newCar } from '../catalog.js';
 
 const VIEWS = {
@@ -36,7 +35,6 @@ function objectFor(kind, id) {
   }
   if (kind === 'food') return { obj: buildFood(id), view: 'food' };
   if (kind === 'wheel') return { obj: buildWheelPreview(id), view: 'wheel' };
-  if (kind === 'build') return { obj: buildTrackObjectPreview(id), view: 'build' };
   return isTopDecor(id) ? { obj: topDecor(id, 1), view: 'topDecor' } : { obj: sideDecor(id), view: 'sideDecor' };
 }
 

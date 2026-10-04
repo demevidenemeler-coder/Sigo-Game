@@ -209,13 +209,6 @@ const FOOTPRINTS = {
 };
 
 // Vorschau-Modell für die Leiste (ohne Strecke)
-export function buildTrackObjectPreview(type) {
-  const item = { type, s: 0, obj: new THREE.Group(), parts: {} };
-  BUILDERS[type](item, 0);
-  for (const w of item.waiting ?? []) setDest(w, null);
-  return item.obj;
-}
-
 // ---------- Verwaltung ----------
 
 export class TrackObjects {
@@ -270,13 +263,13 @@ export class TrackObjects {
     return null;
   }
 
-  add(type, x, z) {
+  add(type, x, z, side = 0) {
     const d = def(type);
     if (this.count(type) >= d.max) return null;
     const near = this.track.nearestS(x, z);
     const s = this.freeSpotNear(near.s, d.span, null, type);
     if (s == null) return null;
-    const item = { type, s, obj: new THREE.Group(), parts: {}, owner: this };
+    const item = { type, s, obj: new THREE.Group(), parts: {}, owner: this, side };
     item.obj.userData.item = item;
     const used = this.items.map((it) => it.color);
     BUILDERS[type](item, type === 'bahnhof' ? STATION_COLORS.findIndex((_, c) => !used.includes(c)) : 0);
@@ -339,7 +332,7 @@ export class TrackObjects {
     const f = this.track.frameAt(item.s);
     item.obj.position.set(f.p.x, 0, f.p.z);
     // Stünde das Gebäude (links der Fahrtrichtung) im Fluss, auf der Straße oder im Berg → auf die andere Seite
-    item.flipped = this.sideAt(item.s) === -1;
+    item.flipped = item.side ? item.side === -1 : this.sideAt(item.s) === -1;
     item.obj.rotation.set(0, f.angle + (item.flipped ? Math.PI : 0), 0);
     item.x = f.p.x;
     item.z = f.p.z;
@@ -369,7 +362,7 @@ export class TrackObjects {
   }
 
   load(list) {
-    for (const o of list ?? []) if (BUILDERS[o.type]) this.add(o.type, o.x, o.z);
+    for (const o of list ?? []) if (BUILDERS[o.type]) this.add(o.type, o.x, o.z, o.side ?? 0);
   }
 
   footprints() {

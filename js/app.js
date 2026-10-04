@@ -1,5 +1,5 @@
 import {
-  loadSettings, saveSettings, loadSession, saveSession, loadTrain, saveTrain, loadTrack, saveTrack, loadHeard, saveHeard,
+  loadSettings, saveSettings, loadSession, saveSession, loadTrain, saveTrain,  loadHeard, saveHeard,
 } from './settings.js';
 import { LANGUAGES, setLanguage, lang, speechLang, t, nameOf, soundWordOf } from './i18n.js';
 import {
@@ -10,7 +10,6 @@ import { Music } from './music.js';
 import { loadRecordings, hasRecording, playRecording } from './recordings.js';
 import { showVoiceStudio, PHRASE_KEYS, keys as recKeys } from './voiceStudio.js';
 import { defaultTrain, upgradeTrain } from './catalog.js';
-import { defaultTrackPoints } from './game/track.js';
 import { Game } from './game/game.js';
 import { preloadModels } from './game/models.js';
 
@@ -143,8 +142,7 @@ const game = new Game({
   canvas: document.getElementById('scene'),
   ui: document.getElementById('ui'),
   trainData: upgradeTrain(loadTrain() ?? defaultTrain()),
-  trackData: loadTrack(),
-  services: { say: sayText, sayName, count: countAloud, counting: () => settings.counting, animalCall, sfx, t, saveTrain, saveTrack, soundsOn: () => settings.sounds, bedDone: () => finishBedtime() },
+  services: { say: sayText, sayName, count: countAloud, counting: () => settings.counting, animalCall, sfx, t, saveTrain, soundsOn: () => settings.sounds, bedDone: () => finishBedtime() },
 });
 game.setSeason(settings.season ?? 'auto');
 
@@ -361,15 +359,6 @@ function showSettings() {
       game.train.data = data;
       game.train.rebuild();
       saveTrain(data);
-      sfx('poof');
-    }),
-    button(t('resetTrack'), 'big secondary', () => {
-      const pts = defaultTrackPoints();
-      game.land.track.setPoints(pts);
-      game.land.crossings.rebuild();
-      [...game.land.objects.items].forEach((it) => game.land.objects.remove(it));
-      game.land.clearAroundTrack();
-      saveTrack(null);
       sfx('poof');
     }),
   );

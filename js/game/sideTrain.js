@@ -14,7 +14,8 @@ const RX = 8;
 const RZ = 4.6;
 const SPEED = 2.0;
 const MEET_DIST = 8.5;
-const MEET_COOLDOWN = 22; // Sekunden, bevor sich beide wieder zuwinken
+const MEET_COOLDOWN = 22;
+const PREFERRED = [6, -16]; // Wunschplatz: freie Wiese innerhalb der großen Strecke // Sekunden, bevor sich beide wieder zuwinken
 
 function sideTrainData() {
   const loco = newCar('elok');
@@ -97,8 +98,8 @@ export class SideTrain {
           let centerDist = Infinity;
           for (const [sx, sz] of track.samples) centerDist = Math.min(centerDist, Math.hypot(sx - cx, sz - cz));
           if (centerDist < 6.5) continue;
-          // je näher an der Strecke, desto besser (man soll sich begegnen), aber nicht direkt daneben
-          const score = nearest + centerDist * 0.2;
+          // möglichst am Wunschplatz
+          const score = Math.hypot(cx - PREFERRED[0], cz - PREFERRED[1]);
           if (!best || score < best.score) best = { cx, cz, rot, score, pts };
         }
       }

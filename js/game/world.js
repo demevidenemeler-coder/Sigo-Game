@@ -389,26 +389,35 @@ export function createLandscape() {
   fenceLine(fence, FENCE.x, -FENCE.z, FENCE.x, FENCE.z, rand);
   scene.add(fence);
 
-  // Teich mit Schilf und Enten (links)
+  // Dorfteich mit Schilf, Seerosen, Steg und Enten (östlich vom Dorf, nah an der Strecke)
+  const POND = { x: 27, z: 36 };
   const pond = new THREE.Group();
-  pond.position.set(-FENCE.x - 9, 0, 6);
-  const water = add(pond, new THREE.CircleGeometry(5, 40), new THREE.MeshStandardMaterial({ map: waterTexture(), roughness: 0.1, metalness: 0.1 }), 0, 0.06, 0, false);
+  pond.position.set(POND.x, 0, POND.z);
+  const water = add(pond, new THREE.CircleGeometry(2.6, 40), new THREE.MeshStandardMaterial({ map: waterTexture(), roughness: 0.1, metalness: 0.1 }), 0, 0.06, 0, false);
   water.rotation.x = -Math.PI / 2;
   water.scale.set(1.3, 1, 1);
-  const rim = add(pond, new THREE.RingGeometry(5, 5.8, 40), mat('#d9c9a0'), 0, 0.04, 0, false);
+  const rim = add(pond, new THREE.RingGeometry(2.6, 3.1, 40), mat('#d9c9a0'), 0, 0.04, 0, false);
   rim.rotation.x = -Math.PI / 2;
   rim.scale.set(1.3, 1, 1);
-  for (let i = 0; i < 14; i++) {
-    const a = rand() * Math.PI * 2;
-    add(pond, new THREE.CylinderGeometry(0.04, 0.05, 1.2, 5), mat('#6b8f3e'), Math.cos(a) * 6.3, 0.6, Math.sin(a) * 4.8);
-    add(pond, new THREE.CapsuleGeometry(0.08, 0.3, 4, 8), mat('#7a4b2a'), Math.cos(a) * 6.3, 1.3, Math.sin(a) * 4.8);
+  for (let i = 0; i < 10; i++) {
+    const a = 3.6 + (i / 10) * 2.4 + rand() * 0.2; // Schilf nur auf der hinteren Seite
+    add(pond, new THREE.CylinderGeometry(0.04, 0.05, 1.0, 5), mat('#6b8f3e'), Math.cos(a) * 3.6, 0.5, Math.sin(a) * 2.75);
+    add(pond, new THREE.CapsuleGeometry(0.07, 0.25, 4, 8), mat('#7a4b2a'), Math.cos(a) * 3.6, 1.1, Math.sin(a) * 2.75);
   }
+  for (const [x, z] of [[-1.6, 0.8], [1.2, 1.1], [0.4, -1.3], [-0.5, 1.6]]) add(pond, new THREE.CylinderGeometry(0.3, 0.3, 0.02, 14), mat('#4f9a45', 0.6), x, 0.08, z, false);
+  add(pond, new THREE.SphereGeometry(0.09, 10, 8), mat('#f7a8c8', 0.5), 1.2, 0.13, 1.1, false);
+  // Steg
+  const jetty = add(pond, new THREE.BoxGeometry(0.8, 0.08, 2.0), mat('#b98553'), 2.7, 0.22, 0.6);
+  jetty.rotation.y = -0.5;
+  for (const [x, z] of [[2.4, 1.3], [3.0, 1.0], [2.4, -0.1], [3.0, -0.4]]) add(pond, new THREE.CylinderGeometry(0.06, 0.06, 0.4, 6), mat('#8a5a33'), x, 0.1, z);
   scene.add(pond);
+  const pondDucks = [];
   for (let i = 0; i < 3; i++) {
     const duck = buildFigure('ente');
-    duck.scale.setScalar(1.6);
+    duck.scale.setScalar(1.5);
     scene.add(duck);
-    animated.push({ kind: 'swim', obj: duck, center: pond.position, r: 2 + i * 1.1, speed: 0.25 + i * 0.07, phase: i * 2 });
+    animated.push({ kind: 'swim', obj: duck, center: pond.position, r: 0.9 + i * 0.55, speed: 0.3 + i * 0.07, phase: i * 2 });
+    pondDucks.push(duck);
   }
 
   // Bauernhof mit Weide (rechts)
@@ -423,7 +432,7 @@ export function createLandscape() {
   fenceLine(scene, pasture.x - pasture.w, pasture.z + pasture.d, pasture.x + pasture.w, pasture.z + pasture.d, rand);
   fenceLine(scene, pasture.x - pasture.w, pasture.z - pasture.d, pasture.x - pasture.w, pasture.z + pasture.d, rand);
   fenceLine(scene, pasture.x + pasture.w, pasture.z - pasture.d, pasture.x + pasture.w, pasture.z + pasture.d, rand);
-  const tappable = [];
+  const tappable = [...pondDucks];
   for (const id of ['kuh', 'kuh', 'schaf', 'schaf', 'schwein']) {
     const a = buildFigure(id);
     a.scale.setScalar(1.8);
@@ -473,7 +482,7 @@ export function createLandscape() {
     tappable.push(obj);
     return obj;
   };
-  const occupied = []; // [x, z, r]: hier keine Einzelbäume oder Blumen
+  const occupied = [[POND.x, POND.z, 4.2]]; // [x, z, r]: hier keine Einzelbäume oder Blumen
   const isFree = (x, z, r) => occupied.every(([ox, oz, or]) => Math.hypot(ox - x, oz - z) > or + r);
 
   // Dorf: Häuser im Kreis um den Platz (zum Platz gedreht), Kirche, Brunnen, Bänke, Laternen, Dorflinde
@@ -597,7 +606,7 @@ export function createLandscape() {
   }
 
   // Kleine Weide neben dem Hof mit grasenden Tieren
-  const paddockArea = { x: F.x + 11.5, z: F.z - 4.5, w: 3.2, d: 2.6 };
+  const paddockArea = { x: F.x + 10, z: F.z + 0.5, w: 3.2, d: 2.6 }; // nah an der Strecke: man sieht die Tiere vom Zug aus
   const paddock = new THREE.Group();
   {
     const { w, d } = paddockArea;

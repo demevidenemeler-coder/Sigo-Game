@@ -179,12 +179,12 @@ export function createDriveMode(game) {
     }
     const cx = (Math.max(...xs) + Math.min(...xs)) / 2;
     const cz = (Math.max(...zs) + Math.min(...zs)) / 2;
-    const hw = (Math.max(...xs) - Math.min(...xs)) / 2 + 5;
-    const hh = (Math.max(...zs) - Math.min(...zs)) / 2 + 5;
+    const hw = (Math.max(...xs) - Math.min(...xs)) / 2 + 7;
+    const hh = (Math.max(...zs) - Math.min(...zs)) / 2 + 9; // unten (vorne) liegen Dorf und Hof: etwas mehr Rand
     if (game.isPortrait()) {
       game.fit(new THREE.Vector3(cx + 0.8, 0, cz), Math.max(hh, 7), Math.max(hw * 0.8, 11), new THREE.Vector3(0.75, 1, 0));
     } else {
-      game.fit(new THREE.Vector3(cx, 0, cz + 0.8), Math.max(hw, 11), Math.max(hh * 0.8, 7), new THREE.Vector3(0, 1, 0.75));
+      game.fit(new THREE.Vector3(cx, 0, cz + 3), Math.max(hw, 11), Math.max(hh * 0.85, 7), new THREE.Vector3(0, 1, 0.75));
     }
   }
 

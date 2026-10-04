@@ -37,7 +37,7 @@ export function zonePaint() {
     fields: LAYOUT.fields,
     paths: [
       { pts: [[v.x, v.z], [4, 45], [-10, 48], [-26, 49.5], [-36, 46], [f.x, f.z]] }, // Dorf → Hof
-      { pts: [[v.x, v.z], [15.5, 33], [17, 27.5]], width: 2 }, // Dorf → Landstraße
+      { pts: [[v.x, v.z], [15.5, 33], [16.5, 27], [17, 21]], width: 2 }, // Dorf → Bahnhof → Landstraße
       { pts: [[f.x, f.z], [-52, 45], [-57, 43]], width: 1.8 }, // Hof → Kornfeld
       { pts: [[v.x, v.z], [26, 42], [36, 46], [44, 44]], width: 1.6 }, // Dorf → Wäldchen
     ],

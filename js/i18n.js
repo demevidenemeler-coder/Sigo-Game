@@ -6,7 +6,6 @@ export const LANGUAGES = {
     speechLang: 'de-DE',
     strings: {
       workshop: 'Werkstatt',
-      draw: 'Strecke bauen',
       drive: 'Los geht\'s!',
       trackDone: 'Die Strecke ist fertig!',
       bedtime: 'Der Zug ist müde. Deckst du ihn zu?',
@@ -79,7 +78,6 @@ export const LANGUAGES = {
       back: 'Zurück zum Spiel',
       newSession: 'Neue Spielzeit starten',
       resetTrain: 'Zug zurücksetzen',
-      resetTrack: 'Strecke zurücksetzen',
       restActive: 'Pause läuft bis {time} Uhr.',
       playedToday: 'Gespielt in dieser Spielzeit: {min} Min.',
       voiceOk: 'Stimme gefunden: {name}',
@@ -120,7 +118,6 @@ export const LANGUAGES = {
     speechLang: 'en-US',
     strings: {
       workshop: 'Workshop',
-      draw: 'Build the track',
       drive: 'Let\'s go!',
       trackDone: 'The track is ready!',
       bedtime: 'The train is sleepy. Can you tuck it in?',
@@ -193,7 +190,6 @@ export const LANGUAGES = {
       back: 'Back to the game',
       newSession: 'Start new play time',
       resetTrain: 'Reset train',
-      resetTrack: 'Reset track',
       restActive: 'Break until {time}.',
       playedToday: 'Played this session: {min} min',
       voiceOk: 'Voice found: {name}',

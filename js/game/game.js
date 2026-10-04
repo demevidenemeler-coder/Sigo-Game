@@ -5,9 +5,8 @@ import { RoomEnvironment } from '../../vendor/RoomEnvironment.js';
 import { createWorkshop, createLandscape } from './world.js';
 import { Train } from './train.js';
 import { Environment } from './environment.js';
-import { defaultTrackPoints } from './track.js';
 import { createWorkshopMode } from './modes/workshop.js';
-import { createDrawMode } from './modes/draw.js';
+import { ROUTE, STATIONS } from './route.js';
 import { createDriveMode } from './modes/drive.js';
 import { createWashMode } from './modes/wash.js';
 import { createBedMode } from './modes/bed.js';
@@ -16,9 +15,10 @@ import { WeatherFx } from './weatherFx.js';
 import { Hint } from './hint.js';
 import { SideTrain } from './sideTrain.js';
 import { Discoveries } from './discover.js';
+import { AnimalGreetings } from './greetings.js';
 import { VillageLife } from './village.js';
 
-const MODE_ICONS = { workshop: '🛠️', wash: '🧽', draw: '🛤️', drive: '🚂' };
+const MODE_ICONS = { workshop: '🛠️', wash: '🧽', drive: '🚂' };
 const SUN_OFFSET = new THREE.Vector3(12, 24, 14);
 // Achsen des Sonnenlichts (zum Einrasten der Schattenkarte)
 const WARM = new THREE.Color('#ffb36b');
@@ -64,10 +64,10 @@ export class Game {
     this.time = 0;
     this.env = new Environment(this.land);
     this.train = new Train(trainData);
-    const points = Array.isArray(trackData) ? trackData : trackData?.points;
-    this.land.track.setPoints(points ?? defaultTrackPoints());
+    // Feste Strecke mit festen Bahnhöfen (der Zeichenmodus ist entfallen)
+    this.land.track.setPoints(ROUTE);
     this.land.crossings.rebuild();
-    this.land.objects.load(trackData?.objects);
+    this.land.objects.load(STATIONS);
     this.land.clearAroundTrack();
     this.drive = { s: 0, speed: 0, target: 0 };
     this.weatherFx = new WeatherFx(this);
@@ -80,7 +80,6 @@ export class Game {
 
     this.modes = {
       workshop: createWorkshopMode(this),
-      draw: createDrawMode(this),
       drive: createDriveMode(this),
       wash: createWashMode(this),
       bed: createBedMode(this),
@@ -91,6 +90,7 @@ export class Game {
     this.buildModeBar();
     this.discover = new Discoveries(this); // Entdecker-Album
     this.village = new VillageLife(this); // Leute im Dorf
+    this.greetings = new AnimalGreetings(this); // Tiere im Zug und draußen rufen sich zu
     this.bindPointer();
     this.resize();
     window.addEventListener('resize', () => this.resize());
@@ -145,6 +145,7 @@ export class Game {
       this.sideTrain.update(dt);
       this.discover.update(dt, this.time);
       this.village.update(dt, this.time);
+      this.greetings.update(dt);
       this.renderer.toneMappingExposure = 0.98 - 0.36 * this.env.night;
       this.glow.style.opacity = (this.env.dusk * 0.42).toFixed(3);
     } else {
@@ -318,10 +319,6 @@ export class Game {
 
   saveTrain() {
     this.services.saveTrain(this.train.data);
-  }
-
-  saveTrack() {
-    this.services.saveTrack({ points: this.land.track.points, objects: this.land.objects.serialize() });
   }
 
   // ---------- Kamera ----------

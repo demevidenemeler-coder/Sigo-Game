@@ -117,12 +117,12 @@ export class Discoveries {
       this.spots.push({ ...def, root, fig, size: opts.size ?? 1.7, show: 0, want: 0, t: Math.random() * 5, hinted: false, peekTime: 0,
         night: !!opts.night, fish: !!opts.fish, enabled: true, onChurch: !!opts.onChurch });
     };
-    add('fuchs', -59, -30, { clue: 'bau', at: [0.95, 0, 0], rot: 0.4, size: 1.8 });
-    add('reh', 62, -32.5, { rot: 2.6, size: 1.6 });
-    add('eichhoernchen', -30.5, -17.5, { clue: 'stumpf', at: [0, 0.5, 0], size: 2.0 });
+    add('fuchs', -66, -35, { clue: 'bau', at: [0.95, 0, 0], rot: 0.4, size: 1.8 });
+    add('reh', 42, -39, { rot: 2.6, size: 1.6 });
+    add('eichhoernchen', -26, -26, { clue: 'stumpf', at: [0, 0.5, 0], size: 2.0 });
     add('eule', -64, -41, { clue: 'hochstumpf', at: [0, 1.3, 0], size: 2.0, night: true });
     add('igel', -12, 30.5, { clue: 'laub', at: [0.35, 0, 0], size: 2.2 });
-    add('maulwurf', 38, -19, { clue: 'huegel', size: 2.2 });
+    add('maulwurf', 27, -19, { clue: 'huegel', size: 2.2 });
     add('schnecke', -2.5, -38, { size: 2.8 });
     // Storch auf dem Kirchendach (wenn die Kirche steht)
     const ch = this.land.church;
@@ -131,9 +131,9 @@ export class Discoveries {
       const p = new THREE.Vector3(0.9, 3.42, 0).applyMatrix4(ch.matrixWorld);
       add('storch', p.x, p.z, { y: p.y, clue: 'nest', at: [0, 0.12, 0], size: 1.5, onChurch: true });
     }
-    const r1 = nearRiver(10, 14);
+    const r1 = nearRiver(29, 11);
     add('fisch', r1.x, r1.z, { rot: r1.ang, size: 2.4, fish: true });
-    const r2 = nearRiver(-48, -9);
+    const r2 = nearRiver(-64, -11);
     const off = f.riverWidth / 2 + 0.7;
     add('biber', r2.x + r2.nx * off, r2.z + r2.nz * off, { clue: 'damm', rot: r2.ang, size: 2.0 });
   }
@@ -168,8 +168,9 @@ export class Discoveries {
       const dLook = Math.hypot(look.x - pos.x, look.z - pos.z);
       const near = Math.min(dTrain, dLook + 3);
       const awake = s.night ? night > 0.5 : true;
-      if (driving && awake && s.root.visible && near < NEAR) s.want = 1;
-      else if (!awake || !driving || near > FAR) s.want = 0;
+      const extra = s.onChurch ? 5 : 0; // die Kirche steht etwas weiter weg von der Strecke
+      if (driving && awake && s.root.visible && near < NEAR + extra) s.want = 1;
+      else if (!awake || !driving || near > FAR + extra) s.want = 0;
       s.t += dt;
       const k = 1 - Math.exp(-dt * (s.want ? 7 : 4));
       s.show += (s.want - s.show) * k;

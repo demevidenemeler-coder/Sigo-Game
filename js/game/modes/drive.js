@@ -452,6 +452,16 @@ export function createDriveMode(game) {
       const y = ((1 - v.y) / 2) * window.innerHeight;
       if (x > 0 && x < window.innerWidth && y > 0 && y < window.innerHeight) return game.hint.tap(x, y);
     }
+    // Steht der Zug in der Nähe der Feuerwache und wurde sie noch nie angetippt: auf die Wache zeigen
+    const fire = game.village?.fire;
+    if (fire && !fire.used && fire.root.visible && step % 2 === 1) {
+      const v = fire.st.getWorldPosition(new THREE.Vector3());
+      v.y += 1.5;
+      v.project(game.camera);
+      const x = ((v.x + 1) / 2) * window.innerWidth;
+      const y = ((1 - v.y) / 2) * window.innerHeight;
+      if (v.z < 1 && x > 40 && x < window.innerWidth - 40 && y > 80 && y < window.innerHeight - 80) return game.hint.tap(x, y);
+    }
     if (d.target === 0) return game.hint.tapElement(goBtn);
     if (step % 3 === 2) {
       // Hupen: auf die Lok tippen (die Hupe-Taste gibt es nicht mehr)

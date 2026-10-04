@@ -314,6 +314,14 @@ Object.assign(SOUNDS, {
   carhonk(t) {
     for (const dt of [0, 0.2]) tone('square', 480, t + dt, 0.01, 0.13, 0.15, lowpass(1600));
   },
+  // Feuerwehr: Tatütata (zweitönig, dreimal)
+  siren(t) {
+    for (let i = 0; i < 6; i++) {
+      const f = i % 2 ? 587 : 440;
+      tone('triangle', f, t + i * 0.42, 0.02, 0.4, 0.18);
+      tone('sine', f * 2, t + i * 0.42, 0.02, 0.38, 0.05);
+    }
+  },
   // Traktor springt an: tiefes „Tuck-tuck-tuck“, erst langsam, dann schneller
   tractor(t) {
     let at = t;

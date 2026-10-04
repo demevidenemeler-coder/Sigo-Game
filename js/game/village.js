@@ -4,6 +4,7 @@
 import * as THREE from 'three';
 import { buildFigure } from './figures.js';
 import { wave } from './trainModel.js';
+import { FIRE, fireTruck } from './zones.js';
 
 const WAVE_DIST = 17;
 const COOLDOWN = 18;
@@ -33,6 +34,7 @@ export class VillageLife {
     });
 
     this.makePets();
+    this.makeFire();
 
     // Schaukeln (zwei Sitze am Gestell, auf einem sitzt der Teddy)
     this.swings = [];
@@ -96,6 +98,101 @@ export class VillageLife {
     this.barkCooldown = 0;
   }
 
+  // ---------- Feuerwehr: Rolltor und Feuerwehrauto (beweglich, daher eigene Objekte) ----------
+  makeFire() {
+    const st = this.land.village.fire;
+    if (!st) return;
+    st.updateMatrixWorld(true);
+    const { d, door } = FIRE;
+    this.fire = { st, busy: false, flash: 0 };
+    const root = new THREE.Group();
+    root.position.copy(st.position);
+    root.rotation.y = st.rotation.y;
+    this.land.scene.add(root);
+    // Rolltor: weiß mit Rillen, fährt nach oben
+    const dg = new THREE.Group();
+    dg.position.set(door.x, 0, d / 2 + 0.02);
+    const panel = new THREE.Mesh(new THREE.BoxGeometry(door.w, door.h, 0.06), new THREE.MeshStandardMaterial({ color: '#f2efe8', roughness: 0.5 }));
+    panel.position.y = door.h / 2;
+    panel.castShadow = true;
+    dg.add(panel);
+    const groove = new THREE.MeshStandardMaterial({ color: '#c9c4ba', roughness: 0.6 });
+    for (let i = 1; i < 6; i++) {
+      const gr = new THREE.Mesh(new THREE.BoxGeometry(door.w, 0.03, 0.07), groove);
+      gr.position.y = (door.h / 6) * i;
+      dg.add(gr);
+    }
+    root.add(dg);
+    // Feuerwehrauto steht drinnen
+    const truck = fireTruck();
+    truck.position.set(door.x, 0, -0.15);
+    // Feuerwehrmann im Fahrerhaus (Fahrer-Figur mit rotem Helm)
+    const ff = buildFigure('fahrer');
+    ff.scale.setScalar(0.92);
+    ff.position.set(-0.25, 0.74, 0.92);
+    const helmet = new THREE.Mesh(new THREE.SphereGeometry(0.16, 14, 8, 0, Math.PI * 2, 0, Math.PI / 2), new THREE.MeshStandardMaterial({ color: '#d23c32', roughness: 0.4 }));
+    helmet.position.y = 0.66;
+    helmet.scale.set(1.1, 0.9, 1.15);
+    ff.add(helmet);
+    truck.add(ff);
+    root.add(truck);
+    Object.assign(this.fire, { root, door: dg, truck, home: truck.position.z });
+    this.land.tappable.push(truck);
+    truck.userData.tap = 'fire';
+  }
+
+  // Tatütata: Tor auf, Auto fährt heraus, Leiter hoch, Wasser marsch – und alles wieder zurück
+  fireAlarm() {
+    const f = this.fire;
+    if (!f || f.busy) return;
+    f.busy = true;
+    f.used = true;
+    const g = this.game;
+    const { door } = FIRE;
+    const { truck } = f;
+    const ladder = truck.userData.ladder;
+    const out = f.home + 3.0;
+    g.services.sfx('siren');
+    f.flash = 9.5;
+    const step = (dur, fn, next) => g.tween(dur, fn, next);
+    step(0.7, (t) => { f.door.position.y = t * door.h * 0.95; f.door.scale.y = 1 - t * 0.85; }, () =>
+      step(1.6, (t) => { truck.position.z = f.home + (out - f.home) * (1 - (1 - t) ** 2); }, () =>
+        step(0.8, (t) => { ladder.rotation.x = -0.75 * t; }, () => {
+          this.spray(2.2);
+          setTimeout(() => step(0.8, (t) => { ladder.rotation.x = -0.75 * (1 - t); }, () =>
+            step(1.8, (t) => { truck.position.z = out - (out - f.home) * t * t * (3 - 2 * t); }, () =>
+              step(0.7, (t) => { f.door.position.y = (1 - t) * door.h * 0.95; f.door.scale.y = 0.15 + t * 0.85; }, () => {
+                f.busy = false;
+              }))), 2400);
+        })));
+  }
+
+  // Wasserstrahl aus der Leiterspitze: Tropfen im Bogen nach vorne
+  spray(dur) {
+    const f = this.fire;
+    const ladder = f.truck.userData.ladder;
+    const geo = this.dropGeo ??= new THREE.SphereGeometry(0.06, 6, 4);
+    const mat = this.sprayMat ??= new THREE.MeshStandardMaterial({ color: '#7cc4f0', roughness: 0.1, transparent: true, opacity: 0.85 });
+    const fwd = new THREE.Vector3(0, 0, 1).applyQuaternion(f.root.quaternion);
+    let left = Math.round(dur * 30);
+    const shoot = () => {
+      if (left-- <= 0) return;
+      ladder.updateMatrixWorld(true);
+      const from = f.truck.userData.tip.clone().applyMatrix4(ladder.matrixWorld);
+      const m = new THREE.Mesh(geo, mat);
+      m.position.copy(from);
+      this.land.scene.add(m);
+      const sp = 3.2 + Math.random() * 0.6;
+      const side = (Math.random() - 0.5) * 0.4;
+      this.game.tween(0.9, (t) => {
+        m.position.set(from.x + (fwd.x * sp + fwd.z * side) * t, from.y + 2.2 * t - 5 * t * t, from.z + (fwd.z * sp - fwd.x * side) * t);
+      }, () => this.land.scene.remove(m));
+      setTimeout(shoot, 33);
+    };
+    shoot();
+    this.game.services.sfx('splash');
+  }
+
   // ---------- Antippen im Dorf ----------
   tap(o) {
     const g = this.game;
@@ -108,6 +205,7 @@ export class VillageLife {
     }, () => o.scale.setScalar(s0));
     const at = (x, y, z) => new THREE.Vector3(x, y, z).applyMatrix4(o.matrixWorld);
     if (kind === 'house') return this.visitor(o);
+    if (kind === 'fire') return this.fireAlarm();
     if (kind === 'church') {
       g.services.sfx('churchbell');
       setTimeout(() => g.services.animalCall('storch'), 2400);
@@ -274,6 +372,15 @@ export class VillageLife {
 
   update(dt, time) {
     this.layout();
+    // Feuerwehr: nur sichtbar, wenn die Wache steht; Blaulicht blinkt im Einsatz
+    if (this.fire) {
+      const f = this.fire;
+      f.root.visible = f.st.visible && f.st.scale.x > 0.5;
+      f.flash = Math.max(0, f.flash - dt);
+      f.truck.userData.lights.forEach((l, i) => {
+        l.material.emissiveIntensity = f.flash > 0 ? (Math.sin(time * 14 + i * Math.PI) > 0 ? 3.5 : 0.2) : 0.3;
+      });
+    }
     for (const s of this.swings) {
       s.pivot.visible = s.frame.visible && s.frame.scale.x > 0.5;
       s.swing.rotation.x = Math.sin(time * 1.6 + s.phase) * s.amp; // vor und zurück (quer zum Balken)

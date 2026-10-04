@@ -533,3 +533,87 @@ export function doghouse() {
   g.userData.clearR = 1.0;
   return g;
 }
+
+// ---------- Feuerwehr ----------
+
+// Feuerwache: rote Halle mit großem Tor (vorne = +z), Schlauchturm mit Blaulicht, Vorplatz.
+// Das Rolltor und das Feuerwehrauto baut village.js als eigene, bewegliche Teile.
+export const FIRE = { w: 4.4, d: 3.2, h: 2.7, door: { x: 0.35, w: 2.5, h: 2.1 } };
+const fireBlue = lamp(new THREE.MeshStandardMaterial({ color: '#4d8dff', emissive: '#2f6bff', roughness: 0.3 }), 0.3, 2.5);
+export function fireStation() {
+  const g = new THREE.Group();
+  const { w, d, h, door } = FIRE;
+  const red = mat('#d23c32', 0.6);
+  const white = mat('#f7f1e3', 0.6);
+  // Halle: Wände um die Toröffnung herum
+  add(g, new RoundedBoxGeometry(w, h, d - 0.2, 2, 0.05), red, 0, h / 2, -0.1);
+  add(g, new THREE.BoxGeometry(door.w + 0.1, door.h + 0.05, 0.3), mat('#2a2522', 0.9), door.x, door.h / 2, d / 2 - 0.25, false); // dunkles Inneres
+  // Rahmen ums Tor, Zierband, Dach
+  add(g, new THREE.BoxGeometry(door.w + 0.4, 0.18, 0.12), white, door.x, door.h + 0.09, d / 2 - 0.05);
+  for (const s of [-1, 1]) add(g, new THREE.BoxGeometry(0.18, door.h, 0.12), white, door.x + s * (door.w / 2 + 0.11), door.h / 2, d / 2 - 0.05);
+  add(g, new THREE.BoxGeometry(w + 0.04, 0.14, d - 0.16), white, 0, h - 0.07, -0.1);
+  add(g, gableRoof(w, d, 0.75), mat('#4a4f5a', 0.6), 0, h, -0.1);
+  add(g, gableFill(w, d - 0.2, 0.75), red, 0, h, -0.1);
+  // Wappen über dem Tor (rundes Schild mit Flamme)
+  add(g, new THREE.CylinderGeometry(0.28, 0.28, 0.06, 24).rotateX(Math.PI / 2), white, door.x, h + 0.32, d / 2 - 0.1);
+  add(g, new THREE.ConeGeometry(0.12, 0.3, 10), mat('#f08a24', 0.5), door.x, h + 0.32, d / 2 - 0.05);
+  // Fenster neben dem Tor
+  add(g, new THREE.BoxGeometry(0.5, 0.6, 0.06), lamp(new THREE.MeshStandardMaterial({ color: '#9fc6e6', emissive: '#ffcf70', roughness: 0.2 }), 0, 1.2), -1.65, 1.5, d / 2 - 0.17);
+  // Schlauchturm links mit Fenstern, Spitzdach und Blaulicht
+  const tx = -w / 2 - 0.55;
+  add(g, new RoundedBoxGeometry(1.2, 4.6, 1.2, 2, 0.05), red, tx, 2.3, -0.4);
+  for (const y of [1.6, 2.6, 3.6]) add(g, new THREE.BoxGeometry(0.34, 0.44, 0.06), mat('#233345', 0.2), tx, y, 0.22);
+  add(g, new THREE.BoxGeometry(1.3, 0.12, 1.3), white, tx, 4.62, -0.4);
+  add(g, new THREE.ConeGeometry(0.95, 0.8, 4).rotateY(Math.PI / 4), mat('#4a4f5a', 0.6), tx, 5.08, -0.4);
+  add(g, new THREE.SphereGeometry(0.16, 12, 8), fireBlue, tx, 5.55, -0.4);
+  // Vorplatz
+  add(g, new THREE.BoxGeometry(w + 0.4, 0.04, 2.4), mat('#b8b2a6', 0.95), door.x * 0.5, 0.02, d / 2 + 1.2, false);
+  for (const s of [-1, 1]) add(g, new THREE.BoxGeometry(0.08, 0.02, 2.2), mat('#f2c832', 0.6), door.x + s * (door.w / 2 + 0.15), 0.045, d / 2 + 1.2, false);
+  g.userData.kind = 'house';
+  g.userData.clearR = 3.2;
+  return g;
+}
+
+// Feuerwehrauto (fährt nach +z). userData: ladder (Pivot hinten), lights (Blaulichter), tip (Leiterspitze, lokal)
+export function fireTruck() {
+  const g = new THREE.Group();
+  const red = new THREE.MeshPhysicalMaterial({ color: '#e0322b', roughness: 0.35, clearcoat: 0.8 });
+  const white = mat('#f7f1e3', 0.5);
+  const dark = mat('#2a2a2a', 0.8);
+  const metal = mat('#c3beb5', 0.35, { metalness: 0.7 });
+  add(g, new RoundedBoxGeometry(1.2, 0.25, 2.6, 2, 0.05), dark, 0, 0.38, 0); // Fahrgestell
+  add(g, new RoundedBoxGeometry(1.25, 0.85, 1.75, 2, 0.08), red, 0, 0.92, -0.35); // Aufbau
+  add(g, new RoundedBoxGeometry(1.25, 0.5, 0.8, 2, 0.1), red, 0, 0.75, 0.9); // Fahrerhaus unten
+  add(g, new RoundedBoxGeometry(1.25, 0.1, 0.8, 2, 0.04), red, 0, 1.42, 0.9); // Dach
+  add(g, new THREE.BoxGeometry(1.2, 0.5, 0.06), red, 0, 1.15, 0.53); // Rückwand
+  const glass = new THREE.MeshStandardMaterial({ color: '#bfe3f5', roughness: 0.1, transparent: true, opacity: 0.35, depthWrite: false });
+  add(g, new RoundedBoxGeometry(1.1, 0.4, 0.05, 2, 0.02), glass, 0, 1.2, 1.31, false); // Frontscheibe
+  for (const s of [-1, 1]) add(g, new RoundedBoxGeometry(0.05, 0.35, 0.5, 2, 0.02), glass, s * 0.63, 1.2, 0.95, false);
+  for (const s of [-1, 1]) add(g, new THREE.BoxGeometry(0.02, 0.1, 1.7), white, s * 0.635, 0.75, -0.35); // weiße Streifen
+  for (const s of [-1, 1]) for (let i = 0; i < 3; i++) add(g, new THREE.BoxGeometry(0.02, 0.5, 0.02), mat('#b02a24', 0.5), s * 0.635, 1.0, -1.05 + i * 0.45); // Rollläden
+  for (const s of [-1, 1]) add(g, new THREE.SphereGeometry(0.07, 10, 8), mat('#fff6d8', 0.3, { emissive: '#ffd36b', emissiveIntensity: 0.6 }), s * 0.42, 0.75, 1.31);
+  add(g, new THREE.BoxGeometry(1.0, 0.12, 0.06), metal, 0, 0.48, 1.32); // Stoßstange
+  // Räder
+  for (const z of [0.85, -0.85]) for (const s of [-1, 1]) {
+    add(g, new THREE.CylinderGeometry(0.28, 0.28, 0.22, 16).rotateZ(Math.PI / 2), dark, s * 0.58, 0.28, z);
+    add(g, new THREE.CylinderGeometry(0.13, 0.13, 0.24, 12).rotateZ(Math.PI / 2), metal, s * 0.58, 0.28, z);
+  }
+  // Blaulichter auf dem Fahrerhaus
+  const lights = [];
+  for (const s of [-1, 1]) {
+    const m = new THREE.MeshStandardMaterial({ color: '#3d7bff', emissive: '#2f6bff', emissiveIntensity: 0.3, roughness: 0.3 });
+    lights.push(add(g, new THREE.SphereGeometry(0.1, 12, 8), m, s * 0.35, 1.5, 0.95));
+  }
+  // Leiter (Pivot hinten oben), liegt flach nach vorne
+  const ladder = new THREE.Group();
+  ladder.position.set(0, 1.42, -1.1);
+  add(ladder, new THREE.CylinderGeometry(0.16, 0.18, 0.16, 14), metal, 0, -0.04, 0);
+  for (const s of [-1, 1]) add(ladder, new THREE.BoxGeometry(0.05, 0.06, 2.3), metal, s * 0.2, 0.06, 1.1);
+  for (let i = 0; i < 8; i++) add(ladder, new THREE.BoxGeometry(0.4, 0.03, 0.03), metal, 0, 0.06, 0.1 + i * 0.29);
+  add(ladder, new THREE.BoxGeometry(0.5, 0.25, 0.3), red, 0, 0.12, 2.25); // Korb
+  g.add(ladder);
+  g.userData.ladder = ladder;
+  g.userData.lights = lights;
+  g.userData.tip = new THREE.Vector3(0, 0.3, 2.35); // in Leiter-Koordinaten
+  return g;
+}

@@ -253,6 +253,9 @@ Platz und winken, wenn der Zug vorbeifährt (`js/game/village.js`).
 Zum Anfassen: Haus antippen → jemand kommt heraus und winkt; Kirche → Glocken; Brunnen → Platschen;
 Marktstand → Apfel hüpft; Briefkasten → Brief fliegt. Dazu Bäckerei, Wimpelketten, Wäscheleine,
 Katze auf dem Dach und ein Hund, der den Zug anbellt.
+**Feuerwehr** neben dem Dorfbahnhof (rote Wache mit Schlauchturm und Blaulicht): Antippen → Tatütata, das Rolltor
+fährt hoch, das Feuerwehrauto (mit Feuerwehrmann) fährt mit Blaulicht heraus, die Leiter geht hoch, Wasser marsch –
+dann fährt alles wieder zurück. Die Zeige-Hand zeigt einmal auf die Wache, solange sie noch nie angetippt wurde.
 **Ententeich** neben dem Dorf (nah an der Strecke) mit Schilf, Seerosen, Steg und drei Enten.
 
 ## Tiere rufen sich zu

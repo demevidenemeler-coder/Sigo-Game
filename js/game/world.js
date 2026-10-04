@@ -15,7 +15,7 @@ import { woodTexture, waterTexture } from './textures.js';
 import { paintGround, groundMaterial } from './groundPaint.js';
 import {
   LAYOUT, zonePaint, cropProps, church, well, hayBale, tractor, bench, lantern, contactShadow, tuftGeometry, flowerGeometries, colored,
-  gableRoof, gableFill, marketStall, slide, swingFrame, sandbox, hedge, mailbox, bakeryExtras, bunting, laundry, doghouse,
+  gableRoof, gableFill, marketStall, slide, swingFrame, sandbox, hedge, mailbox, bakeryExtras, bunting, laundry, doghouse, fireStation,
 } from './zones.js';
 
 // Spielfeld, auf dem gemalt werden kann (halbe Breite / halbe Tiefe)
@@ -578,6 +578,11 @@ export function createLandscape() {
   }
   for (const [dx, dz] of [[4.6, 0.6], [-4.6, -0.6], [0.4, 4.4]]) put(lantern(), V.x + dx, V.z + dz);
 
+  // Feuerwache neben dem Dorfbahnhof (Tor zur Strecke hin, man sieht sie vom Zug aus)
+  const fireObj = put(fireStation(), 28, 23.6, 0);
+  fireObj.userData.tap = 'fire';
+  occupied.push([27, 24.5, 4.5]);
+
   // Bauernhof: Scheune mit Silo, Heuballen, Traktor
   const F = LAYOUT.farm;
   occupied.push([F.x, F.z, 10]);
@@ -902,6 +907,6 @@ export function createLandscape() {
     track.group, objects.group, crossings.group, trainAnchor, ground]);
   mergeStatic(scene, (o) => keepSet.has(o) || o.isLight || o.isInstancedMesh, { cell: 90, dedupe: true });
   landRef = { proxies, scene, sun, hemi: scene.userData.hemi, sky: skyMat, snowables, track, objects, features, crossings, trainAnchor, scenery, tappable, clearAroundTrack, setThin, animate, ground, animated, ambient, church: churchObj,
-    village: { center: V, plaza: V.plaza, swing: swingFrameObj, houses: villageHouses, dogAt }, extraFootprints: [] };
+    village: { center: V, plaza: V.plaza, swing: swingFrameObj, houses: villageHouses, dogAt, fire: fireObj }, extraFootprints: [] };
   return landRef;
 }

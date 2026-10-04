@@ -85,6 +85,9 @@ Nach ein paar Hinweisen ohne Reaktion ist Ruhe, bis wieder getippt wird.
   Kommt der Zug des Kindes in seine Nähe, **winken sich beide Lokführer und Fahrgäste zu und hupen**. Die Nebenstrecke sucht
   sich selbst einen freien Platz nahe der Strecke und verschwindet, wenn kein Platz da ist. Antippen → winkt und hupt.
 - Tiere auf der Weide antippen → sie rufen; Bäume und Häuser wackeln.
+- **Bauernhof zum Anfassen:** Scheunentor → knarrt, ein Tier kommt heraus und ruft · Traktor → tuckert, pufft Rauch und
+  fährt ein Stück vor und zurück · Heuballen → Stroh fliegt, manchmal hat sich ein Hase, eine Katze oder ein Huhn versteckt ·
+  Windmühle → dreht sich ein paar Sekunden ganz schnell.
 - Jede Lok fährt anders schnell (Schnellzug am schnellsten).
 
 **Tiergeräusche** sind echte Aufnahmen (gemeinfrei, CC0 – Quellen in `sounds/QUELLEN.md`) für Kuh, Schwein, Schaf,

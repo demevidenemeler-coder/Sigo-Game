@@ -314,6 +314,15 @@ Object.assign(SOUNDS, {
   carhonk(t) {
     for (const dt of [0, 0.2]) tone('square', 480, t + dt, 0.01, 0.13, 0.15, lowpass(1600));
   },
+  // Traktor springt an: tiefes „Tuck-tuck-tuck“, erst langsam, dann schneller
+  tractor(t) {
+    let at = t;
+    for (let i = 0; i < 12; i++) {
+      noise(at, 0.07, 0.5, 'lowpass', 380, sfxBus, 1.5);
+      tone('square', 58, at, 0.004, 0.06, 0.16, lowpass(260));
+      at += Math.max(0.09, 0.24 - i * 0.02);
+    }
+  },
   creak(t) {
     const o = tone('sawtooth', 110, t, 0.05, 0.6, 0.18, filter('bandpass', 700, 6));
     o.frequency.linearRampToValueAtTime(170, t + 0.6);

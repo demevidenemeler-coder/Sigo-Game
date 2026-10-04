@@ -121,35 +121,107 @@ export class VillageLife {
       g.services.sfx('boing');
       return this.flyThing(at(0, 1.1, 0.2), new THREE.SphereGeometry(0.11, 10, 8), ['#e5484d', '#f08a24', '#f2c832'][Math.floor(Math.random() * 3)], 2.2);
     }
+    // ---- Bauernhof ----
+    if (kind === 'barn') {
+      // Tor knarrt, ein Tier kommt heraus und ruft
+      g.services.sfx('creak');
+      const id = ['pferd', 'kuh', 'schwein', 'schaf', 'hase', 'katze', 'hund'][Math.floor(Math.random() * 7)];
+      return this.visitor(o, { id, door: o.userData.door ?? 2.4, scale: 2.0, sound: null, call: true, delay: 500 });
+    }
+    if (kind === 'hay') {
+      g.services.sfx('poof');
+      this.droplets(at(0, 0.9, 0), '#e8c45a', 16);
+      // manchmal hat sich jemand im Heu versteckt
+      if (Math.random() < 0.45) {
+        const id = ['hase', 'katze', 'huhn'][Math.floor(Math.random() * 3)];
+        this.visitor(o, { id, door: 1.0, scale: 1.4, sound: null, call: true, delay: 250 });
+      }
+      return;
+    }
+    if (kind === 'tractor') return this.startTractor(o);
+    if (kind === 'mill') {
+      g.services.sfx('whoosh');
+      const rotor = o.userData.rotor;
+      if (!rotor) return;
+      g.tween(3.5, (t) => { rotor.userData.boost = 1 + 9 * Math.sin(Math.min(1, t * 1.4) * Math.PI * 0.5) * (1 - t) ** 0.5; }, () => { rotor.userData.boost = 1; });
+      return;
+    }
     if (kind === 'mailbox') {
       g.services.sfx('pling');
       return this.flyThing(at(0, 1.1, 0), new THREE.BoxGeometry(0.26, 0.02, 0.18), '#ffffff', 3.2, true);
     }
   }
 
-  // Tür geht auf: jemand kommt heraus, winkt und geht wieder hinein
-  visitor(house) {
+  // Tür geht auf: jemand kommt heraus, winkt (oder ruft) und geht wieder hinein
+  visitor(house, opts = {}) {
     if (house.userData.visiting) return;
     house.userData.visiting = true;
     const g = this.game;
-    g.services.sfx('dingdong');
-    const id = ['kind', 'oma', 'papa', 'teddy'][Math.floor(Math.random() * 4)];
+    const { id = ['kind', 'oma', 'papa', 'teddy'][Math.floor(Math.random() * 4)], door = 1.15, scale = 1.5, sound = 'dingdong', call = false, delay = 0 } = opts;
+    if (sound) g.services.sfx(sound);
     const fig = buildFigure(id);
     house.updateMatrixWorld(true);
-    fig.position.copy(new THREE.Vector3(0, 0.02, 1.15).applyMatrix4(house.matrixWorld));
+    fig.position.copy(new THREE.Vector3(0, 0.02, door).applyMatrix4(house.matrixWorld));
+    fig.position.y = 0.02;
     fig.rotation.y = house.rotation.y;
     fig.scale.setScalar(0.001);
-    this.land.scene.add(fig);
-    g.tween(0.45, (t) => fig.scale.setScalar(1.5 * Math.max(0.001, Math.sin(t * Math.PI * 0.5) * (1 + Math.sin(t * Math.PI) * 0.15))), () => {
-      if (fig.userData.waveArm) wave(fig, g);
-      else g.hop(fig);
-      g.services.sayName(id);
-      setTimeout(() => {
-        g.tween(0.4, (t) => fig.scale.setScalar(1.5 * Math.max(0.001, 1 - t)), () => {
-          this.land.scene.remove(fig);
-          house.userData.visiting = false;
-        });
-      }, 2600);
+    setTimeout(() => {
+      this.land.scene.add(fig);
+      g.tween(0.45, (t) => fig.scale.setScalar(scale * Math.max(0.001, Math.sin(t * Math.PI * 0.5) * (1 + Math.sin(t * Math.PI) * 0.15))), () => {
+        if (fig.userData.waveArm) wave(fig, g);
+        else g.hop(fig);
+        if (call) g.services.animalCall(id);
+        else g.services.sayName(id);
+        setTimeout(() => {
+          g.tween(0.4, (t) => fig.scale.setScalar(scale * Math.max(0.001, 1 - t)), () => {
+            this.land.scene.remove(fig);
+            house.userData.visiting = false;
+          });
+        }, 2600);
+      });
+    }, delay);
+  }
+
+  // Traktor: tuckert los, wackelt, pufft Rauch und fährt ein Stückchen vor und zurück
+  startTractor(o) {
+    if (o.userData.busy) return;
+    o.userData.busy = true;
+    const g = this.game;
+    g.services.sfx('tractor');
+    o.updateMatrixWorld(true);
+    const start = o.position.clone();
+    const fwd = new THREE.Vector3(1, 0, 0).applyQuaternion(o.quaternion).setY(0).normalize();
+    const exhaust = new THREE.Vector3(0.65, 1.65, 0.2);
+    let nextPuff = 0;
+    g.tween(2.6, (t) => {
+      const drive = Math.sin(t * Math.PI) * 1.6; // vor und wieder zurück
+      o.position.copy(start).addScaledVector(fwd, drive);
+      o.position.y = Math.abs(Math.sin(t * 60)) * 0.03;
+      o.rotation.z = Math.sin(t * 47) * 0.015;
+      if (t >= nextPuff) {
+        nextPuff += 0.12;
+        this.puff(exhaust.clone().applyMatrix4(o.matrixWorld));
+      }
+      o.updateMatrixWorld(true);
+    }, () => {
+      o.position.copy(start);
+      o.rotation.z = 0;
+      o.userData.busy = false;
+    });
+  }
+
+  puff(at) {
+    const geo = this.puffGeo ??= new THREE.IcosahedronGeometry(0.18, 1);
+    const m = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ color: '#7a7a7a', roughness: 1, transparent: true, opacity: 0.8, depthWrite: false }));
+    m.position.copy(at);
+    this.land.scene.add(m);
+    this.game.tween(1.2, (t) => {
+      m.position.set(at.x + t * 0.3, at.y + t * 1.4, at.z);
+      m.scale.setScalar(1 + t * 2.5);
+      m.material.opacity = 0.75 * (1 - t);
+    }, () => {
+      this.land.scene.remove(m);
+      m.material.dispose();
     });
   }
 

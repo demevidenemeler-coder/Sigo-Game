@@ -416,6 +416,8 @@ export function createLandscape() {
   farm.position.set(FENCE.x + 14, 0, -2);
   farm.rotation.y = -0.5;
   scene.add(farm);
+  farm.userData.tap = 'barn';
+  farm.userData.door = 2.4;
   const pasture = { x: FENCE.x + 8, z: 8, w: 5, d: 5 };
   fenceLine(scene, pasture.x - pasture.w, pasture.z - pasture.d, pasture.x + pasture.w, pasture.z - pasture.d, rand);
   fenceLine(scene, pasture.x - pasture.w, pasture.z + pasture.d, pasture.x + pasture.w, pasture.z + pasture.d, rand);
@@ -437,6 +439,8 @@ export function createLandscape() {
   mill.rotation.y = 0.5;
   scene.add(mill);
   animated.push({ kind: 'spin', obj: mill.userData.rotor });
+  mill.userData.tap = 'mill';
+  tappable.push(farm, mill);
   for (let i = 0; i < 6; i++) {
     const h = house(rand, i % 3 === 0);
     h.position.set(-16 + i * 6.5 + rand() * 2, 0, -FENCE.z - 6 - rand() * 3);
@@ -576,8 +580,10 @@ export function createLandscape() {
   fbs.scale.set(3.6, 1, 2.8);
   fb.add(fbs);
   put(fb, F.x - 1, F.z - 4.8, 0.12);
-  for (const [dx, dz] of [[4.5, -2.5], [5.3, -0.8], [4.8, 2.4]]) put(hayBale(rand), F.x + dx, F.z + dz, rand() * 3);
-  put(tractor(), F.x - 3.6, F.z + 2.4, 0.6);
+  fb.userData.tap = 'barn';
+  fb.userData.door = 2.4;
+  for (const [dx, dz] of [[4.5, -2.5], [5.3, -0.8], [4.8, 2.4]]) put(hayBale(rand), F.x + dx, F.z + dz, rand() * 3).userData.tap = 'hay';
+  put(tractor(), F.x - 3.6, F.z + 2.4, 0.6).userData.tap = 'tractor';
   // Hühner und ein Hahn laufen auf dem Hof herum
   const yardAnimals = [];
   for (const id of ['huhn', 'huhn', 'hahn', 'huhn']) {
@@ -844,7 +850,7 @@ export function createLandscape() {
     crossings.animate(dt, time);
     features.updateTraffic(dt, crossings.crossings);
     for (const a of animated) {
-      if (a.kind === 'spin') a.obj.rotation.z -= dt * 0.6;
+      if (a.kind === 'spin') a.obj.rotation.z -= dt * 0.6 * (a.obj.userData.boost ?? 1);
       else if (a.kind === 'cloud') {
         a.obj.position.x += a.speed * dt;
         if (a.obj.position.x > 220) a.obj.position.x = -220;

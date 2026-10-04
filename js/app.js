@@ -66,12 +66,13 @@ async function say(text, opts = {}) {
 }
 
 const music = new Music();
+let bedtimeActive = false; // Lok wird ins Bett gebracht: keine Hintergrundmusik (nur das Wiegenlied)
 
 // Musik und Zuggeräusche folgen den Einstellungen
 function applySound() {
   setChannelVolume('engine', settings.sounds ? 1 : 0);
   setChannelVolume('sfx', settings.sounds ? 1 : 0);
-  if (settings.music && document.body.dataset.screen === 'game') music.start(settings.musicVolume);
+  if (settings.music && document.body.dataset.screen === 'game' && !bedtimeActive) music.start(settings.musicVolume);
   else music.stop();
 }
 
@@ -188,10 +189,10 @@ setInterval(() => {
 }, 1000);
 
 // Spielzeit um: erst bringt das Kind den Zug ins Bett (bed.js), danach kommt der Ruhe-Bildschirm
-let bedtimeActive = false;
 function endSession() {
   if (bedtimeActive) return;
   bedtimeActive = true;
+  music.stop(); // die fröhliche Musik hört auf, damit das Wiegenlied allein spielt
   game.setMode('bed', { silent: true });
 }
 

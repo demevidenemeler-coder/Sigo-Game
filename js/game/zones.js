@@ -362,3 +362,104 @@ export function gableFill(w, d, h) {
   }
   return gableCache.get(key);
 }
+
+// ---------- Dorf: Marktstand, Spielplatz, Gärten ----------
+
+// Marktstand mit gestreiftem Dach, Obst- und Gemüsekisten
+export function marketStall() {
+  const g = new THREE.Group();
+  const wood = mat('#b98553');
+  for (const x of [-0.9, 0.9]) for (const z of [-0.45, 0.45]) add(g, new THREE.BoxGeometry(0.08, 1.7, 0.08), wood, x, 0.85, z);
+  add(g, new RoundedBoxGeometry(2.0, 0.12, 1.0, 2, 0.03), wood, 0, 0.75, 0.05);
+  add(g, new THREE.BoxGeometry(1.95, 0.7, 0.06), mat('#a8703f'), 0, 0.37, 0.52);
+  // Streifendach
+  const cols = ['#e5484d', '#ffffff'];
+  for (let i = 0; i < 6; i++) {
+    const s = add(g, new THREE.BoxGeometry(0.36, 0.05, 1.3), mat(cols[i % 2], 0.6), -0.9 + i * 0.36 + 0.18, 1.78, 0.1);
+    s.rotation.x = 0.18;
+  }
+  for (let i = 0; i < 6; i++) add(g, new THREE.ConeGeometry(0.18, 0.22, 3), mat(cols[i % 2], 0.6), -0.9 + i * 0.36 + 0.18, 1.6, 0.76).rotation.x = Math.PI;
+  // Kisten mit Äpfeln, Möhren, Kürbissen
+  const crate = new RoundedBoxGeometry(0.55, 0.18, 0.4, 2, 0.02);
+  const goods = [['#e5484d', 0.07], ['#f08a24', 0.06], ['#f2c832', 0.07]];
+  goods.forEach(([c, r], i) => {
+    const x = -0.62 + i * 0.62;
+    add(g, crate, mat('#c99a62'), x, 0.9, 0.08);
+    for (let k = 0; k < 6; k++) add(g, new THREE.SphereGeometry(r, 8, 6), mat(c, 0.45), x - 0.18 + (k % 3) * 0.18, 1.02, -0.02 + Math.floor(k / 3) * 0.16, false);
+  });
+  g.add(contactShadow(1.4, 0.3));
+  g.userData.kind = 'house';
+  g.userData.clearR = 1.8;
+  return g;
+}
+
+// Rutsche
+export function slide() {
+  const g = new THREE.Group();
+  const metal = mat('#3b7cc9', 0.4);
+  for (const z of [-0.35, 0.35]) {
+    add(g, new THREE.CylinderGeometry(0.05, 0.05, 1.6, 8), metal, -0.8, 0.8, z);
+    add(g, new THREE.CylinderGeometry(0.05, 0.05, 1.6, 8), metal, -0.3, 0.8, z);
+  }
+  add(g, new RoundedBoxGeometry(0.6, 0.08, 0.8, 2, 0.03), mat('#f2c832', 0.5), -0.55, 1.55, 0);
+  for (let i = 0; i < 4; i++) add(g, new THREE.BoxGeometry(0.06, 0.05, 0.7), mat('#f2c832'), -0.95, 0.3 + i * 0.38, 0);
+  const chute = add(g, new RoundedBoxGeometry(1.9, 0.06, 0.6, 2, 0.03), mat('#e5484d', 0.35), 0.45, 0.85, 0);
+  chute.rotation.z = -0.62;
+  for (const z of [-0.3, 0.3]) {
+    const rail = add(g, new THREE.BoxGeometry(1.9, 0.12, 0.05), mat('#e5484d', 0.35), 0.45, 0.93, z);
+    rail.rotation.z = -0.62;
+  }
+  g.add(contactShadow(1.4, 0.28));
+  g.userData.kind = 'tree';
+  g.userData.clearR = 1.8;
+  return g;
+}
+
+// Schaukelgestell (die Sitze schwingen: eigene Teile in village.js)
+export function swingFrame() {
+  const g = new THREE.Group();
+  const wood = mat('#c99a62');
+  for (const x of [-1.1, 1.1]) {
+    for (const z of [-0.5, 0.5]) {
+      const p = add(g, new THREE.CylinderGeometry(0.06, 0.07, 2.1, 8), wood, x, 0.98, z * 0.6);
+      p.rotation.x = z > 0 ? -0.28 : 0.28;
+    }
+  }
+  add(g, new THREE.CylinderGeometry(0.07, 0.07, 2.4, 8).rotateZ(Math.PI / 2), wood, 0, 1.98, 0);
+  g.add(contactShadow(1.5, 0.25));
+  g.userData.kind = 'tree';
+  g.userData.clearR = 1.9;
+  return g;
+}
+
+export function sandbox() {
+  const g = new THREE.Group();
+  const wood = mat('#b98553');
+  for (const [x, z, w, d] of [[0, 0.7, 1.6, 0.14], [0, -0.7, 1.6, 0.14], [0.73, 0, 0.14, 1.3], [-0.73, 0, 0.14, 1.3]]) add(g, new THREE.BoxGeometry(w, 0.2, d), wood, x, 0.1, z);
+  add(g, new THREE.BoxGeometry(1.32, 0.12, 1.26), mat('#f0dca0', 1), 0, 0.06, 0, false);
+  add(g, new THREE.ConeGeometry(0.25, 0.25, 12), mat('#e8cf8c', 1), 0.2, 0.22, -0.1);
+  add(g, new THREE.CylinderGeometry(0.1, 0.08, 0.14, 10), mat('#e5484d', 0.4), -0.3, 0.2, 0.2); // Eimer
+  add(g, new THREE.BoxGeometry(0.06, 0.03, 0.3), mat('#3b7cc9', 0.4), -0.1, 0.15, 0.35).rotation.y = 0.5; // Schaufel
+  g.userData.kind = 'tree';
+  g.userData.clearR = 1.2;
+  return g;
+}
+
+// Hecke (Gartenzaun aus Grün)
+export function hedge(len) {
+  const g = new THREE.Group();
+  add(g, new RoundedBoxGeometry(len, 0.55, 0.42, 2, 0.15), mat('#4f9a4f', 0.9), 0, 0.28, 0);
+  g.userData.kind = 'tree';
+  g.userData.clearR = len / 2 + 0.3;
+  return g;
+}
+
+export function mailbox() {
+  const g = new THREE.Group();
+  add(g, new THREE.CylinderGeometry(0.04, 0.04, 0.9, 6), mat('#5a4a42'), 0, 0.45, 0);
+  add(g, new RoundedBoxGeometry(0.36, 0.26, 0.24, 2, 0.06), mat('#f2c832', 0.45), 0, 1.0, 0);
+  add(g, new THREE.BoxGeometry(0.2, 0.03, 0.02), mat('#3a3a3a'), 0, 1.05, 0.125);
+  g.userData.kind = 'tree';
+  g.userData.clearR = 0.6;
+  return g;
+}

@@ -15,7 +15,7 @@ import { woodTexture, waterTexture } from './textures.js';
 import { paintGround, groundMaterial } from './groundPaint.js';
 import {
   LAYOUT, zonePaint, cropProps, church, well, hayBale, tractor, bench, lantern, contactShadow, tuftGeometry, flowerGeometries, colored,
-  gableRoof, gableFill,
+  gableRoof, gableFill, marketStall, slide, swingFrame, sandbox, hedge, mailbox,
 } from './zones.js';
 
 // Spielfeld, auf dem gemalt werden kann (halbe Breite / halbe Tiefe)
@@ -505,6 +505,31 @@ export function createLandscape() {
     put(linde, V.x - 3.2, V.z - 2.6);
   }
   for (const [dx, dz, ry] of [[2.6, -3.4, 0.2], [-3.6, 2.8, 2.4]]) put(bench(), V.x + dx, V.z + dz, ry);
+  // Marktstand am Platz (Theke zum Platz hin)
+  {
+    const x = V.x + 2.6;
+    const z = V.z + 2.7;
+    put(marketStall(), x, z, Math.atan2(V.x - x, V.z - z));
+  }
+  // Gärten: Hecken hinter den Häusern, Briefkästen davor
+  ring.forEach(([deg, r], i) => {
+    const a = THREE.MathUtils.degToRad(deg);
+    const hx = V.x + Math.cos(a) * (r + 2.3);
+    const hz = V.z + Math.sin(a) * (r + 2.3) * 0.85;
+    if (i % 2 === 0 && free(hx, hz, 1)) put(hedge(3.2), hx, hz, -Math.atan2(Math.cos(a) * 0.85, -Math.sin(a)));
+    const mx = V.x + Math.cos(a + 0.2) * (r - 1.8);
+    const mz = V.z + Math.sin(a + 0.2) * (r - 1.8) * 0.85;
+    if (i % 3 === 0 && free(mx, mz, 0.5)) put(mailbox(), mx, mz, Math.atan2(V.x - mx, V.z - mz));
+  });
+  // Spielplatz westlich vom Dorf: Rutsche, Schaukel, Sandkasten
+  const P = { x: V.x - 13, z: V.z - 1 };
+  occupied.push([P.x, P.z, 4.5]);
+  let swingFrameObj = null;
+  if (free(P.x, P.z, 3)) {
+    put(slide(), P.x - 0.5, P.z - 2.2, 0.3);
+    swingFrameObj = put(swingFrame(), P.x + 0.3, P.z + 1.9, -0.15);
+    put(sandbox(), P.x + 2.8, P.z - 0.4, 0.2);
+  }
   for (const [dx, dz] of [[4.6, 0.6], [-4.6, -0.6], [0.4, 4.4]]) put(lantern(), V.x + dx, V.z + dz);
 
   // Bauernhof: Scheune mit Silo, Heuballen, Traktor
@@ -828,6 +853,7 @@ export function createLandscape() {
   const keepSet = new Set([...scenery, ...tappable, ...animated.map((a) => a.obj), ...features.cars,
     track.group, objects.group, crossings.group, trainAnchor, ground]);
   mergeStatic(scene, (o) => keepSet.has(o) || o.isLight || o.isInstancedMesh, { cell: 90, dedupe: true });
-  landRef = { proxies, scene, sun, hemi: scene.userData.hemi, sky: skyMat, snowables, track, objects, features, crossings, trainAnchor, scenery, tappable, clearAroundTrack, setThin, animate, ground, animated, ambient, church: churchObj, extraFootprints: [] };
+  landRef = { proxies, scene, sun, hemi: scene.userData.hemi, sky: skyMat, snowables, track, objects, features, crossings, trainAnchor, scenery, tappable, clearAroundTrack, setThin, animate, ground, animated, ambient, church: churchObj,
+    village: { center: V, plaza: V.plaza, swing: swingFrameObj }, extraFootprints: [] };
   return landRef;
 }

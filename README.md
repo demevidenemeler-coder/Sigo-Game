@@ -243,6 +243,12 @@ Code: `js/game/discover.js`, gespeichert in `localStorage` (`sigo.album.v1`).
 „Wie draußen“ (nach Kalender) oder fest im Eltern-Bereich: Frühling (Apfelblüte, fallende Blütenblätter),
 Sommer, Herbst (bunte Bäume, fallendes Laub), Winter (bereifte Bäume, Schnee bleibt liegen).
 
+## Dorf
+
+Häuser um den Platz mit Brunnen, Linde, Bänken, Laternen, Kirche (mit Storchennest), Marktstand, Gärten mit Hecken
+und Briefkästen, Spielplatz (Rutsche, Schaukel mit Teddy, Sandkasten). Oma, Papa und das Kind spazieren über den
+Platz und winken, wenn der Zug vorbeifährt (`js/game/village.js`).
+
 ## Landschaft
 
 - `js/game/groundPaint.js`: gemalter Boden (Wiesenflecken, Feldwege, Dorfplatz, Felder) + feine Halm-Struktur

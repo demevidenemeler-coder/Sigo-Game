@@ -16,6 +16,7 @@ import { WeatherFx } from './weatherFx.js';
 import { Hint } from './hint.js';
 import { SideTrain } from './sideTrain.js';
 import { Discoveries } from './discover.js';
+import { VillageLife } from './village.js';
 
 const MODE_ICONS = { workshop: '🛠️', wash: '🧽', draw: '🛤️', drive: '🚂' };
 const SUN_OFFSET = new THREE.Vector3(12, 24, 14);
@@ -89,6 +90,7 @@ export class Game {
 
     this.buildModeBar();
     this.discover = new Discoveries(this); // Entdecker-Album
+    this.village = new VillageLife(this); // Leute im Dorf
     this.bindPointer();
     this.resize();
     window.addEventListener('resize', () => this.resize());
@@ -142,6 +144,7 @@ export class Game {
       this.weatherFx.update(dt, this.cam.look);
       this.sideTrain.update(dt);
       this.discover.update(dt, this.time);
+      this.village.update(dt, this.time);
       this.renderer.toneMappingExposure = 0.98 - 0.36 * this.env.night;
       this.glow.style.opacity = (this.env.dusk * 0.42).toFixed(3);
     } else {

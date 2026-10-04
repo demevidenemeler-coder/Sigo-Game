@@ -117,6 +117,17 @@ async function sayWord(id) {
   await say(nameOf(id));
 }
 
+// Mitzählen beim Ein-/Aussteigen: die Zahl wird immer gesprochen (sonst bricht das Zählen ab)
+function countAloud(n) {
+  if (!settings.counting || !settings.voice) return false;
+  const word = (LANGUAGES[lang()]?.strings.numbers ?? LANGUAGES.de.strings.numbers)[n - 1];
+  if (!word) return false;
+  ++speechToken;
+  stopSpeaking();
+  speak(word, { lang: speechLang(), rate: settings.speechRate, pitch: 1.25 });
+  return true;
+}
+
 function sayText(text) {
   const key = PHRASE_KEYS.find((k) => t(k) === text) ?? text;
   if (!shouldSpeak(`phrase:${key}`, ALWAYS_KEYS.includes(key))) return Promise.resolve();
@@ -133,7 +144,7 @@ const game = new Game({
   ui: document.getElementById('ui'),
   trainData: upgradeTrain(loadTrain() ?? defaultTrain()),
   trackData: loadTrack(),
-  services: { say: sayText, sayName, animalCall, sfx, t, saveTrain, saveTrack, soundsOn: () => settings.sounds, bedDone: () => finishBedtime() },
+  services: { say: sayText, sayName, count: countAloud, counting: () => settings.counting, animalCall, sfx, t, saveTrain, saveTrack, soundsOn: () => settings.sounds, bedDone: () => finishBedtime() },
 });
 game.setSeason(settings.season ?? 'auto');
 
@@ -328,6 +339,7 @@ function showSettings() {
     voiceName ? t('voiceOk', { name: voiceName }) : t('voiceMissing')));
   page.append(row(t('voiceMode'), choice([['sparse', t('voiceSparse')], ['always', t('voiceAlways')]], settings.voiceMode,
     (v) => update({ voiceMode: v })), t('voiceModeHint')));
+  page.append(row(t('counting'), choice(onOff, settings.counting ?? true, (v) => update({ counting: v })), t('countingHint')));
   page.append(row(t('season'), choice([['auto', t('seasonAuto')], ['fruehling', '🌸'], ['sommer', '☀️'], ['herbst', '🍂'], ['winter', '⛄']],
     settings.season ?? 'auto', (v) => { update({ season: v }); game.setSeason(v); }), t('seasonHint')));
   page.append(row(t('speechRate'), choice([[0.7, t('slow')], [0.85, t('normal')]], settings.speechRate,

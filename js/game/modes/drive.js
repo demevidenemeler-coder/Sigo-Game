@@ -265,6 +265,8 @@ export function createDriveMode(game) {
   function arrive(item) {
     braking = null;
     stoppedAt = item;
+    countIn = 0;
+    countOut = 0;
     d.speed = 0;
     d.target = 0;
     updateGo();
@@ -283,6 +285,26 @@ export function createDriveMode(game) {
   }
 
   // ---------- Ein- und Aussteigen ----------
+
+  // Mitzählen: pro Halt wird beim Einsteigen und beim Aussteigen jeweils von eins an gezählt.
+  // Eine große Zahl steigt über dem Fahrgast auf, eine Stimme sagt sie.
+  let countIn = 0;
+  let countOut = 0;
+  function countUp(n, world) {
+    if (!services.counting?.()) return false;
+    const v = world.clone();
+    v.y += 1.2;
+    v.project(game.camera);
+    const el = document.createElement('div');
+    el.className = 'count-pop';
+    el.textContent = n;
+    el.style.left = `${((v.x + 1) / 2) * 100}%`;
+    el.style.top = `${((1 - v.y) / 2) * 100}%`;
+    game.ui.appendChild(el);
+    setTimeout(() => el.remove(), 1500);
+    services.count?.(n);
+    return true;
+  }
 
   function fly(obj, fromWorld, toWorld, dur, done) {
     land.scene.attach(obj);
@@ -321,7 +343,7 @@ export function createDriveMode(game) {
       game.popIn(c.userData.cargoItems[c.userData.cargoItems.length - 1]);
       train.placeOnCurve(track.curve, track.length, d.s);
       services.sfx('pop');
-      services.sayName(id);
+      if (!countUp(++countIn, to)) services.sayName(id);
       game.saveTrain();
     });
   }
@@ -345,7 +367,7 @@ export function createDriveMode(game) {
     services.sfx('whoosh');
     fly(fig, from, door, 0.8, () => {
       services.sfx('pop');
-      services.animalCall?.(id);
+      if (!countUp(++countOut, door)) services.animalCall?.(id);
       game.tween(0.5, (t) => fig.scale.setScalar(1.2 * (1 - t)), () => land.scene.remove(fig));
     });
     game.saveTrain();
@@ -386,7 +408,7 @@ export function createDriveMode(game) {
       item.obj.attach(fig);
       fig.position.copy(local);
       services.sfx('pop');
-      services.sayName(id);
+      if (!countUp(++countOut, target)) services.sayName(id);
     });
     item.waiting = item.waiting.filter((w) => w !== fig);
     item.waiting.push(fig);

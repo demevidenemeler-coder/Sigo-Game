@@ -67,6 +67,8 @@ Nach ein paar Hinweisen ohne Reaktion ist Ruhe, bis wieder getippt wird.
 - ▶ = losfahren / ⏸ anhalten · 📯 = pfeifen · 🎥 = Kamera fährt mit · unten links: 🌞 → 🌇 → 🌙 Tag / Abend / Nacht (weicher Übergang, Abendrot, Sonne wandert), 🌤️/🌧️/❄️ Wetter – die Knöpfe zeigen immer den aktuellen Zustand
 - **Bahnhof:** Der Zug hält von selbst („Bahnhof! Wer steigt ein?“). Wartende antippen → hüpfen in den Zug.
   Mitfahrer im Zug antippen → steigen aus. ▶ blinkt = weiterfahren.
+- **Mitzählen:** Bei jedem Halt zählt eine Stimme beim Einsteigen mit („eins, zwei, drei …“), ebenso beim Aussteigen,
+  und eine große Zahl steigt über dem Fahrgast auf. Ohne Zwang, nur Begleitung – im Eltern-Bereich abschaltbar.
 - **Fahrgäste mit Ziel:** Gibt es mindestens zwei Bahnhöfe, zeigt jeder Wartende eine **Sprechblase in einer Bahnhofsfarbe**.
   Er fährt mit und **steigt am Bahnhof dieser Farbe von selbst aus** („Danke!“) und geht ins Bahnhofshaus.
   Farben zuordnen statt Punkte zählen – kein Druck, nichts kann falsch gemacht werden.

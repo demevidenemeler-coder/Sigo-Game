@@ -85,6 +85,8 @@ export const LANGUAGES = {
       voiceOk: 'Stimme gefunden: {name}',
       voiceMissing: 'Keine passende Stimme gefunden. Android: Einstellungen → Sprachausgabe → Sprachdaten für Deutsch installieren.',
       holdHint: 'Zum Öffnen 3 Sekunden gedrückt halten',
+      counting: 'Mitzählen', countingHint: 'Beim Ein- und Aussteigen zählt eine Stimme mit: „eins, zwei, drei …“ und eine große Zahl erscheint.',
+      numbers: ['eins', 'zwei', 'drei', 'vier', 'fünf', 'sechs', 'sieben', 'acht', 'neun', 'zehn', 'elf', 'zwölf', 'dreizehn', 'vierzehn', 'fünfzehn', 'sechzehn', 'siebzehn', 'achtzehn', 'neunzehn', 'zwanzig'],
       season: 'Jahreszeit', seasonAuto: 'Wie draußen', seasonHint: '„Wie draußen“ richtet sich nach dem Kalender: Frühling mit Blüten, Herbst mit bunten Blättern, Winter mit Schnee.',
     },
     names: {
@@ -197,6 +199,8 @@ export const LANGUAGES = {
       voiceOk: 'Voice found: {name}',
       voiceMissing: 'No matching voice found. Android: Settings → Text-to-speech → install voice data.',
       holdHint: 'Hold for 3 seconds to open',
+      counting: 'Counting along', countingHint: 'When passengers get on or off, a voice counts along: “one, two, three …” and a big number appears.',
+      numbers: ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen', 'twenty'],
       season: 'Season', seasonAuto: 'Like outside', seasonHint: '“Like outside” follows the calendar: blossoms in spring, colorful leaves in autumn, snow in winter.',
     },
     names: {

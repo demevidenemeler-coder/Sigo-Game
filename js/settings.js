@@ -18,6 +18,7 @@ export const DEFAULT_SETTINGS = {
   musicVolume: 0.5,
   speechRate: 0.85,
   season: 'auto', // Jahreszeit: 'auto' (Kalender) | 'fruehling' | 'sommer' | 'herbst' | 'winter'
+  counting: true, // beim Ein- und Aussteigen leise mitzählen
   voiceMode: 'sparse', // 'sparse' = Wörter nur bei Neuem, 'always' = immer
 };
 

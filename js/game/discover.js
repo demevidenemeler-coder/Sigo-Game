@@ -202,7 +202,8 @@ export class Discoveries {
       // Herausgekommen: kurzes Geräusch, und wenn er es nach ein paar Sekunden noch nicht gefunden hat, zeigt die Hand hin
       if (s.want && s.show > 0.5 && !s.announced) {
         s.announced = true;
-        this.game.services.sfx(s.fish ? 'splash' : 'squeak');
+        if (s.fish) this.game.services.sfx('splash');
+        this.game.services.animalCall(s.id); // man hört das Tier, bevor man es findet
       }
       if (!s.want && s.show < 0.1) {
         s.announced = false;

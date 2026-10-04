@@ -1,6 +1,6 @@
 // Offline-Unterstützung: Mit Internet wird immer die neueste Fassung geladen (und gespeichert),
 // ohne Internet die gespeicherte. Neue Dateien in ASSETS eintragen.
-const VERSION = 'sigo-v18';
+const VERSION = 'sigo-v19';
 const ASSETS = [
   './',
   'index.html',

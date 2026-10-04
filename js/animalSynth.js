@@ -118,7 +118,127 @@ function normalize(out, peak = 0.9) {
   return out;
 }
 
+
+// Kurzes, gefiltertes Rauschen (Klappern, Schnuffeln, Nagen, Buddeln)
+function noiseBurst(out, sr, at, dur, freq, bw, amp, seed = 3) {
+  const rand = rng(seed);
+  const fil = resonator(freq, bw, sr);
+  const n = Math.floor(dur * sr);
+  const s0 = Math.floor(at * sr);
+  for (let i = 0; i < n && s0 + i < out.length; i++) {
+    const u = i / n;
+    const env = u < 0.1 ? u / 0.1 : (1 - u) ** 2;
+    out[s0 + i] += fil(rand()) * amp * env * 6;
+  }
+}
+
+// Sinus-Gleiter (Blubbern, Fiepen)
+function glide(out, sr, at, dur, f0, f1, amp) {
+  const n = Math.floor(dur * sr);
+  const s0 = Math.floor(at * sr);
+  let ph = 0;
+  for (let i = 0; i < n && s0 + i < out.length; i++) {
+    const u = i / n;
+    ph += (f0 + (f1 - f0) * u) / sr;
+    out[s0 + i] += Math.sin(2 * Math.PI * ph) * amp * Math.sin(Math.PI * u) ** 1.5;
+  }
+}
+
 const RECIPES = {
+  // Eule: weiches „Huu – hu-huuu“
+  eule(sr) {
+    const out = new Float32Array(Math.floor(1.9 * sr));
+    for (const [at, d, f, sd] of [[0, 0.5, 400, 3], [0.75, 0.16, 420, 5], [0.98, 0.7, 410, 7]]) {
+      voice(out, sr, Math.floor(at * sr), {
+        dur: d, seed: sd, f0: curve([[0, f * 0.92], [0.25, f], [1, f * 0.82]]),
+        amp: curve([[0, 0], [0.2, 1], [0.7, 0.8], [1, 0]]),
+        formants: [[f, 90, 2.0], [f * 2, 200, 0.25]], jitter: 0.01, shimmer: 0.05, breath: 0.12, breathTone: 1200, drive: 1,
+      });
+    }
+    return normalize(out, 0.8);
+  },
+  // Storch: schnelles Schnabelklappern
+  storch(sr) {
+    const out = new Float32Array(Math.floor(1.3 * sr));
+    for (let i = 0; i < 18; i++) {
+      const at = i * 0.062 * (1 - i * 0.012);
+      noiseBurst(out, sr, at, 0.03, 1900 + (i % 2) * 400, 500, 1, 11 + i);
+      noiseBurst(out, sr, at, 0.02, 700, 300, 0.6, 31 + i);
+    }
+    return normalize(out, 0.75);
+  },
+  // Fuchs: zwei helle, kurze Beller („Wäck! Wäck!“)
+  fuchs(sr) {
+    const out = new Float32Array(Math.floor(0.9 * sr));
+    for (const [at, sd] of [[0, 2], [0.42, 4]]) {
+      voice(out, sr, Math.floor(at * sr), {
+        dur: 0.24, seed: sd, f0: curve([[0, 700], [0.2, 980], [1, 560]]),
+        amp: curve([[0, 0], [0.08, 1], [0.5, 0.7], [1, 0]]),
+        formants: [[1100, 220, 1.3], [2300, 350, 0.8], [600, 200, 0.4]], jitter: 0.04, shimmer: 0.3, sub: 0.25, breath: 0.4, breathTone: 4000, drive: 2.8,
+      });
+    }
+    return normalize(out, 0.8);
+  },
+  // Reh: helles, kurzes Fiepen
+  reh(sr) {
+    const out = new Float32Array(Math.floor(0.8 * sr));
+    for (const [at, sd] of [[0, 6], [0.38, 9]]) {
+      voice(out, sr, Math.floor(at * sr), {
+        dur: 0.26, seed: sd, f0: curve([[0, 900], [0.3, 1100], [1, 800]]),
+        amp: curve([[0, 0], [0.15, 1], [0.6, 0.6], [1, 0]]),
+        formants: [[1300, 250, 1.2], [2700, 400, 0.5]], vibrato: [11, 30], jitter: 0.02, shimmer: 0.15, breath: 0.3, breathTone: 5000, drive: 1.6,
+      });
+    }
+    return normalize(out, 0.7);
+  },
+  // Igel: Schnuffeln (kurze Atemstöße) und ein winziges Quieken
+  igel(sr) {
+    const out = new Float32Array(Math.floor(1.0 * sr));
+    for (let i = 0; i < 5; i++) noiseBurst(out, sr, i * 0.13, 0.08, 1500 + (i % 2) * 500, 900, 0.8, 5 + i);
+    glide(out, sr, 0.72, 0.16, 1800, 2400, 0.35);
+    return normalize(out, 0.7);
+  },
+  // Eichhörnchen: schnelles Keckern
+  eichhoernchen(sr) {
+    const out = new Float32Array(Math.floor(0.9 * sr));
+    for (let i = 0; i < 9; i++) {
+      voice(out, sr, Math.floor(i * 0.085 * sr), {
+        dur: 0.05, seed: 40 + i, f0: curve([[0, 1700], [1, 1500]]),
+        amp: curve([[0, 0], [0.2, 1], [1, 0]]),
+        formants: [[2200, 400, 1.2], [3800, 600, 0.6]], jitter: 0.05, shimmer: 0.3, breath: 0.6, breathTone: 6000, drive: 2.5,
+      });
+    }
+    return normalize(out, 0.7);
+  },
+  // Fisch: Blubberblasen
+  fisch(sr) {
+    const out = new Float32Array(Math.floor(0.9 * sr));
+    [[0, 320], [0.14, 380], [0.3, 300], [0.42, 420], [0.6, 360]].forEach(([at, f]) => glide(out, sr, at, 0.1, f, f * 2.6, 0.7));
+    return normalize(out, 0.75);
+  },
+  // Maulwurf: Buddeln (dumpfes Scharren) und ein fröhliches Fiepen
+  maulwurf(sr) {
+    const out = new Float32Array(Math.floor(1.1 * sr));
+    for (let i = 0; i < 5; i++) noiseBurst(out, sr, i * 0.12, 0.09, 450 + (i % 3) * 120, 400, 1, 21 + i);
+    glide(out, sr, 0.7, 0.12, 1500, 1900, 0.4);
+    glide(out, sr, 0.86, 0.14, 1600, 2200, 0.4);
+    return normalize(out, 0.75);
+  },
+  // Schnecke: langsames, nasses Schlürfen und ein kleines Plopp
+  schnecke(sr) {
+    const out = new Float32Array(Math.floor(1.1 * sr));
+    for (let i = 0; i < 6; i++) noiseBurst(out, sr, i * 0.11, 0.16, 500 + i * 160, 250, 0.6, 50 + i);
+    glide(out, sr, 0.85, 0.12, 500, 1300, 0.6);
+    return normalize(out, 0.7);
+  },
+  // Biber: Nagen (schnelle, raue Bisse) und ein Platscher mit dem Schwanz
+  biber(sr) {
+    const out = new Float32Array(Math.floor(1.3 * sr));
+    for (let i = 0; i < 10; i++) noiseBurst(out, sr, i * 0.07, 0.04, 2600 + (i % 2) * 600, 900, 0.8, 70 + i);
+    noiseBurst(out, sr, 0.85, 0.25, 300, 400, 1.6, 99);
+    glide(out, sr, 0.86, 0.2, 180, 90, 0.8);
+    return normalize(out, 0.8);
+  },
   // Löwe: tiefes, raues Brüllen mit Anschwellen, danach zwei kurze Grunzer
   loewe(sr) {
     const out = new Float32Array(Math.floor(2.6 * sr));

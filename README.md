@@ -13,17 +13,32 @@ Unten: oben eine Reihe Fächer (mit Beschriftung), darunter große Karten – mi
 | Fach | Inhalt |
 |---|---|
 | 🚂 Loks | Dampflok, Diesellok, E-Lok, Schnellzug |
-| 🚃 Wagen | Tierwagen zuerst: Tier-, Stall-, Hühner-, Teich-, Zoo-, Zirkuswagen; dann Personen-, Güter-, Rungen-, Milch-, Schluss-, Kranwagen, Autotransporter (max. 6) |
+| 🚃 Wagen | Tierwagen zuerst: Haustier-, Stall-, Hühner-, Teich-, Zoo-, Affen-, Zirkuswagen; dann Personen-, Güter-, Rungen-, Milch-, Schluss-, Kranwagen, Autotransporter (max. 6) |
 | 🎨 Farben | 10 Farben – Topf wählen, dann ein Teil antippen (Kessel, Dach, Räder …) oder den Topf auf den Zug ziehen |
 | 🛞 Räder | 12 verspielte Radmuster (Speichen, Stern, Herz, Blume, Punkte, Regenbogen, Sonne, Spirale, Lachgesicht, Donut, Ball, Zahnrad) + Farbtöpfe nur für die Räder |
 | ⭐ Schmuck | Gesicht, Stern, Herz, Blume, Lampe, Lichterkette, Glocke, Fähnchen, Luftballon, Regenbogen |
-| 🐄 Tiere | Kuh, Schwein, Schaf, Pferd, Hund, Katze, Huhn, Hahn, Ente, Hase, Frosch, Löwe, Elefant, Giraffe, Pinguin |
+| 🐄 Tiere | Kuh, Schwein, Schaf, Pferd, Hund, Katze, Huhn, Hahn, Ente, Hase, Frosch, Löwe, Elefant, Giraffe, Affe, Pinguin |
 | 🧸 Mitfahrer | Kind, Papa, Oma, Teddy, Ball, Kiste, Geschenk, Milchkanne, Apfel |
 | 🥕 Futter | Heu, Karotte, Apfel, Banane, Körner, Fisch, Knochen, Fleisch, Blätter, Fliege |
 
-**Lieblingswagen:** Kommt ein Tier in „seinen“ Wagen (Ente/Frosch/Pinguin → Teichwagen, Huhn/Hahn → Hühnerwagen,
-Pferd/Kuh/Schwein/Schaf → Stall- oder Tierwagen, Löwe/Elefant/Giraffe → Zoowagen), freut es sich: Herzchen und ein Hüpfer.
-In alle anderen Wagen darf es trotzdem.
+**Wer fährt wo mit:** Jedes Tier hat seinen Wagen – ein Elefant gehört nicht in den Teichwagen.
+| Wagen | Wer darf hinein |
+|---|---|
+| Stallwagen | Kuh, Pferd, Schaf, Schwein |
+| Haustierwagen | Hund, Katze, Hase |
+| Hühnerwagen | Huhn, Hahn |
+| Teichwagen | Ente, Frosch, Pinguin |
+| Zoowagen | Löwe, Elefant, Giraffe, Affe |
+| Affenwagen (Käfig mit Klettergerüst, Autoreifen und Schaukel – wer auf Platz 2 sitzt, schaukelt) | Affe |
+| Zirkuswagen | Löwe, Elefant, Affe |
+| Personen-, Schlusswagen | Kind, Papa, Oma, Teddy |
+| Güter-, Rungenwagen | Ball, Kiste, Geschenk, Milchkanne, Apfel |
+
+Im richtigen Wagen freut sich das Tier (Herzchen + Hüpfer). Im falschen erscheint es kurz, **schüttelt den Kopf** und hüpft
+wieder hinunter; der passende Wagen im Zug hüpft – gibt es keinen, zeigt eine **Denkblase den Wunschwagen** und er wird benannt.
+Antippen eines Tiers in der Leiste setzt es gleich in einen passenden Wagen. Am Bahnhof steigen Wartende nur in passende
+Wagen ein (sonst Kopfschütteln + Denkblase); neue Wartende passen meistens zum Zug, wer nie mitkann, geht irgendwann heim.
+Alte Spielstände: Hoftiere im früheren „Tierwagen“ ziehen automatisch in einen Stallwagen um.
 
 **Ziehen:** Beim Ziehen leuchtet ein Ring unter dem Wagen, auf dem es landen wird – man muss nicht genau treffen.
 **Wegnehmen:** Mitfahrer, Schmuck oder Wagen vom Zug **in die Leiste ziehen** → weg. Auf einen anderen Wagen ziehen → umsetzen.
@@ -171,6 +186,7 @@ js/settings.js             Speichern auf dem Gerät
 js/game/game.js            3D-Kern: Kamera, Bildschleife, Eingabe
 js/game/trainModel.js      3D-Modelle von Loks und Wagen, Schmuck
 js/game/figures.js         3D-Tiere, Menschen, Ladung
+js/game/animalLife.js      Lebendige Tiere: Skelett + Verhalten (laufen, grasen, picken, wedeln …)
 js/game/textures.js        Per Code gezeichnete Texturen (Holz, Gras, Schotter, Wasser)
 js/game/train.js           Zug anordnen / auf Strecke setzen
 js/game/track.js           Aus Fingerstrich wird Schienenstrecke
@@ -205,7 +221,9 @@ sw.js                      Offline-Speicher (neue Dateien in ASSETS eintragen)
 
 ## Ehrliche Grenzen
 
-- Einige Tierlaute (Ente, Pferd, Löwe, Elefant, Pinguin) sind nachgebaut und klingen künstlich.
+- Einige Tierlaute (Ente, Pferd, Löwe, Elefant, Pinguin, Affe) sind nachgebaut und klingen künstlich.
+- Die Tierbewegungen sind Spielzeug-Animationen ohne echte Knie/Gelenke: Beine schwingen als Ganzes, bei großen
+  Bewegungen dehnt sich das Fell an den Übergängen etwas.
 - Die Grafik ist auf neuere Tablets ausgelegt. Damit es flüssig läuft: unbewegliche Teile werden zu wenigen großen Teilen
   zusammengefasst, Bäume als Instanzen gezeichnet, Schatten aus der Vogelperspektive seltener berechnet und alle Shader beim
   Start vorab übersetzt. Ruckelt es trotzdem, senkt die App stufenweise selbst: Auflösung → Schattenqualität → Schatten aus.
@@ -231,6 +249,23 @@ Winke-Arme bleiben im Spiel beweglich; Münder (Füttern) setzt das Spiel automa
 - Ergebnis: `models/<id>.sigm` (kleines eigenes Format: Ecken, Normalen, Eckfarben, Dreiecke; zusammen ~1,8 MB)
 - Laden: `js/game/models.js` (`MODEL_IDS`); fehlt ein Modell, wird die alte, gebaute Figur benutzt
 - Neue Modelldateien in `sw.js` (ASSETS) eintragen, damit sie offline funktionieren
+
+## Lebendige Tiere
+
+Alle Tiere (auch Affe und Entdecker-Tiere) haben ein kleines Skelett: Körper, Kopf/Hals, Schwanz, Beine, Ohren,
+Flügel, Rüssel, Arme. Die Gewichte rechnet `js/game/animalLife.js` beim Laden aus der Lage der Ecken (Bereiche mit
+weichen Übergängen je Tier in `RIGS`) – die Blender-Modelle bleiben unverändert.
+
+- **Immer:** atmen, Kopf bewegt sich leicht, Schwanz pendelt, Elefant schwingt den Rüssel und fächelt mit den Ohren.
+- **Eigene Aktionen** (zufällig, je Tierart): grasen (Kuh, Schaf, Pferd, Reh), wühlen (Schwein), picken (Huhn, Ente),
+  schnüffeln + wedeln (Hund), strecken + putzen (Katze), gähnen (Löwe), trompeten (Elefant), Blätter zupfen (Giraffe),
+  hoppeln (Hase, Frosch), flattern (Vögel, Pinguin), Kopf ganz herumdrehen (Eule), am Kopf kratzen, klatschen,
+  winken (Affe), Ohr zucken, Schwanz schlagen, einen Schritt machen – und manchmal **schaut das Tier zur Kamera**.
+- **Laufen:** Wer ein Tier bewegt, setzt `life.speed` – Vierbeiner im Kreuzgang, Vögel watscheln, Hasen hoppeln.
+  Auf Weide und Hof suchen sich die Tiere freie Plätze (sie laufen nicht ineinander) und bleiben länger stehen.
+- **Antippen / Rufen:** Kopf hoch, Maul auf und zu (Hahn kräht, Elefant trompetet, Hund wedelt, Affe klatscht).
+- **Füttern:** Das Tier hält still, der Mund sitzt am Kopf- bzw. Rüsselknochen und geht mit.
+- Bewegt wird nur, was gerade gezeichnet wird (`onBeforeRender`): ~0,15 ms pro Bild für alle Tiere zusammen.
 
 ## Entdecker-Album
 

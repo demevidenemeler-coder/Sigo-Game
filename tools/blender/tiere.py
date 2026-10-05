@@ -691,6 +691,43 @@ def biber():
 ANIMALS.update({'fuchs': fuchs, 'igel': igel, 'eichhoernchen': eichhoernchen, 'storch': storch, 'fisch': fisch,
                 'maulwurf': maulwurf, 'reh': reh, 'eule': eule, 'schnecke': schnecke, 'biber': biber})
 
+
+def affe():
+    # Affe sitzt aufrecht: lange Arme hängen seitlich (beweglich im Spiel), Ringelschwanz hinten
+    F, FACE, DARKF = '#8a5a33', '#f0cfa0', '#6b4226'
+    parts = [body('affe', [
+        ('sphere', (0, 0, 0.3), (0.12, 0.115, 0.15), E),
+        ('sphere', (0.01, 0, 0.17), (0.11, 0.1, 0.07), E),
+    ], F)]
+    parts.append(prim('sphere', (0.065, 0, 0.29), (0.07, 0.08, 0.11), color=FACE, seg=18))  # Bauch
+    # Kopf
+    parts.append(prim('sphere', (0.01, 0, 0.56), (0.13, 0.13, 0.12), color=F, seg=26))
+    parts.append(prim('sphere', (0.085, 0, 0.56), (0.07, 0.1, 0.085), color=FACE, seg=22))  # Gesicht
+    parts.append(prim('sphere', (0.125, 0, 0.51), (0.05, 0.075, 0.045), color=FACE, seg=18))  # Schnauze
+    for s in (1, -1):
+        parts.append(prim('sphere', (0.165, s * 0.018, 0.525), (0.008, 0.01, 0.008), color='#5a3a28', seg=8))
+        parts.append(prim('sphere', (0.0, s * 0.135, 0.57), (0.03, 0.035, 0.055), color=F, seg=14))  # Ohren
+        parts.append(prim('sphere', (0.012, s * 0.14, 0.57), (0.018, 0.02, 0.035), color=FACE, seg=10))
+    parts.append(prim('torus', (0.165, 0, 0.5), (0.03, 0.03, 0.03), rot=(0, math.pi / 2, 0), color='#8a3b3b', seg=12, minor=0.18, arc=math.pi * 0.8, start=math.pi * 1.1))  # Lächeln
+    parts += eyes(0.13, 0.04, 0.585, 0.022)
+    parts.append(prim('sphere', (-0.03, 0, 0.675), (0.035, 0.03, 0.03), rot=(0, -0.5, 0), color=DARKF, seg=10))  # Haarbüschel
+    # Arme (lang, hängen herab) mit Händen
+    for s in (1, -1):
+        parts.append(prim('cyl', (0.03, s * 0.158, 0.3), (0.027, 0.027, 0.24), color=F, seg=10))
+        parts.append(prim('sphere', (0.03, s * 0.155, 0.42), (0.033, 0.03, 0.033), color=F, seg=12))  # Schulter
+        parts.append(prim('sphere', (0.04, s * 0.162, 0.17), (0.036, 0.028, 0.03), color=FACE, seg=12))  # Hand
+    # Beine (gebeugt, Füße vorne)
+    for s in (1, -1):
+        parts.append(prim('sphere', (0.06, s * 0.075, 0.09), (0.085, 0.045, 0.05), rot=(0, 0.3, 0), color=F, seg=14))
+        parts.append(prim('sphere', (0.13, s * 0.08, 0.03), (0.05, 0.032, 0.025), color=FACE, seg=12))  # Fuß
+    # Ringelschwanz
+    parts.append(prim('torus', (-0.2, 0, 0.3), (0.09, 0.09, 0.09), rot=(math.pi / 2, 0, 0), color=F, seg=18, minor=0.17, arc=math.pi * 1.6, start=-math.pi * 0.85))
+    parts.append(prim('cyl', (-0.14, 0, 0.17), (0.016, 0.016, 0.12), rot=(0, -1.0, 0), color=F, seg=8))
+    return parts
+
+
+ANIMALS['affe'] = affe
+
 if __name__ == '__main__':
     want = sys.argv[1:] or list(ANIMALS)
     for name in want:

@@ -16,6 +16,7 @@ import { Hint } from './hint.js';
 import { SideTrain } from './sideTrain.js';
 import { Discoveries } from './discover.js';
 import { AnimalGreetings } from './greetings.js';
+import { lifeClock } from './animalLife.js';
 import { VillageLife } from './village.js';
 
 const MODE_ICONS = { workshop: '🛠️', wash: '🧽', drive: '🚂' };
@@ -134,6 +135,7 @@ export class Game {
     const dt = Math.min(0.05, raw);
     this.last = now;
     this.time += dt;
+    lifeClock.time = this.time;
     this.adaptQuality(raw);
     this.mode?.update(dt);
     if (this.scene === this.land.scene) {
@@ -461,6 +463,7 @@ export class Game {
 
   // Kurz hüpfen (Rückmeldung beim Antippen) – von der eigenen Grundhöhe aus
   hop(obj) {
+    obj.userData.life?.cheer();
     const base = obj.userData.baseY ?? (obj.userData.hopBase ??= obj.position.y);
     this.tween(0.35, (t) => { obj.position.y = base + Math.sin(t * Math.PI) * 0.35; });
   }

@@ -7,6 +7,7 @@ import { RoundedBoxGeometry } from '../../vendor/RoundedBoxGeometry.js';
 import { woodTexture } from './textures.js';
 import { mergeStatic } from './merge.js';
 import { modelGeometry, MODEL_MATERIAL } from './models.js';
+import { hasLife, makeSkinned, Life } from './animalLife.js';
 
 const mats = new Map();
 function mat(color, roughness = 0.6) {
@@ -424,7 +425,7 @@ const BUILD = {
 };
 
 // Tiere drehen den Kopf zur Kamera ein wenig, damit man die Gesichter sieht
-const TURN = Object.fromEntries(['kuh', 'schwein', 'schaf', 'hund', 'katze', 'ente', 'pferd', 'huhn', 'hahn', 'hase', 'frosch', 'loewe', 'elefant', 'giraffe', 'pinguin'].map((id) => [id, id === 'pinguin' ? 1.0 : 0.35]));
+const TURN = Object.fromEntries(['kuh', 'schwein', 'schaf', 'hund', 'katze', 'ente', 'pferd', 'huhn', 'hahn', 'hase', 'frosch', 'loewe', 'elefant', 'giraffe', 'pinguin', 'affe'].map((id) => [id, { pinguin: 1.0, affe: 0.8 }[id] ?? 0.35]));
 
 // ---------- Münder (gehen auf und zu: Füttern) ----------
 
@@ -433,7 +434,7 @@ const MOUTH_HUMAN = { kind: [0, 0.595, 0.15, 0.036], oma: [0, 0.62, 0.14, 0.034]
 // Tiere: Größe der Mundöffnung
 const MOUTH_SIZE = {
   kuh: 0.062, schwein: 0.052, schaf: 0.046, pferd: 0.07, hund: 0.05, katze: 0.04, huhn: 0.034, hahn: 0.038, ente: 0.05,
-  hase: 0.034, frosch: 0.06, loewe: 0.07, elefant: 0.062, giraffe: 0.05, pinguin: 0.04,
+  hase: 0.034, frosch: 0.06, loewe: 0.07, elefant: 0.062, giraffe: 0.05, pinguin: 0.04, affe: 0.045,
 };
 const mouthAnchors = new Map();
 const MOUTH_MAT = new THREE.MeshStandardMaterial({ color: '#5a1620', roughness: 0.7 });
@@ -514,13 +515,37 @@ const WAVE_ARMS = {
   fahrer: { pos: [0, 0.4, 0.13], color: '#2f5c9e', rx: -0.3 },
 };
 
+// Knochen mit dem größten Einfluss an der Ecke, die einem Punkt (Welt) am nächsten liegt
+function boneAt(mesh, world) {
+  const p = mesh.worldToLocal(world.clone());
+  const pos = mesh.geometry.attributes.position;
+  const si = mesh.geometry.attributes.skinIndex;
+  const sw = mesh.geometry.attributes.skinWeight;
+  let best = -1;
+  let bd = Infinity;
+  const v = new THREE.Vector3();
+  for (let i = 0; i < pos.count; i++) {
+    const d = v.fromBufferAttribute(pos, i).distanceToSquared(p);
+    if (d < bd) {
+      bd = d;
+      best = i;
+    }
+  }
+  if (best < 0) return null;
+  let k = 0;
+  for (let j = 1; j < 4; j++) if (sw.getComponent(best, j) > sw.getComponent(best, k)) k = j;
+  return mesh.skeleton.bones[si.getComponent(best, k)];
+}
+
 export function buildFigure(id) {
   const g = new THREE.Group();
   const inner = new THREE.Group();
   const model = modelGeometry(id);
   if (model) {
-    // Blender-Modell: ein einziges Teil (weicher, schöner, und billiger zu zeichnen)
-    const m = new THREE.Mesh(model, MODEL_MATERIAL);
+    // Blender-Modell: ein einziges Teil (weicher, schöner, und billiger zu zeichnen).
+    // Tiere bekommen ein Skelett und bewegen sich (animalLife.js).
+    const m = hasLife(id) ? makeSkinned(id, model, MODEL_MATERIAL) : new THREE.Mesh(model, MODEL_MATERIAL);
+    if (m.isSkinnedMesh) g.userData.skinned = m;
     m.castShadow = true;
     inner.add(m);
     // Winke-Arm bleibt beweglich (nicht im Modell)
@@ -547,6 +572,17 @@ export function buildFigure(id) {
   g.userData.box = new THREE.Box3().setFromObject(g);
   g.userData.top = g.userData.box.max.y;
   addMouth(g, id);
+  const skinned = g.userData.skinned;
+  if (skinned) {
+    // Mund geht mit dem Knochen mit, der die Schnauze bewegt (Kopf, beim Elefanten der Rüssel)
+    const holder = g.userData.mouthHolder;
+    if (holder) {
+      g.updateMatrixWorld(true);
+      const bone = boneAt(skinned, holder.getWorldPosition(new THREE.Vector3()));
+      if (bone) bone.attach(holder);
+    }
+    g.userData.life = new Life(id, skinned, g);
+  }
   // Leistung: unbewegliche Teile zusammenfassen (Winke-Arm und Mund bleiben beweglich)
   mergeStatic(g, (o) => o === g.userData.waveArm || o === g.userData.mouthHolder);
   return g;

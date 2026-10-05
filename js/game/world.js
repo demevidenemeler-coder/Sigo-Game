@@ -873,15 +873,25 @@ export function createLandscape() {
         a.obj.position.set(a.center.x + Math.cos(ang) * a.r * 1.2, 0.05 + Math.sin(time * 3 + a.phase) * 0.03, a.center.z + Math.sin(ang) * a.r * 0.8);
         a.obj.rotation.y = Math.atan2(-Math.cos(ang) * 0.8, -Math.sin(ang) * 1.2);
       } else if (a.kind === 'graze') {
+        const life = a.obj.userData.life;
         if (a.wait > 0) {
           a.wait -= dt;
+          if (life) life.speed = 0;
           continue;
         }
         tmp.copy(a.target).sub(a.obj.position);
         const d = tmp.length();
         if (d < 0.1) {
-          a.wait = a.quick ? 0.6 + Math.random() * 2 : 2 + Math.random() * 5;
-          a.target.set(a.area.x + (Math.random() - 0.5) * (a.area.w * 2 - 2), 0, a.area.z + (Math.random() - 0.5) * (a.area.d * 2 - 2));
+          // stehen bleiben: grasen, umschauen … (macht animalLife.js); längere Pausen, damit man das sieht
+          a.wait = a.quick ? 1 + Math.random() * 3 : 4 + Math.random() * 8;
+          if (life) life.speed = 0;
+          // neues Ziel – nicht dort, wo schon ein anderes Tier steht oder hinläuft (sonst laufen sie ineinander)
+          const minD = a.quick ? 0.7 : 1.5;
+          for (let k = 0; k < 8; k++) {
+            a.target.set(a.area.x + (Math.random() - 0.5) * (a.area.w * 2 - 2), 0, a.area.z + (Math.random() - 0.5) * (a.area.d * 2 - 2));
+            if (!animated.some((b) => b !== a && b.kind === 'graze' && b.area.x === a.area.x && b.area.z === a.area.z
+              && (b.target.distanceTo(a.target) < minD || b.obj.position.distanceTo(a.target) < minD))) break;
+          }
           continue;
         }
         const step = Math.min(d, dt * (a.quick ? 1.1 : 0.6));
@@ -890,7 +900,8 @@ export function createLandscape() {
         let diff = want - a.obj.rotation.y;
         diff = Math.atan2(Math.sin(diff), Math.cos(diff));
         a.obj.rotation.y += diff * Math.min(1, dt * 3);
-        a.obj.position.y = Math.abs(Math.sin(time * 6)) * 0.05;
+        if (life) life.speed = step / dt;
+        else a.obj.position.y = Math.abs(Math.sin(time * 6)) * 0.05;
       }
     }
   }

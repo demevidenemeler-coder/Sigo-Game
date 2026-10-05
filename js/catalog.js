@@ -14,6 +14,7 @@ export const WAGONS = [
   { id: 'huehner', slots: 2, paint: { body: '#f2c832', roof: '#d9463b', trim: '#8a5a33' } },
   { id: 'teich', slots: 3, paint: { body: '#3b7cc9', roof: '#f5f1ea', trim: '#2f2f2f' } },
   { id: 'zoo', slots: 2, paint: { body: '#ee8a2b', roof: '#4fa65a', trim: '#2f2f2f' } },
+  { id: 'affen', slots: 3, paint: { body: '#4fa65a', roof: '#f2c832', trim: '#2f2f2f' } },
   { id: 'zirkus', slots: 2, paint: { body: '#d9463b', roof: '#f2c832', trim: '#2f2f2f' } },
   { id: 'gueter', slots: 3, paint: { body: '#8a5a33', roof: '#5c3b22', trim: '#2f2f2f' } },
   { id: 'flach', slots: 3, paint: { body: '#ee8a2b', roof: '#5c3b22', trim: '#2f2f2f' } },
@@ -51,7 +52,7 @@ export const DECOR = [
 
 // Tiere und Mitfahrer (eigene Fächer in der Werkstatt)
 export const ANIMALS = ['kuh', 'schwein', 'schaf', 'pferd', 'hund', 'katze', 'huhn', 'hahn', 'ente', 'hase', 'frosch',
-  'loewe', 'elefant', 'giraffe', 'pinguin'].map((id) => ({ id }));
+  'loewe', 'elefant', 'giraffe', 'affe', 'pinguin'].map((id) => ({ id }));
 export const PASSENGERS = ['kind', 'papa', 'oma', 'teddy', 'ball', 'kiste', 'geschenk', 'milch', 'apfel'].map((id) => ({ id }));
 export const CARGO = [...ANIMALS, ...PASSENGERS];
 
@@ -60,7 +61,7 @@ export const FOODS = ['heu', 'karotte', 'apfel', 'banane', 'koerner', 'fisch', '
 export const LIKES = {
   kuh: ['heu'], schaf: ['heu'], pferd: ['karotte', 'heu', 'apfel'], schwein: ['apfel', 'karotte', 'banane', 'koerner'],
   hund: ['knochen', 'fleisch'], katze: ['fisch'], huhn: ['koerner'], hahn: ['koerner'], ente: ['koerner'],
-  hase: ['karotte'], frosch: ['fliege'], loewe: ['fleisch'], elefant: ['banane', 'apfel', 'heu'], giraffe: ['blatt'],
+  hase: ['karotte'], frosch: ['fliege'], loewe: ['fleisch'], elefant: ['banane', 'apfel', 'heu'], giraffe: ['blatt'], affe: ['banane', 'apfel'],
   pinguin: ['fisch'], kind: ['apfel', 'banane', 'karotte'], papa: ['apfel', 'banane', 'karotte'],
   oma: ['apfel', 'banane', 'karotte'], teddy: ['apfel', 'banane'],
 };
@@ -80,16 +81,27 @@ export const STATION_COLORS = [
   { id: 'gruen', hex: '#4fa65a' },
 ];
 
-// Lieblingswagen: kommt ein Tier in „seinen“ Wagen, freut es sich (Herzchen + Tierlaut)
-export const HOME_WAGON = {
-  stall: ['pferd', 'kuh', 'schwein', 'schaf'],
-  tier: ['kuh', 'schwein', 'schaf', 'pferd'],
+// Wer in welchen Wagen darf (ein Elefant passt nicht in den Teichwagen).
+// In den richtigen Wagen gesetzt freut sich das Tier (Herzchen + Laut); im falschen schüttelt es den Kopf.
+const PEOPLE = ['kind', 'papa', 'oma', 'teddy'];
+const THINGS = ['ball', 'kiste', 'geschenk', 'milch', 'apfel'];
+export const RIDES_IN = {
+  personen: PEOPLE,
+  schluss: PEOPLE,
+  tier: ['hund', 'katze', 'hase'],
+  stall: ['kuh', 'pferd', 'schaf', 'schwein'],
   huehner: ['huhn', 'hahn'],
   teich: ['ente', 'frosch', 'pinguin'],
-  zoo: ['loewe', 'elefant', 'giraffe'],
-  zirkus: ['loewe', 'elefant'],
+  affen: ['affe'],
+  zoo: ['loewe', 'elefant', 'giraffe', 'affe'],
+  zirkus: ['loewe', 'elefant', 'affe'],
+  gueter: THINGS,
+  flach: THINGS,
 };
-export const isHomeWagon = (type, id) => (HOME_WAGON[type] ?? []).includes(id);
+export const canRide = (type, id) => (RIDES_IN[type] ?? []).includes(id);
+export const isHomeWagon = canRide;
+// Wagen, in den ein Tier/Mitfahrer am liebsten möchte (für die Denkblase)
+export const homeWagonOf = (id) => Object.keys(RIDES_IN).find((type) => RIDES_IN[type].includes(id)) ?? null;
 
 export const MAX_WAGONS = 6;
 export const MAX_DECOR = 4;
@@ -113,7 +125,7 @@ export function defaultTrain() {
   loco.decor = ['gesicht'];
   const w1 = newCar('personen');
   w1.cargo = ['kind', 'teddy'];
-  const w2 = newCar('tier');
+  const w2 = newCar('stall');
   w2.cargo = ['kuh', 'schaf'];
   w1.dest = [null, null];
   w2.dest = [null, null];
@@ -138,6 +150,8 @@ export function upgradeTrain(data) {
   // Holz- und Kohlewagen gibt es nicht mehr: werden zu Rungen- bzw. Güterwagen
   const RETIRED = { holz: 'flach', kohle: 'gueter' };
   for (const c of data.cars) {
+    // früher fuhren Kühe & Co. im Tierwagen – jetzt ist das der Haustierwagen, die Hoftiere ziehen in den Stallwagen
+    if (c.type === 'tier' && c.cargo.length && c.cargo.every((id) => canRide('stall', id))) c.type = 'stall';
     if (RETIRED[c.type]) {
       const def = WAGONS.find((w) => w.id === RETIRED[c.type]);
       c.type = def.id;

@@ -30,8 +30,8 @@ function heartTexture() {
   return t;
 }
 
-// Denkblase mit dem Bild des Lieblingsfutters
-function thoughtSprite(src, done) {
+// Denkblase mit einem Bild (Lieblingsfutter, passender Wagen …)
+export function thoughtSprite(src, done) {
   const img = new Image();
   img.onload = () => {
     const c = document.createElement('canvas');
@@ -46,7 +46,10 @@ function thoughtSprite(src, done) {
       g.fill();
       g.stroke();
     }
-    g.drawImage(img, 26, 16, 108, 108);
+    const k = 108 / Math.max(img.width, img.height);
+    const w = img.width * k;
+    const h = img.height * k;
+    g.drawImage(img, 80 - w / 2, 70 - h / 2, w, h);
     const t = new THREE.CanvasTexture(c);
     t.colorSpace = THREE.SRGBColorSpace;
     const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: t, depthWrite: false, transparent: true }));

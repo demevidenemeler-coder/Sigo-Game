@@ -7,11 +7,12 @@
 // - Eine Zeige-Hand zeigt, wie es geht, wenn eine Weile nichts passiert.
 
 import * as THREE from 'three';
-import { LOCOS, WAGONS, COLORS, DECOR, CARGO, ANIMALS, PASSENGERS, FOODS, LIKES, MAX_WAGONS, MAX_DECOR, newCar, partDef, isLoco, pushCargo, spliceCargo, isHomeWagon } from '../../catalog.js';
+import { LOCOS, WAGONS, COLORS, DECOR, CARGO, ANIMALS, PASSENGERS, FOODS, LIKES, MAX_WAGONS, MAX_DECOR, newCar, partDef, isLoco, pushCargo, spliceCargo, isHomeWagon, canRide, homeWagonOf } from '../../catalog.js';
 import { renderThumbnails } from '../thumbs.js';
 import { createTray } from '../tray.js';
-import { wave, applyDirt } from '../trainModel.js';
-import { createFeeder } from '../feeding.js';
+import { wave, applyDirt, slotWorldPosition } from '../trainModel.js';
+import { createFeeder, thoughtSprite } from '../feeding.js';
+import { buildFigure } from '../figures.js';
 import { WHEEL_STYLES } from '../wheelStyles.js';
 
 const TABS = [
@@ -246,7 +247,10 @@ export function createWorkshopMode(game) {
       const fig = list.find((f) => (LIKES[f.userData.figure] ?? []).includes(entry.id)) ?? list[0];
       feedFig(fig, entry.id);
     } else if (kind === 'cargo') {
-      const target = hasRoom(lastCar) ? lastCar : train.data.cars.findIndex((_, i) => hasRoom(i));
+      // am liebsten in einen passenden Wagen mit Platz; gibt es keinen, zeigt das Tier, welchen es sich wünscht
+      const fits = (i) => hasRoom(i) && canRide(train.data.cars[i].type, entry.id);
+      let target = fits(lastCar) ? lastCar : train.data.cars.findIndex((_, i) => fits(i));
+      if (target < 0) target = hasRoom(lastCar) ? lastCar : train.data.cars.findIndex((_, i) => hasRoom(i));
       if (target < 0) full();
       else addCargo(target, entry.id);
     }
@@ -430,6 +434,10 @@ export function createWorkshopMode(game) {
       services.sfx('boing');
       return false;
     }
+    if (!canRide(train.data.cars[index].type, id)) {
+      refuseRide(index, id);
+      return false;
+    }
     pushCargo(train.data.cars[index], id, dest);
     const car = train.rebuildCar(index);
     const fig = car.userData.cargoItems[car.userData.cargoItems.length - 1];
@@ -449,6 +457,52 @@ export function createWorkshopMode(game) {
     return true;
   }
 
+  // Falscher Wagen: das Tier erscheint kurz, schüttelt den Kopf und hüpft wieder hinunter
+  function refuseRide(index, id) {
+    const car = train.cars[index];
+    const fig = buildFigure(id);
+    const s0 = 1.12;
+    fig.scale.setScalar(s0);
+    fig.position.copy(slotWorldPosition(car, train.data.cars[index].cargo.length));
+    car.getWorldQuaternion(fig.quaternion);
+    game.scene.add(fig);
+    game.popIn(fig);
+    services.sfx('nope');
+    setTimeout(() => fig.userData.life?.play('nope'), 350);
+    showWish(fig, id, index);
+    setTimeout(() => {
+      const p0 = fig.position.clone();
+      game.tween(0.6, (t) => {
+        fig.position.set(p0.x, p0.y + Math.sin(t * Math.PI) * 0.7 - t * 1.3, p0.z + t * 1.6);
+        fig.scale.setScalar(s0 * Math.max(0.05, 1 - t * 0.9));
+      }, () => game.scene.remove(fig));
+    }, 2200);
+  }
+
+  // Wohin möchte das Tier? Passender Wagen im Zug hüpft – sonst Denkblase mit dem Wunschwagen
+  function showWish(fig, id, notIndex) {
+    const good = train.data.cars.findIndex((c, i) => i !== notIndex && canRide(c.type, id) && hasRoom(i));
+    if (good >= 0) {
+      setTimeout(() => {
+        game.hop(train.cars[good]);
+        services.sfx('sparkle');
+      }, 900);
+      return;
+    }
+    const type = homeWagonOf(id);
+    const src = type && thumbs?.[thumbKey('parts', type)];
+    if (!src) return;
+    thoughtSprite(src, (sp) => {
+      sp.position.set(0, fig.userData.top + 0.1, 0);
+      const size = 2.1 / (fig.scale.x || 1);
+      sp.scale.setScalar(0.01);
+      fig.add(sp);
+      game.tween(0.3, (t) => sp.scale.setScalar(size * t));
+      setTimeout(() => game.tween(0.3, (t) => sp.scale.setScalar(size * (1 - t) + 0.001), () => fig.remove(sp)), 2400);
+    });
+    setTimeout(() => services.sayName(type), 700);
+  }
+
   function removeItem(index, removable) {
     if (removable.list === 'cargo') spliceCargo(train.data.cars[index], removable.index);
     else train.data.cars[index][removable.list].splice(removable.index, 1);
@@ -461,6 +515,14 @@ export function createWorkshopMode(game) {
   function moveItem(from, removable, to) {
     const list = removable.list;
     if (list === 'cargo' && !hasRoom(to)) return false;
+    if (list === 'cargo' && !canRide(train.data.cars[to].type, removable.id)) {
+      // will da nicht hin: bleibt sitzen, schüttelt den Kopf
+      const fig = train.cars[from].userData.cargoItems[removable.index];
+      services.sfx('nope');
+      setTimeout(() => fig?.userData.life?.play('nope'), 150);
+      if (fig) showWish(fig, removable.id, from);
+      return false;
+    }
     const { id, dest } = list === 'cargo' ? spliceCargo(train.data.cars[from], removable.index) : { id: train.data.cars[from][list].splice(removable.index, 1)[0] };
     train.rebuildCar(from);
     if (list === 'cargo') addCargo(to, id, dest);
@@ -605,7 +667,10 @@ export function createWorkshopMode(game) {
     const btn = items.children[0];
     if (!btn) return;
     let target = tab === 'wagons' ? train.cars.length - 1 : 0;
-    if (kindOf(tab) === 'cargo') target = Math.max(0, train.data.cars.findIndex((_, i) => hasRoom(i)));
+    if (kindOf(tab) === 'cargo') {
+      const fit = train.data.cars.findIndex((c, i) => hasRoom(i) && canRide(c.type, entry.id));
+      target = Math.max(0, fit >= 0 ? fit : train.data.cars.findIndex((_, i) => hasRoom(i)));
+    }
     if (tab === 'food') target = Math.max(0, train.data.cars.findIndex((c) => c.cargo.some((id) => LIKES[id])));
     if (tab === 'wheels' || tab === 'decor') target = Math.min(1, train.cars.length - 1);
     btn.scrollIntoView({ inline: 'nearest', block: 'nearest' });

@@ -10,7 +10,9 @@
 import * as THREE from 'three';
 import { chuff, railJoint, RollingSound, NoiseLoop, setEcho, xyloNote } from '../../audio.js';
 import { wave, applyDirt, slotWorldPosition } from '../trainModel.js';
-import { partDef, pushCargo, spliceCargo } from '../../catalog.js';
+import { partDef, pushCargo, spliceCargo, canRide, homeWagonOf } from '../../catalog.js';
+import { renderThumbnails } from '../thumbs.js';
+import { thoughtSprite } from '../feeding.js';
 import { addWaiting } from '../trackObjects.js';
 import { buildFigure } from '../figures.js';
 
@@ -20,7 +22,7 @@ const ACCENT = [1, 0.55, 0.8, 0.55];
 const BRAKE = 1.6; // Bremsverzögerung beim Halten
 // Die Knöpfe zeigen immer den AKTUELLEN Zustand (nicht den nächsten)
 const WEATHERS = [['sonne', '🌤️'], ['regen', '🌧️'], ['schnee', '❄️']];
-const WAITING_IDS = ['kind', 'oma', 'papa', 'hund', 'katze', 'teddy', 'hase', 'pinguin', 'schaf', 'ente', 'pferd', 'huhn', 'kuh', 'frosch'];
+const WAITING_IDS = ['kind', 'oma', 'papa', 'hund', 'katze', 'teddy', 'hase', 'pinguin', 'schaf', 'ente', 'pferd', 'huhn', 'kuh', 'frosch', 'affe', 'schwein'];
 
 class Puffs {
   constructor(scene) {
@@ -323,12 +325,20 @@ export function createDriveMode(game) {
       services.sayName(id);
       return;
     }
-    // freien Platz suchen, am liebsten im nächsten Wagen
-    const idx = train.data.cars.findIndex((c, i) => i > 0 && c.cargo.length < (partDef(c.type).slots ?? 0));
+    // freien Platz in einem passenden Wagen suchen (die Kuh will in den Stallwagen, nicht in den Teichwagen)
+    const room = (c, i) => i > 0 && c.cargo.length < (partDef(c.type).slots ?? 0);
+    const idx = train.data.cars.findIndex((c, i) => room(c, i) && canRide(c.type, id));
     if (idx < 0) {
-      game.hop(fig);
-      services.sfx('boing');
-      services.say(services.t('full'));
+      if (train.data.cars.some((c, i) => i > 0 && canRide(c.type, id))) {
+        game.hop(fig);
+        services.sfx('boing');
+        services.say(services.t('full'));
+      } else {
+        // kein passender Wagen dabei: Kopfschütteln und Denkblase mit dem Wunschwagen
+        services.sfx('nope');
+        fig.userData.life?.play('nope');
+        wish(fig, id);
+      }
       return;
     }
     item.waiting = item.waiting.filter((w) => w !== fig);
@@ -346,6 +356,32 @@ export function createDriveMode(game) {
       if (!countUp(++countIn, to)) services.sayName(id);
       game.saveTrain();
     });
+  }
+
+  function wish(fig, id) {
+    const type = homeWagonOf(id);
+    if (!type || fig.userData.wishing) return;
+    const src = renderThumbnails([{ kind: 'parts', id: type }])[`parts:${type}`];
+    fig.userData.wishing = true;
+    thoughtSprite(src, (sp) => {
+      sp.position.set(0, fig.userData.top + 0.1, 0);
+      const size = 2.1 / (fig.scale.x || 1);
+      sp.scale.setScalar(0.01);
+      fig.add(sp);
+      game.tween(0.3, (t) => sp.scale.setScalar(size * t));
+      setTimeout(() => game.tween(0.3, (t) => sp.scale.setScalar(size * (1 - t) + 0.001), () => {
+        fig.remove(sp);
+        fig.userData.wishing = false;
+      }), 2600);
+    });
+    setTimeout(() => services.sayName(type), 700);
+  }
+
+  // Neue Wartende: meistens jemand, der in einen Wagen des Zugs passt
+  function waitingId() {
+    const fitting = WAITING_IDS.filter((id) => train.data.cars.some((c, i) => i > 0 && canRide(c.type, id)));
+    const list = fitting.length && Math.random() < 0.8 ? fitting : WAITING_IDS;
+    return list[Math.floor(Math.random() * list.length)];
   }
 
   function hasArrivals(item) {
@@ -559,8 +595,16 @@ export function createDriveMode(game) {
       it.refillIn -= dt;
       if (it.refillIn <= 0) {
         it.refillIn = it.waiting.length < 2 ? 8 : null;
+        // Wer mit diesem Zug nicht mitfahren kann, geht irgendwann nach Hause – dann ist Platz für Neue
+        const fits = (f) => train.data.cars.some((c, i) => i > 0 && canRide(c.type, f.userData.figure));
+        const stuck = it.waiting.find((f) => !fits(f));
+        if (it.waiting.length >= 3 && stuck && stoppedAt !== it) {
+          it.waiting = it.waiting.filter((f) => f !== stuck);
+          const s0 = stuck.scale.x;
+          game.tween(0.5, (t) => stuck.scale.setScalar(s0 * (1 - t) + 0.001), () => stuck.parent?.remove(stuck));
+        }
         if (it.waiting.length < 3) {
-          const f = addWaiting(it, WAITING_IDS[Math.floor(Math.random() * WAITING_IDS.length)]);
+          const f = addWaiting(it, waitingId());
           if (f) game.popIn(f);
         }
       }

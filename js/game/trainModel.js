@@ -582,6 +582,56 @@ function buildZoo(car, mats) {
   return len;
 }
 
+// Affenwagen: Käfig zum Klettern (Gitterstäbe, Kletterstangen oben), in der Mitte eine Schaukel.
+// Der Affe auf Platz 2 sitzt auf der Schaukel und schaukelt mit (animateCar).
+function buildAffen(car, mats) {
+  const len = 2.8;
+  underframe(car, len, mats);
+  endBeams(car, len);
+  floor(car, len, mats);
+  car.add(mesh(box(len - 0.3, 0.05, 0.95, 0.02), shared.hay, 0, 0.88, 0));
+  sideBand(car, len, 0.86, mats, 0.56, 0.16);
+  const top = 2.1; // passt noch durch den Tunnelbogen
+  // Eckpfosten und Gitterstäbe
+  for (const s of [1, -1]) {
+    for (const sx of [1, -1]) car.add(mesh(box(0.1, top - 0.8, 0.1, 0.03), mats.body, sx * (len / 2 - 0.08), (top + 0.8) / 2, s * 0.52, 'body'));
+    for (let i = 1; i < 12; i++) car.add(mesh(cyl(0.018, 0.018, top - 0.95, 6), mats.roof, -len / 2 + 0.08 + i * ((len - 0.16) / 12), (top + 0.95) / 2, s * 0.53, 'roof'));
+    car.add(mesh(cylX(0.04, len - 0.1, 8), mats.body, 0, top, s * 0.52, 'body'));
+  }
+  for (const sx of [1, -1]) {
+    car.add(mesh(cylZ(0.04, 1.08, 8), mats.body, sx * (len / 2 - 0.08), top, 0, 'body'));
+    for (let i = 1; i < 5; i++) car.add(mesh(cyl(0.018, 0.018, top - 0.95, 6), mats.roof, sx * (len / 2 - 0.08), (top + 0.95) / 2, -0.52 + i * 0.208, 'roof'));
+  }
+  // Kletterstangen oben (quer)
+  for (const x of [-0.9, -0.45, 0.45, 0.9]) car.add(mesh(cylZ(0.028, 1.04, 8), mats.roof, x, top, 0, 'roof'));
+  // Schaukel in der Mitte: Querstange, zwei Seile, Sitzbrett (dreht sich um die Stange)
+  car.add(mesh(cylZ(0.04, 1.04, 8), mats.body, 0, top, 0, 'body'));
+  const swing = new THREE.Group();
+  swing.position.set(0, top, 0);
+  const seatY = 0.88 + 0.36;
+  const rope = new THREE.MeshStandardMaterial({ color: '#c9a36b', roughness: 0.9 });
+  for (const z of [0.22, -0.22]) swing.add(mesh(cyl(0.012, 0.012, top - seatY, 5), rope, 0, -(top - seatY) / 2, z));
+  swing.add(mesh(box(0.34, 0.05, 0.56, 0.02), mats.body, 0, -(top - seatY) - 0.025, 0, 'body'));
+  car.add(swing);
+  car.userData.swing = { obj: swing, slot: 1, length: top - seatY };
+  // Autoreifen zum Klettern an einer Ecke, Bananen auf dem Boden
+  const tire = mesh(cached('tire', () => new THREE.TorusGeometry(0.16, 0.06, 8, 18)), shared.dark, -1.05, 1.55, -0.32);
+  tire.rotation.y = Math.PI / 2;
+  car.add(tire);
+  car.add(mesh(cyl(0.008, 0.008, top - 1.7, 4), rope, -1.05, (top + 1.7) / 2, -0.32));
+  const banana = new THREE.MeshStandardMaterial({ color: '#f5d33b', roughness: 0.5 });
+  for (let i = 0; i < 4; i++) {
+    const b = mesh(cached('banana', () => new THREE.TorusGeometry(0.1, 0.028, 6, 10, Math.PI * 0.8)), banana, 1.05 + (i % 2) * 0.06, 0.94, 0.3 - i * 0.05);
+    b.rotation.set(Math.PI / 2, 0, i * 0.5);
+    car.add(b);
+  }
+  car.userData.cargoY = 0.88;
+  car.userData.slotX = [-0.75, 0, 0.75];
+  car.userData.slotY = [0, seatY - 0.88 - 0.1, 0];
+  car.userData.decorY = { side: 0.86, top: top + 0.1, sideZ: 0.6, sideX: [-0.7, 0.7, 0, -0.35], topX: [-1.2, 1.2, -1.2, 1.2] };
+  return len;
+}
+
 // Führerhaus aus Einzelteilen mit offenen Seitenfenstern und Lokführer
 function openCab(car, mats, cx, w = 0.96, d = 1.16, y0 = 0.8) {
   for (const s of [1, -1]) {
@@ -839,6 +889,7 @@ const BUILDERS = {
   huehner: buildHuehner,
   teich: buildTeich,
   zoo: buildZoo,
+  affen: buildAffen,
 };
 
 // ---------- Schmuck ----------
@@ -1039,8 +1090,9 @@ function addCargo(car) {
     if (i >= slotX.length) return;
     const fig = buildFigure(id);
     fig.scale.setScalar(CARGO_SCALE);
-    fig.position.set(slotX[i], car.userData.cargoY + CARGO_LIFT, 0);
-    fig.userData.baseY = car.userData.cargoY + CARGO_LIFT;
+    const y = car.userData.cargoY + CARGO_LIFT + (car.userData.slotY?.[i] ?? 0);
+    fig.position.set(slotX[i], y, 0);
+    fig.userData.baseY = y;
     fig.userData.phase = i * 1.7;
     fig.userData.removable = { list: 'cargo', index: i, id };
     const dest = car.userData.data.dest?.[i];
@@ -1082,7 +1134,8 @@ export function buildCar(data) {
 export function slotWorldPosition(car, index) {
   const def = partDef(car.userData.data.type);
   const slotX = car.userData.slotX ?? SLOTS[def.slots] ?? [0];
-  return car.localToWorld(new THREE.Vector3(slotX[Math.min(index, slotX.length - 1)], (car.userData.cargoY ?? 0.9) + CARGO_LIFT, 0));
+  const i = Math.min(index, slotX.length - 1);
+  return car.localToWorld(new THREE.Vector3(slotX[i], (car.userData.cargoY ?? 0.9) + CARGO_LIFT + (car.userData.slotY?.[i] ?? 0), 0));
 }
 
 // ---------- Schmutz ----------
@@ -1168,6 +1221,18 @@ export function animateCar(car, time, distanceDelta, moving) {
       ? Math.abs(Math.sin(time * 6 + s.userData.phase)) * 0.05
       : Math.max(0, Math.sin(time * 1.3 + s.userData.phase)) * 0.015;
     s.position.y = s.userData.baseY + hop;
+  }
+  // Schaukel im Affenwagen (wer auf Platz 2 sitzt, schaukelt mit)
+  const sw = car.userData.swing;
+  if (sw) {
+    const a = Math.sin(time * 2.2) * (moving ? 0.38 : 0.22);
+    sw.obj.rotation.z = a;
+    const rider = car.userData.cargoItems[sw.slot];
+    if (rider) {
+      const top = sw.obj.position.y;
+      rider.position.set(Math.sin(a) * sw.length, top - Math.cos(a) * sw.length + 0.01, 0);
+      rider.rotation.z = a;
+    }
   }
   const driver = car.userData.driver;
   if (driver) driver.position.y = (car.userData.driverY ?? 1.02) + Math.sin(time * (moving ? 8 : 1.5)) * 0.012;

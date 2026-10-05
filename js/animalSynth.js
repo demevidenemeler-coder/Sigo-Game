@@ -319,6 +319,21 @@ const RECIPES = {
     }
     return normalize(out, 0.75);
   },
+  // Affe: „Uh-uh-uh-ah-ah!“ – kurze Rufe, die immer höher und offener werden
+  affe(sr) {
+    const out = new Float32Array(Math.floor(1.5 * sr));
+    const calls = [[0, 380, 0], [0.17, 420, 0], [0.34, 470, 0.2], [0.55, 640, 0.8], [0.8, 760, 1], [1.05, 820, 1]];
+    calls.forEach(([at, f, open], i) => {
+      voice(out, sr, Math.floor(at * sr), {
+        dur: open > 0.5 ? 0.2 : 0.13, seed: 20 + i,
+        f0: curve([[0, f * 0.85], [0.3, f * 1.12], [1, f * 0.9]]),
+        amp: curve([[0, 0], [0.12, 1], [0.6, 0.75], [1, 0]]),
+        formants: [[320 + open * 520, 120, 1.3], [800 + open * 450, 200, 0.9], [2400, 400, 0.25]],
+        jitter: 0.05, shimmer: 0.3, sub: 0.2, breath: 0.35, breathTone: 3500, drive: 2.8,
+      });
+    });
+    return normalize(out, 0.8);
+  },
 };
 
 export const SYNTH_ANIMALS = Object.keys(RECIPES);

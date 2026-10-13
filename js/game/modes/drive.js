@@ -6,6 +6,7 @@
 // - Tunnel: dunkel, Lampen an, Pfeife hallt. Brücke: Schienenstöße klingen hohl.
 // - Bahnübergang: Schranke zu, Blinklicht, Glocke, Autos warten.
 // - Knöpfe: Los/Halt, Pfeife, Kamera, Tag/Nacht, Wetter.
+// - Baustelle an der Strecke (buildSite.js): antippen → Bereich „Bauen“ (modes/build.js).
 
 import * as THREE from 'three';
 import { chuff, railJoint, RollingSound, NoiseLoop, setEcho, xyloNote } from '../../audio.js';
@@ -878,6 +879,12 @@ export function createDriveMode(game) {
       if (o.userData.kind === 'snowman') return game.weatherFx.tapSnowman(o);
       if (o.userData.kind === 'puddle') return game.weatherFx.tapPuddle(o);
       if (!land.tappable.includes(o)) return;
+      if (o.userData.site) {
+        // Baustelle: weiter im Bau-Bereich, an genau diesem Bauplatz
+        services.sfx('pop');
+        game.buildSite = o.userData.siteRef;
+        return game.setMode('build');
+      }
       if (o.userData.tap) return game.village.tap(o); // Dorf zum Anfassen
       if (o.userData.figure) {
         game.hop(o);

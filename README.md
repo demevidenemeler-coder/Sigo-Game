@@ -64,6 +64,50 @@ Nach ein paar Hinweisen ohne Reaktion ist Ruhe, bis wieder getippt wird.
 - Liegt der Schwamm still, wackelt er über dem Wagen und zeigt, was zu tun ist.
 - Der Schmutz vom Fahren (Regen!) ist derselbe – hier oder in der Waschanlage an der Strecke wird er wieder sauber.
 
+### 🏗️ Bauen
+Die Kamera steht nah an der Baustelle; unten liegt eine Leiste (`js/game/modes/build.js`, Teile in `js/game/buildParts.js` und `buildMore.js`,
+Gebäude in `js/game/buildSite.js`).
+
+- **Zwölf Themen mit zusammen 209 Teilen**, dazu 13 Anbauten, 8 Muster und 18 Bewohner. Der Themen-Knopf (links in der oberen Reihe) klappt die Auswahl auf; bei
+  leerem Bauplatz ist sie gleich offen: 🏠 Haus · 🏰 Burg · 🎪 Zirkus · 🚀 Rakete · 🍦 Laden · 🍄 Märchen · 🚜 Bauernhof ·
+  ⚓ Piraten · ⛵ Meer (Leuchtturm, Strandhaus, Sandburg) · 👑 Schloss · ⛄ Winter · 🌴 Dschungel.
+  Die Themen sind nur Fächer zum Aussuchen: alles lässt sich frei mischen (Burgturm mit Pilzdach und Eiswaffel obendrauf).
+- **Neun Fächer** je Thema: Stockwerke (bis fünf übereinander; eckig, rund, schmal) · Türen · Fenster · Muster · Dächer ·
+  Spitzen · Anbauten · Schmuck · Bewohner. Beispiele: Scheune mit Mansarddach, Silo, Traktor, Heuballen, Kuh und Huhn · Schiffsrumpf, Segel am Mast,
+  Kanonenluken, Piratenflagge, Schatzkiste, Hai, der seine Runden dreht · Leuchtturm mit drehendem Licht, Möwe, Ruderboot,
+  Krabbe · Schlossturm mit Kronendach, Balkonfenster, Springbrunnen, Kutsche · Lebkuchenhaus, Iglu, Schneedach mit
+  Eiszapfen, Tannenbaum mit blinkenden Lichtern, fallende Flocken · Bambushütte, Blätterdach, Lianen, Reifenschaukel, Affe.
+  Dazu u. a. Fachwerk, Glashaus, Container, Wolken- und Kürbishaus · Herztür, Schwingtür, Iglu-Tunnel · Fenster mit Läden,
+  buntes Glas, Mond, Blume · Pagode, Dachgarten, Solardach, Glaskuppel, Stufenpyramide · Uhrtürmchen (die Zeiger laufen),
+  Glocke, Windsack, Drachen an der Schnur, UFO, Vogelnest · Teich mit Ente, Hundehütte, Wäscheleine, Fahrrad, Auto,
+  Lagerfeuer, Trampolin, Planschbecken, Grill, Schmetterlinge, Wolken.
+  Weitere Teile ergänzen: in `js/game/buildMore.js` eintragen (dort stehen die sechs neueren Themen und die Zusatzteile).
+- **Drei Bauplätze** an der Strecke (beim Dorf, im Westen am Wald, im Nordosten bei den Sonnenblumen; Lage in
+  `LAYOUT.sites`, `js/game/zones.js`). Der Zahlen-Knopf neben dem Themen-Knopf wechselt zum nächsten Bauplatz; beim Fahren
+  führt ein Tipp auf einen Bauplatz genau dorthin. Jeder Bauplatz hat sein eigenes Gebäude und seinen eigenen Speicherstand.
+- **Anbauten** (in allen Themen gleich): Seitenflügel, Garage mit Auto, Turm, Wintergarten, Schuppen, Windmühle (dreht sich),
+  Wasserrad (dreht sich), Zelt, Außentreppe, Unterstand mit Heu, Verkaufsstand, Baumhaus, Rutschturm. Sie kommen abwechselnd rechts und links ans unterste Stockwerk, bis zu zwei je Seite
+  (der zweite steht außen neben dem ersten); ein fünfter ersetzt den ältesten. Nochmal antippen = wieder weg. Die Dächer der Anbauten übernehmen die Farbe des Hausdachs.
+- **Bewohner:** bis zu sechs Figuren (Kind, Oma, Papa, Teddy und 14 Tiere; die zum Thema passenden stehen vorne) ziehen vor
+  das Gebäude. Antippen → sie hüpfen und rufen bzw. werden benannt. **Fährt der Zug vorbei, winken und hüpfen sie.**
+- **Muster** (in allen Themen gleich): Punkte, Streifen, Karo, Herzen, Sterne, Blumen, Wellen, Zickzack – legen sich in Weiß
+  über alle Stockwerke; die Wandfarbe darunter lässt sich weiter durch Antippen wechseln. Nochmal antippen = Muster weg.
+- **Album (📷):** zeigt unten zuerst 📸 „Foto machen“ (legt das Gebäude ins Album, bis zu zwölf eigene), dann die eigenen
+  Fotos und zwölf **Vorlagen** (💡, zu jedem Thema ein fertiges Gebäude). Antippen → das Gebäude wird auf den Bauplatz
+  gesetzt und kann umgebaut werden (↩️ holt das vorherige zurück). Gespeichert wird nur die Beschreibung, die Bilder
+  werden bei Bedarf neu gerendert (`housePreview` in `js/game/buildSite.js`, Vorlagen in `js/game/buildMore.js`).
+- **Bauen:** Teil antippen → es fliegt vom Steinstapel heran und wird festgehämmert. Die Leiste springt zum nächsten
+  sinnvollen Fach (erste Mauer → Türen → Fenster → Dächer → Spitzen → Schmuck); man kann jederzeit selbst wechseln.
+  Was gerade nicht passt (z. B. Spitze ohne Dach), ist blass; ein Tipp darauf zeigt, welches Fach vorher dran ist.
+  Tür, Fenster, Dach und Spitze lassen sich jederzeit austauschen, Schmuck an- und abwählen.
+- **Schmücken:** Teil am Gebäude antippen → nächste Farbe (jedes Stockwerk, Tür, Dach und viele Spitzen einzeln).
+- **Abbauen:** ↩️ nimmt den letzten Schritt zurück · 💥 (oder der Bagger) reißt alles ab, es poltert und staubt.
+- **✅ Fertig:** es glitzert, Feuerwerksraketen steigen auf; wohnt schon jemand hier, jubeln die Bewohner, sonst zieht
+  passend zum Thema jemand ein (im Zirkus z. B. Affe, Löwe oder Elefant).
+- **Kamera:** Finger ziehen = ums Gebäude herum schauen (auch höher/tiefer), zwei Finger = näher/weiter. Der Ausschnitt
+  wächst mit dem Gebäude mit. Steht der Zug gerade vor der Baustelle, wird er solange ausgeblendet.
+- Das Gebäude bleibt gespeichert und steht beim Fahren an der Strecke (abends leuchten die Fenster).
+
 ### 🛤️ Die große Strecke (fest)
 - Es gibt **keinen Zeichenmodus** mehr. Eine feste, große Strecke führt einmal durch die ganze Welt
   (`js/game/route.js`): am **Dorf** mit Dorfbahnhof und Ententeich vorbei, südlich um den **Bauernhof** (Weide direkt
@@ -235,7 +279,7 @@ sw.js                      Offline-Speicher (neue Dateien in ASSETS eintragen)
 ## Ideen für später
 - Lieferaufträge mit Kran (Kisten am Bauernhof abholen)
 - Tiere auf den Gleisen, Lok ins Bett bringen (schönes Spielende)
-- Landschaft selbst gestalten (Bäume, Häuser, Tiere setzen)
+- Landschaft selbst gestalten (Bäume, Tiere setzen); mehrere Bauplätze
 - Eigene Fotos als Fahrgäste, selbst eingesprochene Laute
 - Weichen / zwei Züge (eher für ältere Kinder)
 
@@ -290,6 +334,8 @@ Platz und winken, wenn der Zug vorbeifährt (`js/game/village.js`).
 Zum Anfassen: Haus antippen → jemand kommt heraus und winkt; Kirche → Glocken; Brunnen → Platschen;
 Marktstand → Apfel hüpft; Briefkasten → Brief fliegt. Dazu Bäckerei, Wimpelketten, Wäscheleine,
 Katze auf dem Dach und ein Hund, der den Zug anbellt.
+**Baustelle** an der Strecke westlich vom Dorf: siehe Bereich 🏗️ Bauen. Beim Fahren führt ein Tipp auf die Baustelle dorthin.
+
 **Feuerwehr** neben dem Dorfbahnhof (rote Wache mit Schlauchturm und Blaulicht): Antippen → Tatütata, das Rolltor
 fährt hoch, das Feuerwehrauto (mit Feuerwehrmann) fährt mit Blaulicht heraus, die Leiter geht hoch, Wasser marsch –
 dann fährt alles wieder zurück.

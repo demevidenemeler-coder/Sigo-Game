@@ -188,6 +188,7 @@ export class VillageLife {
   hintTarget() {
     if (this.cat?.state === 'stuck' && !this.cat.rescued && this.cat.fig.visible) return this.cat.fig;
     if (this.fire && !this.fire.used && this.fire.root.visible) return this.fire.st;
+    if (this.game.buildSites && !this.game.buildSites.some((s) => s.used)) return this.game.buildSites[0].plot;
     return null;
   }
 

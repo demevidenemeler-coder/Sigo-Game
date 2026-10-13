@@ -10,6 +10,9 @@ import { makeGlowPool } from './beams.js';
 // Lage der Bereiche (frei von Fluss, Straße, Bergen und der Start-Strecke)
 export const LAYOUT = {
   village: { x: 14, z: 40, plaza: 4.6 },
+  // Bauplätze an der Strecke (buildSite.js): beim Dorf, im Westen am Wald, im Nordosten bei den Sonnenblumen.
+  // In der Übersicht liegt keiner unter den Knöpfen.
+  sites: [{ x: -6, z: 30, rot: 0.75 }, { x: -60, z: -22, rot: 0.75 }, { x: 24, z: -25, rot: 0.75 }],
   farm: { x: -42, z: 42, yard: 4.2 },
   fields: [
     { x: -63, z: 41, w: 12, d: 8, rot: 0.08, kind: 'korn' },
@@ -33,7 +36,8 @@ export function zonePaint() {
   const v = LAYOUT.village;
   const f = LAYOUT.farm;
   return {
-    plazas: [{ x: v.x, z: v.z, r: v.plaza, squash: 0.85 }, { x: f.x, z: f.z, r: f.yard, squash: 0.8 }],
+    plazas: [{ x: v.x, z: v.z, r: v.plaza, squash: 0.85 }, { x: f.x, z: f.z, r: f.yard, squash: 0.8 },
+      ...LAYOUT.sites.map((s) => ({ x: s.x, z: s.z, r: 5.0, squash: 0.85 }))],
     fields: LAYOUT.fields,
     paths: [
       { pts: [[v.x, v.z], [4, 45], [-10, 48], [-26, 49.5], [-36, 46], [f.x, f.z]] }, // Dorf → Hof

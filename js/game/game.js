@@ -18,8 +18,11 @@ import { Discoveries } from './discover.js';
 import { AnimalGreetings } from './greetings.js';
 import { lifeClock } from './animalLife.js';
 import { VillageLife } from './village.js';
+import { BuildSite } from './buildSite.js';
+import { LAYOUT } from './zones.js';
+import { createBuildMode } from './modes/build.js';
 
-const MODE_ICONS = { workshop: '🛠️', wash: '🧽', drive: '🚂' };
+const MODE_ICONS = { workshop: '🛠️', wash: '🧽', drive: '🚂', build: '🏗️' };
 const SUN_OFFSET = new THREE.Vector3(12, 24, 14);
 // Achsen des Sonnenlichts (zum Einrasten der Schattenkarte)
 const WARM = new THREE.Color('#ffb36b');
@@ -84,6 +87,7 @@ export class Game {
       drive: createDriveMode(this),
       wash: createWashMode(this),
       bed: createBedMode(this),
+      build: createBuildMode(this),
     };
     this.mode = null;
     this.modeName = null;
@@ -91,6 +95,9 @@ export class Game {
     this.buildModeBar();
     this.discover = new Discoveries(this); // Entdecker-Album
     this.village = new VillageLife(this); // Leute im Dorf
+    // Bauplätze an der Strecke; buildSite ist der, an dem gerade gebaut wird (modes/build.js)
+    this.buildSites = LAYOUT.sites.map((cfg, i) => new BuildSite(this, cfg, i));
+    this.buildSite = this.buildSites[0];
     this.greetings = new AnimalGreetings(this); // Tiere im Zug und draußen rufen sich zu
     this.bindPointer();
     this.resize();
@@ -147,6 +154,7 @@ export class Game {
       this.sideTrain.update(dt);
       this.discover.update(dt, this.time);
       this.village.update(dt, this.time);
+      for (const s of this.buildSites) s.update(dt);
       this.greetings.update(dt);
       this.renderer.toneMappingExposure = 0.98 - 0.36 * this.env.night;
       this.glow.style.opacity = (this.env.dusk * 0.42).toFixed(3);

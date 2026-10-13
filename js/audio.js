@@ -340,6 +340,20 @@ Object.assign(SOUNDS, {
   carhonk(t) {
     for (const dt of [0, 0.2]) tone('square', 480, t + dt, 0.01, 0.13, 0.15, lowpass(1600));
   },
+  // Baustelle: zwei Hammerschläge auf Holz
+  hammer(t) {
+    for (const d of [0, 0.17]) {
+      noise(t + d, 0.04, 0.6, 'bandpass', 1900, sfxBus, 3);
+      tone('triangle', 520, t + d, 0.002, 0.07, 0.3);
+    }
+  },
+  // Baustelle: Mauerteil poltert herunter
+  rumble(t) {
+    const n = noise(t, 0.5, 0.55, 'lowpass', 420);
+    n.filter.frequency.exponentialRampToValueAtTime(120, t + 0.45);
+    tone('sine', 75, t, 0.01, 0.35, 0.4);
+    noise(t + 0.12, 0.08, 0.4, 'bandpass', 900, sfxBus, 2);
+  },
   // Feuerwehr: Tatütata (zweitönig, dreimal)
   siren(t) {
     for (let i = 0; i < 6; i++) {

@@ -352,6 +352,66 @@ button {
 }
 .env-controls .drive-btn { width: min(12vmin, 80px); font-size: min(6vmin, 38px); }
 
+/* ---------- Bauen: Leiste mit Themen, Fächern und Bauteilen (modes/build.js) ---------- */
+.site-panel {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1vmin;
+  padding: 1.2vmin 1.5vmin calc(1.2vmin + env(safe-area-inset-bottom));
+  background: rgba(255, 250, 242, 0.95);
+  box-shadow: 0 -6px 20px rgba(74, 63, 53, 0.12);
+  border-radius: 26px 26px 0 0;
+}
+.site-tabs { display: flex; flex-wrap: wrap; justify-content: center; gap: 1vmin 2.2vmin; }
+.site-group { display: flex; gap: 0.8vmin; }
+.site-tab {
+  width: min(8.6vmin, 56px);
+  aspect-ratio: 1;
+  border-radius: 28%;
+  background: var(--tile) center / 86% no-repeat;
+  box-shadow: 0 3px 8px var(--shadow);
+  font-family: var(--emoji);
+  font-size: min(5.4vmin, 34px);
+  opacity: 0.75;
+}
+.site-tab.active { opacity: 1; background-color: #ffe7c7; outline: 3px solid var(--accent); }
+.site-tab.act { border-radius: 50%; opacity: 1; }
+.site-tab.off { opacity: 0.3; }
+.site-tab.pulse { animation: attention 0.9s ease 2; }
+.site-parts {
+  display: flex;
+  gap: 1.6vmin;
+  padding: 0.6vmin 0.4vmin 0.8vmin;
+  overflow-x: auto;
+  justify-content: safe center;
+  scrollbar-width: none;
+}
+.site-parts::-webkit-scrollbar { display: none; }
+.site-part {
+  flex: none;
+  width: min(15vmin, 104px);
+  aspect-ratio: 1;
+  border-radius: 22%;
+  background: var(--tile) center / 92% no-repeat;
+  box-shadow: 0 4px 10px var(--shadow);
+}
+.site-part:active { transform: scale(0.92); }
+.site-part.active { outline: 4px solid var(--accent); background-color: #ffe7c7; }
+.site-part.off { opacity: 0.35; }
+.site-part.pick { width: min(13vmin, 86px); font-family: var(--emoji); font-size: min(7.5vmin, 50px); }
+.site-parts.picking { flex-wrap: wrap; justify-content: center; overflow-x: visible; }
+/* Album: eigene Fotos mit weißem Rand wie ein Foto, Vorlagen mit Glühbirne */
+.site-part.photo { width: min(17vmin, 116px); background-size: 100%; border: 4px solid #fff; }
+.site-part.idea { position: relative; border-color: #ffe7a8; }
+.site-part.idea::after { content: '💡'; position: absolute; right: -4px; top: -8px; font: min(4vmin, 22px) var(--emoji); }
+.site-flash { position: fixed; inset: 0; background: #fff; opacity: 0; pointer-events: none !important; }
+.site-flash.go { animation: site-flash 0.5s ease-out; }
+@keyframes site-flash { 0% { opacity: 0.85; } 100% { opacity: 0; } }
+
 /* ---------- Mal-Hinweis ---------- */
 /* ---------- Eltern-Knopf ---------- */
 #parent-btn {

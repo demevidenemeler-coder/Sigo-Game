@@ -740,7 +740,9 @@ export function createLandscape() {
   const tuftData = [];
   const tuftAt = (x, z, sc = 1) => {
     if (features.blocked(x, z, 0.2)) return;
-    tuftData.push({ x, z, y: 0, s: (0.7 + rand() * 0.7) * sc, r: rand() * Math.PI });
+    const tuft = { x, z, y: 0, s: (0.7 + rand() * 0.7) * sc, r: rand() * Math.PI };
+    if (LAYOUT.sites.some((b) => Math.hypot(x - b.x, z - b.z) < 4.7)) return; // Baustellen: kein Gras auf dem Bauplatz
+    tuftData.push(tuft);
   };
   for (const [pts, off] of [[features.riverS.pts, features.riverWidth / 2 + 1.6], [features.roadS.pts, features.roadWidth / 2 + 1.0]]) {
     for (let i = 1; i < pts.length - 1; i++) {

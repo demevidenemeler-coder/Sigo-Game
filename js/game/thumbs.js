@@ -5,6 +5,8 @@ import { buildCar, sideDecor, topDecor, isTopDecor, buildWheelPreview } from './
 import { buildFigure } from './figures.js';
 import { buildFood } from './foods.js';
 import { newCar } from '../catalog.js';
+import { partPreview } from './buildParts.js';
+import { housePreview } from './buildSite.js';
 
 const VIEWS = {
   car: { size: [240, 160], fov: 30, pos: [2.6, 2.8, 6.4], look: [0, 1.0, 0] },
@@ -14,6 +16,8 @@ const VIEWS = {
   sideDecor: { size: [160, 160], fov: 30, pos: [0.2, 0.25, 1.3], look: [0, 0, 0] },
   topDecor: { size: [160, 160], fov: 30, pos: [0.4, 1.0, 3.4], look: [0.1, 0.9, 0] },
   build: { size: [200, 160], fov: 40, pos: [9, 10, 12], look: [0, 0.8, 1.2] },
+  site: { size: [160, 160], fov: 30, pos: [0.5, 0.75, 2.3], look: [0, 0, 0] },
+  house: { size: [200, 200], fov: 30, pos: [0.4, 0.6, 2.25], look: [0, 0, 0] },
 };
 
 function objectFor(kind, id) {
@@ -33,6 +37,8 @@ function objectFor(kind, id) {
     g.add(f);
     return { obj: g, view: 'figure' };
   }
+  if (kind === 'site') return { obj: partPreview(id), view: 'site' }; // Bauteile der Baustelle
+  if (kind === 'house') return { obj: housePreview(id), view: 'house' }; // ganzes Gebäude fürs Album (id = Beschreibung als Text)
   if (kind === 'food') return { obj: buildFood(id), view: 'food' };
   if (kind === 'wheel') return { obj: buildWheelPreview(id), view: 'wheel' };
   return isTopDecor(id) ? { obj: topDecor(id, 1), view: 'topDecor' } : { obj: sideDecor(id), view: 'sideDecor' };

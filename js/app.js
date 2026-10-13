@@ -4,7 +4,7 @@ import {
 import { LANGUAGES, setLanguage, lang, speechLang, t, nameOf, soundWordOf } from './i18n.js';
 import {
   unlockAudio, playSound, speak, stopSpeaking, voiceInfo, setChannelVolume, animalSound, hasAnimalSound,
-  preloadSamples, ANIMAL_SAMPLE_NAMES,
+  preloadSamples, ANIMAL_SAMPLE_NAMES, audioContext,
 } from './audio.js';
 import { Music } from './music.js';
 import { loadRecordings, hasRecording, playRecording } from './recordings.js';
@@ -404,9 +404,22 @@ function setupParentGate() {
 }
 
 document.addEventListener('contextmenu', (e) => e.preventDefault());
-document.addEventListener('visibilitychange', () => {
-  if (document.hidden) saveSession(session);
-});
+// Spiel verlassen (Home-Taste, andere App, Bildschirm aus): alles wird still – Musik, Geräusche, Stimme.
+// Kommt man zurück, geht es an derselben Stelle weiter.
+function leaveGame() {
+  saveSession(session);
+  stopSpeaking();
+  music.stop();
+  audioContext().suspend?.().catch?.(() => {});
+}
+function returnToGame() {
+  lastTick = Date.now();
+  audioContext().resume?.().catch?.(() => {});
+  applySound();
+}
+document.addEventListener('visibilitychange', () => (document.hidden ? leaveGame() : returnToGame()));
+window.addEventListener('pagehide', leaveGame);
+window.addEventListener('pageshow', () => { if (!document.hidden) returnToGame(); });
 setupParentGate();
 showStart();
 

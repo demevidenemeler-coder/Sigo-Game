@@ -65,6 +65,17 @@ Nach ein paar Hinweisen ohne Reaktion ist Ruhe, bis wieder getippt wird.
 - Liegt der Schwamm still, wackelt er über dem Wagen und zeigt, was zu tun ist.
 - Der Schmutz vom Fahren (Regen!) ist derselbe – hier oder in der Waschanlage an der Strecke wird er wieder sauber.
 
+### Gerätetest für bewegliche Tiere
+
+Beim Start prüft das Spiel, ob das Gerät Skelett-Animation richtig zeichnet (`js/game/skinCheck.js`). Fällt der Test
+durch, bleiben die Tiere starr – sonst stünden sie auf manchen Tablets im Boden oder schwebten. Im Eltern-Bereich
+lässt sich „Tiere bewegen sich“ auch von Hand ausschalten; dort stehen das Testergebnis und der Name des Grafikchips.
+
+### Musik
+
+Vier kurze Lieder wechseln sich ab (`js/music.js`): Zuglied, Hopser, Sonnenschein, Zirkusmarsch. Verlässt man das
+Spiel (Home-Taste, andere App, Bildschirm aus), werden Musik, Geräusche und Stimme angehalten.
+
 ### 🏗️ Bauen
 Die Kamera steht nah an der Baustelle; unten liegt eine Leiste (`js/game/modes/build.js`, Teile in `js/game/buildParts.js` und `buildMore.js`,
 Gebäude in `js/game/buildSite.js`).

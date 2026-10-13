@@ -177,7 +177,10 @@ const RIGS = {
 };
 RIGS.hahn = { ...RIGS.huhn, acts: ['peck', 'look', 'crow', 'flap', 'lookCam', 'peck'] };
 
-export const hasLife = (id) => id in RIGS;
+// Bewegliche Tiere lassen sich abschalten (Gerät zeichnet sie falsch, siehe skinCheck.js): dann sind alle starr
+let lifeOn = true;
+export const setLife = (on) => { lifeOn = !!on; };
+export const hasLife = (id) => lifeOn && id in RIGS;
 
 // ---------- Skelett und Gewichte ----------
 

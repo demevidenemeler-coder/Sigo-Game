@@ -12,6 +12,8 @@ import { showVoiceStudio, PHRASE_KEYS, keys as recKeys } from './voiceStudio.js'
 import { defaultTrain, upgradeTrain } from './catalog.js';
 import { Game } from './game/game.js';
 import { preloadModels } from './game/models.js';
+import { checkSkinning } from './game/skinCheck.js';
+import { setLife } from './game/animalLife.js';
 
 const overlay = document.getElementById('overlay');
 let settings = loadSettings();
@@ -137,6 +139,9 @@ function sayText(text) {
 
 // ---------- Spiel ----------
 
+// Zeichnet dieses Gerät bewegliche Tiere richtig? Wenn nicht (oder abgeschaltet), bleiben sie starr.
+const skin = checkSkinning();
+setLife(skin.ok && settings.liveAnimals !== 'off');
 await preloadModels(); // Blender-Modelle (klein, kommen offline aus dem Speicher)
 const game = new Game({
   canvas: document.getElementById('scene'),
@@ -346,6 +351,10 @@ function showSettings() {
   page.append(row(t('music'), choice(onOff, settings.music, (v) => update({ music: v }))));
   page.append(row(t('musicVolume'), choice([[0.3, t('quiet')], [0.5, t('medium')], [0.8, t('loud')]], settings.musicVolume,
     (v) => update({ musicVolume: v }))));
+
+  page.append(row(t('liveAnimals'), choice([['auto', t('on')], ['off', t('off')]], settings.liveAnimals ?? 'auto',
+    (v) => { update({ liveAnimals: v }); location.reload(); }),
+    `${t(skin.ok ? 'liveOk' : 'liveBad')} · ${skin.gpu} · ${skin.detail}`));
 
   if (isResting()) {
     const time = new Date(session.restUntil).toLocaleTimeString(lang(), { hour: '2-digit', minute: '2-digit' });

@@ -19,6 +19,7 @@ export const DEFAULT_SETTINGS = {
   speechRate: 0.85,
   season: 'auto', // Jahreszeit: 'auto' (Kalender) | 'fruehling' | 'sommer' | 'herbst' | 'winter'
   counting: true, // beim Ein- und Aussteigen leise mitzählen
+  liveAnimals: 'auto', // bewegliche Tiere: 'auto' (wenn das Gerät sie richtig zeichnet) | 'off' (starr)
   voiceMode: 'sparse', // 'sparse' = Wörter nur bei Neuem, 'always' = immer
 };
 

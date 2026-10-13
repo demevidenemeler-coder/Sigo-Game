@@ -672,7 +672,7 @@ function buildAffen(car, mats) {
   }
   car.userData.cargoY = 0.88;
   car.userData.slotX = [-0.75, 0, 0.75];
-  car.userData.slotY = [0, seatY - 0.88 - 0.1, 0];
+  car.userData.slotY = [0, seatY - 0.88, 0];
   car.userData.decorY = { side: 0.86, top: top + 0.1, sideZ: 0.6, sideX: [-0.7, 0.7, 0, -0.35], topX: [-1.2, 1.2, -1.2, 1.2] };
   return len;
 }
@@ -1125,7 +1125,7 @@ function addDecor(car) {
 
 const SLOTS = { 3: [-0.72, 0, 0.72], 2: [-0.5, 0.5], 1: [0] };
 // Mitfahrer stehen etwas erhöht und sind etwas größer – gut zu sehen und leicht mit dem Finger zu greifen
-const CARGO_LIFT = 0.14;
+const CARGO_LIFT = 0.025; // knapp über dem Wagenboden (Stroh, Bretter), damit die Füße wirklich aufstehen
 const CARGO_SCALE = 1.12;
 
 function addCargo(car) {

@@ -368,6 +368,7 @@ export class Game {
     const w = window.innerWidth;
     const h = window.innerHeight;
     const b = this.bottomInset;
+    if (!(w > 0 && h > b)) return; // Fenster gerade ohne Größe (z. B. im Hintergrund): Kamera lassen, wo sie ist
     const full = h + b;
     const tanV = Math.tan(THREE.MathUtils.degToRad(this.camera.fov / 2));
     const tanVis = (tanV * (h - b)) / full;

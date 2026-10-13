@@ -1,8 +1,11 @@
 // Bauen: Die Kamera steht nah an der Baustelle (buildSite.js), unten liegt die Leiste mit den Bauteilen.
 //
-// - Obere Reihe: Themen (Haus, Burg, Zirkus, Rakete, Laden, Märchen) · Fächer (Stockwerke, Türen, Fenster,
-//   Dächer, Spitzen, Schmuck; der Themen-Knopf links klappt die Auswahl der Themen auf) · ↩ letzten Schritt zurück · 💥 Bagger reißt alles ab · ✅ fertig (Richtfest).
-// - Untere Reihe: die Teile des Fachs. Antippen → das Teil wird gebaut. Was gerade nicht passt, ist blass.
+// - Leiste unten, obere Reihe: nur die Fächer (Stockwerke, Türen, Fenster, …). Das gewählte Fach ist groß
+//   hervorgehoben, das Fach für den nächsten sinnvollen Schritt wackelt leicht.
+// - Leiste unten, untere Reihe: die Teile des Fachs. Antippen → das Teil wird gebaut. Was gerade nicht passt,
+//   ist blass. Passen nicht alle Teile ins Bild: wischen oder die Pfeile ◀ ▶ antippen.
+// - Links am Rand (klein, selten gebraucht): Thema · Bauplatz wechseln · Album · 💥 Bagger reißt alles ab.
+// - Rechts am Rand: ↩ letzten Schritt zurück · ✅ fertig (Richtfest).
 // - Finger ziehen = ums Gebäude herum schauen, zwei Finger = näher/weiter. Teil am Gebäude antippen = andere Farbe.
 
 import * as THREE from 'three';
@@ -41,10 +44,15 @@ export function createBuildMode(game) {
   panel.className = 'site-panel hidden';
   const tabs = document.createElement('div');
   tabs.className = 'site-tabs';
+  const row = document.createElement('div');
+  row.className = 'site-row';
   const partsRow = document.createElement('div');
   partsRow.className = 'site-parts';
-  panel.append(tabs, partsRow);
-  game.ui.append(panel);
+  // seltene Knöpfe links am Rand, Zurück und Fertig rechts
+  const tools = document.createElement('div');
+  tools.className = 'site-side left hidden';
+  const acts = document.createElement('div');
+  acts.className = 'site-side right hidden';
 
   const button = (parent, cls, onTap) => {
     const b = document.createElement('button');
@@ -54,6 +62,42 @@ export function createBuildMode(game) {
     parent.append(b);
     return b;
   };
+  // Pfeile zum Blättern (nur sichtbar, wenn nicht alle Teile ins Bild passen)
+  const page = (d) => partsRow.scrollBy({ left: d * partsRow.clientWidth * 0.75, behavior: 'smooth' });
+  const left = button(row, 'site-arrow', () => page(-1));
+  left.textContent = '◀';
+  row.append(partsRow);
+  const right = button(row, 'site-arrow', () => page(1));
+  right.textContent = '▶';
+  function updateArrows() {
+    const over = !partsRow.classList.contains('picking') && partsRow.scrollWidth > partsRow.clientWidth + 4;
+    row.classList.toggle('overflow', over);
+    left.disabled = partsRow.scrollLeft < 4;
+    right.disabled = partsRow.scrollLeft + partsRow.clientWidth > partsRow.scrollWidth - 4;
+  }
+  partsRow.addEventListener('scroll', updateArrows, { passive: true });
+  panel.append(tabs, row);
+  game.ui.append(panel, tools, acts);
+  let shown = ''; // was die untere Reihe gerade zeigt – bleibt es gleich, bleibt auch die Stelle beim Blättern
+
+  // Welches Fach ist als Nächstes sinnvoll? (wackelt leicht)
+  function nextCat(s) {
+    if (s.empty) return 'levels';
+    if (!s.state.door) return 'doors';
+    if (!s.state.win) return 'windows';
+    if (!s.state.roof) return 'roofs';
+    if (!s.state.top) return 'tops';
+    return null;
+  }
+  // Leiste fertig aufgebaut: Pfeile, Blätter-Stelle, Platz für die Kamera
+  function settle(key) {
+    const keep = key === shown ? partsRow.dataset.at | 0 : 0;
+    shown = key;
+    updateArrows(); // erst die Pfeile (sie nehmen Platz weg), dann die Stelle
+    partsRow.scrollLeft = keep;
+    updateArrows();
+    game.setBottomInset(panel.offsetHeight);
+  }
   // Bewohner nutzen die Figuren-Bilder der Werkstatt, alles andere die Bauteil-Vorschau
   const item = (id) => ({ kind: catOf(id) === 'folk' ? 'cargo' : 'site', id });
   const thumb = (id) => `url(${renderThumbnails([item(id)])[`${item(id).kind}:${id}`]})`;
@@ -71,18 +115,20 @@ export function createBuildMode(game) {
     const s = site();
     // alle Bilder des Themas in einem Durchgang rendern
     renderThumbnails(CATS.flatMap((c) => partsOf(theme, c)).map(item));
+    partsRow.dataset.at = partsRow.scrollLeft;
     tabs.replaceChildren();
-    const group = (cls) => { const d = document.createElement('div'); d.className = `site-group ${cls}`; tabs.append(d); return d; };
-    const themes = group('themes');
-    button(themes, `site-tab theme${picking ? ' active' : ''}`, () => {
+    tools.replaceChildren();
+    acts.replaceChildren();
+    button(tools, `site-tab theme${picking ? ' active' : ''}`, () => {
       picking = !picking;
       browsing = false;
       services.sfx('pop');
       refresh();
     }).textContent = THEMES[theme].icon;
-    const cats = group('cats');
+    const next = picking || browsing ? null : nextCat(s);
     for (const c of CATS) {
-      const b = button(cats, `site-tab${c === cat && !picking && !browsing ? ' active' : ''}`, () => {
+      const on = c === cat && !picking && !browsing;
+      const b = button(tabs, `site-tab${on ? ' active' : ''}${c === next && !on ? ' next' : ''}`, () => {
         cat = c;
         picking = false;
         browsing = false;
@@ -94,22 +140,21 @@ export function createBuildMode(game) {
     }
     // nächster Bauplatz (es gibt mehrere an der Strecke)
     const sites = game.buildSites;
-    button(themes, 'site-tab plot', () => {
+    button(tools, 'site-tab plot', () => {
       game.buildSite = sites[(sites.indexOf(s) + 1) % sites.length];
       services.sfx('whoosh');
       attach();
     }).textContent = ['1️⃣', '2️⃣', '3️⃣', '4️⃣'][sites.indexOf(s)] ?? '➡️';
-    const acts = group('acts');
-    button(acts, `site-tab act${browsing ? ' active' : ''}`, () => {
+    button(tools, `site-tab${browsing ? ' active' : ''}`, () => {
       browsing = !browsing;
       picking = false;
       services.sfx('pop');
       refresh();
     }).textContent = '📷';
+    button(tools, `site-tab${s.empty ? ' off' : ''}`, () => s.demolish()).textContent = '💥';
     button(acts, `site-tab act${s.history.length ? '' : ' off'}`, () => {
       if (s.undo()) refresh();
     }).textContent = '↩️';
-    button(acts, `site-tab act${s.empty ? ' off' : ''}`, () => s.demolish()).textContent = '💥';
     button(acts, `site-tab act ok${s.empty ? ' off' : ''}`, () => {
       if (s.celebrate()) resetView(); // von vorne zuschauen, wer einzieht
     }).textContent = '✅';
@@ -141,7 +186,7 @@ export function createBuildMode(game) {
       };
       for (const json of album) button(partsRow, `site-part photo${json === mine ? ' active' : ''}`, () => load(json)).style.backgroundImage = pic(json);
       for (const json of TEMPLATES) button(partsRow, 'site-part photo idea', () => load(json)).style.backgroundImage = pic(json);
-      game.setBottomInset(panel.offsetHeight);
+      settle('album');
       return;
     }
     if (picking) {
@@ -160,7 +205,7 @@ export function createBuildMode(game) {
       const b = button(partsRow, `site-part${s.can(id) ? '' : ' off'}${s.has(id) ? ' active' : ''}`, () => choose(id));
       b.style.backgroundImage = thumb(id);
     }
-    game.setBottomInset(panel.offsetHeight);
+    settle(picking ? 'themes' : `${theme}:${cat}`);
   }
 
   function choose(id) {
@@ -265,18 +310,20 @@ export function createBuildMode(game) {
       active = true;
       game.useScene('land');
       train.placeOnCurve(land.track.curve, land.track.length, game.drive.s);
-      panel.classList.remove('hidden');
+      for (const el of [panel, tools, acts]) el.classList.remove('hidden');
       attach();
     },
     exit() {
       active = false;
-      panel.classList.add('hidden');
+      for (const el of [panel, tools, acts]) el.classList.add('hidden');
       game.setBottomInset(0);
       train.group.visible = true;
       fingers.clear();
     },
     onResize() {
-      if (active) game.setBottomInset(panel.offsetHeight);
+      if (!active) return;
+      updateArrows();
+      game.setBottomInset(panel.offsetHeight);
     },
     update() {
       camera();

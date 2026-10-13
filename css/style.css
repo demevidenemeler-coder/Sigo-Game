@@ -366,27 +366,65 @@ button {
   box-shadow: 0 -6px 20px rgba(74, 63, 53, 0.12);
   border-radius: 26px 26px 0 0;
 }
-.site-tabs { display: flex; flex-wrap: wrap; justify-content: center; gap: 1vmin 2.2vmin; }
-.site-group { display: flex; gap: 0.8vmin; }
+/* Fächer: eine Reihe; das gewählte ist groß und farbig, das nächste sinnvolle wackelt leicht */
+.site-tabs { display: flex; justify-content: center; align-items: flex-end; gap: 1vmin; padding-top: 1vmin; }
 .site-tab {
-  width: min(8.6vmin, 56px);
+  flex: none;
+  width: min(9vmin, 62px);
   aspect-ratio: 1;
   border-radius: 28%;
   background: var(--tile) center / 86% no-repeat;
   box-shadow: 0 3px 8px var(--shadow);
   font-family: var(--emoji);
   font-size: min(5.4vmin, 34px);
-  opacity: 0.75;
+  opacity: 0.85;
+  transition: transform 0.15s;
 }
-.site-tab.active { opacity: 1; background-color: #ffe7c7; outline: 3px solid var(--accent); }
+.site-tab.active { opacity: 1; background-color: #ffd9a8; outline: 4px solid var(--accent); transform: translateY(-0.8vmin) scale(1.14); }
+.site-tab.next { opacity: 1; animation: site-next 1.6s ease-in-out infinite; }
 .site-tab.act { border-radius: 50%; opacity: 1; }
 .site-tab.off { opacity: 0.3; }
 .site-tab.pulse { animation: attention 0.9s ease 2; }
+@keyframes site-next { 0%, 60%, 100% { transform: rotate(0); } 70% { transform: rotate(-9deg) scale(1.08); } 85% { transform: rotate(9deg) scale(1.08); } }
+/* Knöpfe am Rand: links klein (Thema, Bauplatz, Album, Abreißen), rechts groß (Zurück, Fertig) */
+.site-side {
+  position: fixed;
+  top: calc(30px + min(15vmin, 84px) + env(safe-area-inset-top));
+  display: flex;
+  flex-direction: column;
+  gap: 1.4vmin;
+}
+.site-side.left { left: calc(12px + env(safe-area-inset-left)); }
+.site-side.right { right: calc(12px + env(safe-area-inset-right)); }
+.site-side .site-tab { opacity: 0.9; width: min(9vmin, 54px); font-size: min(5vmin, 30px); }
+.site-side .site-tab.active { transform: none; }
+.site-side.right .site-tab { width: min(13vmin, 76px); font-size: min(7.5vmin, 44px); opacity: 1; }
+.site-side .site-tab.off { opacity: 0.3; }
+/* Teile-Reihe mit Blätter-Pfeilen */
+.site-row { display: flex; align-items: center; gap: 1vmin; }
+.site-arrow {
+  flex: none;
+  display: none;
+  width: min(10vmin, 60px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fffaf2;
+  font-size: min(4.5vmin, 28px);
+  box-shadow: 0 3px 8px var(--shadow);
+}
+.site-row.overflow .site-arrow { display: block; }
+.site-arrow:disabled { opacity: 0.25; }
+.site-arrow:active { transform: scale(0.9); }
 .site-parts {
+  flex: 1;
+  min-width: 0;
   display: flex;
   gap: 1.6vmin;
   padding: 0.6vmin 0.4vmin 0.8vmin;
   overflow-x: auto;
+  overflow-y: hidden;
+  touch-action: pan-x; /* mit dem Finger hin- und herschieben */
   justify-content: safe center;
   scrollbar-width: none;
 }
@@ -398,6 +436,7 @@ button {
   border-radius: 22%;
   background: var(--tile) center / 92% no-repeat;
   box-shadow: 0 4px 10px var(--shadow);
+  touch-action: pan-x;
 }
 .site-part:active { transform: scale(0.92); }
 .site-part.active { outline: 4px solid var(--accent); background-color: #ffe7c7; }

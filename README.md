@@ -96,6 +96,9 @@ Gebäude in `js/game/buildSite.js`).
   Fotos und zwölf **Vorlagen** (💡, zu jedem Thema ein fertiges Gebäude). Antippen → das Gebäude wird auf den Bauplatz
   gesetzt und kann umgebaut werden (↩️ holt das vorherige zurück). Gespeichert wird nur die Beschreibung, die Bilder
   werden bei Bedarf neu gerendert (`housePreview` in `js/game/buildSite.js`, Vorlagen in `js/game/buildMore.js`).
+- **Oberfläche:** Unten liegen nur die Fächer (das gewählte ist groß hervorgehoben, das nächste sinnvolle wackelt
+  leicht) und darunter die Teile – wischen oder mit ◀ ▶ blättern. Links am Rand klein: Thema, Bauplatz, Album 📷,
+  Abreißen 💥. Rechts am Rand groß: Zurück ↩️ und Fertig ✅.
 - **Bauen:** Teil antippen → es fliegt vom Steinstapel heran und wird festgehämmert. Die Leiste springt zum nächsten
   sinnvollen Fach (erste Mauer → Türen → Fenster → Dächer → Spitzen → Schmuck); man kann jederzeit selbst wechseln.
   Was gerade nicht passt (z. B. Spitze ohne Dach), ist blass; ein Tipp darauf zeigt, welches Fach vorher dran ist.

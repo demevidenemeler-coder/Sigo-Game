@@ -368,6 +368,51 @@ function buildFlach(car, mats) {
   return len;
 }
 
+// Musikwagen: Xylophon (fünf bunte Stäbe), Trommel und drei Glocken zum Antippen (drive.js spielt die Töne).
+// Jedes Instrument bleibt ein eigenes Teil (userData.instrument), damit es beim Anschlagen wippen kann.
+const BAR_COLORS = ['#e5484d', '#ee8a2b', '#f2c832', '#4fa65a', '#3b7cc9'];
+const drumSkin = new THREE.MeshStandardMaterial({ color: '#fbf6ea', roughness: 0.7 });
+function buildMusik(car, mats) {
+  const len = 2.6;
+  underframe(car, len, mats);
+  endBeams(car, len);
+  floor(car, len, mats);
+  sideBand(car, len, 0.78, mats, 0.585, 0.1);
+  const top = 0.86;
+  const instrument = (def, x, y, z) => {
+    const g = new THREE.Group();
+    g.position.set(x, y, z);
+    g.userData.instrument = def;
+    car.add(g);
+    return g;
+  };
+  // Xylophon: zwei Holme, darauf fünf Stäbe (lang = tief, kurz = hoch)
+  for (const z of [0.2, -0.2]) car.add(mesh(box(1.12, 0.08, 0.07, 0.02), shared.dark, -0.62, top + 0.05, z));
+  BAR_COLORS.forEach((c, i) => {
+    const bar = instrument({ kind: 'xylo', note: i }, -1.06 + i * 0.22, top + 0.13, 0);
+    bar.add(mesh(box(0.17, 0.07, 0.92 - i * 0.09, 0.03), new THREE.MeshStandardMaterial({ color: c, roughness: 0.3 })));
+  });
+  // Trommel
+  const drum = instrument({ kind: 'drum' }, 0.42, top, 0);
+  drum.add(mesh(cyl(0.33, 0.3, 0.4, 24), mats.body, 0, 0.2, 0, 'body'));
+  drum.add(mesh(cyl(0.345, 0.345, 0.05, 24), mats.roof, 0, 0.4, 0, 'roof'));
+  drum.add(mesh(cyl(0.345, 0.345, 0.05, 24), mats.roof, 0, 0.03, 0, 'roof'));
+  drum.add(mesh(cyl(0.31, 0.31, 0.02, 24), drumSkin, 0, 0.43, 0));
+  // Glocken an einem Bogen
+  for (const z of [0.5, -0.5]) car.add(mesh(cyl(0.035, 0.04, 0.85, 8), mats.roof, 1.02, top + 0.42, z, 'roof'));
+  car.add(mesh(cylZ(0.035, 1.08, 8), mats.roof, 1.02, top + 0.85, 0, 'roof'));
+  [0.3, 0, -0.3].forEach((z, i) => {
+    const s = 1 - i * 0.14; // große Glocke = tiefer Ton
+    const bell = instrument({ kind: 'glocke', note: 5 + i * 2 }, 1.02, top + 0.83, z);
+    bell.add(mesh(cyl(0.01, 0.01, 0.12, 5), shared.dark, 0, -0.06, 0));
+    bell.add(mesh(cyl(0.06 * s, 0.15 * s, 0.2 * s, 16), shared.gold, 0, -0.12 - 0.1 * s, 0));
+    bell.add(mesh(sph(0.035), shared.dark, 0, -0.12 - 0.21 * s, 0));
+  });
+  car.userData.cargoY = top;
+  car.userData.decorY = { side: 0.78, top: 0.9, sideZ: 0.6, sideX: [-0.75, 0, 0.75, -0.35], topX: [0.72, -0.1, 0.72, -0.1] };
+  return len;
+}
+
 // Milchwagen: weißer Kessel mit Kuhflecken und einer großen Milchkanne obendrauf
 const cowSpot = new THREE.MeshStandardMaterial({ color: '#2b2b2b', roughness: 0.5 });
 function buildTank(car, mats) {
@@ -890,6 +935,7 @@ const BUILDERS = {
   teich: buildTeich,
   zoo: buildZoo,
   affen: buildAffen,
+  musik: buildMusik,
 };
 
 // ---------- Schmuck ----------
@@ -1178,7 +1224,7 @@ function mergeCar(car) {
   if (u.driver) keep.add(u.driver);
   if (u.crane) keep.add(u.crane);
   for (const r of u.rods?.sides ?? []) for (const k of ['coupling', 'main', 'piston']) if (r[k]) keep.add(r[k]);
-  mergeStatic(car, (o) => keep.has(o) || o.userData.bell || o.userData.flag || o.userData.balloon);
+  mergeStatic(car, (o) => keep.has(o) || o.userData.instrument || o.userData.bell || o.userData.flag || o.userData.balloon);
 }
 
 export function disposeCar(car) {

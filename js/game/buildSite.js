@@ -13,6 +13,7 @@ import {
 } from './buildParts.js';
 import { buildFigure } from './figures.js';
 import { wave } from './trainModel.js';
+import { Garden } from './garden.js';
 import './buildMore.js'; // weitere Themen tragen sich in die Verzeichnisse ein
 
 const KEY = 'sigo.site.v3';
@@ -218,12 +219,13 @@ export class BuildSite {
       this.land.tappable.push(o);
     }
     this.pileAt = new THREE.Vector3(PILE_AT[0], 0.3, PILE_AT[1]); // lokal zum Bauplatz
+    this.garden = new Garden(this, saved.g); // Beet vor dem Gebäude (garden.js)
     this.rebuild();
   }
 
   save() {
     try {
-      localStorage.setItem(this.key, JSON.stringify({ s: this.state, used: this.used }));
+      localStorage.setItem(this.key, JSON.stringify({ s: this.state, used: this.used, g: this.garden?.data }));
     } catch { /* ohne Speicher geht es trotzdem */ }
   }
 
@@ -677,6 +679,7 @@ export class BuildSite {
   update(dt) {
     const g = this.game;
     for (const fn of this.anims) fn(g.time);
+    this.garden.update(dt);
     // Abends leuchten die Fenster; aus dem Schornstein steigt Rauch
     this.glass.emissiveIntensity = (g.env?.night ?? 0) * 1.4;
     // Kommt der Zug vorbei, winken und hüpfen die Bewohner

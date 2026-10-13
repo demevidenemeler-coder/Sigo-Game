@@ -30,6 +30,7 @@ Unten: oben eine Reihe Fächer (mit Beschriftung), darunter große Karten – mi
 | Teichwagen | Ente, Frosch, Pinguin |
 | Zoowagen | Löwe, Elefant, Giraffe, Affe |
 | Affenwagen (Käfig mit Klettergerüst, Autoreifen und Schaukel – wer auf Platz 2 sitzt, schaukelt) | Affe |
+| Musikwagen (Xylophon mit fünf Stäben, Trommel, drei Glocken – beim Fahren antippen: Ton, und alle Mitfahrer tanzen) | – |
 | Zirkuswagen | Löwe, Elefant, Affe |
 | Personen-, Schlusswagen | Kind, Papa, Oma, Teddy |
 | Güter-, Rungenwagen | Ball, Kiste, Geschenk, Milchkanne, Apfel |
@@ -99,6 +100,12 @@ Gebäude in `js/game/buildSite.js`).
 - **Oberfläche:** Unten liegen nur die Fächer (das gewählte ist groß hervorgehoben, das nächste sinnvolle wackelt
   leicht) und darunter die Teile – wischen oder mit ◀ ▶ blättern. Links am Rand klein: Thema, Bauplatz, Album 📷,
   Abreißen 💥. Rechts am Rand groß: Zurück ↩️ und Fertig ✅.
+- **Garten** (letztes Fach, `js/game/garden.js`): vor jedem Gebäude liegt ein Beet mit sechs Plätzen. Pflanze in der
+  Leiste antippen = säen (Karotte, Apfelbaum, Bananenstaude, Sonnenblume, Salat, Gras). Pflanze im Beet antippen =
+  die Gießkanne gießt, die Pflanze wächst eine Stufe (dreimal bis reif). Reife Pflanzen wippen; antippen = ernten,
+  die Frucht hüpft in den Korb. Die Ernte erscheint rechts in der Leiste (🧺, mit Anzahl): antippen füttert einen
+  Bewohner, der das mag (Karotte, Apfel, Banane, Körner, Blatt, Heu – wer was mag, steht in `LIKES` in `js/catalog.js`).
+  Mag es keiner, zeigt ein Bewohner in der Denkblase sein Lieblingsfutter; wohnt noch niemand da, wackelt das Fach Bewohner.
 - **Bauen:** Teil antippen → es fliegt vom Steinstapel heran und wird festgehämmert. Die Leiste springt zum nächsten
   sinnvollen Fach (erste Mauer → Türen → Fenster → Dächer → Spitzen → Schmuck); man kann jederzeit selbst wechseln.
   Was gerade nicht passt (z. B. Spitze ohne Dach), ist blass; ein Tipp darauf zeigt, welches Fach vorher dran ist.

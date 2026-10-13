@@ -16,6 +16,7 @@ export const WAGONS = [
   { id: 'zoo', slots: 2, paint: { body: '#ee8a2b', roof: '#4fa65a', trim: '#2f2f2f' } },
   { id: 'affen', slots: 3, paint: { body: '#4fa65a', roof: '#f2c832', trim: '#2f2f2f' } },
   { id: 'zirkus', slots: 2, paint: { body: '#d9463b', roof: '#f2c832', trim: '#2f2f2f' } },
+  { id: 'musik', slots: 0, paint: { body: '#8b5bb5', roof: '#f2c832', trim: '#2f2f2f' } },
   { id: 'gueter', slots: 3, paint: { body: '#8a5a33', roof: '#5c3b22', trim: '#2f2f2f' } },
   { id: 'flach', slots: 3, paint: { body: '#ee8a2b', roof: '#5c3b22', trim: '#2f2f2f' } },
   { id: 'tank', slots: 0, paint: { body: '#f5f1ea', roof: '#3b7cc9', trim: '#2f2f2f' } },

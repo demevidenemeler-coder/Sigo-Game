@@ -347,6 +347,11 @@ Object.assign(SOUNDS, {
       tone('triangle', 520, t + d, 0.002, 0.07, 0.3);
     }
   },
+  // Musikwagen: Trommel
+  drum(t) {
+    tone('sine', 150, t, 0.002, 0.28, 0.6).frequency.exponentialRampToValueAtTime(70, t + 0.2);
+    noise(t, 0.07, 0.35, 'lowpass', 900);
+  },
   // Baustelle: Mauerteil poltert herunter
   rumble(t) {
     const n = noise(t, 0.5, 0.55, 'lowpass', 420);

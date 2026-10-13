@@ -7,6 +7,7 @@ import { buildFood } from './foods.js';
 import { newCar } from '../catalog.js';
 import { partPreview } from './buildParts.js';
 import { housePreview } from './buildSite.js';
+import { plantPreview } from './garden.js';
 
 const VIEWS = {
   car: { size: [240, 160], fov: 30, pos: [2.6, 2.8, 6.4], look: [0, 1.0, 0] },
@@ -39,6 +40,7 @@ function objectFor(kind, id) {
   }
   if (kind === 'site') return { obj: partPreview(id), view: 'site' }; // Bauteile der Baustelle
   if (kind === 'house') return { obj: housePreview(id), view: 'house' }; // ganzes Gebäude fürs Album (id = Beschreibung als Text)
+  if (kind === 'plant') return { obj: plantPreview(id), view: 'site' }; // Pflanzen fürs Beet
   if (kind === 'food') return { obj: buildFood(id), view: 'food' };
   if (kind === 'wheel') return { obj: buildWheelPreview(id), view: 'wheel' };
   return isTopDecor(id) ? { obj: topDecor(id, 1), view: 'topDecor' } : { obj: sideDecor(id), view: 'sideDecor' };

@@ -367,10 +367,10 @@ button {
   border-radius: 26px 26px 0 0;
 }
 /* Fächer: eine Reihe; das gewählte ist groß und farbig, das nächste sinnvolle wackelt leicht */
-.site-tabs { display: flex; justify-content: center; align-items: flex-end; gap: 1vmin; padding-top: 1vmin; }
+.site-tabs { display: flex; justify-content: center; align-items: flex-end; gap: 0.9vmin; padding-top: 1vmin; }
 .site-tab {
   flex: none;
-  width: min(9vmin, 62px);
+  width: min(8.3vmin, 62px);
   aspect-ratio: 1;
   border-radius: 28%;
   background: var(--tile) center / 86% no-repeat;
@@ -443,6 +443,22 @@ button {
 .site-part.off { opacity: 0.35; }
 .site-part.pick { width: min(13vmin, 86px); font-family: var(--emoji); font-size: min(7.5vmin, 50px); }
 .site-parts.picking { flex-wrap: wrap; justify-content: center; overflow-x: visible; }
+/* Garten: Korb-Zeichen als Trenner, Ernte mit Anzahl */
+.site-sep { flex: none; align-self: center; font: min(7vmin, 44px) var(--emoji); padding: 0 0.6vmin; touch-action: pan-x; }
+.site-part.food { position: relative; background-color: #eaf6dc; }
+.site-part.food::after {
+  content: attr(data-n);
+  position: absolute;
+  right: -4px;
+  top: -6px;
+  min-width: min(5.4vmin, 32px);
+  line-height: min(5.4vmin, 32px);
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fffaf2;
+  font-size: min(3.6vmin, 20px);
+  font-weight: 800;
+}
 /* Album: eigene Fotos mit weißem Rand wie ein Foto, Vorlagen mit Glühbirne */
 .site-part.photo { width: min(17vmin, 116px); background-size: 100%; border: 4px solid #fff; }
 .site-part.idea { position: relative; border-color: #ffe7a8; }

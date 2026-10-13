@@ -162,6 +162,33 @@ export function createDriveMode(game) {
     goBtn.classList.toggle('waiting', !!stoppedAt && d.target === 0);
   }
 
+  // Musikwagen: Ton spielen, das Instrument wippt, und alle Mitfahrer im Zug tanzen (hüpfen nacheinander)
+  function playInstrument(inst) {
+    const def = inst.userData.instrument;
+    if (def.kind === 'drum') services.sfx('drum');
+    else xyloNote(def.note, def.kind === 'glocke' ? 0.26 : 0.34);
+    const y0 = inst.userData.restY ?? (inst.userData.restY = inst.position.y);
+    game.tween(0.35, (t) => {
+      const k = Math.sin(t * Math.PI) * (1 - t);
+      if (def.kind === 'glocke') inst.rotation.x = Math.sin(t * Math.PI * 4) * 0.5 * (1 - t);
+      else if (def.kind === 'drum') inst.scale.set(1 + k * 0.12, 1 - k * 0.2, 1 + k * 0.12);
+      else inst.position.y = y0 - k * 0.08;
+    }, () => {
+      inst.rotation.x = 0;
+      inst.scale.setScalar(1);
+      inst.position.y = y0;
+    });
+    const dancers = train.cars.flatMap((c) => c.userData.cargoItems);
+    dancers.forEach((fig, i) => {
+      if (fig.userData.dancing) return;
+      fig.userData.dancing = true;
+      setTimeout(() => {
+        fig.userData.dancing = false;
+        if (fig.parent) game.hop(fig);
+      }, i * 70);
+    });
+  }
+
   function horn() {
     game.hop(train.loco);
     wave(train.loco.userData.driver, game);
@@ -805,6 +832,10 @@ export function createDriveMode(game) {
       if (game.discover.tap(e.clientX, e.clientY)) return;
       const targets = [objects.group, land.crossings.group, ...train.cars, ...land.tappable.filter((o) => o.visible)];
       const hit = game.pick(e.clientX, e.clientY, targets)[0];
+      // Musikwagen: Instrument antippen = Ton, und alle im Zug tanzen mit (geht auch am Bahnhof)
+      let inst = hit?.object;
+      while (inst && !inst.userData.instrument) inst = inst.parent;
+      if (inst) return playInstrument(inst);
       const hitOwner = hit?.object.userData.owner;
       // Mitfahrer im Zug antippen hat Vorrang (Aussteigen am Bahnhof)
       const hitCargo = hitOwner?.userData.removable?.list === 'cargo' && train.carIndexOf(hit.object) >= 0;

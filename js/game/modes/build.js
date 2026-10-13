@@ -4,6 +4,8 @@
 //   hervorgehoben, das Fach für den nächsten sinnvollen Schritt wackelt leicht.
 // - Leiste unten, untere Reihe: die Teile des Fachs. Antippen → das Teil wird gebaut. Was gerade nicht passt,
 //   ist blass. Passen nicht alle Teile ins Bild: wischen oder die Pfeile ◀ ▶ antippen.
+// - Fach „Garten“ (letztes Fach): Pflanze antippen = säen. Im Beet: Pflanze antippen = gießen, reife Pflanze
+//   antippen = ernten. Was im Korb liegt, erscheint rechts in der Leiste – antippen füttert einen Bewohner.
 // - Links am Rand (klein, selten gebraucht): Thema · Bauplatz wechseln · Album · 💥 Bagger reißt alles ab.
 // - Rechts am Rand: ↩ letzten Schritt zurück · ✅ fertig (Richtfest).
 // - Finger ziehen = ums Gebäude herum schauen, zwei Finger = näher/weiter. Teil am Gebäude antippen = andere Farbe.
@@ -12,6 +14,9 @@ import * as THREE from 'three';
 import { THEMES, CATS, catOf, partsOf } from '../buildParts.js';
 import { renderThumbnails } from '../thumbs.js';
 import { TEMPLATES } from '../buildMore.js';
+import { PLANT_IDS, PLANTS } from '../garden.js';
+import { createFeeder } from '../feeding.js';
+import { LIKES } from '../../catalog.js';
 
 const THEME_KEY = 'sigo.site.theme';
 const ALBUM_KEY = 'sigo.site.album';
@@ -38,6 +43,9 @@ export function createBuildMode(game) {
   flash.className = 'site-flash';
   game.ui.append(flash);
   let active = false;
+  const feeder = createFeeder(game, services);
+  const TABS = [...CATS, 'garden'];
+  const inGarden = () => cat === 'garden' && !picking && !browsing;
 
   // ---------- Leiste ----------
   const panel = document.createElement('div');
@@ -126,17 +134,14 @@ export function createBuildMode(game) {
       refresh();
     }).textContent = THEMES[theme].icon;
     const next = picking || browsing ? null : nextCat(s);
-    for (const c of CATS) {
+    for (const c of TABS) {
       const on = c === cat && !picking && !browsing;
       const b = button(tabs, `site-tab${on ? ' active' : ''}${c === next && !on ? ' next' : ''}`, () => {
-        cat = c;
-        picking = false;
-        browsing = false;
         services.sfx('pop');
-        refresh();
+        setCat(c);
       });
       b.dataset.cat = c;
-      b.style.backgroundImage = thumb(partsOf(theme, c)[0]);
+      b.style.backgroundImage = c === 'garden' ? plantPic('karotte') : thumb(partsOf(theme, c)[0]);
     }
     // nächster Bauplatz (es gibt mehrere an der Strecke)
     const sites = game.buildSites;
@@ -161,6 +166,29 @@ export function createBuildMode(game) {
 
     partsRow.replaceChildren();
     partsRow.classList.toggle('picking', picking);
+    if (inGarden()) {
+      // Garten: links die Pflanzen zum Säen, rechts der Korb mit der Ernte (antippen = Bewohner füttern)
+      const gd = s.garden;
+      for (const id of PLANT_IDS) {
+        button(partsRow, `site-part${gd.full ? ' off' : ''}`, () => {
+          if (!gd.sow(id)) services.sfx('nope');
+        }).style.backgroundImage = plantPic(id);
+      }
+      const foods = Object.entries(gd.data.basket);
+      if (foods.length) {
+        const sep = document.createElement('div');
+        sep.className = 'site-sep';
+        sep.textContent = '🧺';
+        partsRow.append(sep);
+      }
+      for (const [food, n] of foods) {
+        const b = button(partsRow, 'site-part food', () => feedFromBasket(food));
+        b.style.backgroundImage = `url(${renderThumbnails([{ kind: 'food', id: food }])[`food:${food}`]})`;
+        b.dataset.n = n;
+      }
+      settle('garden');
+      return;
+    }
     if (browsing) {
       // Album: zuerst „Foto machen“, dann die eigenen Fotos, dann die Vorlagen
       renderThumbnails([...album, ...TEMPLATES].map((id) => ({ kind: 'house', id })));
@@ -208,6 +236,22 @@ export function createBuildMode(game) {
     settle(picking ? 'themes' : `${theme}:${cat}`);
   }
 
+  const plantPic = (id) => `url(${renderThumbnails([{ kind: 'plant', id }])[`plant:${id}`]})`;
+
+  // Ernte verfüttern: an den ersten Bewohner, der das mag. Mag es keiner, zeigt einer in der Denkblase, was er möchte.
+  function feedFromBasket(food) {
+    const s = site();
+    const figs = s.figures.filter((f) => LIKES[f.userData.figure] && !f.userData.eating);
+    if (!figs.length) return nope('folk'); // erst muss jemand einziehen
+    const fan = figs.find((f) => LIKES[f.userData.figure].includes(food));
+    if (!fan) {
+      const thumbs = renderThumbnails(figs.map((f) => ({ kind: 'food', id: LIKES[f.userData.figure][0] })));
+      return feeder.feed(figs[0], food, { thumbs, from: s.garden.basketWorld() });
+    }
+    const from = s.garden.take(food);
+    if (from) feeder.feed(fan, food, { from });
+  }
+
   function choose(id) {
     const s = site();
     if (s.busy) return;
@@ -227,15 +271,33 @@ export function createBuildMode(game) {
   const dir = new THREE.Vector3();
   const center = new THREE.Vector3();
   function resetView() {
-    view.yaw = site().rot + 0.42;
-    view.tilt = 0.3;
+    // Garten: gerade von vorne aufs Beet, etwas von oben; sonst schräg aufs Gebäude
+    view.yaw = site().rot + (inGarden() ? 0.1 : 0.42);
+    view.tilt = inGarden() ? 0.5 : 0.3;
     view.zoom = 1;
+  }
+  // Fach wechseln; zwischen Garten und Gebäude schwenkt die Kamera um
+  function setCat(c) {
+    const was = inGarden();
+    cat = c;
+    picking = false;
+    browsing = false;
+    if (was !== inGarden()) resetView();
+    refresh();
   }
   function camera() {
     const s = site();
     const h = Math.max(2.4, s.height * 1.15 + 0.5);
     center.copy(s.center).setY(h * 0.42); // etwas unter der Mitte: der Boden mit Zaun und Garten bleibt im Bild
     dir.set(Math.sin(view.yaw) * Math.cos(view.tilt), Math.sin(view.tilt), Math.cos(view.yaw) * Math.cos(view.tilt));
+    if (inGarden()) {
+      // Garten: näher ans Beet, das Gebäude mit den Bewohnern bleibt dahinter im Bild
+      center.copy(s.garden.centre).lerp(s.center, 0.3).setY(0.9);
+      game.fit(center, game.isPortrait() ? 3.1 : 3.6, 2.0, dir);
+      game.cam.tPos.sub(center).multiplyScalar(view.zoom).add(center);
+      game.cam.tPos.y = Math.max(0.6, game.cam.tPos.y);
+      return;
+    }
     const wide = s.wide * 0.75; // mit Anbauten mehr Platz links und rechts
     game.fit(center, (game.isPortrait() ? 4.0 : 5.2) + wide, Math.max(2.9, h * 0.66), dir);
     game.cam.tPos.sub(center).multiplyScalar(view.zoom).add(center);
@@ -268,11 +330,22 @@ export function createBuildMode(game) {
       }
     });
     if (near >= 0) return s.tapPart(`p:${near}`);
-    const hit = game.pick(x, y, [s.house, s.digger, s.plot])[0];
+    const hit = game.pick(x, y, [s.house, s.digger, s.plot, s.garden.group])[0];
     if (!hit) return;
     let o = hit.object;
     while (o && !o.userData.site) o = o.parent;
     if (!o) return;
+    if (o.userData.site === 'garden') {
+      // Beet: Pflanze gießen oder ernten; von einem anderen Fach aus geht es zuerst in den Garten
+      const i = s.garden.spotAt(hit.point);
+      if (!inGarden()) {
+        services.sfx('pop');
+        setCat('garden');
+      }
+      if (i >= 0) s.garden.tap(i);
+      else services.sfx('pop');
+      return;
+    }
     if (o.userData.site === 'digger') return s.demolish();
     if (o.userData.site === 'plot') return services.sfx('pop');
     const key = s.keyOf(hit.object);
@@ -296,8 +369,11 @@ export function createBuildMode(game) {
       }
       refresh();
     };
-    if (s.empty) cat = 'levels';
-    picking = s.empty; // leerer Bauplatz: zuerst ein Thema aussuchen
+    s.garden.onChange = () => {
+      if (active && site() === s) refresh();
+    };
+    if (s.empty && cat !== 'garden') cat = 'levels';
+    picking = s.empty && cat !== 'garden'; // leerer Bauplatz: zuerst ein Thema aussuchen
     browsing = false;
     refresh();
     resetView();
@@ -317,6 +393,7 @@ export function createBuildMode(game) {
       active = false;
       for (const el of [panel, tools, acts]) el.classList.add('hidden');
       game.setBottomInset(0);
+      feeder.clear();
       train.group.visible = true;
       fingers.clear();
     },
@@ -325,8 +402,9 @@ export function createBuildMode(game) {
       updateArrows();
       game.setBottomInset(panel.offsetHeight);
     },
-    update() {
+    update(dt) {
       camera();
+      feeder.update(dt);
     },
     pointerDown(e) {
       fingers.set(e.pointerId, { x: e.clientX, y: e.clientY });

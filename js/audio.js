@@ -80,7 +80,7 @@ export function preloadSamples(names) {
   const c = ac();
   for (const n of names) {
     if (samples.has(n)) continue;
-    samples.set(n, fetch(`sounds/${n}.mp3`)
+    samples.set(n, fetch(`sounds/${n.includes('.') ? n : `${n}.mp3`}`)
       .then((r) => r.arrayBuffer())
       .then((b) => c.decodeAudioData(b))
       .then((buf) => { samples.set(n, buf); return buf; })
@@ -88,7 +88,8 @@ export function preloadSamples(names) {
   }
 }
 
-export async function playSample(name, { gain = 1, rate = 1 } = {}) {
+// start/dur (Sekunden): nur einen Ausschnitt der Aufnahme spielen (weich ein- und ausgeblendet)
+export async function playSample(name, { gain = 1, rate = 1, start = 0, dur = 0 } = {}) {
   const c = ac();
   let buf = samples.get(name);
   if (buf === undefined) {
@@ -103,13 +104,34 @@ export async function playSample(name, { gain = 1, rate = 1 } = {}) {
   const g = c.createGain();
   g.gain.value = gain;
   src.connect(g).connect(sfxBus);
-  src.start();
-  await new Promise((r) => setTimeout(r, (buf.duration / rate) * 1000));
+  const len = dur > 0 ? Math.min(dur, buf.duration - start) : buf.duration - start;
+  if (start > 0 || dur > 0) {
+    const t0 = c.currentTime;
+    const end = t0 + len / rate;
+    g.gain.setValueAtTime(0, t0);
+    g.gain.linearRampToValueAtTime(gain, t0 + 0.03);
+    g.gain.setValueAtTime(gain, end - 0.12);
+    g.gain.linearRampToValueAtTime(0, end);
+    src.start(t0, start, len);
+  } else {
+    src.start();
+  }
+  await new Promise((r) => setTimeout(r, (len / rate) * 1000));
   return true;
 }
 
 // Tierlaute: echte Aufnahme, wenn vorhanden, sonst nachgebaut
 const ANIMAL_SAMPLES = { kuh: 'kuh', katze: 'katze', hund: 'hund', hahn: 'hahn', huhn: 'huhn', schwein: 'schwein', schaf: 'schaf', frosch: 'frosch' };
+// Echte Aufnahmen als Ausschnitt (Quellen in sounds/QUELLEN.md). Lässt sich die Datei nicht abspielen,
+// springt die nachgebaute Stimme ein.
+const ANIMAL_CLIPS = {
+  ente: { file: 'ente.ogg', start: 1.1, dur: 1.3, gain: 0.65 },
+  pferd: { file: 'pferd.ogg', dur: 1.9, gain: 2 },
+  loewe: { file: 'loewe.ogg', start: 0.3, dur: 2.4, gain: 1.2 },
+  elefant: { file: 'elefant.ogg', gain: 1.7 },
+  pinguin: { file: 'pinguin.ogg', start: 0.4, dur: 0.85, gain: 0.5 },
+  affe: { file: 'affe.ogg', start: 1.55, dur: 2.5, gain: 0.85 },
+};
 // Tiere ohne freie Aufnahme: Stimm-Synthese (animalSynth.js), einmal berechnet und dann zwischengespeichert
 const ANIMAL_SYNTH = Object.fromEntries(SYNTH_ANIMALS.map((id) => [id, id]));
 const synthBuffers = new Map();
@@ -123,14 +145,18 @@ function synthBuffer(id) {
   }
   return synthBuffers.get(id);
 }
-export const ANIMAL_SAMPLE_NAMES = [...Object.values(ANIMAL_SAMPLES), 'voegel'];
+export const ANIMAL_SAMPLE_NAMES = [...Object.values(ANIMAL_SAMPLES), 'voegel', ...Object.values(ANIMAL_CLIPS).map((c) => c.file)];
 
 export function hasAnimalSound(id) {
-  return id in ANIMAL_SAMPLES || id in ANIMAL_SYNTH;
+  return id in ANIMAL_SAMPLES || id in ANIMAL_CLIPS || id in ANIMAL_SYNTH;
 }
 
 export async function animalSound(id) {
   if (ANIMAL_SAMPLES[id]) return playSample(ANIMAL_SAMPLES[id], { gain: id === 'schwein' ? 0.6 : 0.9 });
+  if (ANIMAL_CLIPS[id]) {
+    const { file, ...opts } = ANIMAL_CLIPS[id];
+    if (await playSample(file, opts)) return true;
+  }
   if (ANIMAL_SYNTH[id]) {
     const c = ac();
     const buf = synthBuffer(id);

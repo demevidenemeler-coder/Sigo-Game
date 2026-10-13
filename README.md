@@ -104,8 +104,9 @@ Nach ein paar Hinweisen ohne Reaktion ist Ruhe, bis wieder getippt wird.
 - Jede Lok fährt anders schnell (Schnellzug am schnellsten).
 
 **Tiergeräusche** sind echte Aufnahmen (gemeinfrei, CC0 – Quellen in `sounds/QUELLEN.md`) für Kuh, Schwein, Schaf,
-Hund, Katze, Huhn, Hahn und Frosch. Löwe, Elefant, Pferd, Ente und Pinguin sind per Stimm-Synthese nachgebaut
-(`js/animalSynth.js`: Stimmpulse mit Zittern + Atem + Formanten), weil keine freien Aufnahmen erreichbar waren.
+Hund, Katze, Huhn, Hahn und Frosch. Auch Löwe, Elefant, Pferd, Ente, Pinguin und Affe sind echte Aufnahmen (Wikimedia Commons,
+teils mit Namensnennung). Nur die Entdecker-Tiere sind per Stimm-Synthese nachgebaut
+(`js/animalSynth.js`: Stimmpulse mit Zittern + Atem + Formanten).
 Besser: im Eltern-Bereich unter **Eigene Stimme** selbst einsprechen – die eigene Aufnahme hat immer Vorrang (Mikrofon-Erlaubnis nötig).
 Eigene Aufnahmen (MP3) lassen sich auch in `sounds/` ablegen und in `js/audio.js` (ANIMAL_SAMPLES) eintragen.
 
@@ -221,7 +222,8 @@ sw.js                      Offline-Speicher (neue Dateien in ASSETS eintragen)
 
 ## Ehrliche Grenzen
 
-- Einige Tierlaute (Ente, Pferd, Löwe, Elefant, Pinguin, Affe) sind nachgebaut und klingen künstlich.
+- Ente, Pferd, Löwe, Elefant, Pinguin und Affe sind echte Aufnahmen von Wikimedia Commons (teils mit Namensnennung, siehe
+  `sounds/QUELLEN.md`). Die Laute der Entdecker-Tiere (Eule, Fuchs, Reh …) sind weiter nachgebaut.
 - Die Tierbewegungen sind Spielzeug-Animationen ohne echte Knie/Gelenke: Beine schwingen als Ganzes, bei großen
   Bewegungen dehnt sich das Fell an den Übergängen etwas.
 - Die Grafik ist auf neuere Tablets ausgelegt. Damit es flüssig läuft: unbewegliche Teile werden zu wenigen großen Teilen

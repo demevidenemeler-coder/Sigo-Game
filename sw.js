@@ -1,6 +1,6 @@
 // Offline-Unterstützung: Mit Internet wird immer die neueste Fassung geladen (und gespeichert),
 // ohne Internet die gespeicherte. Neue Dateien in ASSETS eintragen.
-const VERSION = 'sigo-v27';
+const VERSION = 'sigo-v28';
 const ASSETS = [
   './',
   'index.html',
@@ -96,6 +96,12 @@ const ASSETS = [
   'sounds/schaf.mp3',
   'sounds/schwein.mp3',
   'sounds/voegel.mp3',
+  'sounds/ente.ogg',
+  'sounds/pferd.ogg',
+  'sounds/loewe.ogg',
+  'sounds/elefant.ogg',
+  'sounds/pinguin.ogg',
+  'sounds/affe.ogg',
   'icons/icon-192.png',
   'icons/icon-512.png',
   'icons/icon-maskable-512.png',

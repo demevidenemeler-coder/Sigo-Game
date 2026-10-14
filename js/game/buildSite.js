@@ -22,7 +22,7 @@ const EMPTY = () => ({ L: [], win: null, pat: null, door: null, roof: null, top:
 const PEOPLE = ['kind', 'oma', 'papa', 'teddy']; // werden benannt, Tiere rufen
 const STAY = ['x_ecktuerme', 'x_hai']; // Schmuck, der auch neben einem Anbau an seinem Platz bleibt
 const DIGGER_AT = [-4.9, 1.2]; // Bagger und Steinstapel (lokal zum Bauplatz); rücken bei Anbauten nach außen
-const PILE_AT = [3.3, 1.7];
+const PILE_AT = [4.1, 2.4]; // Steinstapel: vorne rechts, neben dem Beet (das liegt rechts hinten)
 const DEFS = { door: DOORS, roof: ROOFS, top: TOPS };
 
 function load(key) {

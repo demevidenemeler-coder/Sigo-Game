@@ -46,6 +46,19 @@ function add(parent, geometry, color, x = 0, y = 0, z = 0) {
   parent.add(m);
   return m;
 }
+// Emoji als Bild (für das Schild)
+function emojiTexture(ch) {
+  const c = document.createElement('canvas');
+  c.width = c.height = 128;
+  const x = c.getContext('2d');
+  x.font = '100px system-ui, "Segoe UI Emoji", sans-serif';
+  x.textAlign = 'center';
+  x.textBaseline = 'middle';
+  x.fillText(ch, 64, 70);
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  return t;
+}
 const ball = (r) => geo(`s${r}`, () => new THREE.SphereGeometry(r, 14, 10));
 const cyl = (rt, rb, h, seg = 10) => geo(`c${rt},${rb},${h},${seg}`, () => new THREE.CylinderGeometry(rt, rb, h, seg));
 const cone = (r, h, seg = 8) => geo(`k${r},${h},${seg}`, () => new THREE.ConeGeometry(r, h, seg));
@@ -217,7 +230,8 @@ export class Garden {
     this.group = g;
     // Beet: Holzrahmen, dunkle Erde, sechs kleine Hügel
     const wood = mat('#b98a56', 0.9);
-    add(g, boxG(3.9, 0.16, 1.0), wood, 0, 0.08, 0);
+    add(g, boxG(3.9, 0.16, 1.0), mat('#e8a24a', 0.7), 0, 0.08, 0); // bunter Rand: sieht man sofort
+    add(g, boxG(3.98, 0.05, 1.08), mat('#fff3d6', 0.6), 0, 0.02, 0);
     add(g, boxG(3.74, 0.06, 0.84), mat('#6b4a32', 1), 0, 0.15, 0);
     this.spots = [];
     for (let i = 0; i < SPOTS; i++) {
@@ -230,6 +244,19 @@ export class Garden {
       g.add(spot);
       this.spots.push(spot);
     }
+    // Leere Plätze blinken als heller Ring: „Hier kann man etwas machen!“
+    this.marks = this.spots.map((spot) => {
+      const ring = new THREE.Mesh(geo('markRing', () => new THREE.RingGeometry(0.24, 0.34, 28).rotateX(-Math.PI / 2)),
+        new THREE.MeshBasicMaterial({ color: '#fff6b0', transparent: true, opacity: 0.9, depthWrite: false }));
+      ring.position.y = 0.2;
+      spot.add(ring);
+      return ring;
+    });
+    // Schild am Ende des Beets: ein Blatt, damit ein Kind das Beet gleich erkennt
+    const sign = new THREE.Sprite(new THREE.SpriteMaterial({ map: emojiTexture('🌱'), depthWrite: false }));
+    sign.position.set(-2.25, 0.85, -0.45);
+    sign.scale.setScalar(0.7);
+    g.add(sign);
     // Korb links
     const basket = new THREE.Group();
     basket.position.set(BASKET_X, 0, 0.05);
@@ -465,6 +492,17 @@ export class Garden {
 
   update(dt) {
     const t = this.game.time;
+    this.marks.forEach((ring, i) => {
+      const empty = !this.data.beds[i];
+      ring.visible = empty;
+      if (empty) {
+        const k = 1 + Math.sin(t * 3 + i) * 0.12;
+        ring.scale.set(k, 1, k);
+        ring.material.opacity = 0.55 + Math.sin(t * 3 + i) * 0.35;
+      }
+    });
+    // Gießkanne wackelt leicht: „Ich bin bereit!“
+    this.can.rotation.z = Math.sin(t * 2) * 0.04;
     // reife Pflanzen wippen: „Pflück mich!“
     this.data.beds.forEach((b, i) => {
       const p = this.plants[i];

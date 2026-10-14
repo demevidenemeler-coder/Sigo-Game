@@ -29,7 +29,7 @@ const ANIMAL_Z = [1.35, 1.35, 1.35]; // vor dem Beet, nicht mehr auf den Pflanze
 const READY_MS = 40_000; // so lange dauert es, bis das Tier wieder etwas gibt
 export const RIPE = 3; // Stufen: 0 Keimling, 1 klein, 2 groß, 3 reif
 const BASKET_MAX = 9;
-const AT = [-0.2, 2.95]; // Mitte des Beets, lokal zum Bauplatz
+const AT = [3.0, -0.4]; // rechts neben dem Haus (lokal zum Bauplatz), das Beet steht quer zur Strecke // Mitte des Beets, lokal zum Bauplatz
 const SPOT_X = (i) => -1.5 + i * 0.6;
 const BASKET_X = -2.5;
 const CAN_X = 2.45;
@@ -211,7 +211,7 @@ export class Garden {
 
     const g = new THREE.Group();
     g.position.copy(site.at(...AT));
-    g.rotation.y = site.rot;
+    g.rotation.y = site.rot + Math.PI / 2;
     g.userData.site = 'garden';
     g.userData.siteRef = site;
     this.group = g;

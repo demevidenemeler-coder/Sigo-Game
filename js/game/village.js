@@ -293,14 +293,7 @@ export class VillageLife {
     c.fig.visible = vis;
     if (c.state === 'stuck') {
       c.fig.position.y = c.perch.y + Math.abs(Math.sin(time * 1.3)) * 0.02;
-      // ab und zu miauen, wenn der Zug in der Nähe ist
-      c.meow -= dt;
-      const lp = this.game.train.loco?.getWorldPosition(new THREE.Vector3());
-      if (c.meow <= 0 && lp && this.game.modeName === 'drive' && lp.distanceTo(c.perch) < 22) {
-        c.meow = 11 + Math.random() * 5;
-        this.game.services.animalCall('katze');
-        this.game.hop(c.fig);
-      }
+      // (kein Dauer-Miauen mehr: die Katze ruft nur, wenn man sie antippt)
     } else if (c.state === 'down' && !this.fire.busy) {
       c.downTime += dt;
       if (c.downTime > 45) {

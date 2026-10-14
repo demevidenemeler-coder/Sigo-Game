@@ -6,6 +6,7 @@ import { renderAnimal, SYNTH_ANIMALS } from './animalSynth.js';
 
 let ctx = null;
 let sfxBus = null;
+let lullabyBus = null; // Wiegenlied: kann sofort abgeschaltet werden
 let engineBus = null;
 let musicBus = null;
 let noiseBuf = null;
@@ -397,6 +398,11 @@ Object.assign(SOUNDS, {
     o.frequency.linearRampToValueAtTime(52, t + 2.0);
   },
   lullaby(t) {
+    // eigener Lautstärkeregler: beim Aufwachen wird das Lied sofort still (stopLullaby)
+    stopLullaby();
+    lullabyBus = ac().createGain();
+    lullabyBus.connect(sfxBus);
+    const out = lullabyBus;
     // Spieluhr: ein Wiegenlied (nach Brahms), langsam und weich
     const N = { D4: 293.66, E4: 329.63, F4: 349.23, G4: 392, A4: 440, B4: 493.88, C5: 523.25 };
     const beat = 0.82;
@@ -407,9 +413,9 @@ Object.assign(SOUNDS, {
     let at = t + 0.2;
     for (const [n, len] of song) {
       const f = N[n];
-      tone('sine', f, at, 0.004, 1.3, 0.2);
-      tone('sine', f * 2.76, at, 0.002, 0.25, 0.045);
-      tone('sine', f * 5.4, at, 0.001, 0.08, 0.015);
+      tone('sine', f, at, 0.004, 1.3, 0.2, out);
+      tone('sine', f * 2.76, at, 0.002, 0.25, 0.045, out);
+      tone('sine', f * 5.4, at, 0.001, 0.08, 0.015, out);
       at += len * beat;
     }
   },
@@ -448,6 +454,17 @@ Object.assign(SOUNDS, {
 const SOUND_LENGTH = { dingdong: 2.0, whistle: 1.6, elhorn: 1.2, chime: 1.2, poof: 0.4, pop: 0.2, hiss: 1.4 };
 
 // Spielt ein Geräusch; das Promise endet ungefähr, wenn es verklungen ist.
+// Wiegenlied sofort aus (z. B. wenn eine neue Spielzeit startet)
+export function stopLullaby() {
+  if (!lullabyBus) return;
+  try {
+    lullabyBus.gain.cancelScheduledValues(0);
+    lullabyBus.gain.value = 0;
+    lullabyBus.disconnect();
+  } catch { /* egal */ }
+  lullabyBus = null;
+}
+
 export function playSound(name) {
   const fn = SOUNDS[name];
   if (!fn) return Promise.resolve();

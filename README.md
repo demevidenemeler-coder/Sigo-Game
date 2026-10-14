@@ -73,6 +73,8 @@ lässt sich „Tiere bewegen sich“ auch von Hand ausschalten; dort stehen das 
 
 ### Musik
 
+Das Gute-Nacht-Lied stoppt, sobald eine neue Spielzeit beginnt. Die Katze auf dem Baum miaut nur noch, wenn man sie antippt.
+
 Vier kurze Lieder wechseln sich ab (`js/music.js`): Zuglied, Hopser, Sonnenschein, Zirkusmarsch. Verlässt man das
 Spiel (Home-Taste, andere App, Bildschirm aus), werden Musik, Geräusche und Stimme angehalten.
 

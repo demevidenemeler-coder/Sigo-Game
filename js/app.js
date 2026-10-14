@@ -4,7 +4,7 @@ import {
 import { LANGUAGES, setLanguage, lang, speechLang, t, nameOf, soundWordOf } from './i18n.js';
 import {
   unlockAudio, playSound, speak, stopSpeaking, voiceInfo, setChannelVolume, animalSound, hasAnimalSound,
-  preloadSamples, ANIMAL_SAMPLE_NAMES, audioContext,
+  preloadSamples, ANIMAL_SAMPLE_NAMES, audioContext, stopLullaby,
 } from './audio.js';
 import { Music } from './music.js';
 import { loadRecordings, hasRecording, playRecording } from './recordings.js';
@@ -263,6 +263,7 @@ function showStart() {
 }
 
 function startPlaying() {
+  stopLullaby(); // ein neuer Spieltag fängt ohne Gute-Nacht-Lied an
   hideOverlay();
   game.start();
   // Nach dem Schlafen (oder wenn die Eltern weiterspielen lassen): zurück in die Werkstatt

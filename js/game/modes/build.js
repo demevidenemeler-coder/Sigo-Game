@@ -1,20 +1,19 @@
-// Bauen: Die Kamera steht nah an der Baustelle (buildSite.js), unten liegt die Leiste mit den Bauteilen.
+// Bauen: Die Kamera steht nah an der Baustelle (buildSite.js), unten liegt ein Fenster mit allem zum Bauen.
 //
-// - Leiste unten, obere Reihe: nur die Fächer (Stockwerke, Türen, Fenster, …). Das gewählte Fach ist groß
-//   hervorgehoben, das Fach für den nächsten sinnvollen Schritt wackelt leicht.
-// - Leiste unten, untere Reihe: die Teile des Fachs. Antippen → das Teil wird gebaut. Was gerade nicht passt,
-//   ist blass. Passen nicht alle Teile ins Bild: wischen oder die Pfeile ◀ ▶ antippen.
-// - Fach „Garten“ (letztes Fach): Pflanze antippen = säen. Im Beet: Pflanze antippen = gießen, reife Pflanze
-//   antippen = ernten. Was im Korb liegt, erscheint rechts in der Leiste – antippen füttert einen Bewohner.
-// - Links am Rand (klein, selten gebraucht): Thema · Bauplatz wechseln · Album · 💥 Bagger reißt alles ab.
-// - Rechts am Rand: ↩ letzten Schritt zurück · ✅ fertig (Richtfest).
+// Aufbau des Fensters unten (eine Fassung, alles an einer Stelle – nichts am Bildrand):
+// - Kopfzeile: Bauplatz wechseln · Thema · ↩️ Zurück · ✅ Fertig (Richtfest)
+// - Kategorien: große Knöpfe mit Bild und Namen (Stockwerke, Türen, … Garten, Tiere, Album, Abreißen)
+// - Teile: die Teile der gewählten Kategorie. Antippen → das Teil wird gebaut. Was gerade nicht passt, ist blass.
+//   Passen nicht alle Teile ins Bild: wischen oder die Pfeile ◀ ▶ antippen.
+// - Kategorie „Garten“: Pflanze antippen = säen. Im Beet: Pflanze gießen (antippen), reife Pflanze ernten.
+// - Kategorie „Tiere“: Tiere an das Beet stellen, streicheln, füttern; Kuh und Huhn geben Milch und Eier.
 // - Finger ziehen = ums Gebäude herum schauen, zwei Finger = näher/weiter. Teil am Gebäude antippen = andere Farbe.
 
 import * as THREE from 'three';
 import { THEMES, CATS, catOf, partsOf } from '../buildParts.js';
 import { renderThumbnails } from '../thumbs.js';
 import { TEMPLATES } from '../buildMore.js';
-import { PLANT_IDS, PLANTS, STABLE_ANIMALS, ANIMAL_PRODUCTS } from '../garden.js';
+import { PLANT_IDS, STABLE_ANIMALS } from '../garden.js';
 import { createFeeder } from '../feeding.js';
 import { LIKES } from '../../catalog.js';
 
@@ -22,6 +21,8 @@ const THEME_KEY = 'sigo.site.theme';
 const ALBUM_KEY = 'sigo.site.album';
 const ALBUM_MAX = 12; // so viele eigene Fotos bleiben im Album
 const NEXT_CAT = { doors: 'windows', windows: 'roofs', roofs: 'tops', tops: 'decos' };
+// Namen und Bilder der Kategorien (das Bild ist ein Teil aus dem Fach)
+const CAT_NAME = { levels: 'Stockwerke', doors: 'Türen', windows: 'Fenster', paint: 'Farben', roofs: 'Dächer', tops: 'Spitzen', wings: 'Anbauten', decos: 'Schmuck', folk: 'Bewohner' };
 
 export function createBuildMode(game) {
   const { services, land, train } = game;
@@ -31,8 +32,8 @@ export function createBuildMode(game) {
     theme = THEMES[localStorage.getItem(THEME_KEY)] ? localStorage.getItem(THEME_KEY) : 'haus';
   } catch { /* ohne Speicher geht es trotzdem */ }
   let cat = 'levels';
-  let picking = false; // untere Reihe zeigt gerade die Themen statt der Teile
-  let browsing = false; // untere Reihe zeigt gerade das Album (eigene Fotos und Vorlagen)
+  let picking = false; // die Teile-Reihe zeigt gerade die Themen
+  let browsing = false; // die Teile-Reihe zeigt gerade das Album (eigene Fotos und Vorlagen)
   // Album: eigene Gebäude als Beschreibung (Text) – die Bilder dazu werden bei Bedarf neu gerendert
   let album = [];
   try {
@@ -44,25 +45,23 @@ export function createBuildMode(game) {
   game.ui.append(flash);
   let active = false;
   const feeder = createFeeder(game, services);
-  const TABS = [...CATS, 'garden', 'stable'];
   const inGarden = () => cat === 'garden' && !picking && !browsing;
   const inStable = () => cat === 'stable' && !picking && !browsing;
   const nearBed = () => inGarden() || inStable(); // Kamera nah am Beet und den Tieren
 
-  // ---------- Leiste ----------
+  // ---------- Fenster unten ----------
   const panel = document.createElement('div');
-  panel.className = 'site-panel hidden';
-  const tabs = document.createElement('div');
-  tabs.className = 'site-tabs';
+  panel.className = 'bz-sheet hidden';
+  const head = document.createElement('div');
+  head.className = 'bz-head';
+  const cats = document.createElement('div');
+  cats.className = 'bz-cats';
   const row = document.createElement('div');
-  row.className = 'site-row';
-  const partsRow = document.createElement('div');
-  partsRow.className = 'site-parts';
-  // seltene Knöpfe links am Rand, Zurück und Fertig rechts
-  const tools = document.createElement('div');
-  tools.className = 'site-side left hidden';
-  const acts = document.createElement('div');
-  acts.className = 'site-side right hidden';
+  row.className = 'bz-row';
+  const items = document.createElement('div');
+  items.className = 'bz-items';
+  panel.append(head, cats, row);
+  game.ui.append(panel);
 
   const button = (parent, cls, onTap) => {
     const b = document.createElement('button');
@@ -73,22 +72,20 @@ export function createBuildMode(game) {
     return b;
   };
   // Pfeile zum Blättern (nur sichtbar, wenn nicht alle Teile ins Bild passen)
-  const page = (d) => partsRow.scrollBy({ left: d * partsRow.clientWidth * 0.75, behavior: 'smooth' });
-  const left = button(row, 'site-arrow', () => page(-1));
+  const page = (d) => items.scrollBy({ left: d * items.clientWidth * 0.75, behavior: 'smooth' });
+  const left = button(row, 'bz-arrow', () => page(-1));
   left.textContent = '◀';
-  row.append(partsRow);
-  const right = button(row, 'site-arrow', () => page(1));
+  row.append(items);
+  const right = button(row, 'bz-arrow', () => page(1));
   right.textContent = '▶';
   function updateArrows() {
-    const over = !partsRow.classList.contains('picking') && partsRow.scrollWidth > partsRow.clientWidth + 4;
+    const over = !items.classList.contains('picking') && items.scrollWidth > items.clientWidth + 4;
     row.classList.toggle('overflow', over);
-    left.disabled = partsRow.scrollLeft < 4;
-    right.disabled = partsRow.scrollLeft + partsRow.clientWidth > partsRow.scrollWidth - 4;
+    left.disabled = items.scrollLeft < 4;
+    right.disabled = items.scrollLeft + items.clientWidth > items.scrollWidth - 4;
   }
-  partsRow.addEventListener('scroll', updateArrows, { passive: true });
-  panel.append(tabs, row);
-  game.ui.append(panel, tools, acts);
-  let shown = ''; // was die untere Reihe gerade zeigt – bleibt es gleich, bleibt auch die Stelle beim Blättern
+  items.addEventListener('scroll', updateArrows, { passive: true });
+  let shown = ''; // was die Reihe gerade zeigt – bleibt es gleich, bleibt auch die Stelle beim Blättern
 
   // Welches Fach ist als Nächstes sinnvoll? (wackelt leicht)
   function nextCat(s) {
@@ -99,112 +96,133 @@ export function createBuildMode(game) {
     if (!s.state.top) return 'tops';
     return null;
   }
-  // Leiste fertig aufgebaut: Pfeile, Blätter-Stelle, Platz für die Kamera
+  // Fenster fertig aufgebaut: Pfeile, Stelle beim Blättern, Platz für die Kamera
   function settle(key) {
-    const keep = key === shown ? partsRow.dataset.at | 0 : 0;
+    const keep = key === shown ? items.dataset.at | 0 : 0;
     shown = key;
     updateArrows(); // erst die Pfeile (sie nehmen Platz weg), dann die Stelle
-    partsRow.scrollLeft = keep;
+    items.scrollLeft = keep;
     updateArrows();
     game.setBottomInset(panel.offsetHeight);
   }
   // Bewohner nutzen die Figuren-Bilder der Werkstatt, alles andere die Bauteil-Vorschau
   const item = (id) => ({ kind: catOf(id) === 'folk' ? 'cargo' : 'site', id });
   const thumb = (id) => `url(${renderThumbnails([item(id)])[`${item(id).kind}:${id}`]})`;
+  const plantPic = (id) => `url(${renderThumbnails([{ kind: 'plant', id }])[`plant:${id}`]})`;
+  const animalPic = (id) => `url(${renderThumbnails([{ kind: 'cargo', id }])[`cargo:${id}`]})`;
 
   function nope(wantCat) {
     services.sfx('nope');
-    const b = tabs.querySelector(`[data-cat="${wantCat}"]`);
+    const b = cats.querySelector(`[data-cat="${wantCat}"]`);
     if (!b) return;
     b.classList.remove('pulse');
     void b.offsetWidth;
     b.classList.add('pulse');
   }
 
+  // Kategorie-Knopf: Bild oben, Name darunter
+  function catButton(parent, key, name, bg, onTap) {
+    const b = button(parent, 'bz-cat', onTap);
+    const ico = document.createElement('span');
+    ico.className = 'ico';
+    if (bg?.startsWith('url(')) ico.style.backgroundImage = bg;
+    else ico.textContent = bg;
+    const lab = document.createElement('span');
+    lab.className = 'lab';
+    lab.textContent = name;
+    b.append(ico, lab);
+    if (key) b.dataset.cat = key;
+    return b;
+  }
+
   function refresh() {
     const s = site();
     // alle Bilder des Themas in einem Durchgang rendern
     renderThumbnails(CATS.flatMap((c) => partsOf(theme, c)).map(item));
-    partsRow.dataset.at = partsRow.scrollLeft;
-    tabs.replaceChildren();
-    tools.replaceChildren();
-    acts.replaceChildren();
-    button(tools, `site-tab theme${picking ? ' active' : ''}`, () => {
+    items.dataset.at = items.scrollLeft;
+    head.replaceChildren();
+    cats.replaceChildren();
+
+    // ---- Kopfzeile: Bauplatz · Thema · Zurück · Fertig
+    const sites = game.buildSites;
+    const plot = button(head, 'bz-pill', () => {
+      game.buildSite = sites[(sites.indexOf(s) + 1) % sites.length];
+      services.sfx('whoosh');
+      attach();
+    });
+    plot.innerHTML = `<span class="ico">📍</span>Bauplatz ${sites.indexOf(s) + 1}`;
+    button(head, `bz-pill${picking ? ' on' : ''}`, () => {
       picking = !picking;
       browsing = false;
       services.sfx('pop');
       refresh();
-    }).textContent = THEMES[theme].icon;
+    }).innerHTML = `<span class="ico">${THEMES[theme].icon}</span>Thema`;
+    const spacer = document.createElement('div');
+    spacer.className = 'bz-spacer';
+    head.append(spacer);
+    button(head, `bz-pill round${s.history.length ? '' : ' off'}`, () => {
+      if (s.undo()) refresh();
+    }).innerHTML = '<span class="ico">↩️</span>';
+    button(head, `bz-pill primary${s.empty ? ' off' : ''}`, () => {
+      if (s.celebrate()) resetView(); // von vorne zuschauen, wer einzieht
+    }).innerHTML = '<span class="ico">✅</span>Fertig';
+
+    // ---- Kategorien
     const next = picking || browsing ? null : nextCat(s);
-    for (const c of TABS) {
+    for (const c of CATS) {
       const on = c === cat && !picking && !browsing;
-      const b = button(tabs, `site-tab${on ? ' active' : ''}${c === next && !on ? ' next' : ''}`, () => {
+      const b = catButton(cats, c, CAT_NAME[c], thumb(partsOf(theme, c)[0]), () => {
         services.sfx('pop');
         setCat(c);
       });
-      b.dataset.cat = c;
-      b.style.backgroundImage = c === 'garden' ? plantPic('karotte') : c === 'stable' ? animalPic('kuh') : thumb(partsOf(theme, c)[0]);
+      b.classList.toggle('active', on);
+      b.classList.toggle('next', c === next && !on);
     }
-    // nächster Bauplatz (es gibt mehrere an der Strecke)
-    const sites = game.buildSites;
-    button(tools, 'site-tab plot', () => {
-      game.buildSite = sites[(sites.indexOf(s) + 1) % sites.length];
-      services.sfx('whoosh');
-      attach();
-    }).textContent = ['1️⃣', '2️⃣', '3️⃣', '4️⃣'][sites.indexOf(s)] ?? '➡️';
-    button(tools, `site-tab${browsing ? ' active' : ''}`, () => {
+    catButton(cats, 'garden', 'Garten', plantPic('karotte'), () => { services.sfx('pop'); setCat('garden'); })
+      .classList.toggle('active', inGarden());
+    catButton(cats, 'stable', 'Tiere', animalPic('kuh'), () => { services.sfx('pop'); setCat('stable'); })
+      .classList.toggle('active', inStable());
+    catButton(cats, 'album', 'Album', '📷', () => {
       browsing = !browsing;
       picking = false;
       services.sfx('pop');
       refresh();
-    }).textContent = '📷';
-    button(tools, `site-tab${s.empty ? ' off' : ''}`, () => s.demolish()).textContent = '💥';
-    button(acts, `site-tab act${s.history.length ? '' : ' off'}`, () => {
-      if (s.undo()) refresh();
-    }).textContent = '↩️';
-    button(acts, `site-tab act ok${s.empty ? ' off' : ''}`, () => {
-      if (s.celebrate()) resetView(); // von vorne zuschauen, wer einzieht
-    }).textContent = '✅';
+    }).classList.toggle('active', browsing);
+    catButton(cats, 'demolish', 'Abreißen', '💥', () => s.demolish()).classList.toggle('off', s.empty);
+    cats.querySelector('[data-cat="demolish"]')?.classList.add('danger');
 
-    partsRow.replaceChildren();
-    partsRow.classList.toggle('picking', picking);
+    // aktive Kategorie in die Mitte der Reihe schieben (die Reihe ist schmal und wischbar)
+    const on = cats.querySelector('.active');
+    if (on) cats.scrollLeft = on.offsetLeft - cats.clientWidth / 2 + on.offsetWidth / 2;
+
+    // ---- Teile
+    items.replaceChildren();
+    items.classList.toggle('picking', picking);
     if (inStable()) {
-      // Tierstation: Tiere zum Hinstellen, rechts die Milch und die Eier
+      // Tierstation: Tiere zum Hinstellen, dahinter Milch und Eier
       const gd = s.garden;
       for (const id of STABLE_ANIMALS) {
-        button(partsRow, `site-part${gd.data.animals.length >= 3 ? ' off' : ''}`, () => {
+        button(items, `bz-item${gd.data.animals.length >= 3 ? ' off' : ''}`, () => {
           if (!gd.addAnimal(id)) services.sfx('nope');
         }).style.backgroundImage = animalPic(id);
       }
-      const sep = document.createElement('div');
-      sep.className = 'site-sep';
-      sep.textContent = '🧺';
-      partsRow.append(sep);
       for (const [p, icon] of [['milch', '🥛'], ['ei', '🥚']]) {
         const n = gd.data.products[p];
-        const b = button(partsRow, `site-part pick${n ? '' : ' off'}`, () => services.sfx(n ? 'pling' : 'nope'));
-        b.textContent = `${icon} ${n}`;
+        button(items, `bz-item pick${n ? '' : ' off'}`, () => services.sfx(n ? 'pling' : 'nope')).textContent = `${icon} ${n}`;
       }
       settle('stable');
       return;
     }
     if (inGarden()) {
-      // Garten: links die Pflanzen zum Säen, rechts der Korb mit der Ernte (antippen = Bewohner füttern)
+      // Garten: links die Pflanzen zum Säen, dahinter der Korb mit der Ernte (antippen = füttern)
       const gd = s.garden;
       for (const id of PLANT_IDS) {
-        button(partsRow, `site-part${gd.full ? ' off' : ''}`, () => {
+        button(items, `bz-item${gd.full ? ' off' : ''}`, () => {
           if (!gd.sow(id)) services.sfx('nope');
         }).style.backgroundImage = plantPic(id);
       }
-      const foods = Object.entries(gd.data.basket);
-      if (foods.length) {
-        const sep = document.createElement('div');
-        sep.className = 'site-sep';
-        sep.textContent = '🧺';
-        partsRow.append(sep);
-      }
-      for (const [food, n] of foods) {
-        const b = button(partsRow, 'site-part food', () => feedFromBasket(food));
+      for (const [food, n] of Object.entries(gd.data.basket)) {
+        const b = button(items, 'bz-item food', () => feedFromBasket(food));
         b.style.backgroundImage = `url(${renderThumbnails([{ kind: 'food', id: food }])[`food:${food}`]})`;
         b.dataset.n = n;
       }
@@ -216,7 +234,7 @@ export function createBuildMode(game) {
       renderThumbnails([...album, ...TEMPLATES].map((id) => ({ kind: 'house', id })));
       const pic = (json) => `url(${renderThumbnails([{ kind: 'house', id: json }])[`house:${json}`]})`;
       const mine = s.snapshot();
-      button(partsRow, `site-part pick${s.empty ? ' off' : ''}`, () => {
+      button(items, `bz-item pick${s.empty ? ' off' : ''}`, () => {
         if (s.empty) return services.sfx('nope');
         // Foto: kurz weiß aufblitzen, vorne im Album ablegen (gleiche Gebäude nicht doppelt)
         album = [mine, ...album.filter((j) => j !== mine)].slice(0, ALBUM_MAX);
@@ -234,15 +252,15 @@ export function createBuildMode(game) {
         resetView();
         refresh();
       };
-      for (const json of album) button(partsRow, `site-part photo${json === mine ? ' active' : ''}`, () => load(json)).style.backgroundImage = pic(json);
-      for (const json of TEMPLATES) button(partsRow, 'site-part photo idea', () => load(json)).style.backgroundImage = pic(json);
+      for (const json of album) button(items, `bz-item photo${json === mine ? ' active' : ''}`, () => load(json)).style.backgroundImage = pic(json);
+      for (const json of TEMPLATES) button(items, 'bz-item photo idea', () => load(json)).style.backgroundImage = pic(json);
       settle('album');
       return;
     }
     if (picking) {
       // Themen-Auswahl: große Bildknöpfe
       for (const [id, t] of Object.entries(THEMES)) {
-        button(partsRow, `site-part pick${id === theme ? ' active' : ''}`, () => {
+        button(items, `bz-item pick${id === theme ? ' active' : ''}`, () => {
           theme = id;
           picking = false;
           try { localStorage.setItem(THEME_KEY, id); } catch { /* egal */ }
@@ -252,14 +270,11 @@ export function createBuildMode(game) {
       }
     }
     for (const id of picking ? [] : partsOf(theme, cat)) {
-      const b = button(partsRow, `site-part${s.can(id) ? '' : ' off'}${s.has(id) ? ' active' : ''}`, () => choose(id));
+      const b = button(items, `bz-item${s.can(id) ? '' : ' off'}${s.has(id) ? ' active' : ''}`, () => choose(id));
       b.style.backgroundImage = thumb(id);
     }
     settle(picking ? 'themes' : `${theme}:${cat}`);
   }
-
-  const plantPic = (id) => `url(${renderThumbnails([{ kind: 'plant', id }])[`plant:${id}`]})`;
-  const animalPic = (id) => `url(${renderThumbnails([{ kind: 'cargo', id }])[`cargo:${id}`]})`;
 
   // Tier am Beet antippen: Futter aus dem Korb (wenn es das mag), sonst streicheln; Kuh und Huhn geben etwas
   function visitAnimal(i) {
@@ -430,12 +445,12 @@ export function createBuildMode(game) {
       active = true;
       game.useScene('land');
       train.placeOnCurve(land.track.curve, land.track.length, game.drive.s);
-      for (const el of [panel, tools, acts]) el.classList.remove('hidden');
+      panel.classList.remove('hidden');
       attach();
     },
     exit() {
       active = false;
-      for (const el of [panel, tools, acts]) el.classList.add('hidden');
+      panel.classList.add('hidden');
       game.setBottomInset(0);
       feeder.clear();
       train.group.visible = true;

@@ -352,117 +352,182 @@ button {
 }
 .env-controls .drive-btn { width: min(12vmin, 80px); font-size: min(6vmin, 38px); }
 
-/* ---------- Bauen: Leiste mit Themen, Fächern und Bauteilen (modes/build.js) ---------- */
-.site-panel {
+/* ---------- Bauen: Fenster unten mit Kopfzeile, Kategorien und Teilen (modes/build.js) ---------- */
+.bz-sheet {
   position: fixed;
   left: 0;
   right: 0;
   bottom: 0;
   display: flex;
   flex-direction: column;
-  gap: 1vmin;
-  padding: 1.2vmin 1.5vmin calc(1.2vmin + env(safe-area-inset-bottom));
-  background: rgba(255, 250, 242, 0.95);
-  box-shadow: 0 -6px 20px rgba(74, 63, 53, 0.12);
-  border-radius: 26px 26px 0 0;
+  gap: 1.2vmin;
+  padding: 1vmin 1.6vmin calc(1.4vmin + env(safe-area-inset-bottom));
+  background: linear-gradient(180deg, #fffdf8 0%, #f8efdf 100%);
+  border-radius: 30px 30px 0 0;
+  box-shadow: 0 -12px 34px rgba(74, 63, 53, 0.18), inset 0 1px 0 #fff;
 }
-/* Fächer: eine Reihe; das gewählte ist groß und farbig, das nächste sinnvolle wackelt leicht */
-.site-tabs { display: flex; justify-content: center; align-items: flex-end; gap: 0.9vmin; padding-top: 1vmin; }
-.site-tab {
-  flex: none;
-  width: min(8.3vmin, 62px);
-  aspect-ratio: 1;
-  border-radius: 28%;
-  background: var(--tile) center / 86% no-repeat;
-  box-shadow: 0 3px 8px var(--shadow);
-  font-family: var(--emoji);
-  font-size: min(5.4vmin, 34px);
-  opacity: 0.85;
+/* kleiner Griff oben: zeigt, dass das Fenster zum Wischen ist */
+.bz-sheet::before {
+  content: '';
+  align-self: center;
+  width: 12vmin;
+  height: 5px;
+  border-radius: 3px;
+  background: rgba(74, 63, 53, 0.16);
+  margin-bottom: -0.4vmin;
+}
+/* Kopfzeile: Bauplatz, Thema, Zurück, Fertig */
+.bz-head { display: flex; align-items: center; gap: 1vmin; }
+.bz-spacer { flex: 1; }
+.bz-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.8vmin;
+  height: min(8.4vmin, 56px);
+  padding: 0 min(2.4vmin, 18px);
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: 0 3px 10px rgba(74, 63, 53, 0.12);
+  font-size: min(3.1vmin, 19px);
+  font-weight: 700;
+  color: var(--ink);
+  white-space: nowrap;
   transition: transform 0.15s;
 }
-.site-tab.active { opacity: 1; background-color: #ffd9a8; outline: 4px solid var(--accent); transform: translateY(-0.8vmin) scale(1.14); }
-.site-tab.next { opacity: 1; animation: site-next 1.6s ease-in-out infinite; }
-.site-tab.act { border-radius: 50%; opacity: 1; }
-.site-tab.off { opacity: 0.3; }
-.site-tab.pulse { animation: attention 0.9s ease 2; }
-@keyframes site-next { 0%, 60%, 100% { transform: rotate(0); } 70% { transform: rotate(-9deg) scale(1.08); } 85% { transform: rotate(9deg) scale(1.08); } }
-/* Knöpfe am Rand: links klein (Thema, Bauplatz, Album, Abreißen), rechts groß (Zurück, Fertig) */
-.site-side {
-  position: fixed;
-  top: calc(30px + min(15vmin, 84px) + env(safe-area-inset-top));
+.bz-pill:active { transform: scale(0.94); }
+.bz-pill .ico { font-family: var(--emoji); font-size: min(4.6vmin, 28px); line-height: 1; }
+.bz-pill.round { width: min(8.4vmin, 56px); padding: 0; justify-content: center; }
+.bz-pill.on { background: #ffe6c2; box-shadow: 0 0 0 3px var(--accent); }
+.bz-pill.primary {
+  background: linear-gradient(180deg, #6cc37a 0%, #3f9a4f 100%);
+  color: #fffaf2;
+  box-shadow: 0 5px 14px rgba(63, 154, 79, 0.35);
+}
+.bz-pill.off { opacity: 0.35; }
+/* Kategorien: große Knöpfe mit Bild und Name, in einer Reihe (wischbar) */
+.bz-cats {
+  display: flex;
+  gap: 1.1vmin;
+  overflow-x: auto;
+  padding: 0.6vmin 0.4vmin 0.2vmin;
+  justify-content: safe center;
+  scrollbar-width: none;
+}
+.bz-cats::-webkit-scrollbar { display: none; }
+.bz-cat {
+  flex: none;
   display: flex;
   flex-direction: column;
-  gap: 1.4vmin;
+  align-items: center;
+  gap: 0.5vmin;
+  width: min(15.5vmin, 88px);
+  transition: transform 0.15s;
 }
-.site-side.left { left: calc(12px + env(safe-area-inset-left)); }
-.site-side.right { right: calc(12px + env(safe-area-inset-right)); }
-.site-side .site-tab { opacity: 0.9; width: min(9vmin, 54px); font-size: min(5vmin, 30px); }
-.site-side .site-tab.active { transform: none; }
-.site-side.right .site-tab { width: min(13vmin, 76px); font-size: min(7.5vmin, 44px); opacity: 1; }
-.site-side .site-tab.off { opacity: 0.3; }
+.bz-cat:active { transform: scale(0.93); }
+.bz-cat .ico {
+  width: min(12vmin, 68px);
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  border-radius: 22px;
+  background: #fff center / 84% no-repeat;
+  box-shadow: 0 4px 12px rgba(74, 63, 53, 0.14), inset 0 -3px 0 rgba(74, 63, 53, 0.05);
+  font-family: var(--emoji);
+  font-size: min(6vmin, 36px);
+  opacity: 0.8;
+}
+.bz-cat .lab {
+  font-size: min(2.7vmin, 16px);
+  font-weight: 700;
+  color: #7a6a5a;
+  white-space: nowrap;
+  opacity: 0.85;
+}
+.bz-cat.active .ico { opacity: 1; background-color: #ffe0b0; box-shadow: 0 0 0 3px var(--accent), 0 6px 14px rgba(74, 63, 53, 0.2); }
+.bz-cat.active .lab { color: var(--accent); opacity: 1; }
+.bz-cat.danger .ico { background-color: #ffe1dc; }
+.bz-cat.off { opacity: 0.4; }
+.bz-cat.next .ico { animation: bz-next 1.8s ease-in-out infinite; }
+.bz-cat.pulse .ico { animation: attention 0.9s ease 2; }
+@keyframes bz-next {
+  0%, 60%, 100% { transform: rotate(0); }
+  70% { transform: rotate(-8deg) scale(1.06); }
+  85% { transform: rotate(8deg) scale(1.06); }
+}
 /* Teile-Reihe mit Blätter-Pfeilen */
-.site-row { display: flex; align-items: center; gap: 1vmin; }
-.site-arrow {
+.bz-row { display: flex; align-items: center; gap: 1vmin; }
+.bz-arrow {
   flex: none;
   display: none;
-  width: min(10vmin, 60px);
+  width: min(9vmin, 54px);
   aspect-ratio: 1;
   border-radius: 50%;
   background: var(--accent);
   color: #fffaf2;
-  font-size: min(4.5vmin, 28px);
-  box-shadow: 0 3px 8px var(--shadow);
+  font-size: min(4vmin, 24px);
+  box-shadow: 0 3px 8px rgba(74, 63, 53, 0.2);
 }
-.site-row.overflow .site-arrow { display: block; }
-.site-arrow:disabled { opacity: 0.25; }
-.site-arrow:active { transform: scale(0.9); }
-.site-parts {
+.bz-row.overflow .bz-arrow { display: block; }
+.bz-arrow:disabled { opacity: 0.25; }
+.bz-arrow:active { transform: scale(0.9); }
+.bz-items {
   flex: 1;
   min-width: 0;
   display: flex;
   gap: 1.6vmin;
-  padding: 0.6vmin 0.4vmin 0.8vmin;
+  padding: 0.8vmin 0.6vmin 1vmin;
   overflow-x: auto;
   overflow-y: hidden;
-  touch-action: pan-x; /* mit dem Finger hin- und herschieben */
+  touch-action: pan-x;
   justify-content: safe center;
+  scroll-snap-type: x proximity;
   scrollbar-width: none;
 }
-.site-parts::-webkit-scrollbar { display: none; }
-.site-part {
+.bz-items::-webkit-scrollbar { display: none; }
+.bz-items.picking { flex-wrap: wrap; justify-content: center; overflow-x: visible; }
+.bz-item {
   flex: none;
-  width: min(15vmin, 104px);
+  width: min(15vmin, 98px);
   aspect-ratio: 1;
-  border-radius: 22%;
-  background: var(--tile) center / 92% no-repeat;
-  box-shadow: 0 4px 10px var(--shadow);
-  touch-action: pan-x;
+  border-radius: 24px;
+  background: #fff center / 88% no-repeat;
+  box-shadow: 0 4px 12px rgba(74, 63, 53, 0.14), inset 0 -3px 0 rgba(74, 63, 53, 0.05);
+  scroll-snap-align: start;
+  transition: transform 0.15s;
 }
-.site-part:active { transform: scale(0.92); }
-.site-part.active { outline: 4px solid var(--accent); background-color: #ffe7c7; }
-.site-part.off { opacity: 0.35; }
-.site-part.pick { width: min(13vmin, 86px); font-family: var(--emoji); font-size: min(7.5vmin, 50px); }
-.site-parts.picking { flex-wrap: wrap; justify-content: center; overflow-x: visible; }
-/* Garten: Korb-Zeichen als Trenner, Ernte mit Anzahl */
-.site-sep { flex: none; align-self: center; font: min(7vmin, 44px) var(--emoji); padding: 0 0.6vmin; touch-action: pan-x; }
-.site-part.food { position: relative; background-color: #eaf6dc; }
-.site-part.food::after {
+.bz-item:active { transform: scale(0.92); }
+.bz-item.active { box-shadow: 0 0 0 4px var(--accent), 0 6px 14px rgba(74, 63, 53, 0.16); background-color: #fff3df; }
+.bz-item.off { opacity: 0.38; }
+.bz-item.pick {
+  width: min(13vmin, 88px);
+  display: grid;
+  place-items: center;
+  font-family: var(--emoji);
+  font-size: min(7vmin, 46px);
+}
+.bz-item.pick.off { font-size: min(5.4vmin, 34px); }
+/* Garten: Ernte mit Anzahl; Album: Fotos mit weißem Rand, Vorlagen mit Glühbirne */
+.bz-item.food { background-color: #eef8e4; }
+.bz-item.food::after {
   content: attr(data-n);
   position: absolute;
   right: -4px;
   top: -6px;
-  min-width: min(5.4vmin, 32px);
-  line-height: min(5.4vmin, 32px);
+  min-width: 30px;
+  height: 30px;
+  line-height: 30px;
+  padding: 0 6px;
   border-radius: 999px;
   background: var(--accent);
   color: #fffaf2;
-  font-size: min(3.6vmin, 20px);
+  font-size: 17px;
   font-weight: 800;
+  text-align: center;
 }
-/* Album: eigene Fotos mit weißem Rand wie ein Foto, Vorlagen mit Glühbirne */
-.site-part.photo { width: min(17vmin, 116px); background-size: 100%; border: 4px solid #fff; }
-.site-part.idea { position: relative; border-color: #ffe7a8; }
-.site-part.idea::after { content: '💡'; position: absolute; right: -4px; top: -8px; font: min(4vmin, 22px) var(--emoji); }
+.bz-item.food { position: relative; }
+.bz-item.photo { width: min(17vmin, 116px); background-size: 100%; border: 4px solid #fff; }
+.bz-item.idea { position: relative; border-color: #ffe7a8; }
+.bz-item.idea::after { content: '💡'; position: absolute; right: -4px; top: -8px; font: min(4vmin, 22px) var(--emoji); }
 .site-flash { position: fixed; inset: 0; background: #fff; opacity: 0; pointer-events: none !important; }
 .site-flash.go { animation: site-flash 0.5s ease-out; }
 @keyframes site-flash { 0% { opacity: 0.85; } 100% { opacity: 0; } }

@@ -108,9 +108,9 @@ Gebäude in `js/game/buildSite.js`).
   Fotos und zwölf **Vorlagen** (💡, zu jedem Thema ein fertiges Gebäude). Antippen → das Gebäude wird auf den Bauplatz
   gesetzt und kann umgebaut werden (↩️ holt das vorherige zurück). Gespeichert wird nur die Beschreibung, die Bilder
   werden bei Bedarf neu gerendert (`housePreview` in `js/game/buildSite.js`, Vorlagen in `js/game/buildMore.js`).
-- **Oberfläche:** Unten liegen nur die Fächer (das gewählte ist groß hervorgehoben, das nächste sinnvolle wackelt
-  leicht) und darunter die Teile – wischen oder mit ◀ ▶ blättern. Links am Rand klein: Thema, Bauplatz, Album 📷,
-  Abreißen 💥. Rechts am Rand groß: Zurück ↩️ und Fertig ✅.
+- **Oberfläche (neu):** Unten ein Fenster mit einer Kopfzeile (Bauplatz wechseln, Thema, ↩️ Zurück, ✅ Fertig),
+  einer Reihe großer Kategorien mit Namen (Stockwerke … Garten, Tiere, Album, Abreißen) und darunter den Teilen.
+  Das nächste sinnvolle Fach wackelt leicht. Passen nicht alle Teile ins Bild: wischen oder ◀ ▶ antippen.
 - **Tierstation** (Fach ganz rechts, Tierbild): bis zu drei Tiere vor dem Beet. Tier antippen: Mit Futter aus dem Korb
   frisst es, wenn es das mag, sonst hüpft es, ruft und bekommt Herzchen. Kuh gibt Milch, Huhn ein Ei – je einmal
   alle 40 Sekunden. Der Zähler (🥛 🥚) steht in der Leiste; was man damit macht, ist noch nicht eingebaut.

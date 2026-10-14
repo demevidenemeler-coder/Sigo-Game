@@ -412,6 +412,7 @@ button {
   padding: 0.6vmin 0.4vmin 0.2vmin;
   justify-content: safe center;
   scrollbar-width: none;
+  touch-action: pan-x; /* Knöpfe sonst sperren das Wischen (button hat touch-action: none) */
 }
 .bz-cats::-webkit-scrollbar { display: none; }
 .bz-cat {
@@ -424,6 +425,7 @@ button {
   transition: transform 0.15s;
 }
 .bz-cat:active { transform: scale(0.93); }
+.bz-cat { touch-action: pan-x; }
 .bz-cat .ico {
   width: min(12vmin, 68px);
   aspect-ratio: 1;
@@ -496,6 +498,7 @@ button {
   transition: transform 0.15s;
 }
 .bz-item:active { transform: scale(0.92); }
+.bz-item { touch-action: pan-x; }
 .bz-item.active { box-shadow: 0 0 0 4px var(--accent), 0 6px 14px rgba(74, 63, 53, 0.16); background-color: #fff3df; }
 .bz-item.off { opacity: 0.38; }
 .bz-item.pick {

@@ -627,7 +627,7 @@ export function stopSpeaking() {
   if ('speechSynthesis' in window) speechSynthesis.cancel();
 }
 
-export function speak(text, { lang, rate = 0.85, pitch = 1.1 } = {}) {
+export function speak(text, { lang, rate = 0.85, pitch = 1.6 } = {}) { // höher = kindlicher und fröhlicher
   if (!text || !('speechSynthesis' in window)) return Promise.resolve();
   return new Promise((resolve) => {
     const u = new SpeechSynthesisUtterance(text);

@@ -95,7 +95,7 @@ async function sayName(id) {
     await sayWord(id);
     const word = !hasCall && soundWordOf(id);
     if (word && my === speechToken && settings.sounds) {
-      await speak(word, { lang: speechLang(), rate: settings.speechRate, pitch: 1.5 });
+      await speak(word, { lang: speechLang(), rate: settings.speechRate, pitch: 1.8 });
     }
   } else if (!hasCall && Date.now() - lastSfxAt > 500) {
     sfx('pop'); // kein Wort, aber eine Rückmeldung zum Antippen
@@ -125,7 +125,7 @@ function countAloud(n) {
   if (!word) return false;
   ++speechToken;
   stopSpeaking();
-  speak(word, { lang: speechLang(), rate: settings.speechRate, pitch: 1.25 });
+  speak(word, { lang: speechLang(), rate: settings.speechRate, pitch: 1.7 });
   return true;
 }
 

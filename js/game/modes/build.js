@@ -14,7 +14,7 @@ import * as THREE from 'three';
 import { THEMES, CATS, catOf, partsOf } from '../buildParts.js';
 import { renderThumbnails } from '../thumbs.js';
 import { TEMPLATES } from '../buildMore.js';
-import { PLANT_IDS, PLANTS } from '../garden.js';
+import { PLANT_IDS, PLANTS, STABLE_ANIMALS, ANIMAL_PRODUCTS } from '../garden.js';
 import { createFeeder } from '../feeding.js';
 import { LIKES } from '../../catalog.js';
 
@@ -44,8 +44,10 @@ export function createBuildMode(game) {
   game.ui.append(flash);
   let active = false;
   const feeder = createFeeder(game, services);
-  const TABS = [...CATS, 'garden'];
+  const TABS = [...CATS, 'garden', 'stable'];
   const inGarden = () => cat === 'garden' && !picking && !browsing;
+  const inStable = () => cat === 'stable' && !picking && !browsing;
+  const nearBed = () => inGarden() || inStable(); // Kamera nah am Beet und den Tieren
 
   // ---------- Leiste ----------
   const panel = document.createElement('div');
@@ -141,7 +143,7 @@ export function createBuildMode(game) {
         setCat(c);
       });
       b.dataset.cat = c;
-      b.style.backgroundImage = c === 'garden' ? plantPic('karotte') : thumb(partsOf(theme, c)[0]);
+      b.style.backgroundImage = c === 'garden' ? plantPic('karotte') : c === 'stable' ? animalPic('kuh') : thumb(partsOf(theme, c)[0]);
     }
     // nächster Bauplatz (es gibt mehrere an der Strecke)
     const sites = game.buildSites;
@@ -166,6 +168,26 @@ export function createBuildMode(game) {
 
     partsRow.replaceChildren();
     partsRow.classList.toggle('picking', picking);
+    if (inStable()) {
+      // Tierstation: Tiere zum Hinstellen, rechts die Milch und die Eier
+      const gd = s.garden;
+      for (const id of STABLE_ANIMALS) {
+        button(partsRow, `site-part${gd.data.animals.length >= 3 ? ' off' : ''}`, () => {
+          if (!gd.addAnimal(id)) services.sfx('nope');
+        }).style.backgroundImage = animalPic(id);
+      }
+      const sep = document.createElement('div');
+      sep.className = 'site-sep';
+      sep.textContent = '🧺';
+      partsRow.append(sep);
+      for (const [p, icon] of [['milch', '🥛'], ['ei', '🥚']]) {
+        const n = gd.data.products[p];
+        const b = button(partsRow, `site-part pick${n ? '' : ' off'}`, () => services.sfx(n ? 'pling' : 'nope'));
+        b.textContent = `${icon} ${n}`;
+      }
+      settle('stable');
+      return;
+    }
     if (inGarden()) {
       // Garten: links die Pflanzen zum Säen, rechts der Korb mit der Ernte (antippen = Bewohner füttern)
       const gd = s.garden;
@@ -237,6 +259,26 @@ export function createBuildMode(game) {
   }
 
   const plantPic = (id) => `url(${renderThumbnails([{ kind: 'plant', id }])[`plant:${id}`]})`;
+  const animalPic = (id) => `url(${renderThumbnails([{ kind: 'cargo', id }])[`cargo:${id}`]})`;
+
+  // Tier am Beet antippen: Futter aus dem Korb (wenn es das mag), sonst streicheln; Kuh und Huhn geben etwas
+  function visitAnimal(i) {
+    const s = site();
+    const gd = s.garden;
+    const fig = gd.figs[i];
+    if (!fig || fig.userData.eating) return;
+    const id = fig.userData.figure;
+    const food = Object.keys(gd.data.basket).find((f) => (LIKES[id] ?? []).includes(f));
+    if (food) {
+      const from = gd.take(food);
+      if (from) feeder.feed(fig, food, { from });
+      return;
+    }
+    game.hop(fig);
+    services.animalCall(id);
+    feeder.hearts(fig.getWorldPosition(new THREE.Vector3()).add(new THREE.Vector3(0, 0.9, 0)));
+    if (gd.produce(i)) services.sfx('pling');
+  }
 
   // Ernte verfüttern: an den ersten Bewohner, der das mag. Mag es keiner, zeigt einer in der Denkblase, was er möchte.
   function feedFromBasket(food) {
@@ -272,17 +314,17 @@ export function createBuildMode(game) {
   const center = new THREE.Vector3();
   function resetView() {
     // Garten: gerade von vorne aufs Beet, etwas von oben; sonst schräg aufs Gebäude
-    view.yaw = site().rot + (inGarden() ? 0.1 : 0.42);
-    view.tilt = inGarden() ? 0.5 : 0.3;
+    view.yaw = site().rot + (nearBed() ? 0.1 : 0.42);
+    view.tilt = nearBed() ? 0.5 : 0.3;
     view.zoom = 1;
   }
   // Fach wechseln; zwischen Garten und Gebäude schwenkt die Kamera um
   function setCat(c) {
-    const was = inGarden();
+    const was = nearBed();
     cat = c;
     picking = false;
     browsing = false;
-    if (was !== inGarden()) resetView();
+    if (was !== nearBed()) resetView();
     refresh();
   }
   function camera() {
@@ -290,9 +332,9 @@ export function createBuildMode(game) {
     const h = Math.max(2.4, s.height * 1.15 + 0.5);
     center.copy(s.center).setY(h * 0.42); // etwas unter der Mitte: der Boden mit Zaun und Garten bleibt im Bild
     dir.set(Math.sin(view.yaw) * Math.cos(view.tilt), Math.sin(view.tilt), Math.cos(view.yaw) * Math.cos(view.tilt));
-    if (inGarden()) {
-      // Garten: näher ans Beet, das Gebäude mit den Bewohnern bleibt dahinter im Bild
-      center.copy(s.garden.centre).lerp(s.center, 0.3).setY(0.9);
+    if (nearBed()) {
+      // Garten und Tierstation: näher ans Beet, das Gebäude mit den Bewohnern bleibt dahinter im Bild
+      center.copy(s.garden.centre).setY(0.9); // Beet genau in die Mitte, die Tiere davor bleiben über der Leiste
       game.fit(center, game.isPortrait() ? 3.1 : 3.6, 2.0, dir);
       game.cam.tPos.sub(center).multiplyScalar(view.zoom).add(center);
       game.cam.tPos.y = Math.max(0.6, game.cam.tPos.y);
@@ -332,13 +374,15 @@ export function createBuildMode(game) {
     if (near >= 0) return s.tapPart(`p:${near}`);
     const hit = game.pick(x, y, [s.house, s.digger, s.plot, s.garden.group])[0];
     if (!hit) return;
+    const animal = s.garden.animalAt(hit.object);
+    if (animal >= 0) return visitAnimal(animal);
     let o = hit.object;
     while (o && !o.userData.site) o = o.parent;
     if (!o) return;
     if (o.userData.site === 'garden') {
       // Beet: Pflanze gießen oder ernten; von einem anderen Fach aus geht es zuerst in den Garten
       const i = s.garden.spotAt(hit.point);
-      if (!inGarden()) {
+      if (!inGarden() && !inStable()) {
         services.sfx('pop');
         setCat('garden');
       }

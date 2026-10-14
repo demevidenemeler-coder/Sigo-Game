@@ -111,6 +111,9 @@ Gebäude in `js/game/buildSite.js`).
 - **Oberfläche:** Unten liegen nur die Fächer (das gewählte ist groß hervorgehoben, das nächste sinnvolle wackelt
   leicht) und darunter die Teile – wischen oder mit ◀ ▶ blättern. Links am Rand klein: Thema, Bauplatz, Album 📷,
   Abreißen 💥. Rechts am Rand groß: Zurück ↩️ und Fertig ✅.
+- **Tierstation** (Fach ganz rechts, Tierbild): bis zu drei Tiere vor dem Beet. Tier antippen: Mit Futter aus dem Korb
+  frisst es, wenn es das mag, sonst hüpft es, ruft und bekommt Herzchen. Kuh gibt Milch, Huhn ein Ei – je einmal
+  alle 40 Sekunden. Der Zähler (🥛 🥚) steht in der Leiste; was man damit macht, ist noch nicht eingebaut.
 - **Garten** (letztes Fach, `js/game/garden.js`): vor jedem Gebäude liegt ein Beet mit sechs Plätzen. Pflanze in der
   Leiste antippen = säen (Karotte, Apfelbaum, Bananenstaude, Sonnenblume, Salat, Gras). Pflanze im Beet antippen =
   die Gießkanne gießt, die Pflanze wächst eine Stufe (dreimal bis reif). Reife Pflanzen wippen; antippen = ernten,

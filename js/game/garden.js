@@ -7,6 +7,7 @@
 
 import * as THREE from 'three';
 import { buildFood } from './foods.js';
+import { buildFigure } from './figures.js';
 
 // Pflanze → was man erntet (Futter aus catalog.js)
 export const PLANTS = {
@@ -19,6 +20,13 @@ export const PLANTS = {
 };
 export const PLANT_IDS = Object.keys(PLANTS);
 export const SPOTS = 6;
+// Tierstation: bis zu drei Tiere stehen vor dem Beet. Kuh und Huhn geben etwas (nach einer Pause).
+export const STABLE_ANIMALS = ['kuh', 'schaf', 'schwein', 'pferd', 'hund', 'katze', 'huhn', 'hase', 'ente'];
+export const ANIMAL_PRODUCTS = { kuh: 'milch', huhn: 'ei' };
+const STABLE_MAX = 3;
+const ANIMAL_X = [-1.3, 0, 1.3];
+const ANIMAL_Z = [0.95, 0.55, 0.95]; // das mittlere steht etwas weiter hinten, damit man es nicht verdeckt
+const READY_MS = 40_000; // so lange dauert es, bis das Tier wieder etwas gibt
 export const RIPE = 3; // Stufen: 0 Keimling, 1 klein, 2 groß, 3 reif
 const BASKET_MAX = 9;
 const AT = [-0.2, 2.95]; // Mitte des Beets, lokal zum Bauplatz
@@ -173,6 +181,10 @@ export function plantPreview(id) {
 }
 
 function cleanData(d) {
+  const animals = (d?.animals ?? []).filter((a) => STABLE_ANIMALS.includes(a?.id)).slice(0, STABLE_MAX)
+    .map((a) => ({ id: a.id, ready: +a.ready || 0 }));
+  const products = {};
+  for (const p of Object.values(ANIMAL_PRODUCTS)) products[p] = Math.max(0, Math.min(9, d?.products?.[p] | 0));
   const beds = Array.from({ length: SPOTS }, (_, i) => {
     const b = d?.beds?.[i];
     return b && PLANTS[b.id] ? { id: b.id, st: Math.max(0, Math.min(RIPE, b.st | 0)) } : null;
@@ -183,7 +195,7 @@ function cleanData(d) {
     const n = Math.max(0, Math.min(BASKET_MAX, d?.basket?.[food] | 0));
     if (n) basket[food] = n;
   }
-  return { beds, basket };
+  return { beds, basket, animals, products };
 }
 
 export class Garden {
@@ -195,6 +207,7 @@ export class Garden {
     this.drops = [];
     this.plants = Array(SPOTS).fill(null);
     this.onChange = null;
+    this.figs = []; // Tiere im Stall (nur zum Anzeigen, nicht gespeichert)
 
     const g = new THREE.Group();
     g.position.copy(site.at(...AT));
@@ -227,6 +240,8 @@ export class Garden {
     basket.add(this.basketItems);
     g.add(basket);
     this.basket = basket;
+    this.animalGroup = new THREE.Group();
+    g.add(this.animalGroup);
     // Gießkanne rechts
     const can = new THREE.Group();
     const blue = mat('#3b9ad9', 0.35);
@@ -246,6 +261,47 @@ export class Garden {
     site.land.tappable.push(g);
     for (let i = 0; i < SPOTS; i++) this.showPlant(i);
     this.showBasket();
+    this.showAnimals();
+  }
+
+  // Tiere vor dem Beet aufstellen (gespeichert wird nur die Art, nicht das Modell)
+  showAnimals() {
+    this.animalGroup.clear();
+    this.figs = this.data.animals.map((a, i) => {
+      const f = buildFigure(a.id);
+      f.userData.animal = i;
+      f.position.set(ANIMAL_X[i], 0, ANIMAL_Z[i]);
+      this.animalGroup.add(f);
+      return f;
+    });
+  }
+
+  // Welches Tier (Nummer) steckt hinter diesem Objekt? -1 = keins
+  animalAt(obj) {
+    let o = obj;
+    while (o && o.userData.animal === undefined) o = o.parent;
+    return o ? o.userData.animal : -1;
+  }
+
+  addAnimal(id) {
+    if (this.busy || !STABLE_ANIMALS.includes(id) || this.data.animals.length >= STABLE_MAX) return false;
+    this.data.animals.push({ id, ready: 0 });
+    this.showAnimals();
+    this.game.popIn(this.figs[this.figs.length - 1]);
+    this.game.services.sfx('plop');
+    this.changed();
+    return true;
+  }
+
+  // Kuh gibt Milch, Huhn ein Ei – aber nur einmal alle 40 Sekunden. Gibt das Produkt zurück oder null.
+  produce(i) {
+    const a = this.data.animals[i];
+    const p = a && ANIMAL_PRODUCTS[a.id];
+    if (!p || Date.now() < a.ready) return null;
+    a.ready = Date.now() + READY_MS;
+    this.data.products[p] = Math.min(9, this.data.products[p] + 1);
+    this.changed();
+    return p;
   }
 
   get full() {

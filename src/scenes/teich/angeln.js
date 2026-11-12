@@ -5,6 +5,8 @@
 //   Vorrang (Überraschungen nur, wenn kein Fisch nah ist). Loslassen oder Finger nach oben ziehen → hochziehen.
 // - Jeder Fisch schwimmt auf seiner eigenen Tiefenbahn im sichtbaren Bereich; höchstens fünf sind frei.
 // - Fische kommen in den Glaseimer (sichtbar darin); Eimer antippen → sie hüpfen zurück ins Wasser.
+// - Haupttätigkeit (schatz.js): Flaschenpost angeln, Korken ziehen, Brief aufwischen, das Gesuchte angeln,
+//   Abschluss je Brief; die Andenken sammeln sich auf dem Steg.
 // - Überraschungen werden groß gezeigt, die Katze reagiert (Krone auf, Stiefel schütteln …), bei besonderen
 //   Funden gibt es einen Sticker. Am Grund liegen immer drei Dinge, neue sinken nach. Die Flaschenpost treibt
 //   nach einem Fund erst eine Weile später wieder herein. Ein Krebs läuft am Grund (zwischen den Dingen).
@@ -14,7 +16,8 @@ import {
 } from '../../engine/index.js';
 import { Seite, hgPunkt } from '../../gemeinsam/seiten.js';
 import { belohne } from '../../gemeinsam/sticker.js';
-import { ton, freue, naechsterSticker, Ringe, Vogel, Wolken } from './deko.js';
+import { ton, freue, naechsterSticker, flugDauer, Ringe, Vogel, Wolken } from './deko.js';
+import { SchatzAblauf } from './schatz.js';
 
 const FISCHE = ['fisch_blau', 'fisch_gelb', 'fisch_orange', 'fisch_rosa', 'fisch_streifen'];
 const GRUND_DINGE = ['stiefel', 'schatzkiste_klein', 'krone', 'seestern', 'muschel', 'schluessel_gold'];
@@ -36,6 +39,9 @@ const FISCH_X = [-450, 980];                                // Wendepunkte: ganz
 const FANG_R = 120;
 const FANG_R_DING = 90;                                     // Überraschungen: etwas kleiner …
 const DING_NUR_OHNE_FISCH = 200;                            // … und nur, wenn kein Fisch so nah ist
+const FANG_R_POST = 230;                                    // Flaschenpost: großzügig, sie geht vor
+const FANG_R_SUCHE = 210;                                   // Gesuchtes der Schatzsuche: großzügig
+const ZIEL_R = 330;                                         // so nah am Ziel gilt der Finger als „zielt darauf"
 const ZEIGE = { x: 200, y: 360 };                           // dort wird ein Fund groß gezeigt
 
 export class Angeln extends Seite {
@@ -63,6 +69,7 @@ export class Angeln extends Seite {
     this.fischUhr = 3;
     this.baueDinge();
     this.baueKrebs();
+    this.schatz = new SchatzAblauf(this);
 
     this.vogel = new Vogel(this, this.welt, { yBereich: [110, 280] });
     this.wolken = new Wolken(this, this.hinten, [
@@ -308,6 +315,18 @@ export class Angeln extends Seite {
   // Fische haben Vorrang: der nächste Fisch im Fangradius; eine Überraschung nur, wenn kein Fisch nah ist
   // und gerade keine andere groß gezeigt wird
   pruefeFang() {
+    // Schatzsuche läuft: der Köder fängt nur das Gesuchte – Fische hängen sich nicht dazwischen
+    if (this.schatz.aktiv) {
+      const ges = this.schatz.gesuchtNah(this.k.x, this.k.y, FANG_R_SUCHE);
+      if (ges) this.haenge(ges);
+      return;
+    }
+    // Die treibende Flaschenpost geht vor: in ihrer Nähe, und solange der Finger auf sie zielt, fängt sich nichts anderes
+    const post = this.post;
+    if (post.zustand === 'treibt' && post.c.visible && post.c.alpha > 0.5) {
+      if (Math.hypot(post.x - this.k.x, post.y - this.k.y) < FANG_R_POST) { this.haenge(post); return; }
+      if (this.zieltAuf(post)) return;
+    }
     let bester = null;
     let nd = Infinity;
     for (const f of this.fische) {
@@ -320,8 +339,25 @@ export class Angeln extends Seite {
     if (nd < DING_NUR_OHNE_FISCH || this.buehne) return;
     for (const d of this.dinge) {
       if (d.zustand !== 'liegt' && d.zustand !== 'treibt') continue;
+      if (!this.schatz.fangbar(d)) continue;
       if (Math.hypot(d.x - this.k.x, d.y - this.k.y) < FANG_R_DING) { this.haenge(d); return; }
     }
+  }
+
+  // Führt der Finger den Köder gerade zu o? (Ziel nah an o, oder der Strich zeigt geradewegs darauf)
+  zieltAuf(o) {
+    const z = this.finger || this.rast;
+    if (!z) return false;
+    if (Math.hypot(z.x - o.x, z.y - o.y) < ZIEL_R) return true;
+    const f = this.finger;
+    if (!f) return false;
+    const vx = f.x - f.sx;
+    const vy = f.y - f.sy;
+    const wx = o.x - f.sx;
+    const wy = o.y - f.sy;
+    const lv = Math.hypot(vx, vy);
+    const lw = Math.hypot(wx, wy);
+    return lv > 60 && lw > 1 && (vx * wx + vy * wy) / (lv * lw) > 0.88;
   }
 
   haenge(o) {
@@ -348,7 +384,10 @@ export class Angeln extends Seite {
     const o = this.haken;
     ton('common/angel', { vol: 0.6 }, 0.5);
     const sp = this.spitze();
-    this.tween(this.k, { x: sp.x + 170, y: this.WL - 210 }, 0.9, { ease: 'sineInOut' }).then(() => {
+    const zx = sp.x + 170;
+    const zy = this.WL - 210;
+    const dauer = flugDauer(zx - this.k.x, zy - this.k.y, { ease: 'sine', min: 0.9, v: 1000 });
+    this.tween(this.k, { x: zx, y: zy }, dauer, { ease: 'sineInOut' }).then(() => {
       this.haken = null;
       this.modus = 'frei';
       this.verweilen = 0.6;
@@ -356,7 +395,7 @@ export class Angeln extends Seite {
       if (!this.finger) this.fangBereit = false; // nach dem Hochziehen fängt er erst wieder mit dem Finger
       if (!o) return;
       if (o.fisch) this.fischInEimer(o);
-      else this.zeigeDing(o);
+      else if (!this.schatz.gefangen(o)) this.zeigeDing(o);
     });
   }
 
@@ -422,7 +461,7 @@ export class Angeln extends Seite {
     let heim = 0;
     // Neugier: nur der Fisch, der dem geführten Köder am nächsten ist
     let neugierig = null;
-    if (this.finger && !this.haken && this.modus === 'frei') {
+    if (this.finger && !this.haken && this.modus === 'frei' && !this.schatz.aktiv) {
       let nd = 380;
       for (const f of this.fische) {
         if (f.zustand !== 'schwimmt') continue;
@@ -458,7 +497,7 @@ export class Angeln extends Seite {
           if (ax < 230 && Math.abs(ay) < 170) schub += (ay >= 0 ? 1.5 : -1.5) * (1 - ax / 230);
         }
         // … und dem ruhenden Köder (sonst sähe es aus, als hinge schon ein Fisch dran)
-        if (!this.finger && this.verweilen <= 0 && !this.haken) {
+        if ((!this.finger && this.verweilen <= 0 && !this.haken) || this.schatz.aktiv) {
           const ax = Math.abs(f.x - this.k.x);
           const ay = f.y - this.k.y;
           if (ax < 200 && Math.abs(ay) < 150) schub += (ay >= 0 ? 1.5 : -1.5) * (1 - ax / 200);
@@ -519,6 +558,8 @@ export class Angeln extends Seite {
   bogen(o, zx, zy, { hoehe = 220, dauer = 0.7, s = o.s } = {}) {
     const x0 = o.x;
     const y0 = o.y;
+    // weite Flüge dauern länger (Ruhe-Regel: höchstens ~1100 Einheiten/s)
+    dauer = flugDauer(zx - x0, zy - y0, { hoehe, min: dauer, v: 1100 });
     const s0 = o.s;
     const p = { t: 0 };
     return this.tween(p, { t: 1 }, dauer, {
@@ -569,9 +610,9 @@ export class Angeln extends Seite {
     f.insWasser = true;
     f.c.alpha = 1;
     f.c.zIndex = 450;
-    const zx = rand(-350, 750);
+    const zx = rand(-450, 350);   // nah beim Eimer: kein weiter Flug quer übers Bild
     f.blick = Math.random() < 0.5 ? 1 : -1;
-    this.bogen(f, zx, this.WL + 70, { hoehe: 260, dauer: 0.85, s: FISCH_SKALA }).then((ok) => {
+    this.bogen(f, zx, this.WL + 70, { hoehe: 200, dauer: 0.85, s: FISCH_SKALA }).then((ok) => {
       if (!ok) return;
       this.ringe.ring(zx, this.WL, 300);
       ton('common/platsch', { vol: 0.4 }, 0.25);
@@ -600,12 +641,14 @@ export class Angeln extends Seite {
     ente.art = 'oben';
     ente.zustand = 'treibt';
     ente.x = 700;
+    ente.y = this.WL + 8;   // gleich auf ihrer Höhe (sonst sinkt sie beim ersten Hereinblättern schnell vom Himmel)
     ente.richtung = -1;
     const post = this.ding('flaschenpost', 180);
     this.post = post;
     post.art = 'mitte';
     post.zustand = 'treibt';
     post.x = 200;
+    post.y = 960;
     post.richtung = 1;
     // drei Dinge liegen schon am Grund
     for (const id of mische(GRUND_DINGE).slice(0, GRUND_ANZAHL)) {
@@ -844,7 +887,7 @@ export class Angeln extends Seite {
     d.zustand = 'fliegt';
     d.c.zIndex = 420;
     d.dreh = 0;
-    const zx = rand(-200, 800);
+    const zx = clamp(rand(-200, 800), d.x - 650, d.x + 650);   // nicht quer übers ganze Bild
     ton('common/wusch', { vol: 0.3 }, 0.3);
     this.bogen(d, zx, this.WL + 10, { hoehe: 240, dauer: 0.8, s: d.basisS }).then((ok) => {
       if (!ok) return;
@@ -880,9 +923,23 @@ export class Angeln extends Seite {
 
   updateKrebs(dt, t) {
     const kr = this.krebs;
+    // wohnt gerade im Stiefel: schaut oben heraus
+    if (kr.haus) {
+      const d = kr.haus;
+      kr.c.position.set(d.x - 13 * (d.s / 0.61), d.y - 69 * (d.s / 0.61) + kr.hops.y);
+      kr.c.rotation = 0;
+      return;
+    }
     let tempo = 42;
+    if (kr.zumHaus) {
+      kr.flucht = 0;
+      const d = kr.zumHaus.d;
+      kr.ziel = d.x;
+      if (Math.abs(d.x - kr.x) < 6) { this.krebsHinein(); return; }
+      tempo = 80;
+    }
     // Kommt der Köder nah, flitzt der Krebs zur Seite (lustig, nicht hektisch)
-    if (kr.flucht <= 0 && !this.haken && Math.abs(this.k.x - kr.x) < 200 && this.k.y > this.GRUND - 330) {
+    if (!kr.zumHaus && kr.flucht <= 0 && !this.haken && Math.abs(this.k.x - kr.x) < 200 && this.k.y > this.GRUND - 330) {
       kr.flucht = 1.4;
       // zum Ruheplatz (zwischen den Dingen) auf der vom Köder abgewandten Seite
       const wunsch = kr.x + (kr.x > this.k.x ? 380 : -380);
@@ -898,7 +955,7 @@ export class Angeln extends Seite {
     if (Math.abs(d) > 4) {
       kr.x += Math.sign(d) * Math.min(Math.abs(d), tempo * dt);
       unterwegs = true;
-    } else {
+    } else if (!kr.zumHaus) {
       kr.pause -= dt;
       if (kr.pause <= 0) {
         // nächster Ruheplatz: zwischen den Dingen am Grund, nie in der freien Ecke rechts unten
@@ -910,20 +967,81 @@ export class Angeln extends Seite {
     kr.c.rotation = unterwegs ? Math.sin(t * 9) * 0.05 : 0;
   }
 
+  /** Der Krebs läuft zum Stiefel am Grund und zieht ein (schatz.js); cb, wenn er drin ist */
+  krebsZiehtEin(stiefel, cb) {
+    this.krebs.zumHaus = { d: stiefel, cb };
+  }
+
+  krebsHinein() {
+    const kr = this.krebs;
+    const { d, cb } = kr.zumHaus;
+    kr.zumHaus = null;
+    kr.haus = d;
+    killTweensOf(kr.hops);
+    this.tween(kr.bild.scale, { x: 0.3, y: 0.3 }, 0.4, { ease: 'sineInOut' });
+    this.tween(kr.hops, { y: -60 }, 0.25, { ease: 'quadOut' })
+      .then((ok) => { if (ok) this.tween(kr.hops, { y: 0 }, 0.4, { ease: 'bounceOut' }); });
+    this.burst('blasen', d.x, d.y - 120, { count: 4 });
+    cb?.();
+    // nach einer Weile kommt er wieder heraus, der Stiefel sinkt zurück zu den anderen Dingen
+    this.after(9, () => {
+      if (kr.haus !== d) return;
+      kr.haus = null;
+      kr.x = d.x + 90;
+      kr.ziel = naechster(KREBS_PLAETZE, kr.x + 120);
+      kr.pause = 3;
+      this.tween(kr.bild.scale, { x: 0.46, y: 0.46 }, 0.4, { ease: 'backOut' });
+      note('xylo', 79, { vol: 0.4 });
+      this.after(0.6, () => { if (d.zustand === 'schatz') this.blendeAus(d); });
+    });
+  }
+
+  /** Fische im Eimer hüpfen kurz (Gummiente kommt ins Bad) */
+  fischeHuepfen() {
+    this.imEimer.forEach((f, i) => {
+      this.after(i * 0.15, () => {
+        if (f.zustand !== 'eimer') return;
+        const ey = f.ey;
+        this.tween(f, { ey: ey - 40 }, 0.2, { ease: 'quadOut' })
+          .then((ok) => { if (ok) this.tween(f, { ey }, 0.4, { ease: 'bounceOut' }); });
+      });
+    });
+  }
+
+  /** Andenken auf dem Steg: wackelt und klingt beim Antippen */
+  tapAndenken(s) {
+    const g = s.gross || 0.3;
+    tap(s, () => {
+      fx.wobble(s, 0.12);
+      note('glocke', pick([84, 88, 91]), { vol: 0.3 });
+      this.burst('funkeln', s.x, s.y - 40, { count: 2 });
+    }, { sound: null, squash: false, hitArea: new PIXI.Rectangle(-105 / g, -190 / g, 210 / g, 230 / g) });
+  }
+
+  /** Ein Ding (schatz.js) antippbar machen → Handle mit off() */
+  tapDing(d, fn) {
+    return tap(d.c, fn, { sound: null, squash: false, hitArea: new PIXI.Rectangle(-150, -150, 300, 300) });
+  }
+
   // ---------------------------------------------------------------- Ablauf
 
   update(dt, t) {
     this.updateKoeder(dt, t);
     this.updateFische(dt, t);
     this.updateDinge(dt, t);
+    this.schatz.update(dt, t);
     this.updateKrebs(dt, t);
     this.vogel.update(dt);
     this.wolken.update(dt);
   }
 
   hinweise() {
+    // Schatzsuche: die Hand zeigt (zweimal) den nächsten Schritt
+    const schritt = this.schatz.hinweis();
+    if (schritt && this.schatz.aktiv) return [schritt, schritt, this.katze];
     const frei = this.fische.filter((f) => f.zustand === 'schwimmt' && f.x > -400 && f.x < 1100);
     const liste = [];
+    if (schritt) liste.push(schritt);   // die Flaschenpost treibt vorbei
     if (frei.length) {
       const f = frei.reduce((a, b) => (Math.hypot(a.x - this.k.x, a.y - this.k.y) <
         Math.hypot(b.x - this.k.x, b.y - this.k.y) ? a : b));

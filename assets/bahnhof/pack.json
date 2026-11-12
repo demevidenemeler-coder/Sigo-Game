@@ -4,12 +4,16 @@
     "bahnhofsglocke": {"file": "bahnhofsglocke.webp", "w": 301, "h": 500, "ax": 0.277, "ay": 0.984, "pts": {}, "desc": "Bahnhofsglocke am Pfosten mit Zugseil"},
     "bank": {"file": "bank.webp", "w": 500, "h": 332, "ax": 0.5, "ay": 0.981, "pts": {}, "desc": "Holzbank mit roten Beinen, leer"},
     "fahne_gruen": {"file": "fahne_gruen.webp", "w": 319, "h": 600, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "grüne Abfahrts-Kelle (runde Scheibe am Holzgriff), aufrecht"},
+    "fahrkarte": {"file": "fahrkarte.webp", "w": 220, "h": 175, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Fahrkarte aus Pappe mit rotem Streifen und kleiner Lok (ohne Schrift)"},
     "gepaeckkarre": {"file": "gepaeckkarre.webp", "w": 500, "h": 413, "ax": 0.582, "ay": 0.983, "pts": {}, "desc": "Gepäckkarre mit zwei Koffern, von der Seite"},
     "hg_bahnhof": {"file": "hg_bahnhof.webp", "w": 2829, "h": 1600, "ax": 0.5, "ay": 0.5, "pts": {"boden": [1414, 1085], "gleis": [1414, 1325], "uhr": [925, 442]}, "desc": "Spielzeug-Bahnhof von der Seite: Bahnhofshaus mit Uhrturm links, langer Holzbahnsteig (Oberfläche y≈1040-1100), leerer Schotterstreifen y≈1215-1440 für das Gleis, Hügel und Himmel"},
     "icon_ladung": {"file": "icon_ladung.webp", "w": 347, "h": 360, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Auswahl-Knopf: Geschenk und Ball auf runder Scheibe"},
     "icon_lok": {"file": "icon_lok.webp", "w": 350, "h": 360, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Auswahl-Knopf: kleine Lok auf runder Scheibe"},
     "icon_tiere": {"file": "icon_tiere.webp", "w": 355, "h": 360, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Auswahl-Knopf: Kuhkopf und Kükenkopf auf runder Scheibe"},
     "icon_wagen": {"file": "icon_wagen.webp", "w": 350, "h": 360, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Auswahl-Knopf: gelber Wagen auf runder Scheibe"},
+    "karre_leer": {"file": "karre_leer.webp", "w": 480, "h": 340, "ax": 0.533, "ay": 0.981, "pts": {"lade_l": [112, 181], "lade_r": [468, 181], "griff": [88, 32]}, "desc": "Leere Gepäckkarre von der Seite, Griff links, zwei rote Räder"},
+    "schaffner_happy": {"file": "schaffner_happy.webp", "w": 298, "h": 480, "ax": 0.479, "ay": 0.984, "pts": {"kopf": [96, 36]}, "desc": "Schaffner lacht und hebt die grüne Kelle hoch (schaut nach rechts)"},
+    "schaffner_idle": {"file": "schaffner_idle.webp", "w": 250, "h": 480, "ax": 0.487, "ay": 0.984, "pts": {"kopf": [105, 18], "hand": [198, 240]}, "desc": "Schaffner in blauer Uniform mit Mütze, Pfeife und Knipszange, steht und lächelt (schaut nach rechts)"},
     "wartehaeuschen": {"file": "wartehaeuschen.webp", "w": 800, "h": 793, "ax": 0.5, "ay": 0.984, "pts": {}, "desc": "kleines offenes Wartehäuschen mit rotem Dach, leer"}
   },
   "audio": {

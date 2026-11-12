@@ -23,6 +23,9 @@ export const AUTO_PUNKT = {
   fenster: [636, 238],      // Mitte des Fahrerfensters
   leiter: [62, 176],        // Drehfuß der Leiter (hinten auf dem Dach)
   orden: [600, 284],       // Aufhängung des Ordens an der Fahrertür (unter dem Fenster, links vom Griff)
+  schlauch: [520, 448],    // Anschluss des Schlauchs (unten zwischen hinterem Fach und Führerhaus)
+  fach: [330, 330],        // Mitte der beiden Geräte-Fächer (Rollläden) – dort wird der Schlauch eingerollt
+  heck: [120, 330],        // hinten: hier steigt die Mannschaft ein und aus
 };
 
 // Leiter liegt auf dem Dach (Bild 1000×148, Drehpunkt am roten Fuß, Holme y 20…105, Fuß-Unterkante y 130)
@@ -68,6 +71,8 @@ const HELM_SITZ = {
   baer: { x: 365, y: 268, breite: 660, dreh: -0.04 },
   fuchs: { x: 505, y: 220, breite: 470, dreh: 0.08 },
   hase: { x: 330, y: 300, breite: 360, dreh: 0 },
+  affe: { x: 470, y: 175, breite: 470, dreh: 0.05 },
+  schwein: { x: 480, y: 175, breite: 470, dreh: 0.12 },
 };
 
 /** Bildpunkt der idle-Pose eines Tiers → Koordinaten in actor.atem (wie das Sprite: Anker an den Füßen). */

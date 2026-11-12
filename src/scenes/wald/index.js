@@ -1,7 +1,10 @@
-// Ort „Wald" – Bilderbuch mit drei Seiten:
-//   1. Verstecken (Lichtung): Tierkinder hinter Büschen finden und zur Mama bringen
-//   2. Waldnacht: mit dem Finger als Taschenlampe schlafende Tiere sanft wecken, Glühwürmchen, Eule
-//   3. Sammeln: Pilze, Beeren, Nüsse in den Korb; Eichhörnchen füttern; Specht klopft
+// Ort „Wald" – Bilderbuch mit drei Seiten, jede mit einem Ablauf aus mehreren Schritten:
+//   1. Verstecken (Lichtung): Mama antippen → Spuren folgen → Versteck öffnen (tippen, Stein schieben, Laub
+//      wegwischen) → Kind zur Mama ziehen; sind alle Familien zusammen: Foto für die Fotoleine
+//   2. Waldnacht: müde Tiere mit der Taschenlampe finden → ins Bett bringen → mit einem Blatt zudecken → Gute Nacht;
+//      dann Glühwürmchen ins Glas holen und freilassen – sie werden Sterne am Himmel
+//   3. Picknick: Decke ausrollen → Gäste wünschen sich etwas → sammeln (Korb) → Teller decken → alle essen;
+//      die Wimpelkette wächst mit jedem Picknick
 // Start direkt auf einer Seite: ?szene=wald&seite=1
 
 import { music, ui } from '../../engine/index.js';
@@ -13,6 +16,8 @@ import { Sammeln } from './sammeln.js';
 export default class Wald extends SeitenSzene {
   static id = 'wald';
   static packs = ['wald', 'tiere'];
+  // alle Tiere, deren tiere/<name>_*-Bilder der Wald zeigt (das Reh kommt aus dem Wald-Paket)
+  static tiere = ['fuchs', 'hase', 'eule', 'igel', 'baer', 'eichhoernchen'];
   static music = 'musik/wiese';
   static seiten = [Verstecken, Nacht, Sammeln];
 

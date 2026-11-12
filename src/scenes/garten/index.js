@@ -1,7 +1,7 @@
 // Ort „Garten": ein Bilderbuch mit drei Seiten.
-//   1. Beet       – säen, gießen, ernten (Korb und Hase), kleine Gäste
-//   2. Blumenwiese – Blumen öffnen und klingen lassen, Schmetterlinge, Regenbogen
-//   3. Obstbaum   – Baum schütteln, Obst in die passenden Körbe sortieren, der Igel kommt
+//   1. Beet       – ein Gast wünscht sich Gemüse: Unkraut zupfen, säen, gießen, ernten, waschen, verschenken
+//   2. Blumenwiese – Blumen öffnen und klingen lassen, einen Strauß pflücken, Schleife binden, verschenken
+//   3. Obstbaum   – schütteln, sortieren, in die Saftpresse füllen, kurbeln, Saft an die Gäste verteilen
 // Start direkt auf einer Seite: ?szene=garten&seite=2
 
 import { ui } from '../../engine/index.js';
@@ -13,6 +13,9 @@ import { Obst } from './obst.js';
 export default class Garten extends SeitenSzene {
   static id = 'garten';
   static packs = ['garten', 'tiere'];
+  // alle Tiere, deren Bilder (tiere/<name>_*) der Garten zeigt – auch die zufällig gewählten Gäste
+  static tiere = ['hase', 'schwein', 'baer', 'eichhoernchen', 'pferd', 'ente', 'igel', 'maus', 'kuh', 'schaf',
+    'katze', 'huhn', 'frosch', 'fuchs'];
   static music = 'musik/wiese';
   static seiten = [Beet, Wiese, Obst];
 

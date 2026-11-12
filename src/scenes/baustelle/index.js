@@ -12,7 +12,12 @@ import { Strasse } from './strasse.js';
 
 export default class Baustelle extends SeitenSzene {
   static id = 'baustelle';
+  // (Ball, Teddy und Geschenk der Grube-Besucher liegen im Zug-Paket. Es steht absichtlich NICHT hier: 3 MB nur
+  // dafür wären zu viel Ladezeit. Ist es geladen – im Spiel über die Karte –, kommen alle 8 Besucher; jeder Besuch
+  // prüft das neu, sonst kommen die 5 Futter-Besucher.)
   static packs = ['baustelle', 'tiere'];
+  // alle Tiere, die hier je zu sehen sind (auch Besucher, Bewohner, Gäste und Zuschauer, die zufällig kommen)
+  static tiere = ['affe', 'pinguin', 'hund', 'eichhoernchen', 'maus', 'hase', 'baer', 'katze', 'schaf', 'frosch', 'igel', 'ente', 'fuchs', 'schwein'];
   static music = 'musik/bau';
   static seiten = [Grube, Hausbau, Strasse];
 

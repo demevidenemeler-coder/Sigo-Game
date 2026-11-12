@@ -2,6 +2,7 @@
   "id": "garten",
   "images": {
     "apfel_rot": {"file": "apfel_rot.webp", "w": 175, "h": 200, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "roter Apfel"},
+    "becher": {"file": "becher.webp", "w": 300, "h": 223, "ax": 0.405, "ay": 0.981, "pts": {"oeffnung": [130, 42]}, "desc": "leerer cremeweißer Becher mit Herz, Öffnung sichtbar"},
     "biene": {"file": "biene.webp", "w": 247, "h": 260, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "freundliche Hummel/Biene von der Seite"},
     "birne_gelb": {"file": "birne_gelb.webp", "w": 143, "h": 200, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "gelbe Birne"},
     "blume_blau_auf": {"file": "blume_blau_auf.webp", "w": 242, "h": 420, "ax": 0.452, "ay": 0.983, "pts": {}, "desc": "blaue Blume, offen"},
@@ -33,8 +34,14 @@
     "korb_rot": {"file": "korb_rot.webp", "w": 500, "h": 399, "ax": 0.498, "ay": 0.983, "pts": {}, "desc": "Korb mit rotem Band und Apfel-Bild"},
     "kuerbis_2": {"file": "kuerbis_2.webp", "w": 500, "h": 367, "ax": 0.512, "ay": 0.982, "pts": {}, "desc": "Kürbispflanze halb gewachsen, gelbe Blüte"},
     "kuerbis_3": {"file": "kuerbis_3.webp", "w": 500, "h": 329, "ax": 0.511, "ay": 0.981, "pts": {}, "desc": "Kürbisranke mit großem orangem Kürbis, reif"},
+    "loewenzahn": {"file": "loewenzahn.webp", "w": 334, "h": 360, "ax": 0.531, "ay": 0.985, "pts": {}, "desc": "Löwenzahn (Unkraut) mit gelber Blüte und Wurzel"},
     "marienkaefer": {"file": "marienkaefer.webp", "w": 260, "h": 254, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Marienkäfer von oben"},
+    "pusteblume": {"file": "pusteblume.webp", "w": 234, "h": 400, "ax": 0.489, "ay": 0.985, "pts": {}, "desc": "Pusteblume mit weißem Schirmchen-Ball"},
     "regenwurm": {"file": "regenwurm.webp", "w": 260, "h": 148, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "freundlicher Regenwurm"},
+    "saftflasche": {"file": "saftflasche.webp", "w": 171, "h": 260, "ax": 0.5, "ay": 0.982, "pts": {}, "desc": "Saftflasche mit Korken und Apfel-Bild"},
+    "saftpresse_koerper": {"file": "saftpresse_koerper.webp", "w": 493, "h": 600, "ax": 0.499, "ay": 0.982, "pts": {"rad": [445, 290], "tuelle": [250, 522], "oben": [250, 215]}, "desc": "Saftpresse ohne Kurbelrad"},
+    "saftpresse_rad": {"file": "saftpresse_rad.webp", "w": 420, "h": 336, "ax": 0.398, "ay": 0.5, "pts": {}, "desc": "Kurbelrad der Saftpresse"},
+    "schleife": {"file": "schleife.webp", "w": 300, "h": 232, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "weiße Schleife (zum Einfärben mit tint)"},
     "schmetterling_blau": {"file": "schmetterling_blau.webp", "w": 260, "h": 203, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "blauer Schmetterling von oben, Flügel offen"},
     "schmetterling_gelb": {"file": "schmetterling_gelb.webp", "w": 260, "h": 205, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "gelber Schmetterling von oben, Flügel offen"},
     "schmetterling_rosa": {"file": "schmetterling_rosa.webp", "w": 260, "h": 203, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "rosa Schmetterling von oben, Flügel offen"},
@@ -47,7 +54,8 @@
     "tuete_karotte": {"file": "tuete_karotte.webp", "w": 229, "h": 300, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Samentüte mit Karotten-Bild"},
     "tuete_kuerbis": {"file": "tuete_kuerbis.webp", "w": 238, "h": 300, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Samentüte mit Kürbis-Bild"},
     "tuete_sonnenblume": {"file": "tuete_sonnenblume.webp", "w": 242, "h": 300, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Samentüte mit Sonnenblumen-Bild"},
-    "tuete_tomate": {"file": "tuete_tomate.webp", "w": 244, "h": 300, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Samentüte mit Tomaten-Bild"}
+    "tuete_tomate": {"file": "tuete_tomate.webp", "w": 244, "h": 300, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Samentüte mit Tomaten-Bild"},
+    "vase": {"file": "vase.webp", "w": 319, "h": 360, "ax": 0.498, "ay": 0.985, "pts": {"hals": [160, 32]}, "desc": "hellblaue Vase mit weißen Punkten, leer"}
   },
   "audio": {
   }

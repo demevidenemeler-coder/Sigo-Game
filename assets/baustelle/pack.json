@@ -3,7 +3,12 @@
   "images": {
     "bagger_arm": {"file": "bagger_arm.webp", "w": 900, "h": 634, "ax": 0.5, "ay": 0.5, "pts": {"gelenk": [825, 105], "schaufel": [140, 550]}, "desc": "Gelber Baggerarm mit leerer Schaufel (links unten), Gelenkauge rechts oben; um Punkt gelenk drehen"},
     "bagger_koerper": {"file": "bagger_koerper.webp", "w": 662, "h": 681, "ax": 0.529, "ay": 0.981, "pts": {"gelenk": [32, 410]}, "desc": "Gelber Spielzeug-Bagger ohne Arm, von der Seite, Blick nach links, Gesicht, Kettenfahrwerk; Arm am Punkt gelenk ansetzen"},
+    "band": {"file": "band.webp", "w": 1312, "h": 342, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Rotes Eröffnungsband waagrecht mit großer Schleife in der Mitte"},
     "bauhelm": {"file": "bauhelm.webp", "w": 300, "h": 190, "ax": 0.478, "ay": 0.98, "pts": {}, "desc": "Gelber Bauhelm von der Seite"},
+    "farbeimer_blau": {"file": "farbeimer_blau.webp", "w": 396, "h": 400, "ax": 0.501, "ay": 0.983, "pts": {}, "desc": "Farbeimer (cremeweiß, Henkel) voll mit Farbe: blau"},
+    "farbeimer_gruen": {"file": "farbeimer_gruen.webp", "w": 386, "h": 400, "ax": 0.497, "ay": 0.983, "pts": {}, "desc": "Farbeimer (cremeweiß, Henkel) voll mit Farbe: grün"},
+    "farbeimer_lila": {"file": "farbeimer_lila.webp", "w": 397, "h": 400, "ax": 0.501, "ay": 0.983, "pts": {}, "desc": "Farbeimer (cremeweiß, Henkel) voll mit Farbe: lila"},
+    "farbeimer_rosa": {"file": "farbeimer_rosa.webp", "w": 394, "h": 400, "ax": 0.501, "ay": 0.98, "pts": {}, "desc": "Farbeimer (cremeweiß, Henkel) voll mit Farbe: rosa"},
     "hg_grube": {"file": "hg_grube.webp", "w": 2829, "h": 1600, "ax": 0.5, "ay": 0.5, "pts": {"boden": [1414, 1250], "sandberg": [620, 960], "bagger": [1250, 1250], "kipper": [2150, 1250]}, "desc": "Sandige Baugrube von der Seite: links großer Sandberg, gelb-weißer Bauzaun hinten, ebener Sandboden unten, blauer Himmel"},
     "hg_rohbau": {"file": "hg_rohbau.webp", "w": 2829, "h": 1600, "ax": 0.5, "ay": 0.5, "pts": {"boden": [1414, 1200], "fundament_l": [660, 945], "fundament_r": [2170, 945], "lager": [620, 1330]}, "desc": "Bauplatz: leere helle Betonplatte in der Mitte (Oberkante y~945, x 642-2185), dahinter Bauzaun, halbfertige Ziegelmauern, Gerüst rechts, Häuschen; vorn große ebene Erdfläche"},
     "hg_strasse": {"file": "hg_strasse.webp", "w": 2829, "h": 1600, "ax": 0.5, "ay": 0.5, "pts": {"boden": [1414, 1300], "strasse_l": [350, 1240], "strasse_r": [2480, 1240], "strasse_oben": [1414, 1055], "strasse_unten": [1414, 1425]}, "desc": "Neue Straße: breites leeres dunkelgraues Asphaltband (y 1050-1425) quer im unteren Drittel, darüber Bauzaun, Wiese, Häuschen, Windmühle"},
@@ -28,7 +33,7 @@
     "teil_wand_gelb": {"file": "teil_wand_gelb.webp", "w": 400, "h": 398, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Quadratischer Mauerblock aus gelben Ziegeln, frontal (Haus-Puzzle)"},
     "teil_wand_rot": {"file": "teil_wand_rot.webp", "w": 400, "h": 399, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Quadratischer Mauerblock aus roten Ziegeln, frontal (Haus-Puzzle)"},
     "walze": {"file": "walze.webp", "w": 900, "h": 608, "ax": 0.527, "ay": 0.98, "pts": {"trommel": [650, 452]}, "desc": "Orange Straßenwalze von der Seite, Front nach rechts, Gesicht, Hinterrad; vorn leerer Bogen: walze_trommel mit Mitte auf Punkt trommel, Durchmesser ca. 300 (Trommel-Bild auf ~0.72 skalieren, gleiche Walzen-Skala)"},
-    "walze_ganz": {"file": "walze_ganz.webp", "w": 900, "h": 608, "ax": 0.527, "ay": 0.98, "pts": {}, "desc": "Ganze Straßenwalze mit Trommel in einem Bild (nur für den Sticker im Album; im Spiel walze + walze_trommel benutzen)"},
+    "walze_ganz": {"file": "walze_ganz.webp", "w": 900, "h": 608, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": ""},
     "walze_trommel": {"file": "walze_trommel.webp", "w": 410, "h": 420, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Große graue Stahltrommel der Straßenwalze, rund, von der Seite (drehbar, an walze/trommel setzen)"},
     "ziegelstapel": {"file": "ziegelstapel.webp", "w": 400, "h": 362, "ax": 0.51, "ay": 0.979, "pts": {}, "desc": "Kleiner Stapel roter Spielzeug-Ziegel auf Holzpalette"}
   },

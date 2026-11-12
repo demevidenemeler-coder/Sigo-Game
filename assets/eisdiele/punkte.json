@@ -269,6 +269,46 @@
       "ax": 0.498,
       "ay": 0.983,
       "desc": "goldene Tischklingel auf mintgrünem Fuß"
+    },
+    "kasse": {
+      "ax": 0.5,
+      "ay": 0.985,
+      "desc": "Spielzeug-Kasse rosa-mint mit Schublade und Münzschlitz",
+      "pts": {
+        "schlitz": [
+          248,
+          160
+        ],
+        "lade": [
+          163,
+          325
+        ]
+      }
+    },
+    "eiseimer": {
+      "ax": 0.496,
+      "ay": 0.983,
+      "desc": "Hellblauer Eimer voller Eiswürfel"
+    },
+    "halmbecher": {
+      "ax": 0.498,
+      "ay": 0.987,
+      "desc": "Mintgrüner Becher mit gestreiften Strohhalmen und Gesicht"
+    },
+    "muenze": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Goldene Münze mit Stern"
+    },
+    "schirmchen": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Saft-Schirmchen orange-creme"
+    },
+    "eiswuerfel": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Einzelner Eiswürfel"
     }
   },
   "audio": {}

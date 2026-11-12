@@ -1,9 +1,15 @@
-// Seite 3 – Melken: Die Kuh steht im Melkstand, davor der Eimer. Euter antippen oder halten → Milchstrahl,
-// der Eimer füllt sich (leer → halb → voll). Vollen Eimer zur Milchkanne ziehen → wird umgefüllt, die Kuh freut
-// sich, und das Schälchen der Katze wird voll. Schälchen antippen → die Katze schlabbert. Nach drei Eimern gibt
-// es einen Sticker. Heubündel zur Kuh ziehen → sie frisst.
+// Seite 3 – Melken. Eine Milch-Runde hat mehrere Schritte:
+//   1. Die Kuh hat Hunger (Denkblase): ihr Futter (Heu, Apfel oder Salat – jede Runde anders) zur Kuh ziehen
+//   2. Euter antippen oder halten → Milchstrahl, der Eimer füllt sich (leer → halb → voll)
+//   3. Vollen Eimer zur Milchkanne ziehen → umfüllen; die Katze bekommt dabei ein Schälchen Milch
+//   4. Ein Tierkind kommt herein (Kälbchen, Lämmchen, Ferkel, Fohlen oder Welpe – jede Runde ein anderes) und
+//      wünscht sich Milch: die Kanne antippen → sie kippt, das Fläschchen füllt sich
+//   5. Das Fläschchen zum Tierkind ziehen → es trinkt, freut sich (Sticker) und kuschelt sich zum Schlafen ins
+//      Heu. Im Heu schlafen bis zu drei Tierkinder (bleibt gespeichert) – das älteste wacht auf und geht.
+// Nebenher: Schälchen/Katze antippen → die Katze schlabbert die Milch. Nichts kann falsch gemacht werden: Wer
+// zu früh melkt, sieht die Kuh freundlich an ihr Futter denken.
 
-import { Actor, voice, fx, meta, tex, tap, drag, hold, rand, PIXI } from '../../engine/index.js';
+import { Actor, voice, fx, meta, tex, tap, drag, hold, rand, pick, store, PIXI } from '../../engine/index.js';
 import { Seite } from '../../gemeinsam/seiten.js';
 import { fuettere } from '../../gemeinsam/futter.js';
 import { belohne } from '../../gemeinsam/sticker.js';
@@ -16,12 +22,33 @@ const KANNE_SKALA = 0.74;
 const SCHALE_SKALA = 0.75;
 const SPRITZER_VOLL = 6;
 const MELK_TAKT = 0.42;       // Sekunden zwischen zwei Spritzern beim Halten
-const EIMER_PRO_STICKER = 3;
 const MILCH = 0xfffbf0;
 const STRAHL_ZEIT = 0.45;     // so lange bleibt ein Milchstrahl sichtbar (auch bei einem einzelnen Tipp)
 // Milchkanne (Bild 304×420): der Deckel reicht bis etwa Bildzeile 90, darunter der Hals mit der Öffnung
 const KANNE_DECKEL_Y = 90;
 const KANNE_HALS = { x: 152, y: 96, rx: 62, ry: 15 };
+const KANNE_KIPP = -0.42;     // so weit kippt die Kanne zum Fläschchen
+// Futter der Kuh (jede Runde eins davon)
+const KUH_FUTTER = ['common/futter_heu', 'common/futter_apfel', 'common/futter_salat'];
+// Das Futter liegt zwischen Katze und Kuh, über dem Katzen-Schälchen (das bleibt frei) und vor dem Kuhschwanz
+const FUTTER_ORT = { x: -485, y: 1110 };
+// Jedes Futter bekommt dieselbe Bilddiagonale (Heu ist flach und breit, der Apfel hoch – so wirken alle gleich groß)
+const FUTTER_DIAGONALE = 250;
+const futterSkala = (id) => {
+  const m = meta(id);
+  return FUTTER_DIAGONALE / Math.hypot(m?.w || 420, m?.h || 300);
+};
+// Tierkinder (kleine Ausgaben der großen Tiere)
+const KINDER = ['kuh', 'schaf', 'schwein', 'pferd', 'hund'];
+const KIND_HOEHE = 270;
+const KIND_ORT = { x: -400, y: 1500 };
+// Fläschchen (common/futter_milch, 242×420): Milch im unteren Teil (Bildpunkte)
+const FLASCHE = { x: 630, y: 1350, skala: 0.5 };
+const FLASCHE_MILCH = { x: 22, y: 246, w: 204, h: 160 };
+// Schlafplätze im Heuhaufen links (weit hinten, also kleiner)
+const SCHLAF = [{ x: -1150, y: 1032 }, { x: -1005, y: 1008 }, { x: -860, y: 1018 }];
+const SCHLAF_HOEHE = 175;
+const SCHLAF_KEY = 'bauernhof.heuKinder';
 
 export class Melken extends Seite {
   static hg = 'bauernhof/hg_melken';
@@ -31,6 +58,8 @@ export class Melken extends Seite {
     this.eimerZahl = 0;
     this.giesst = false;
     this.strahlZeit = 0;
+    this.phase = 'heu';     // 'heu' | 'melken' | 'kanne' | 'fuellt' | 'flasche' | 'trinkt' | 'pause'
+    this.runde = 0;
 
     // Kuh (eigenes Bild von der Seite, mit Euter)
     const k = this.punkt('kuh', { x: 0, y: 1240 });
@@ -41,6 +70,7 @@ export class Melken extends Seite {
       fx.wobble(this.kuh, 0.04);
       laut('kuh', 1.5);
       this.kuh.nod();
+      if (this.phase === 'heu') this.zeigeKuhWunsch();
     });
     this.euter = this.kuh.point('euter');
 
@@ -53,25 +83,111 @@ export class Melken extends Seite {
     this.baueKanne();
     this.baueMelkflaeche();
     this.baueKatze();
-    this.baueHeu();
+    this.baueFutter();
+    this.baueFlasche();
 
     this._pg = new PIXI.Point();   // wiederverwendete Punkte (keine neuen Objekte pro Bild)
     this._pl = new PIXI.Point();
     this.giessTipp = 0;
     this.kauZeit = rand(8, 12);
     this.wunschZeit = rand(9, 13);
+    this.kuhWunschZeit = 2;
+    this.kindWunschZeit = 3;
+    this.zzzZeit = 2;
+
+    this.schlaefer = [];
+    let liste = store.get(SCHLAF_KEY, []);
+    if (!Array.isArray(liste)) liste = [];
+    liste.filter((id) => KINDER.includes(id)).slice(-SCHLAF.length).forEach((id) => this.schlafKind(id, null));
+
+    this.neueRunde();
   }
 
   betreten() {
-    // Hinweis kurz nach dem Betreten anmelden – nur, solange die Seite zu sehen ist und noch nicht gemolken wurde
     this._hinweis?.kill();
-    const passt = () => this.aktiv && !this.gemolken;
-    this._hinweis = this.after(2.5, () => { if (passt()) voice('bauernhof_melken', { nurWenn: passt }); });
+    this._hinweis = this.after(2.5, () => this.hinweisAnbieten());
   }
 
   verlassen() {
     this._hinweis?.kill();
     this._hinweis = null;
+  }
+
+  // Hinweise nur, solange die Seite zu sehen ist und das Kind den Schritt noch nicht selbst getan hat
+  hinweisAnbieten() {
+    if (!this.aktiv) return;
+    if (this.phase === 'melken' && !this.gemolken) {
+      const passt = () => this.aktiv && !this.gemolken && this.phase === 'melken';
+      voice('bauernhof_melken', { nurWenn: passt });
+    } else if (this.phase === 'flasche' && !this.flascheGenommen) {
+      const passt = () => this.aktiv && this.phase === 'flasche' && !this.flascheGenommen;
+      voice('bauernhof_flasche', { nurWenn: passt });
+    }
+  }
+
+  // ---------------------------------------------------------------- Runde
+
+  neueRunde() {
+    this.runde++;
+    this.phase = 'heu';
+    this.gemolken = false;
+    this.flascheGenommen = false;
+    // Futter der Kuh: jede Runde ein anderes
+    const alt = this.futterId;
+    const moegliche = KUH_FUTTER.filter((f) => f !== alt);
+    this.futterId = this.runde === 1 ? KUH_FUTTER[0] : pick(moegliche);
+    this.legeFutterHin(this.futterId);
+    // nächstes Tierkind (nie zweimal dasselbe hintereinander)
+    const vorher = this.kindId;
+    this.kindId = pick(KINDER.filter((k) => k !== vorher));
+    this.kuhWunschZeit = 1.5;
+  }
+
+  zeigeKuhWunsch() {
+    if (!this.kuh._blase && this.phase === 'heu') this.kuh.bubble(this.futterId, 2.4);
+  }
+
+  // ---------------------------------------------------------------- Futter für die Kuh
+
+  baueFutter() {
+    this.futter = this.bild(KUH_FUTTER[0], FUTTER_ORT.x, FUTTER_ORT.y, futterSkala(KUH_FUTTER[0]), 45);
+    this.futter.anchor.set(0.5);
+    drag(this.futter, {
+      pad: 32,
+      heim: FUTTER_ORT,
+      onStart: () => ton('common/rascheln', { vol: 0.5, abstand: 0.5 }),
+      targets: () => {
+        const m = this.kuh.point('mouth');
+        return [{ id: 'kuh', x: m.x - 40, y: m.y + 40, radius: 300 }];
+      },
+      onDrop: (ziel, ctx) => {
+        if (!ziel) return;
+        fuettere(this, this.kuh, this.futter, { futter: this.futterId, behalten: true, heim: FUTTER_ORT })
+          .then((ok) => {
+            if (!ok) return;
+            this.kuh.nod(); // kaut genüsslich
+            if (this.phase === 'heu') {
+              this.phase = 'melken';
+              if (this.aktiv) this._hinweis = this.after(1.5, () => this.hinweisAnbieten());
+            }
+            this.after(1.2, () => this.legeFutterHin(this.futterId));
+          });
+      },
+    });
+  }
+
+  legeFutterHin(id) {
+    const f = this.futter;
+    if (f.destroyed) return;
+    if (f.label !== id) {
+      f.texture = tex(id);
+      f.label = id;
+    }
+    f.scale.set(futterSkala(id));
+    f.position.set(FUTTER_ORT.x, FUTTER_ORT.y - 30);
+    f.alpha = 0;
+    f.visible = true;
+    this.tween(f, { alpha: 1, y: FUTTER_ORT.y }, 0.6, { ease: 'sineInOut' });
   }
 
   // ---------------------------------------------------------------- Melken
@@ -99,6 +215,17 @@ export class Melken extends Seite {
   }
 
   spritze() {
+    if (this.phase === 'heu') {
+      // erst Futter: die Kuh denkt freundlich an ihr Futter
+      const jetzt = performance.now();
+      if (jetzt - this.giessTipp > 900) {
+        this.giessTipp = jetzt;
+        fx.wobble(this.kuh, 0.03);
+        laut('kuh', 1.5);
+        this.zeigeKuhWunsch();
+      }
+      return;
+    }
     this.gemolken = true;   // (für den Hinweis „Tipp auf das Euter")
     if (this.giesst) {
       // Der Eimer wird gerade umgefüllt: die Kuh antwortet trotzdem (kleines Wackeln und Muhen)
@@ -185,16 +312,16 @@ export class Melken extends Seite {
     this.eimerZiehen = drag(this.eimer, {
       pad: 50,
       lift: 1.08,
-      targets: () => [{ id: 'kanne', x: this.kanne.x, y: this.kanne.y - 200, radius: 330 }],
+      targets: () => (this.phase === 'fuellt' ? [] : [{ id: 'kanne', x: this.kanne.x, y: this.kanne.y - 200, radius: 330 }]),
       onStart: () => { this.puls?.stop(); this.puls = null; },
       onDrop: (ziel, ctx) => {
-        if (ziel) this.umfuellen(ctx);
+        if (ziel && this.phase !== 'fuellt') this.umfuellen(ctx);
         else ctx.back();
       },
     });
   }
 
-  async umfuellen(ctx) {
+  async umfuellen() {
     this.giesst = true;
     this.eimerZiehen?.off();
     this.eimerZiehen = null;
@@ -238,8 +365,10 @@ export class Melken extends Seite {
     this.kuh.cheer();
     this.eimerZahl++;
     if (!this.schaleVoll) this.after(0.6, () => this.fuelleSchale());
-    if (this.eimerZahl % EIMER_PRO_STICKER === 0) {
-      this.after(1.2, () => belohne(this, 'tier_kuh', this.kuh.x + 120, this.kuh.y - 680));
+    // Jetzt ist Milch in der Kanne: ein Tierkind kommt und wünscht sich ein Fläschchen
+    if (this.phase === 'melken') {
+      this.phase = 'kanne';
+      this.after(0.8, () => this.kindKommt());
     }
   }
 
@@ -262,6 +391,7 @@ export class Melken extends Seite {
     k.scale.set(KANNE_SKALA);
     k.zIndex = 25;
     this.welt.addChild(k);
+    this.kannenOrt = { x: p.x, y: p.y };
     const ox = -m.ax * W;
     const oy = -m.ay * H;
     // Körper (ab der Schnittzeile)
@@ -292,15 +422,16 @@ export class Melken extends Seite {
     this.kannenLoch = loch;
     this.kannenHals = { x: ox + h.x, y: oy + h.y };
     tap(k, () => {
+      if (this.phase === 'kanne') { this.flascheFuellen(); return; }
       fx.wobble(k, 0.05);
       ton('common/klack', { vol: 0.5 });
     }, { sound: null, squash: false, hitArea: new PIXI.Rectangle(ox - 50, oy - 50, W + 100, H + 100) });
   }
 
-  // Mitte der Kannenöffnung in Seiten-Koordinaten
+  // Mitte der Kannenöffnung in Seiten-Koordinaten (berücksichtigt das Kippen)
   kannenOeffnung() {
-    const k = this.kanne;
-    return { x: k.x + this.kannenHals.x * k.scale.x, y: k.y + this.kannenHals.y * k.scale.y };
+    const r = this.welt.toLocal(this.kanne.toGlobal(this.kannenHals, this._pg), undefined, this._pl);
+    return { x: r.x, y: r.y };
   }
 
   deckelAuf(auf) {
@@ -309,6 +440,187 @@ export class Melken extends Seite {
     this.tween(d, { rotation: auf ? 1.0 : 0, y: this.kannenDeckelY - (auf ? 14 : 0) }, 0.4, { ease: 'sineInOut' });
     this.tween(this.kannenLoch, { alpha: auf ? 1 : 0 }, auf ? 0.3 : 0.25, { ease: 'sineInOut', delay: auf ? 0.05 : 0.15 });
     ton('common/klack', { vol: 0.35, abstand: 0.3 });
+  }
+
+  // ---------------------------------------------------------------- Fläschchen
+
+  baueFlasche() {
+    const f = this.bild('common/futter_milch', FLASCHE.x, FLASCHE.y, FLASCHE.skala, 46);
+    f.anchor.set(0.5);
+    const m = meta('common/futter_milch');
+    const w = m.w || 242;
+    const h = m.h || 420;
+    const ox = -0.5 * w;
+    const oy = -0.5 * h;
+    const fm = FLASCHE_MILCH;
+    // leeres Glas: ein heller, gläserner Deckel über der Milch – er schrumpft nach oben weg, wenn Milch kommt
+    const leer = new PIXI.Graphics()
+      .roundRect(0, 0, fm.w, fm.h, 46).fill({ color: 0xe6eef2, alpha: 0.94 })
+      .roundRect(fm.w * 0.12, fm.h * 0.08, fm.w * 0.18, fm.h * 0.7, 16).fill({ color: 0xffffff, alpha: 0.6 });
+    leer.position.set(ox + fm.x, oy + fm.y);
+    f.addChild(leer);
+    this.flascheLeer = leer;
+    f.visible = false;
+    f.alpha = 0;
+    this.flasche = f;
+    drag(f, {
+      pad: 60,
+      lift: 1.08,
+      heim: { x: FLASCHE.x, y: FLASCHE.y },
+      targets: () => (this.phase === 'flasche' && this.kind && !this.kind.destroyed
+        ? [{ id: 'kind', ...this.kindMaul(), radius: 300 }] : []),
+      onStart: () => { this.flascheGenommen = true; this.flaschenPuls?.stop(); this.flaschenPuls = null; },
+      onDrop: (ziel, ctx) => {
+        if (ziel && this.phase === 'flasche') this.kindTrinkt();
+        else ctx.back(0.5);
+      },
+    });
+  }
+
+  // Kanne antippen: sie kippt zum Fläschchen, die Milch steigt darin hoch
+  async flascheFuellen() {
+    this.phase = 'fuellt';
+    this.kannenPuls?.stop();
+    this.kannenPuls = null;
+    const f = this.flasche;
+    const leer = this.flascheLeer;
+    f.position.set(FLASCHE.x, FLASCHE.y);
+    f.rotation = 0;
+    f.eventMode = 'none';
+    leer.scale.y = 1;
+    f.visible = true;
+    ton('common/plopp', { vol: 0.5 });
+    await this.tween(f, { alpha: 1 }, 0.4, { ease: 'sineInOut' });
+    this.deckelAuf(true);
+    await this.tween(this.kanne, { rotation: KANNE_KIPP }, 0.6, { ease: 'sineInOut' });
+    ton('common/giessen', { vol: 0.6, abstand: 1 });
+    const ziel = { x: FLASCHE.x, y: FLASCHE.y - 0.5 * 420 * FLASCHE.skala + 6 };   // Sauger oben am Fläschchen
+    const p = { k: 0 };
+    await this.tween(p, { k: 1 }, 1.4, {
+      ease: 'linear',
+      onUpdate: () => {
+        const o = this.kannenOeffnung();
+        const dicke = 12 * Math.sin(Math.min(1, p.k * 1.1) * Math.PI) + 2;
+        this.strahl.clear()
+          .moveTo(o.x - 20, o.y)
+          .quadraticCurveTo(o.x - 70, (o.y + ziel.y) / 2 - 30, ziel.x, ziel.y)
+          .stroke({ width: dicke, color: MILCH, cap: 'round' });
+        this.strahl.alpha = 1;
+        this.strahlZeit = 0.2;
+        leer.scale.y = Math.max(0, 1 - p.k * 1.1);
+      },
+    });
+    leer.scale.y = 0;
+    this.burst('funkeln', FLASCHE.x, FLASCHE.y - 60, { count: 4 });
+    this.deckelAuf(false);
+    await this.tween(this.kanne, { rotation: 0 }, 0.6, { ease: 'sineInOut' });
+    f.eventMode = 'static';
+    this.phase = 'flasche';
+    this.flaschenPuls = fx.pulse(f, { staerke: 0.05, periode: 1.6 });
+    this.kind?.lookAt(FLASCHE.x);
+    if (this.aktiv) this._hinweis = this.after(1.5, () => this.hinweisAnbieten());
+  }
+
+  // ---------------------------------------------------------------- Tierkind
+
+  kindMaul() {
+    const k = this.kind;
+    const m = k.point('mouth');
+    return { x: m.x + 30, y: m.y };
+  }
+
+  async kindKommt() {
+    if (this.kind && !this.kind.destroyed) return;
+    const id = this.kindId;
+    const skala = KIND_HOEHE / (meta(`tiere/${id}_idle`).h || 900);
+    const k = new Actor(id, { x: -1500, y: KIND_ORT.y, scale: skala, parent: this.welt, z: 60 });
+    this.kind = k;
+    k.onTap(() => {
+      laut(id, 1);
+      if (this.phase === 'flasche' || this.phase === 'kanne' || this.phase === 'fuellt') {
+        fx.wobble(k, 0.05);
+        if (!k._blase) k.bubble('common/futter_milch', 2.2);
+      } else {
+        k.hop(50);
+      }
+    });
+    laut(id, 0.5);
+    await k.walkTo(KIND_ORT.x, KIND_ORT.y, { tempo: 330 });
+    if (k.destroyed) return;
+    k.lookAt(9999);
+    k.bubble('common/futter_milch', 2.6);
+    this.kannenPuls = this.phase === 'kanne' ? fx.pulse(this.kanne, { staerke: 0.03, periode: 1.6 }) : null;
+    this.kindWunschZeit = 7;
+  }
+
+  async kindTrinkt() {
+    this.phase = 'trinkt';
+    const f = this.flasche;
+    const k = this.kind;
+    f.eventMode = 'none';
+    const maul = this.kindMaul();
+    // Fläschchen legt sich an das Maul (Sauger zeigt zum Tierkind)
+    await this.tween(f, { x: maul.x + 70, y: maul.y - 10, rotation: -1.15 }, 0.5, { ease: 'sineInOut' });
+    k.pose('eat');
+    for (let i = 0; i < 4; i++) {
+      ton('common/mampf', { vol: 0.6 - i * 0.08, abstand: 0.3 });
+      this.tween(this.flascheLeer, { scaleY: (i + 1) / 4 }, 0.6, { ease: 'sineInOut' });
+      this.tween(f, { x: maul.x + 70 + (i % 2 ? 6 : -6) }, 0.3, { ease: 'sineInOut' });
+      await this.wait(0.65);
+    }
+    // leeres Fläschchen geht weich weg
+    this.tween(f, { alpha: 0 }, 0.5, { ease: 'sineInOut' }).then(() => { if (!f.destroyed) { f.visible = false; f.rotation = 0; } });
+    if (k.destroyed) return;
+    k.pose('idle');
+    k.cheer();
+    belohne(this, 'tier_' + k.tierId, k.x + 60, k.y - 520);
+    await this.wait(2.4);
+    if (k.destroyed) return;
+    // satt und müde: ins Heu zum Schlafen
+    this.kind = null;
+    await this.schlafKind(k.tierId, k);
+    this.neueRunde();
+  }
+
+  // Ein Tierkind kuschelt sich ins Heu (k = das laufende Kind; null = beim Aufbau schon da). Sind alle Plätze
+  // belegt, wacht das älteste auf und geht hinaus.
+  async schlafKind(id, k) {
+    if (this.schlaefer.length >= SCHLAF.length) {
+      const alt = this.schlaefer.shift();
+      alt.pose('idle');
+      alt.eventMode = 'none';
+      laut(alt.tierId, 1);
+      alt.walkTo(-1550, alt.y + 30, { tempo: 200 }).then(() => { if (!alt.destroyed) alt.destroy({ children: true }); });
+    }
+    const belegt = this.schlaefer.map((s) => s.platz);
+    const platz = SCHLAF.find((p) => !belegt.includes(p)) || SCHLAF[0];
+    const skala = SCHLAF_HOEHE / (meta(`tiere/${id}_idle`).h || 900);
+    if (!k) {
+      k = new Actor(id, { x: platz.x, y: platz.y, scale: skala, parent: this.welt, z: 10 });
+      k.pose('sleep');
+    } else {
+      ton('common/hupf', { vol: 0.4, abstand: 0.2 });
+      // in zwei Hüpfern hinüber ins Heu, dabei kleiner (es ist weiter hinten)
+      this.tween(k, { scale: skala }, 1.2, { ease: 'sineInOut' });
+      const mitte = { x: (k.x + platz.x) / 2, y: (k.y + platz.y) / 2 + 40 };
+      await k.hopTo(mitte.x, mitte.y, { hoehe: 90, dauer: 0.6 });
+      if (k.destroyed) return;
+      k.zIndex = 10;
+      await k.hopTo(platz.x, platz.y, { hoehe: 90, dauer: 0.6, staub: false });
+      if (k.destroyed) return;
+      k.position.set(platz.x, platz.y);
+      ton('common/rascheln', { vol: 0.5 });
+      k.pose('sleep');
+    }
+    k.platz = platz;
+    k.flip = platz.x > -950;
+    k.onTap(() => {
+      ton('common/schnarchen', { vol: 0.4, abstand: 1.2 });
+      fx.wobble(k, 0.04);
+      this.burst('zzz', k.x + 40, k.y - 150, { count: 1 });
+    }, { pad: 60 });
+    this.schlaefer.push(k);
+    store.set(SCHLAF_KEY, this.schlaefer.map((s) => s.tierId));
   }
 
   // ---------------------------------------------------------------- Katze und Schälchen
@@ -392,44 +704,6 @@ export class Melken extends Seite {
     k._schlabbert = false;
   }
 
-  // ---------------------------------------------------------------- Heu
-
-  baueHeu() {
-    // Heubündel liegt auf dem Boden zwischen Katze und Kuh (Mitte; die Unterkante liegt bei y≈1250)
-    this.heuOrt = { x: -520, y: 1175 };
-    this.heu = this.bild('common/futter_heu', this.heuOrt.x, this.heuOrt.y, 0.52, 45);
-    this.heu.anchor.set(0.5);
-    this.heu.futterId = 'futter_heu';
-    drag(this.heu, {
-      pad: 40,
-      onStart: () => ton('common/rascheln', { vol: 0.5, abstand: 0.5 }),
-      targets: () => {
-        const m = this.kuh.point('mouth');
-        return [{ id: 'kuh', x: m.x - 40, y: m.y + 40, radius: 300 }];
-      },
-      onDrop: (ziel, ctx) => {
-        if (!ziel) return;
-        fuettere(this, this.kuh, this.heu, { futter: 'common/futter_heu', behalten: true, heim: this.heuOrt })
-          .then((ok) => {
-            if (!ok) return;
-            this.kuh.nod(); // kaut genüsslich
-            this.heuZurueck();
-          });
-      },
-    });
-  }
-
-  heuZurueck() {
-    const h = this.heu;
-    if (h.destroyed) return;
-    this.after(1.2, () => {
-      h.position.set(this.heuOrt.x, this.heuOrt.y - 30);
-      h.alpha = 0;
-      h.visible = true;
-      this.tween(h, { alpha: 1, y: this.heuOrt.y }, 0.6, { ease: 'sineInOut' });
-    });
-  }
-
   // ---------------------------------------------------------------- Hilfen
 
   bild(id, x, y, skala, z) {
@@ -456,21 +730,64 @@ export class Melken extends Seite {
       this.kauZeit = rand(9, 14);
       if (!this.giesst) this.kuh.nod();
     }
-    // die Katze wünscht sich Milch
+    // Wünsche zeigen (nur, wenn das Kind gerade nichts tut)
+    const ruhig = this.szene.idle > 2;
+    if (this.phase === 'heu') {
+      this.kuhWunschZeit -= dt;
+      if (this.kuhWunschZeit <= 0) {
+        this.kuhWunschZeit = rand(6, 8);
+        if (ruhig || this.runde === 1) this.zeigeKuhWunsch();
+      }
+    }
+    if ((this.phase === 'kanne' || this.phase === 'flasche') && this.kind && !this.kind.destroyed) {
+      this.kindWunschZeit -= dt;
+      if (this.kindWunschZeit <= 0) {
+        this.kindWunschZeit = rand(7, 9);
+        if (ruhig && !this.kind._blase) this.kind.bubble('common/futter_milch', 2.2);
+      }
+    }
     this.wunschZeit -= dt;
     if (this.wunschZeit <= 0) {
       this.wunschZeit = rand(12, 16);
-      if (!this.schaleVoll && this.szene.idle > 2) this.zeigeKatzenWunsch();
+      if (!this.schaleVoll && ruhig && this.phase !== 'heu') this.zeigeKatzenWunsch();
+    }
+    // schlafende Tierkinder im Heu: ab und zu ein langsames Z
+    if (this.schlaefer.length) {
+      this.zzzZeit -= dt;
+      if (this.zzzZeit <= 0) {
+        this.zzzZeit = rand(2.5, 3.5);
+        const s = pick(this.schlaefer);
+        if (s && !s.destroyed && s.poseName === 'sleep') this.burst('zzz', s.x + 40, s.y - 140, { count: 1 });
+      }
     }
   }
 
   hinweise() {
-    if (this.giesst) return [];
+    // Eimer wird gerade umgefüllt: auf die Kanne zeigen (nie leer – sonst zeigte die Hand auf den Pfeil)
+    if (this.giesst) return [this.kanne];
     const liste = [];
-    if (this.spritzer >= SPRITZER_VOLL) liste.push({ von: this.eimer, nach: this.kanne });
-    else liste.push({ x: this.euter.x, y: this.euter.y + 10 });
-    if (this.schaleVoll) liste.push(this.schale);
-    if (this.heu.visible) liste.push({ von: this.heu, nach: this.kuh });
+    switch (this.phase) {
+      case 'heu':
+        if (this.futter.visible) liste.push({ von: this.futter, nach: this.kuh });
+        break;
+      case 'melken':
+        if (this.spritzer >= SPRITZER_VOLL) liste.push({ von: this.eimer, nach: this.kanne });
+        else liste.push({ x: this.euter.x, y: this.euter.y + 10 });
+        break;
+      case 'kanne':
+        // die Kanne ist sofort antippbar – auch, während das Tierkind noch hereinläuft
+        liste.push(this.kanne);
+        break;
+      case 'flasche':
+        if (this.kind && !this.kind.destroyed) liste.push({ von: this.flasche, nach: this.kind });
+        break;
+      default:
+        break;
+    }
+    // die Katze nur, wenn sonst nichts zu tun ist (der Ablauf geht vor)
+    if (!liste.length && this.schaleVoll && !this.katze._schlabbert) liste.push(this.schale);
+    // kurze Übergänge (Fläschchen füllt sich, Tierkind trinkt): auf das Tierkind bzw. die Kuh zeigen
+    if (!liste.length) liste.push(this.kind && !this.kind.destroyed ? this.kind : this.kuh);
     return liste;
   }
 }

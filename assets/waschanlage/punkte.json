@@ -150,6 +150,41 @@
       "ax": 0.5,
       "ay": 0.5,
       "desc": "Rundes Auswahl-Symbol: gruener Traktor"
+    },
+    "pumpe_koerper": {
+      "ax": 0.496,
+      "ay": 0.985,
+      "pts": {
+        "griff": [
+          115,
+          128
+        ],
+        "schlauch": [
+          200,
+          382
+        ]
+      },
+      "desc": "Rote Spielzeug-Luftpumpe ohne Griff (Griff: pumpe_griff), lächelndes Manometer, steht"
+    },
+    "pumpe_griff": {
+      "ax": 0.5,
+      "ay": 0.914,
+      "desc": "Gelber T-Griff mit Stange der Luftpumpe (Anker = Oberkante des Pumpenkörpers)"
+    },
+    "fleck_hell_a": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Heller Fleck a zum Einfärben (Farbe, Staub) – Form wie matsch_a"
+    },
+    "fleck_hell_d": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Heller Fleck d zum Einfärben (Farbe, Staub) – Form wie matsch_d"
+    },
+    "fleck_hell_e": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Heller Fleck e zum Einfärben (Farbe, Staub) – Form wie matsch_e"
     }
   },
   "audio": {}

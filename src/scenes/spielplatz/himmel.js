@@ -1,29 +1,58 @@
-// Seite 1 – Himmel über der Wiese:
+// Seite 1 – Himmel über der Wiese. Hauptsache: die Ballonfahrt eines Gastes (jede Runde ein anderes Tier):
+//   1. Ein Gast kommt über die Wiese und denkt an Luftballons          (Denkblase)
+//   2. Drei Ballons fangen       (antippen – der Ballon schwebt zum Gast, er hält sie hoch)
+//   3. Fliegen                   (der Gast hebt ab; ziehen – er schwebt dem Finger träge nach; nur antippen –
+//                                 er schwebt von selbst ein Stück hinüber)
+//   4. Landen                    (die Ballons oder den Gast antippen: einer nach dem anderen fliegt davon, je eine Überraschung
+//                                 schwebt herab, der Gast sinkt tiefer und gleitet zuletzt auf die Picknickdecke)
+//   5. Picknick                  (aus dem Korb hüpft sein Lieblingsessen – zum Gast ziehen oder antippen)
+//   6. Der Gast und die Maus freuen sich, Sticker; der Gast bleibt auf der Decke sitzen (die Runde wächst, höchstens
+//      drei Gäste – dann geht der älteste nach Hause), bald kommt der nächste.
+//   Frei dazu (wie bisher):
 //   Luftballons steigen langsam auf (höchstens 6) – antippen: weiches Plopp, eine kleine Überraschung schwebt herab.
 //   Seifenblasen-Stab unten im Gras: mit ihm durch die Luft ziehen → Seifenblasen (höchstens 25), antippen → plopp.
 //   Drachen am Himmel: folgt dem ziehenden Finger träge, Schwanz weht nach.
 //   Maus auf der Picknickdecke schaut zu und freut sich mit.
 
 import {
-  spr, tex, Actor, tap, drag, sfx, note, voice, killTweensOf, rand, pick, clamp, PIXI,
+  spr, tex, Actor, tap, drag, sfx, note, voice, fx, killTweensOf, rand, pick, clamp, PIXI,
 } from '../../engine/index.js';
 import { Seite } from '../../gemeinsam/seiten.js';
 import { belohne } from '../../gemeinsam/sticker.js';
-import { freude, bildPunkt, teilTextur, stickerFuer, wolken, Schmetterling, Vogel } from './helfer.js';
+import { wunsch, fuettere } from '../../gemeinsam/futter.js';
+import {
+  freude, bildPunkt, teilTextur, stickerFuer, wolken, Schmetterling, Vogel, andere, bogenFlug, merker,
+} from './helfer.js';
 
 const FARBEN = ['rot', 'gelb', 'blau', 'gruen', 'orange', 'lila'];
 const UEBERRASCHUNGEN = ['ueberraschung_stern', 'ueberraschung_herz', 'ueberraschung_blume'];
-const MAX_BALLONS = 6;
+const MAX_BALLONS = 6;               // so viele schweben höchstens frei
+const BALLON_VORRAT = 9;            // dazu bis zu drei im Bund des Gastes
 const BALLON_SKALA = 0.78;
 const MAX_BLASEN = 25;
 const BLASEN_ABSTAND = 75;          // so weit muss der Ring wandern, bis eine neue Blase entsteht
-const BALLONS_JE_STICKER = 8;       // eine Runde: so viele Ballons geplatzt → Sticker
 const PENTA = [72, 74, 76, 79, 81, 84];
 
 // Bereich für den Mittelpunkt des Drachens – samt Körper (≈ 120/140 Einheiten zur Seite, 135 nach oben), Schweben
 // und Griff-Kreis frei von den Knopf-Ecken oben (je 260×260) und den Blätter-Pfeilen (±1105, y 690…910)
 const DRACHEN_RAUM = { x0: -760, x1: 760, y0: 380, y1: 720 };
 const BLASE_ZAHM = 1.2;             // so lange (s) ist eine frische Blase noch nicht antippbar (Stab/Drachen greifbar)
+
+// Ballonfahrt
+const GAESTE = ['hase', 'igel', 'ente', 'frosch', 'schaf', 'eichhoernchen', 'pinguin', 'fuchs'];
+const GAST_SKALA = 0.22;
+const EINGANG = { x: 1480, y: 1345 };
+const TREFF = { x: -120, y: 1335 };         // hier wartet der Gast auf seine Ballons
+const BUND_ZAHL = 3;
+const BUND_SKALA = 0.62;
+const BUND = [-0.4, 0, 0.4];                // Neigung der Ballons im Bund (die Schnüre treffen sich in der Pfote)
+const SCHNUR = 0.67 * 360 * 0.92;           // Anker → Schnurende im Ballonbild (Bildpunkte)
+const FLUG_RAUM = { x0: -760, x1: 760, y0: 780, y1: 1080 };   // Füße des fliegenden Gastes
+const FLUG_WEG = 1200;                      // so weit fliegen (Einheiten), dann wird gelandet
+const FLUG_MAX = 900;                       // schneller schwebt er nicht (Einheiten/s) – ruhig
+const SITZE = [{ x: -960, y: 1300 }, { x: -515, y: 1318 }, { x: -820, y: 1398 }];
+const KORB = { x: -330, y: 1405 };
+let deckenGaeste = [];                      // wer schon auf der Decke sitzt (bleibt für die ganze Spielzeit)
 
 export class Himmel extends Seite {
   static hg = 'spielplatz/hg_wiese';
@@ -33,6 +62,9 @@ export class Himmel extends Seite {
     this.zeit = 0;
     this.geplatzt = 0;
     this.blasenGezogen = false;
+    this.gast = null;
+    this.letzterGast = null;
+    this._hinweise = [];
 
     this.wolken = wolken(this, [
       { bild: 'wolke1', x: -300, y: 240, scale: 0.42, v: 9 },
@@ -46,12 +78,17 @@ export class Himmel extends Seite {
     this.baueStab();
     this.baueBlasen();
 
+    // hinter Gast, Korb, Essen und Maus (z 19): er fliegt durch ihr Gras und soll ihnen keinen Tipp wegnehmen
     this.falter = new Schmetterling(this, {
-      x: -300, y: 1380, farbe: 0, z: 45,
+      x: -300, y: 1380, farbe: 0, z: 19,
       bereich: { x0: -950, x1: 100, y0: 1250, y1: 1450 },
     });
     this.vogel = new Vogel(this, { y0: 260, y1: 480, z: 22 });
     this.baueBaum();
+    this.baueKorb();
+    this.baueDeckenGaeste();
+    this.flugMerker = merker(this.welt);
+    this.after(1.5, () => this.neuerGast());
   }
 
   // ---------------------------------------------------------------- Baum links (gemalt): raschelt beim Antippen
@@ -88,10 +125,10 @@ export class Himmel extends Seite {
 
   baueBallons() {
     this.ballons = [];
-    for (let i = 0; i < MAX_BALLONS; i++) {
-      const b = spr('spielplatz/ballon_' + FARBEN[i], { anchor: [0.5, 0.33], scale: BALLON_SKALA, z: 30 });
+    for (let i = 0; i < BALLON_VORRAT; i++) {
+      const b = spr('spielplatz/ballon_' + FARBEN[i % FARBEN.length], { anchor: [0.5, 0.33], scale: BALLON_SKALA, z: 30 });
       b.visible = false;
-      b.zustand = { aktiv: false, x0: 0, v: 60, phase: rand(0, 6), weg: false, halt: 0 };
+      b.zustand = { aktiv: false, x0: 0, v: 60, phase: rand(0, 6), weg: false, halt: 0, bund: -1 };
       this.welt.addChild(b);
       // Tippfläche: Ballon samt Schnur, gut 250 Einheiten breit
       tap(b, () => this.platze(b), {
@@ -136,6 +173,8 @@ export class Himmel extends Seite {
   platze(b) {
     const z = b.zustand;
     if (!z.aktiv || z.weg) return;
+    if (z.bund >= 0) { this.bundTipp(b); return; }
+    if (this.fange(b)) return;
     z.weg = true;
     b.eventMode = 'none';
     sfx('common/ballon', { vol: 0.8 });
@@ -147,9 +186,6 @@ export class Himmel extends Seite {
     this.lasseFallen(b.x, b.y + 40);
     this.mausKlatscht(b.x);
     this.geplatzt++;
-    if (this.geplatzt % BALLONS_JE_STICKER === 0) {
-      this.after(1.2, () => belohne(this, stickerFuer('ballon'), b.x, clamp(b.y, 400, 1000)));
-    }
   }
 
   // ---------------------------------------------------------------- Überraschungen
@@ -430,6 +466,377 @@ export class Himmel extends Seite {
     });
   }
 
+  // ---------------------------------------------------------------- Ballonfahrt: Korb und Gäste auf der Decke
+
+  baueKorb() {
+    this.korb = spr('common/icon_korb', { x: KORB.x, y: KORB.y, anchor: [0.5, 0.92], scale: 0.48, z: 21 });
+    this.welt.addChild(this.korb);
+    tap(this.korb, () => {
+      const g = this.gast;
+      if (g && g.zustand === 'picknick' && g.essen && !g.essen.destroyed && g.essen.eventMode === 'static') {
+        this.essenZumGast();
+      } else if (this.zeit - (this.korbZeit ?? -9) > 0.5) {
+        this.korbZeit = this.zeit;
+        sfx('common/hupf', { vol: 0.3 });
+        this.burst('funkeln', this.korb.x, this.korb.y - 120, { count: 2 });
+      }
+    }, { sound: null, squash: true, hitArea: new PIXI.Rectangle(-250, -440, 500, 480) });
+  }
+
+  baueDeckenGaeste() {
+    this.sitzende = [];
+    for (const d of deckenGaeste) this.setzeAufDecke(d.id, d.sitz);
+  }
+
+  setzeAufDecke(id, sitz, a = null) {
+    const p = SITZE[sitz];
+    if (!a) a = new Actor(id, { x: p.x, y: p.y, scale: GAST_SKALA, parent: this.welt, z: 20 });
+    a.zIndex = 20 + (p.y > 1350 ? 2 : 0);
+    a.lookAt(this.maus.x);
+    a.onTap(() => freude(this, a, { herzen: 3, hoehe: 45 }), { pad: 60 });
+    this.sitzende.push({ id, sitz, a });
+    return a;
+  }
+
+  freierSitz() {
+    for (let i = 0; i < SITZE.length; i++) if (!this.sitzende.some((s) => s.sitz === i)) return i;
+    return -1;
+  }
+
+  // ---------------------------------------------------------------- Ballonfahrt: Ablauf
+
+  neuerGast() {
+    if (this.gast) return;
+    // Decke voll: der älteste Gast geht nach Hause
+    if (this.freierSitz() < 0) {
+      const alt = this.sitzende.shift();
+      deckenGaeste = deckenGaeste.filter((d) => d.sitz !== alt.sitz);
+      alt.a._tap?.off();
+      alt.a.zIndex = 41;
+      alt.a.walkTo(EINGANG.x, EINGANG.y, { tempo: 230 }).then(() => {
+        if (!alt.a.destroyed) alt.a.destroy({ children: true });
+      });
+    }
+    const da = this.sitzende.map((s) => s.id);
+    const id = andere(GAESTE.filter((x) => !da.includes(x)), this.letzterGast);
+    this.letzterGast = id;
+    const a = new Actor(id, { x: EINGANG.x, y: EINGANG.y, scale: GAST_SKALA, parent: this.welt, z: 40 });
+    const g = {
+      a, id, zustand: 'kommt', bund: [], weg: 0, vx: 0, vy: 0, heim: { x: 0, y: 0 }, essen: null, blaseZeit: -99,
+      farbe: pick(FARBEN), gelandet: 0, zeit: 0,
+    };
+    this.gast = g;
+    a.onTap(() => this.gastTipp(), { pad: 60 });   // unterwegs: nur ein Laut
+    a.walkTo(TREFF.x, TREFF.y, { tempo: 230 }).then((ok) => {
+      if (this.gast !== g) return;
+      if (!ok) a.position.set(TREFF.x, TREFF.y);
+      g.zustand = 'sammelt';
+      a.lookAt(0);
+      this.zeigeWunsch();
+      this.sageFahrt(g, 0.8);
+    });
+  }
+
+  zeigeWunsch() {
+    const g = this.gast;
+    if (!g || g.zustand !== 'sammelt' || g.bund.length > 0 || this.zeit - g.blaseZeit < 6) return;
+    g.blaseZeit = this.zeit;
+    g.a.bubble('spielplatz/ballon_' + g.farbe, 2.6);
+  }
+
+  gastTipp() {
+    const g = this.gast;
+    if (!g) return;
+    const a = g.a;
+    if (g.zustand === 'sammelt') {
+      if (g.bund.length === 0) {
+        g.blaseZeit = -99;
+        this.zeigeWunsch();
+      }
+      fx.wobble(a);
+      a.sound();
+    } else if (g.zustand === 'picknick') {
+      this.essenZumGast();
+    } else if (g.zustand === 'landen') {
+      // beim Landen darf man auch den Gast antippen: der nächste Ballon fliegt davon
+      const b = g.bund.find((x) => x.zustand.imBund);
+      if (b) this.bundTipp(b);
+    } else if (this.zeit - (g.lautZeit ?? -9) > 0.8) {
+      // unterwegs (kommt, hebt ab, gleitet): nur ein Laut – kein Hüpfer, der die Bewegung ablösen würde
+      g.lautZeit = this.zeit;
+      a.sound();
+    }
+  }
+
+  /** Ballon antippen, während der Gast sammelt: Er schwebt in den Bund statt zu platzen → true */
+  fange(b) {
+    const g = this.gast;
+    if (!g || g.zustand !== 'sammelt' || g.bund.length >= BUND_ZAHL) return false;
+    const z = b.zustand;
+    const i = g.bund.length;
+    if (i === 0) {
+      // Pfoten hoch: ab jetzt hält er die Ballons
+      g.a.pose('happy');
+      const k = g.a.point('kopf');
+      g.handDx = (k.x - g.a.x) * 0.6;
+      g.handDy = k.y - g.a.y + 20;
+      if (g.a._blase && !g.a._blase.destroyed) g.a._blase.visible = false;
+    }
+    z.bund = i;
+    z.imBund = false;
+    z.halt = 0;
+    g.bund.push(b);
+    b.eventMode = 'none';
+    b.zIndex = i === 1 ? 31 : 32;
+    b.hitArea = new PIXI.Circle(0, 30, 230);
+    note('glocke', PENTA[(i * 2) % PENTA.length], { vol: 0.35 });
+    this.burst('funkeln', b.x, b.y, { count: 2 });
+    const r = BUND[i];
+    const l = SCHNUR * BUND_SKALA * (i === 1 ? 1.12 : 1);
+    const zx = g.a.x + g.handDx + Math.sin(r) * l;
+    const zy = g.a.y + g.handDy - Math.cos(r) * l;
+    bogenFlug(this, b, zx, zy, { hoehe: 70, min: 0.7, skala: BUND_SKALA, drehung: r }).then(() => {
+      if (this.gast !== g || z.bund < 0) return;
+      z.imBund = true;
+      if (g.bund.length === BUND_ZAHL && g.bund.every((x) => x.zustand.imBund)) this.hebeAb();
+    });
+    this.maus.lookAt(g.a.x);
+    return true;
+  }
+
+  async hebeAb() {
+    const g = this.gast;
+    if (!g || g.zustand !== 'sammelt') return;
+    g.zustand = 'hebtAb';
+    const a = g.a;
+    a.schatten.visible = false;
+    freude(this, this.maus, { herzen: 3, hoehe: 45 });
+    await this.wait(0.5);
+    if (this.gast !== g) return;
+    sfx('common/wusch', { vol: 0.35, rate: 0.8 });
+    await this.tween(a, { y: 1000 }, 1.8, { ease: 'sineInOut' });
+    if (this.gast !== g) return;
+    g.heim.x = a.x;
+    g.heim.y = a.y;
+    g.vx = 0;
+    g.vy = 0;
+    g.weg = 0;
+    g.zeit = 0;
+    g.zustand = 'fliegt';
+    g.schub = 0;
+    // Griff: unsichtbare Fläche um den Gast – an ihr zieht der Finger, der Gast schwebt träge nach
+    const griff = new PIXI.Container({ label: 'gastGriff' });
+    griff.zIndex = 60;
+    griff.position.set(a.x, a.y);
+    this.welt.addChild(griff);
+    this.gastGriff = griff;
+    g.zug = drag(griff, {
+      back: false,
+      lift: 1,
+      hitArea: new PIXI.Circle(0, -170, 250),
+      onStart: () => sfx('common/wusch', { vol: 0.3 }),
+      onDrop: (_, ctx) => {
+        if (Math.hypot(ctx.x - ctx.startX, ctx.y - ctx.startY) < 40) {
+          // nur angetippt: der Gast schwebt von selbst ein Stück hinüber zur anderen Seite (das zählt auch)
+          g.heim.x = clamp(a.x + (a.x > 0 ? -480 : 480), FLUG_RAUM.x0, FLUG_RAUM.x1);
+          g.heim.y = clamp(a.y + rand(-60, 60), FLUG_RAUM.y0, FLUG_RAUM.y1);
+          g.schub = 2.2;
+          note('glocke', pick(PENTA), { vol: 0.25 });
+          return;
+        }
+        g.heim.x = clamp(griff.x, FLUG_RAUM.x0, FLUG_RAUM.x1);
+        g.heim.y = clamp(griff.y, FLUG_RAUM.y0, FLUG_RAUM.y1);
+      },
+    });
+  }
+
+  gastUpdate(dt) {
+    const g = this.gast;
+    if (!g) return;
+    const a = g.a;
+    if (a.destroyed) return;
+    if (g.zustand === 'sammelt' && this.aktiv) this.zeigeWunsch();
+    if (g.zustand === 'fliegt') {
+      g.zeit += dt;
+      const griff = this.gastGriff;
+      const zieht = !!g.zug?.isDragging();
+      let zx;
+      let zy;
+      if (zieht) {
+        zx = clamp(griff.x, FLUG_RAUM.x0, FLUG_RAUM.x1);
+        zy = clamp(griff.y, FLUG_RAUM.y0, FLUG_RAUM.y1);
+      } else {
+        zx = clamp(g.heim.x + Math.sin(g.zeit * 0.5) * 40, FLUG_RAUM.x0, FLUG_RAUM.x1);
+        zy = clamp(g.heim.y + Math.sin(g.zeit * 0.8) * 25, FLUG_RAUM.y0, FLUG_RAUM.y1);
+        griff.position.set(a.x, a.y);
+      }
+      g.vx += ((zx - a.x) * 4 - g.vx * 3.4) * dt;
+      g.vy += ((zy - a.y) * 4 - g.vy * 3.4) * dt;
+      const v = Math.hypot(g.vx, g.vy);
+      if (v > FLUG_MAX) {
+        g.vx *= FLUG_MAX / v;
+        g.vy *= FLUG_MAX / v;
+      }
+      a.x += g.vx * dt;
+      a.y += g.vy * dt;
+      a.rotation += (clamp(g.vx * 0.0004, -0.18, 0.18) - a.rotation) * Math.min(1, dt * 3);
+      if (Math.abs(g.vx) > 60) a.lookAt(a.x + g.vx);
+      g.schub = Math.max(0, (g.schub || 0) - dt);
+      if (zieht || g.schub > 0) g.weg += Math.min(v, FLUG_MAX) * dt;
+      if (g.weg >= FLUG_WEG) this.starteLanden();
+    }
+    // Ballons im Bund folgen dem Gast und wiegen sich leicht
+    if (g.bund.length && g.handDy !== undefined) {
+      for (let i = 0; i < g.bund.length; i++) {
+        const b = g.bund[i];
+        if (!b.zustand.imBund) continue;
+        const r = BUND[i] + a.rotation;
+        const l = SCHNUR * BUND_SKALA * (i === 1 ? 1.12 : 1);
+        b.x = a.x + g.handDx + Math.sin(r) * l;
+        b.y = a.y + g.handDy - Math.cos(r) * l;
+        b.rotation = r + Math.sin(this.zeit * 1.1 + i) * 0.03;
+      }
+    }
+  }
+
+  starteLanden() {
+    const g = this.gast;
+    g.zustand = 'landen';
+    g.zug?.off();
+    g.zug = null;
+    this.gastGriff?.destroy();
+    this.gastGriff = null;
+    this.tween(g.a, { rotation: 0 }, 0.5, { ease: 'sineInOut' });
+    freude(this, this.maus, { herzen: 3, hoehe: 45 });
+    for (const b of g.bund) b.eventMode = 'static';
+    g.a.onTap(() => this.gastTipp(), { pad: 60 });
+  }
+
+  /** Ballon im Bund angetippt: beim Landen fliegt er davon (Überraschung), sonst klingt er nur leise */
+  bundTipp(b) {
+    const g = this.gast;
+    const z = b.zustand;
+    if (!g || g.zustand !== 'landen' || !z.imBund) {
+      note('glocke', pick(PENTA), { vol: 0.25 });
+      return;
+    }
+    z.imBund = false;
+    z.weg = true;
+    b.eventMode = 'none';
+    note('glocke', PENTA[5 - Math.min(5, g.gelandet * 2)], { vol: 0.35 });
+    this.lasseFallen(b.x, b.y + 40);
+    this.tween(b, { y: b.y - 700, x: b.x + rand(-120, 120), alpha: 0 }, 3.2, { ease: 'sineIn' }).then(() => {
+      z.aktiv = false;
+      z.weg = false;
+      z.bund = -1;
+      z.imBund = false;
+      b.visible = false;
+      b.alpha = 1;
+      b.rotation = 0;
+      b.scale.set(BALLON_SKALA);
+      b.zIndex = 30;
+      b.hitArea = new PIXI.Circle(0, 40, 175);
+    });
+    g.gelandet++;
+    const a = g.a;
+    if (g.gelandet < BUND_ZAHL) {
+      // etwas tiefer sinken
+      this.tween(a, { y: Math.min(a.y + 110, 1180) }, 0.9, { ease: 'sineInOut' });
+    } else {
+      this.gleiteZurDecke();
+    }
+  }
+
+  async gleiteZurDecke() {
+    const g = this.gast;
+    g.zustand = 'gleitet';
+    const a = g.a;
+    g.bund = [];
+    let sitz = this.freierSitz();
+    if (sitz < 0) sitz = 0;
+    g.sitz = sitz;
+    const p = SITZE[sitz];
+    a.lookAt(p.x);
+    await this.wait(0.3);
+    await bogenFlug(this, a, p.x, p.y, { hoehe: -60, min: 1.4 });
+    if (this.gast !== g) return;
+    a.schatten.visible = true;
+    a.pose('idle');
+    a.zIndex = 20 + (p.y > 1350 ? 2 : 0);
+    sfx('common/landen', { vol: 0.4 });
+    this.burst('staub', p.x, p.y, { count: 3 });
+    await this.wait(0.6);
+    if (this.gast !== g) return;
+    this.starteSnack();
+  }
+
+  starteSnack() {
+    const g = this.gast;
+    g.zustand = 'picknick';
+    const a = g.a;
+    a.lookAt(KORB.x);
+    const id = wunsch(g.id);
+    a.bubble(id, 2.6);
+    a.onTap(() => this.gastTipp(), { pad: 60 });
+    // Lieblingsessen hüpft aus dem Korb
+    const e = spr(id, { x: KORB.x, y: KORB.y - 90, anchor: 0.5, z: 45 });
+    const skala = 150 / Math.max(e.texture.width, e.texture.height);
+    e.scale.set(skala * 0.4);
+    e.futterId = id;
+    e.eventMode = 'none';
+    this.welt.addChild(e);
+    g.essen = e;
+    sfx('common/hupf', { vol: 0.4 });
+    fx.wobble(this.korb, 0.03);
+    bogenFlug(this, e, KORB.x + 40, KORB.y - 250, { hoehe: 90, min: 0.6, skala }).then(() => {
+      if (e.destroyed || this.gast !== g) return;
+      e.eventMode = 'static';
+      g.essenZug = drag(e, {
+        back: false,
+        lift: 1.1,
+        hitArea: new PIXI.Circle(0, 0, 150 / skala),
+        targets: [{ obj: a, id: 'gast', radius: 320 }],
+        onDrop: () => this.essenZumGast(),
+      });
+    });
+  }
+
+  async essenZumGast() {
+    const g = this.gast;
+    const e = g?.essen;
+    if (!g || g.zustand !== 'picknick' || !e || e.destroyed || e.eventMode !== 'static') return;
+    g.essenZug?.off();
+    g.essenZug = null;
+    const ok = await fuettere(this, g.a, e, { futter: e.futterId });
+    if (this.gast !== g) return;
+    if (!ok) {
+      // (kommt kaum vor – er bekommt sein Lieblingsessen; isst er noch, hüpft es zurück) – nochmal anbieten
+      if (!e.destroyed) {
+        e.eventMode = 'static';
+        g.essenZug = drag(e, { back: false, lift: 1.1, onDrop: () => this.essenZumGast() });
+      }
+      return;
+    }
+    this.fahrtFertig();
+  }
+
+  async fahrtFertig() {
+    const g = this.gast;
+    g.zustand = 'fertig';
+    g.essen = null;
+    g.a._tap?.off();
+    freude(this, this.maus, { herzen: 5 });
+    await this.wait(0.4);
+    if (this.gast !== g) return;
+    freude(this, g.a, { herzen: 5 });
+    belohne(this, stickerFuer('ballon'), g.a.x + 220, g.a.y - 330);
+    // bleibt auf der Decke sitzen – die Picknick-Runde wächst
+    deckenGaeste.push({ id: g.id, sitz: g.sitz });
+    this.setzeAufDecke(g.id, g.sitz, g.a);
+    this.gast = null;
+    this.after(5, () => this.neuerGast());
+  }
+
   // ---------------------------------------------------------------- Ablauf
 
   betreten() {
@@ -438,12 +845,24 @@ export class Himmel extends Seite {
     // Seite zu sehen ist und das Kind das noch nicht selbst tut (nurWenn: auch, wenn er erst später an die Reihe kommt)
     this.hinweiseAus();
     const erst = this.besuche === 1;
-    const ballonNoch = () => this.aktiv && this.geplatzt === 0;
+    const ballonNoch = () => this.aktiv && this.geplatzt === 0 && !this.gast;
     const blasenNoch = () => this.aktiv && !this.blasenGezogen;
     this._hinweise = [
       this.after(erst ? 5 : 1.2, () => { if (ballonNoch()) voice('spielplatz_ballon', { nurWenn: ballonNoch }); }),
       this.after(erst ? 13 : 9, () => { if (blasenNoch()) voice('spielplatz_blasen', { nurWenn: blasenNoch }); }),
     ];
+    const g = this.gast;
+    if (g && g.zustand === 'sammelt') {
+      this.sageFahrt(g, erst ? 2.5 : 1.0);
+      g.blaseZeit = -99;
+    }
+  }
+
+  sageFahrt(g, nach) {
+    const passt = () => this.aktiv && this.gast === g && g.zustand === 'sammelt' && g.bund.length === 0;
+    this._hinweise.push(this.after(nach, () => {
+      if (passt()) voice('spielplatz_ballonfahrt', { nurWenn: passt });
+    }));
   }
 
   verlassen() {
@@ -464,14 +883,16 @@ export class Himmel extends Seite {
     // Ballons
     this.zeitBallon -= dt;
     let aktiv = 0;
-    for (const b of this.ballons) if (b.zustand.aktiv) aktiv++;
+    for (const b of this.ballons) if (b.zustand.aktiv && b.zustand.bund < 0) aktiv++;
     if (this.zeitBallon <= 0) {
       if (aktiv < MAX_BALLONS) this.starteBallon();
-      this.zeitBallon = rand(2.8, 4.6);
+      // sammelt ein Gast gerade, kommen sie etwas öfter
+      this.zeitBallon = this.gast?.zustand === 'sammelt' ? rand(1.6, 2.6) : rand(2.8, 4.6);
     }
+    this.gastUpdate(dt);
     for (const b of this.ballons) {
       const z = b.zustand;
-      if (!z.aktiv || z.weg) continue;
+      if (!z.aktiv || z.weg || z.bund >= 0) continue;
       // während die Zeige-Hand auf ihn zeigt, bleibt er stehen (wiegt nur)
       if (z.halt > 0) z.halt -= dt;
       else b.y -= z.v * dt;
@@ -535,9 +956,34 @@ export class Himmel extends Seite {
   }
 
   hinweise() {
+    const g = this.gast;
+    if (g) {
+      if (g.zustand === 'fliegt') {
+        // den Gast hinüber zur anderen Seite ziehen (die Hand beginnt am Gast selbst – der Griff ist unsichtbar
+        // und hat keine Fläche, die Zeige-Hand nähme ihn nicht)
+        this.flugMerker.position.set(g.a.x > 0 ? g.a.x - 650 : g.a.x + 650, g.a.y - 150);
+        return [{ von: g.a, nach: this.flugMerker }];
+      }
+      if (g.zustand === 'landen') {
+        const b = g.bund.find((x) => x.zustand.imBund);
+        if (b) return [b];
+      }
+      if (g.zustand === 'picknick' && g.essen && !g.essen.destroyed && g.essen.eventMode === 'static') {
+        return [{ von: g.essen, nach: g.a }];
+      }
+      if (g.zustand === 'sammelt') {
+        // nur Ballons zeigen (bis zu zwei verschiedene) – nicht Stab und Drachen, die vom Ablauf weglocken
+        const frei = this.ballons.filter((b) => b.zustand.aktiv && !b.zustand.weg && b.zustand.bund < 0 &&
+          b.y > 420 && b.y < 1250 && Math.abs(b.x) < 900).slice(0, 2);
+        for (const b of frei) b.zustand.halt = 3.2;
+        return frei.length ? frei : [g.a];
+      }
+      // unterwegs (kommt, hebt ab, gleitet zur Decke): die Hand bleibt beim Gast
+      if (g.zustand !== 'fertig') return [g.a];
+    }
     const liste = [];
-    const ballon = this.ballons.find((b) => b.zustand.aktiv && !b.zustand.weg && b.y > 450 && b.y < 1150 &&
-      Math.abs(b.x) < 850);
+    const ballon = this.ballons.find((b) => b.zustand.aktiv && !b.zustand.weg && b.zustand.bund < 0 &&
+      b.y > 450 && b.y < 1150 && Math.abs(b.x) < 850);
     if (ballon) {
       // anhalten, bis die Hand ihn erreicht und zweimal getippt hat (sonst zeigt sie ins Leere)
       ballon.zustand.halt = 3.2;

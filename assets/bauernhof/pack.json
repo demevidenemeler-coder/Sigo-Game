@@ -8,6 +8,8 @@
     "eimer_leer": {"file": "eimer_leer.webp", "w": 360, "h": 380, "ax": 0.497, "ay": 0.985, "pts": {}, "desc": "leerer Blecheimer"},
     "eimer_voll": {"file": "eimer_voll.webp", "w": 365, "h": 380, "ax": 0.499, "ay": 0.985, "pts": {}, "desc": "Blecheimer randvoll Milch"},
     "futtertrog": {"file": "futtertrog.webp", "w": 500, "h": 185, "ax": 0.5, "ay": 0.979, "pts": {}, "desc": "leerer Holz-Futtertrog auf Beinen"},
+    "handtuch_haengend": {"file": "handtuch_haengend.webp", "w": 360, "h": 355, "ax": 0.497, "ay": 0.984, "pts": {}, "desc": "weißes Handtuch, über die Leine gehängt (wird eingefärbt)"},
+    "handtuch_weiss": {"file": "handtuch_weiss.webp", "w": 420, "h": 267, "ax": 0.515, "ay": 0.979, "pts": {}, "desc": "weißes gefaltetes Handtuch (wird eingefärbt)"},
     "hg_futter": {"file": "hg_futter.webp", "w": 2829, "h": 1600, "ax": 0.5, "ay": 0.5, "pts": {"boden": [1414, 1230], "platz1": [664, 1240], "platz2": [1164, 1240], "platz3": [1664, 1240], "platz4": [2164, 1240]}, "desc": "Futterplatz: rote Scheune links, Zaun, breiter leerer Erdplatz vorn"},
     "hg_huehner": {"file": "hg_huehner.webp", "w": 2829, "h": 1600, "ax": 0.5, "ay": 0.5, "pts": {"boden": [1414, 1450], "nest1": [614, 850], "nest2": [1014, 850], "nest3": [1414, 850], "nest4": [1814, 850], "nest5": [2214, 850], "korb": [2250, 1480]}, "desc": "Hühnerstall innen: Holzwand, rundes Fenster, langes leeres Regalbrett (Oberkante y≈830), Strohboden"},
     "hg_melken": {"file": "hg_melken.webp", "w": 2829, "h": 1600, "ax": 0.5, "ay": 0.5, "pts": {"boden": [1414, 1250], "kuh": [1414, 1240], "eimer": [1375, 1290], "kanne": [2280, 1260], "katze": [560, 1400]}, "desc": "Melkstand im Stall: Holzwand, zwei Fenster, Heuraufe, Heuhaufen links, leerer Holzboden"},
@@ -26,6 +28,7 @@
     "scheunentor": {"file": "scheunentor.webp", "w": 600, "h": 529, "ax": 0.501, "ay": 0.983, "pts": {}, "desc": "rotes zweiflügeliges Scheunentor, geschlossen"},
     "schlauch_duese": {"file": "schlauch_duese.webp", "w": 376, "h": 400, "ax": 0.5, "ay": 0.5, "pts": {"spitze": [372, 95]}, "desc": "grüne Schlauchdüse mit Griff, Spitze nach rechts"},
     "strohballen": {"file": "strohballen.webp", "w": 450, "h": 297, "ax": 0.497, "ay": 0.983, "pts": {}, "desc": "Strohballen mit roten Schnüren"},
+    "strohhaufen": {"file": "strohhaufen.webp", "w": 540, "h": 223, "ax": 0.483, "ay": 0.977, "pts": {}, "desc": "lockerer Heuhaufen aus feinen Halmen, goldbraun (versteckt ein Ei)"},
     "traktor": {"file": "traktor.webp", "w": 900, "h": 729, "ax": 0.481, "ay": 0.983, "pts": {}, "desc": "roter Traktor mit Gesicht von der Seite, nach rechts, mit Rädern"},
     "wolle_ballen": {"file": "wolle_ballen.webp", "w": 344, "h": 350, "ax": 0.483, "ay": 0.984, "pts": {}, "desc": "flauschiger Wollballen"},
     "wollsack": {"file": "wollsack.webp", "w": 345, "h": 450, "ax": 0.503, "ay": 0.986, "pts": {}, "desc": "Jutesack voll Wolle"}

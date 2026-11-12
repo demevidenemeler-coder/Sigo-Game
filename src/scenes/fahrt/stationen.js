@@ -36,15 +36,15 @@ export function neueStation(szene, art, linkeKante) {
   }
 }
 
-const MENSCHEN = new Set(GAESTE_MENSCHEN);
-const GROESSE = {
+export const MENSCHEN = new Set(GAESTE_MENSCHEN);
+export const GROESSE = {
   maus: 0.7, frosch: 0.74, igel: 0.76, ente: 0.8, huhn: 0.82, eichhoernchen: 0.82, hase: 0.86, eule: 0.84,
   pinguin: 0.86, katze: 0.88, fuchs: 0.92, affe: 0.92, hund: 0.95, schaf: 0.98, schwein: 0.98, baer: 1,
   loewe: 1, kuh: 1.04, pferd: 1.06, giraffe: 1.1, elefant: 1.12,
 };
 
 /** Figur (Tier oder Mensch) in passender Größe. */
-function figur(id, opt) {
+export function figur(id, opt) {
   const mensch = MENSCHEN.has(id);
   const skala = (mensch ? 0.29 : 0.26) * (GROESSE[id] ?? 1) * (opt.faktor ?? 1);
   const a = new Actor(id, { pack: mensch ? 'zug' : 'tiere', x: opt.x, y: opt.y, scale: skala, parent: opt.parent });
@@ -54,7 +54,7 @@ function figur(id, opt) {
 }
 
 /** Freundlicher Gruß: winken bzw. Arme hoch, Tierlaut (Menschen: ein leiser Hupfer-Ton). */
-function gruss(s, a, { laut = true } = {}) {
+export function gruss(s, a, { laut = true } = {}) {
   if (!a || a.destroyed) return;
   a.pose('happy');
   if (laut) {

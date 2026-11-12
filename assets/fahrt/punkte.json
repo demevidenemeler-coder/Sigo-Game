@@ -586,6 +586,36 @@
         ]
       },
       "desc": "Rot-weiße Kordel mit Holzgriff zum Ziehen (Pfeife); Anker oben = Aufhängepunkt"
+    },
+    "wasserturm": {
+      "ax": 0.473,
+      "ay": 0.984,
+      "desc": "Wasserturm aus Holz mit Gesicht, Ausguss mit Brause rechts (Lok auftanken)",
+      "pts": {
+        "duese": [
+          520,
+          395
+        ],
+        "gesicht": [
+          275,
+          300
+        ]
+      }
+    },
+    "gueterschuppen": {
+      "ax": 0.498,
+      "ay": 0.983,
+      "desc": "Güterschuppen mit offenem Tor und leerer Holz-Laderampe davor (Ladeplatz)",
+      "pts": {
+        "rampe": [
+          450,
+          535
+        ],
+        "tor": [
+          470,
+          470
+        ]
+      }
     }
   },
   "audio": {}

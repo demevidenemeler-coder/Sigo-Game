@@ -1,10 +1,13 @@
-// Zugfahrt: eine endlose, gemütliche Fahrt von der Seite.
+// Zugfahrt: eine endlose, gemütliche Fahrt von der Seite – mit kleinen Lieferfahrten (auftrag.js).
 //
 // Der Zug des Kindes (ladeZug) steht links der Mitte, die Landschaft zieht in Ebenen vorbei (Himmel, ferne Berge,
 // Hügel, Wiese, Gras ganz vorn). Entlang der Strecke kommen in loser, gemischter Folge „Stationen"
 // (stationen.js: Apfelbaum, Bahnhof, Tunnel, Xylophon-Brücke, Tier auf dem Gleis, Bahnübergang, Waschbogen,
 // Luftballons), dazwischen Bäume, Büsche, Häuser, Mühle, Teich, Zaun, Heu, Blumen (deko.js). Am Himmel: Sonne/Mond,
 // Wolken, Heißluftballon, Vogel; über der Wiese ab und zu ein Schmetterling.
+//
+// Haupttätigkeit: Lieferfahrt in Runden (Ladeplatz → Station → Aufgabe → Station → Ziel → Station), siehe auftrag.js.
+// Jede gelieferte Ladung bringt einen Stern auf das Sternen-Brett über dem Hebel; fünf Sterne → Regenbogen.
 //
 // Bedienung:
 //   Fahr-Hebel rechts (mittlere Höhe, auf einem Holz-Schaltpult)  Tipp → Fahren/Halten; an einem Halt: weiter
@@ -17,7 +20,7 @@
 // Strecke; Bildschirm-x eines Dings = wx − strecke. Vor dem rechten Rand wird geplant, hinter dem linken abgebaut.
 
 import {
-  Scene, stage, spr, tex, sfx, voice, tap, fx, ui, ambient, store, rand, pick, clamp, isTest, PIXI,
+  Scene, stage, spr, tex, sfx, voice, tap, fx, ui, ambient, store, rand, pick, clamp, isTest, onInput, PIXI,
 } from '../../engine/index.js';
 import { Zug, legeGleis, ladeZug, GAESTE_MENSCHEN, LOKS } from '../../gemeinsam/zug.js';
 import { belohne } from '../../gemeinsam/sticker.js';
@@ -26,6 +29,9 @@ import {
 } from './konst.js';
 import { Himmel, neueDekoHinten, neueDekoVorne } from './deko.js';
 import { neueStation } from './stationen.js';
+import {
+  Ladeplatz, Ziel, Wasserturm, Signal, Regenschauer, Sternbrett, neueLieferung, figurenUnterwegs,
+} from './auftrag.js';
 
 const { Container, Graphics, Rectangle, TilingSprite } = PIXI;
 
@@ -50,9 +56,13 @@ const ZUSTAENDE = [
 // Wer am Bahnsteig wartet (abwechselnd Tier und Mensch)
 const WARTENDE_TIERE = ['hund', 'katze', 'hase', 'schwein', 'pinguin', 'ente', 'fuchs', 'baer', 'affe', 'igel', 'eule'];
 
-// Erste Stationen in fester Reihenfolge (das Kind sieht gleich viel), danach gemischt
-const ANFANG = ['bahnhof', 'bruecke', 'tier', 'ballons', 'tunnel', 'uebergang', 'apfel', 'wasch'];
-const ALLE = ['apfel', 'bahnhof', 'tunnel', 'bruecke', 'tier', 'uebergang', 'wasch', 'ballons'];
+// Stationen zwischen den Schritten einer Lieferfahrt (gemischt, nie zweimal dieselbe hintereinander)
+const ZWISCHEN = ['apfel', 'bahnhof', 'tunnel', 'bruecke', 'uebergang', 'wasch', 'ballons', 'regen'];
+// Aufgaben unterwegs (wechseln sich ab)
+const AUFGABEN = ['wasser', 'signal', 'tier'];
+const ALLE = [...ZWISCHEN, ...AUFGABEN, 'laden', 'ziel'];
+// Stationen aus auftrag.js (die übrigen baut stationen.js)
+const NEU = { laden: Ladeplatz, ziel: Ziel, wasser: Wasserturm, signal: Signal, regen: Regenschauer };
 
 const HEBEL_WINKEL = 0.42;       // Halten = nach links gekippt, Fahren = nach rechts
 const HEBEL_PULT = { b: 300, oben: -410, h: 450 };   // Holz-Schaltpult unter dem Hebel (relativ zum Sockel-Fuß)
@@ -62,6 +72,12 @@ const ABBAU_HINTER = 500;        // so weit hinter dem linken Rand wird abgebaut
 export default class Fahrt extends Scene {
   static id = 'fahrt';
   static packs = ['fahrt', 'zug', 'tiere'];
+  // Alle Tiere, die hier zu sehen sein können: Gäste im Zug (der Bahnhof kann jedes Tier einsteigen lassen),
+  // Wartende am Bahnsteig, Tiere auf dem Gleis, am Teich, in Büschen, bei Lieferungen und am Signal
+  static tiere = [
+    'kuh', 'schaf', 'schwein', 'pferd', 'hund', 'katze', 'hase', 'huhn', 'hahn', 'ente', 'frosch', 'maus', 'igel',
+    'baer', 'affe', 'loewe', 'elefant', 'giraffe', 'pinguin', 'fuchs', 'eule', 'eichhoernchen',
+  ];
   static music = 'musik/fahrt';
 
   async enter(params = {}) {
@@ -79,14 +95,24 @@ export default class Fahrt extends Scene {
     this.belohnt = new Set();
     this.mensch = false;       // abwechselnd Tier/Mensch am Bahnsteig
     this.reserviert = new Map(); // Wagen-Index → Gast-id: Platz ist schon vergeben, der Gast hüpft noch hin
+    // Zeige-Hände seit der letzten Berührung (siehe hinweisHaende)
+    this.haendeGezeigt = 0;
+    this.haendeBasis = 0;
+    this.letzteHand = null;
+    this.eingabeAus = onInput(() => {
+      this.haendeGezeigt = 0;
+      this.haendeBasis = 0;
+    });
 
     this.baueLandschaft();
     this.baueEbenen();
     this.baueGleis();
     this.baueZug();
     this.himmel = new Himmel(this);
+    this.sternbrett = new Sternbrett(this);
     this.baueBedienung();
     ui.albumKnopf(this);
+    this.ordneBedienung();
 
     // weiche Abdunklung im Tunnel (über Landschaft und Zug, unter den Knöpfen)
     this.dunkelSchicht = new Graphics().rect(-2000, -100, 4000, 1800).fill(0x1d2440);
@@ -99,10 +125,19 @@ export default class Fahrt extends Scene {
     this.planHinten = -this.W / 2 - 300;
     this.planVorne = -this.W / 2 - 200;
     this.sperren = [];          // belegte Abschnitte der Stationen {von, bis, hinten, vorne}
-    this.folge = [...ANFANG];
+    this.beutel = [];           // gemischte Zwischen-Stationen
+    this.letzteZwischen = null;
+    this.letzteAufgabe = null;
+    // Erste Runde in fester Folge (das Kind sieht gleich viel), danach gemischte Runden
+    const lief = neueLieferung(this);
+    this.folge = [
+      { art: 'laden', lief }, 'bruecke', 'wasser', 'ballons', { art: 'ziel', lief }, 'bahnhof',
+    ];
+    this.letzteAufgabe = 'wasser';
+    this.letzteZwischen = 'bahnhof';
     // Zum Ausprobieren: erste Station wählen (go('fahrt', {station}) oder im Test ?station=tunnel)
     const wunsch = params.station || (isTest ? new URLSearchParams(location.search).get('station') : null);
-    if (ALLE.includes(wunsch)) this.folge = [wunsch, ...ANFANG.filter((a) => a !== wunsch)];
+    if (ALLE.includes(wunsch) && wunsch !== 'laden') this.folge.unshift(wunsch === 'ziel' ? { art: 'ziel', lief: neueLieferung(this) } : wunsch);
     this.letzteArt = null;
     this.setzeStation('apfel', -560);
     this.naechsteStation = 900;
@@ -233,13 +268,14 @@ export default class Fahrt extends Scene {
     // Tageszeit- und Wetter-Knopf: oben links neben dem Karten-Knopf
     this.wetterKnopf = ui.button(ZUSTAENDE[0].icon, { size: 200, parent: this.hud, onTap: () => this.naechsterZustand() });
     this.wetterKnopf.zIndex = 50;
-    this.ordneBedienung();
   }
 
   ordneBedienung() {
     const W = this.W;
     // Pult: x W−405…W−105, y 655…1105 – frei bleiben die Ecke unten rechts (240 × 240) und Platz für die Zeige-Hand
     this.hebel.position.set(W - 255, 1065);
+    // Sternen-Brett gleich über dem Pult (eigene Tippfläche y 450…650, das Pult beginnt bei 655)
+    this.sternbrett.setze(W - 255, 550);
     const album = ui.albumPos();
     // zwischen Seil, Album- und Karten-Knopf bleibt eine Lücke von mindestens 50 Einheiten; oben 70 frei
     this.seil.position.set(album.x - 300, 0);
@@ -264,8 +300,14 @@ export default class Fahrt extends Scene {
   hebelTipp() {
     const s = this.stehtBei;
     if (s && s.haltBei() !== null) {
-      s.weiter();            // Station gibt frei (ruft losfahren)
-      if (!this.fahren) this.losfahren();
+      // Station gibt frei. false = sie erledigt erst noch den offenen Schritt und fährt dann selbst los.
+      const gleich = s.weiter();
+      if (gleich === false) {
+        fx.wobble(this.hebelGriff, 0.05);
+        sfx('common/klack', { vol: 0.5 });
+        return;
+      }
+      this.losfahren();      // (fährt der Zug schon, gibt das nur den Halt frei)
       return;
     }
     if (this.fahren) this.anhalten();
@@ -333,6 +375,7 @@ export default class Fahrt extends Scene {
   naechsterZustand() {
     this.zustand = (this.zustand + 1) % ZUSTAENDE.length;
     const z = ZUSTAENDE[this.zustand];
+    this.schauer = false;   // ein Regenschauer (Überraschung) endet: das Kind hat selbst gewählt
     this.zeit = z.zeit;
     this.wetter = z.wetter;
     this.wetterKnopf.setIcon(z.icon);
@@ -347,15 +390,22 @@ export default class Fahrt extends Scene {
     return LOK_X + 200;
   }
 
-  /** Erster Sitz-Wagen ohne Gast, der auch nicht schon für einen hüpfenden Gast vergeben ist (sonst -1). */
+  /**
+   * Erster Sitz-Wagen ohne Gast, der auch nicht schon für einen hüpfenden Gast vergeben ist (sonst -1) – am
+   * liebsten einer ohne Ladung (neben einem Gast wäre eine Lieferung kaum zu sehen).
+   */
   freierSitz() {
-    return this.zug.wagen.findIndex((w) => w.platz?.art === 'sitz' && !w.gast && !this.reserviert.has(w.index));
+    const frei = (w) => w.platz?.art === 'sitz' && !w.gast && !this.reserviert.has(w.index);
+    const leer = this.zug.wagen.findIndex((w) => frei(w) && !w.ladung);
+    return leer >= 0 ? leer : this.zug.wagen.findIndex(frei);
   }
 
-  /** Wer als Nächstes am Bahnsteig wartet (nicht schon im Zug oder an einem anderen Bahnhof). */
+  /**
+   * Wer als Nächstes am Bahnsteig wartet: nicht schon im Zug, an einem anderen Bahnhof oder als Absender bzw.
+   * Empfänger einer Lieferung an der Strecke (sonst wäre er am Ziel zweimal zu sehen).
+   */
   wartenderGast() {
-    const besetzt = new Set([...this.zug.wagen.map((w) => w.gastId).filter(Boolean), ...this.reserviert.values()]);
-    for (const d of this.dinge) if (d.fahrgaeste) for (const f of d.fahrgaeste) if (f.id) besetzt.add(f.id);
+    const besetzt = figurenUnterwegs(this);
     this.mensch = !this.mensch;
     const liste = (this.mensch ? GAESTE_MENSCHEN : WARTENDE_TIERE).filter((id) => !besetzt.has(id));
     return pick(liste.length ? liste : WARTENDE_TIERE);
@@ -438,8 +488,9 @@ export default class Fahrt extends Scene {
 
   // ---------------------------------------------------------------- Strecke planen
 
-  setzeStation(art, linkeKante) {
-    const d = neueStation(this, art, linkeKante);
+  setzeStation(eintrag, linkeKante) {
+    const art = typeof eintrag === 'string' ? eintrag : eintrag.art;
+    const d = NEU[art] ? new NEU[art](this, linkeKante, eintrag.lief) : neueStation(this, art, linkeKante);
     this.dinge.push(d);
     this.letzteArt = art;
     this.sperren.push({
@@ -450,13 +501,29 @@ export default class Fahrt extends Scene {
   }
 
   naechsteArt() {
-    if (!this.folge.length) {
-      // neue Runde: gemischt, aber nie zweimal dasselbe hintereinander
-      const neu = [...ALLE].sort(() => Math.random() - 0.5);
-      if (neu[0] === this.letzteArt) neu.push(neu.shift());
-      this.folge = neu;
-    }
+    if (!this.folge.length) this.folge = this.neueRunde();
     return this.folge.shift();
+  }
+
+  /** Eine Lieferfahrt: Ladeplatz → Station → Aufgabe → Station → Ziel → Station. */
+  neueRunde() {
+    const lief = neueLieferung(this);
+    const aufgabe = pick(AUFGABEN.filter((a) => a !== this.letzteAufgabe));
+    this.letzteAufgabe = aufgabe;
+    return [
+      { art: 'laden', lief }, this.zwischen(), aufgabe, this.zwischen(), { art: 'ziel', lief }, this.zwischen(),
+    ];
+  }
+
+  /** Nächste Zwischen-Station aus dem gemischten Beutel (nie zweimal dieselbe hintereinander). */
+  zwischen() {
+    if (!this.beutel.length) {
+      this.beutel = [...ZWISCHEN].sort(() => Math.random() - 0.5);
+      if (this.beutel[this.beutel.length - 1] === this.letzteZwischen) this.beutel.unshift(this.beutel.pop());
+    }
+    const art = this.beutel.pop();
+    this.letzteZwischen = art;
+    return art;
   }
 
   // Liegt [von, bis] in einem gesperrten Abschnitt? → Ende des Abschnitts, sonst null
@@ -553,6 +620,7 @@ export default class Fahrt extends Scene {
       if (!halt._haltDa) {
         halt._haltDa = true;
         this.stehtBei = halt;
+        this.haendeBasis = this.haendeGezeigt || 0;   // neuer Halt: wieder drei Zeige-Hände
         halt.angekommen();
       }
     }
@@ -577,6 +645,7 @@ export default class Fahrt extends Scene {
     this.himmel.update(dt, this.v);
     this.plane();
     this.abbauen();
+    this.zaehleHaende();
   }
 
   // Schiene unter der Xylophon-Brücke aussparen (zwei Stücke links und rechts)
@@ -603,22 +672,43 @@ export default class Fahrt extends Scene {
     g2.tilePosition.x = g1.tilePosition.x + von - r;
   }
 
+  // Zeige-Hand: Der Kern zeigt nach einer Berührung höchstens `hinweisHaende` Hände. Eine lange Fahrt ohne
+  // Berührung soll die Hände des nächsten Halts nicht verbrauchen – darum gibt es an jedem neuen Halt wieder drei
+  // (gezählt wird, wie viele Hände seit der letzten Berührung schon zu sehen waren).
+  get hinweisHaende() {
+    return (this.haendeBasis || 0) + 3;
+  }
+
+  zaehleHaende() {
+    const hud = this.hud.children;
+    for (let i = hud.length - 1; i >= 0; i--) {
+      const k = hud[i];
+      if (k.label !== 'zeigeHand') continue;
+      if (k !== this.letzteHand && !k.destroyed) {
+        this.letzteHand = k;
+        this.haendeGezeigt = (this.haendeGezeigt || 0) + 1;
+      }
+      return;
+    }
+  }
+
   hints() {
     const liste = [];
     const s = this.stehtBei;
     if (s) liste.push(...s.hinweise());
     if (s || !this.fahren) liste.push(this.hebel);
     if (!s) {
+      // unterwegs nur, was gerade vorbeikommt und etwas tut (Apfelbaum, Mühle, Brücke …) – nicht die Lok
       for (const d of this.dinge) {
         const sx = d.wx - this.strecke;
         if (sx > -this.W / 2 + 200 && sx < this.W / 2 - 300) liste.push(...d.hinweise());
       }
-      liste.push(this.zug.lok);
     }
     return liste;
   }
 
   exit() {
+    this.eingabeAus?.();
     for (const d of this.dinge) d.zerstoere();
     this.dinge.length = 0;
   }

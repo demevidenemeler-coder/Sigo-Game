@@ -4,14 +4,25 @@
 //   Xylophon  – 8 Regenbogen-Stäbe; antippen oder mit dem Finger darüberstreichen (jeder Finger zählt)
 //   Klavier   – 8 große Tasten, ebenfalls zum Tippen und Streichen
 //   Trommeln  – große Trommel, Becken, Triangel, Bongos, Tamburin, Rasseln zum Antippen
-// Links steht ein Notenständer mit einem Entchen: Antippen spielt „Alle meine Entchen" langsam vor, die passenden
-// Stäbe/Tasten leuchten dabei weich auf (≥ 0,5 s) – mitspielen geht, falsch gibt es nicht. Auf dem Notenständer
-// sitzt ein kleiner Vogel, rechts tanzt eine Maus zur Musik.
+// Links steht ein Notenständer mit einem Liedbild. Daran hängt die Lied-Kette (jede Runde ein anderes Lied):
+//   1. Lied aussuchen – Notenständer antippen: das Bild wechselt zum nächsten Lied (6 Lieder, keins der letzten drei;
+//                       über die Besuche gemerkt, zurück aus dem Stickerbuch geht die Kette mit demselben Lied weiter).
+//   2. Zuhören        – das Lied wird langsam vorgespielt, die passenden Stäbe/Tasten leuchten weich (≥ 0,5 s).
+//   3. Nachspielen    – jetzt das Kind: der nächste Stab/die nächste Taste leuchtet, Antippen spielt den Ton und das
+//                       Licht wandert weiter. Andere Stäbe klingen einfach (falsch gibt es nicht); wer mehrmals daneben
+//                       tippt, bekommt die Zeige-Hand.
+//   4. Besuch         – das Tier vom Liedbild kommt vorn herein und freut sich (antippen).
+//   5. Note aufhängen – eine große Note erscheint; nach oben an die Leine zwischen den zwei Wandbildern ziehen
+//                       (loslassen irgendwo genügt). Die Leine füllt sich über die Besuche hinweg (bis zu acht Noten,
+//                       sie klingen beim Antippen). Sticker.
+// Auf dem Notenständer sitzt ein kleiner Vogel, rechts tanzt eine Maus zur Musik.
 
-import { stage, spr, meta, tap, Actor, fx, note, voice, animal, rand, clamp, ease, PIXI } from '../../engine/index.js';
+import { stage, spr, meta, tap, drag, Actor, fx, ui, note, voice, animal, store, rand, pick, clamp, lerp, ease, PIXI }
+  from '../../engine/index.js';
 import { Seite } from '../../gemeinsam/seiten.js';
 import { belohne } from '../../gemeinsam/sticker.js';
 import { Klangleiste } from './klangleiste.js';
+import { gemerkt, waehleFrisch, merke } from './abwechslung.js';
 import {
   REGENBOGEN, XYLO_TOENE, baueXylophon, xylophonIcon, klavierKoerper, vogel, entchenBild,
 } from './deko.js';
@@ -31,14 +42,31 @@ const VORSCHAU_AB = 1.5;       // Sekunden Abstand zwischen zwei ganzen Vorschau
 const EINZELTON_AB = 0.6;      // Sekunden Abstand zwischen zwei leisen Einzeltönen beim Wieder-Antippen
 const UEBERBLENDEN = 0.5;      // Sekunden je Schritt beim Instrumenten-Wechsel (neues ein, dann altes aus)
 
-// „Alle meine Entchen": [Stab/Taste 0…7, Länge in Vierteln]
-const ENTCHEN = [
-  [0, 1], [1, 1], [2, 1], [3, 1], [4, 2], [4, 2],
-  [5, 1], [5, 1], [5, 1], [5, 1], [4, 4],
-  [5, 1], [5, 1], [5, 1], [5, 1], [4, 4],
-  [3, 1], [3, 1], [3, 1], [3, 1], [2, 2], [2, 2],
-  [1, 1], [1, 1], [1, 1], [1, 1], [0, 4],
+// Die Lieder der Lied-Kette: [Stab/Taste 0…7 (C-Dur c''…c'''), Länge in Vierteln]. Kurze, bekannte Anfänge
+// (12–16 Töne), alle im Umfang der acht Stäbe. gast = wer zu Besuch kommt (auch das Bild auf dem Notenständer).
+const STUECKE = [
+  { id: 'entchen', gast: 'ente', noten: [   // Alle meine Entchen
+    [0, 1], [1, 1], [2, 1], [3, 1], [4, 2], [4, 2], [5, 1], [5, 1], [5, 1], [5, 1], [4, 4],
+    [5, 1], [5, 1], [5, 1], [5, 1], [4, 4]] },
+  { id: 'jakob', gast: 'baer', noten: [     // Bruder Jakob
+    [0, 1], [1, 1], [2, 1], [0, 1], [0, 1], [1, 1], [2, 1], [0, 1], [2, 1], [3, 1], [4, 2], [2, 1], [3, 1], [4, 2]] },
+  { id: 'hans', gast: 'hase', noten: [      // Hänschen klein
+    [4, 1], [2, 1], [2, 2], [3, 1], [1, 1], [1, 2], [0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [4, 1], [4, 2]] },
+  { id: 'stern', gast: 'eule', noten: [     // Funkel, funkel, kleiner Stern
+    [0, 1], [0, 1], [4, 1], [4, 1], [5, 1], [5, 1], [4, 2], [3, 1], [3, 1], [2, 1], [2, 1], [1, 1], [1, 1], [0, 2]] },
+  { id: 'lamm', gast: 'schaf', noten: [     // Ein kleines Lämmchen (Mary had a little lamb)
+    [2, 1], [1, 1], [0, 1], [1, 1], [2, 1], [2, 1], [2, 2], [1, 1], [1, 1], [1, 2], [2, 1], [4, 1], [4, 2]] },
+  { id: 'farm', gast: 'kuh', noten: [       // Old MacDonald (Anfang, in F)
+    [3, 1], [3, 1], [3, 1], [0, 1], [1, 1], [1, 1], [0, 2], [5, 1], [5, 1], [4, 1], [4, 1], [3, 2]] },
 ];
+
+const GAST_Y = 1556;            // der Besuch steht vorn auf dem Holzboden
+const GAST_SKALA = 0.3;
+const NOTE_SKALA = 0.55;        // große Note zum Aufhängen
+const LEINE_SKALA = 0.36;       // Note an der Leine
+const LEINE_PLAETZE = 8;
+const LEINE_TOENE = [72, 74, 76, 79, 81, 84, 86, 88];
+const NACHSPIEL_DANEBEN = 3;    // so oft daneben, dann zeigt die Hand den leuchtenden Stab
 
 // Trommel-Ecke: Bild, Ort, Größe, Bewegung beim Antippen. Was steht, steht mit den Füßen bei (x, y) auf dem
 // Holzboden; was hängt (haken), hängt an einem Holzknauf an der Wand und schwingt beim Antippen.
@@ -71,6 +99,9 @@ export class Instrumente extends Seite {
     this.letzteVorschau = -99;
     this.letzterEinzelton = -99;
     this.blinzeln = rand(2, 4);
+    // Lied-Kette: auswahl → vorspielen → nachspielen → besuch → note → auswahl
+    this.kette = { phase: 'auswahl', stueck: null, i: 0, daneben: 0, gast: null, note: null };
+    this.letzteHand = -99;
 
     this.buehne = new PIXI.Container({ label: 'instrumente' });
     this.buehne.zIndex = 10;
@@ -85,8 +116,43 @@ export class Instrumente extends Seite {
     this.baueNotenstaender();
     this.baueMaus();
     this.baueWandbilder();
+    this.baueLeine();
     this.ordne();
     this.wahl('xylo', { sofort: true });
+    this.fortsetzen(this.szene.params?.liedkette);
+  }
+
+  // ---------------------------------------------------------------- Stand (über Besuche und das Stickerbuch hinweg)
+
+  /** Jetziger Stand der Lied-Kette für scene.rückkehr() – null, solange kein Lied gewählt ist. */
+  rueckweg() {
+    const k = this.kette;
+    if (!k.stueck || k.phase === 'auswahl') return null;
+    // Vorspielen/Nachspielen → wieder nachspielen; Besuch/Note → der Besuch kommt noch einmal
+    return { lied: k.stueck.id, besuch: k.phase === 'besuch' || k.phase === 'note' };
+  }
+
+  // Das zuletzt gewählte Lied steht auf dem Notenständer (beim nächsten Antippen kommt ein anderes). Kommt das Kind
+  // mitten in der Kette aus dem Stickerbuch zurück, geht es mit demselben Lied weiter.
+  fortsetzen(stand) {
+    const k = this.kette;
+    this.liedZuletzt = gemerkt('musik.liederS2', STUECKE.map((s) => s.id));
+    const zuletzt = STUECKE.find((s) => s.id === this.liedZuletzt[this.liedZuletzt.length - 1]);
+    const fort = stand && typeof stand === 'object' ? STUECKE.find((s) => s.id === stand.lied) : null;
+    const st = fort || zuletzt;
+    if (st) {
+      k.stueck = st;
+      this.zeigeKarte(st);
+    }
+    if (!fort) return;
+    if (stand.besuch) {
+      k.phase = 'besuch';
+      this.after(1.2, () => { if (k.phase === 'besuch' && !k.gast) this.gastKommt(); });
+    } else {
+      k.phase = 'nachspielen';
+      k.i = 0;
+      k.daneben = 0;
+    }
   }
 
   // ---------------------------------------------------------------- Xylophon
@@ -117,7 +183,10 @@ export class Instrumente extends Seite {
     note('xylo', XYLO_TOENE[i], { vol });
     fx.pop(st.c, 0.07);
     this.noteSteigt(this.xylo.c, st.x, st.y - st.h / 2 - 30);
-    if (vomKind) this.kindSpielt();
+    if (vomKind) {
+      this.kindSpielt();
+      this.nachspielTon(i);
+    }
   }
 
   // ---------------------------------------------------------------- Klavier
@@ -168,7 +237,10 @@ export class Instrumente extends Seite {
     note('klavier', KLAVIER_TOENE[i], { vol, dauer: 0.55 });
     this.drueckeTaste(i);
     this.noteSteigt(this.klavier, this.tasten[i].x, -60);
-    if (vomKind) this.kindSpielt();
+    if (vomKind) {
+      this.kindSpielt();
+      this.nachspielTon(i);
+    }
   }
 
   // ---------------------------------------------------------------- Trommeln
@@ -394,10 +466,12 @@ export class Instrumente extends Seite {
     this.welt.addChild(g);
     const s = spr('musik/notenstaender', { parent: g });
     s.scale.set(0.9);
-    const ente = entchenBild();
-    ente.position.set(2, -326);
-    ente.scale.set(1.15);
-    g.addChild(ente);
+    // Liedbild auf dem Blatt (wechselt mit dem Lied; zuerst das Entchen wie früher)
+    const karte = new PIXI.Container({ label: 'liedbild' });
+    karte.position.set(2, -326);
+    g.addChild(karte);
+    this.karte = karte;
+    this.zeigeKarte(STUECKE[0]);
     this.stand = g;
     this.standBild = s;
     tap(g, () => this.standTipp(), {
@@ -417,11 +491,48 @@ export class Instrumente extends Seite {
     });
   }
 
+  // Bild auf dem Notenständer: Entchen (gezeichnet) oder das Besuchs-Tier des Liedes
+  zeigeKarte(stueck) {
+    const k = this.karte;
+    for (const c of k.removeChildren()) c.destroy({ children: true });
+    if (stueck.id === 'entchen') {
+      const e = entchenBild();
+      e.scale.set(1.15);
+      k.addChild(e);
+      return;
+    }
+    const b = spr(`tiere/${stueck.gast}_happy`, { anchor: 0.5, parent: k });
+    const t = b.texture;
+    b.scale.set(Math.min(130 / t.width, 112 / t.height));
+    b.eventMode = 'none';
+  }
+
   standTipp() {
     fx.wobble(this.standBild, 0.05);
+    const k = this.kette;
+    if (k.phase === 'besuch' || k.phase === 'note') {
+      // gerade ist Besuch da: der Notenständer klingt nur kurz
+      note('glocke', 79, { vol: 0.2 });
+      return;
+    }
     if (this.lied) return; // läuft schon: einfach weiterhören und mitspielen
+    if (k.phase === 'auswahl') {
+      // Schritt 1: ein neues Lied (das allererste ist das Entchen, danach keins der letzten drei – auch über die
+      // Besuche hinweg: die zuletzt gewählten Lieder sind gemerkt)
+      k.stueck = !this.liedZuletzt.length ? STUECKE[0] : waehleFrisch(STUECKE, this.liedZuletzt, 3, (s) => s.id);
+      const st = k.stueck;
+      this.liedZuletzt = merke('musik.liederS2', this.liedZuletzt, st.id);
+      this.tween(this.karte.scale, { x: 0 }, 0.22, { ease: 'sineInOut' }).then(() => {
+        this.zeigeKarte(st);
+        this.tween(this.karte.scale, { x: 1 }, 0.28, { ease: 'sineOut' });
+      });
+    }
+    // Schritt 2 (auch beim Nachspielen: noch einmal anhören, dann von vorn nachspielen)
+    k.phase = 'vorspielen';
+    k.i = 0;
+    k.daneben = 0;
     if (this.instrument === 'trommeln') this.wahl('xylo');
-    const lied = { i: -1, rest: 0.9, laeuft: false };
+    const lied = { i: -1, rest: 0.9, laeuft: false, noten: k.stueck.noten };
     this.lied = lied;
     // Erst der kurze Satz (falls es ihn gibt), dann das Lied
     // (nicht mehr, wenn die Seite inzwischen verlassen wurde oder das Lied schon wieder vorbei ist)
@@ -515,6 +626,215 @@ export class Instrumente extends Seite {
         this.burst('herzen', this.stand.x + 40, this.stand.y - 480, { count: 4 });
       });
     }
+    if (this.kette.phase === 'vorspielen') this.after(fertig ? 1.2 : 0.3, () => this.starteNachspielen());
+  }
+
+  // ---------------------------------------------------------------- Lied-Kette
+
+  // Schritt 3: das Kind spielt das Lied nach – der nächste Stab leuchtet
+  starteNachspielen() {
+    const k = this.kette;
+    if (k.phase !== 'vorspielen' || this.lied) return;
+    k.phase = 'nachspielen';
+    k.i = 0;
+    k.daneben = 0;
+    voice('musik_nachspielen', { nurWenn: () => this.aktiv && k.phase === 'nachspielen' && k.i === 0 });
+  }
+
+  // Ein Ton des Kindes beim Nachspielen. Der leuchtende Stab bringt das Lied weiter, jeder andere klingt einfach.
+  nachspielTon(i) {
+    const k = this.kette;
+    if (k.phase !== 'nachspielen') return;
+    const noten = k.stueck.noten;
+    if (i === noten[k.i][0]) {
+      k.i++;
+      k.daneben = 0;
+      if (k.i >= noten.length) this.liedGeschafft();
+      return;
+    }
+    if (++k.daneben >= NACHSPIEL_DANEBEN) {
+      k.daneben = 0;
+      const ziel = this.tasteFuer(noten[k.i][0]);
+      fx.pulse(ziel);
+      if (this.szene.t - this.letzteHand > 5) {
+        this.letzteHand = this.szene.t;
+        ui.hand(ziel);
+      }
+    }
+  }
+
+  tasteFuer(i) {
+    return this.instrument === 'klavier' ? this.tasten[i].c : this.xylo.staebe[i].c;
+  }
+
+  // Das ganze Lied ist nachgespielt: Freude, dann kommt Besuch (Schritt 4)
+  liedGeschafft() {
+    const k = this.kette;
+    k.phase = 'besuch';
+    this.energie = 1;
+    this.after(0.5, () => {
+      this.maus.cheer();
+      this.burst('herzen', this.stand.x + 40, this.stand.y - 480, { count: 4 });
+    });
+    this.after(1.6, () => this.gastKommt());
+  }
+
+  gastKommt() {
+    const k = this.kette;
+    const W = stage.W;
+    const g = new Actor(k.stueck.gast, { x: W / 2 + 220, y: GAST_Y, scale: GAST_SKALA, parent: this.welt });
+    g.zIndex = 35;
+    g.da = false;
+    k.gast = g;
+    g.onTap(() => this.gastTipp(g));
+    voice('musik_besuch', { nurWenn: () => this.aktiv && k.gast === g && k.phase === 'besuch' });
+    g.walkTo(this.gastZielX(), GAST_Y, { tempo: 260 }).then(() => {
+      if (g.destroyed || k.gast !== g) return;
+      g.da = true;
+      g.sound();
+      if (k.phase === 'besuch') g.bubble('musik/note_gross_1', 3, { seite: 'links' });
+    });
+  }
+
+  gastZielX() {
+    return stage.W / 2 - 860;
+  }
+
+  gastTipp(g) {
+    const k = this.kette;
+    g.cheer({ parent: this.vorn });
+    if (k.phase !== 'besuch' || k.gast !== g) return;
+    k.phase = 'note';
+    this.after(0.6, () => this.zeigeNote(g));
+  }
+
+  // Schritt 5: eine große Note erscheint über dem Gast und will an die Leine
+  zeigeNote(g) {
+    const k = this.kette;
+    const bild = this.notenZahl % 2 === 0 ? 'musik/note_gross_1' : 'musik/note_gross_2';
+    const n = spr(bild, { anchor: 0.5, x: g.x - 40, y: 1040, parent: this.welt, z: 60 });
+    n.scale.set(0.05);
+    k.note = n;
+    note('glocke', 84, { vol: 0.22 });
+    this.tween(n, { scale: NOTE_SKALA }, 0.5, { ease: 'backOut' });
+    const platz = this.leinePlatz(this.notenZahl % LEINE_PLAETZE);
+    n.zug = drag(n, {
+      hitArea: new PIXI.Circle(0, 0, 270),
+      back: false,
+      targets: [{ x: platz.x, y: platz.y, radius: 600 }],
+      onDrop: () => this.noteAnhaengen(n),
+    });
+    this.after(1.2, () => voice('musik_note', { nurWenn: () => this.aktiv && k.note === n && !n.haengt }));
+  }
+
+  noteAnhaengen(n) {
+    const k = this.kette;
+    if (n.haengt || n.destroyed) return;
+    n.haengt = true;
+    n.zug?.off();
+    n.eventMode = 'none';
+    n.zIndex = 60;
+    const nr = this.notenZahl % LEINE_PLAETZE;
+    const platz = this.leinePlatz(nr);
+    const alt = this.leineNoten[nr];
+    if (alt && !alt.destroyed) {
+      alt.eventMode = 'none';
+      this.tween(alt, { alpha: 0 }, 0.6, { ease: 'sineInOut' }).then(() => { if (!alt.destroyed) alt.destroy(); });
+    }
+    this.notenZahl++;
+    store.set('musik.noten', this.notenZahl);
+    // Ruhe-Regel: mit sineInOut ist die Spitze π/2-mal so schnell wie der Schnitt – auch sie bleibt ≤ 1000 Einheiten/s
+    const d = Math.hypot(platz.x - n.x, platz.y - n.y);
+    this.tween(n, { x: platz.x, y: platz.y, scale: LEINE_SKALA, rotation: rand(-0.12, 0.12) },
+      Math.max(0.6, (d * Math.PI) / 2 / 1000), { ease: 'sineInOut' }).then(() => {
+      if (n.destroyed) return;
+      n.zIndex = 3;
+      this.haengeAuf(n, nr);
+      // kleiner Dreiklang, Freude, Sticker
+      [0, 2, 4].forEach((s, j) => this.after(0.14 * j, () => note('glocke', LEINE_TOENE[(nr + s) % 8], { vol: 0.22 })));
+      this.burst('funkeln', platz.x, platz.y, { count: 5 });
+      fx.wobble(n, 0.1);
+      this.maus.cheer();
+      k.gast?.cheer({ parent: this.vorn });
+      belohne(this, 'musik_trommel', 0, 560);
+      k.note = null;
+      // Der Besuch winkt und geht; dann wartet der Notenständer auf das nächste Lied
+      const g = k.gast;
+      this.after(3.2, () => {
+        k.gast = null;
+        k.phase = 'auswahl';
+        if (g && !g.destroyed) {
+          g.da = false;
+          g.rotation = 0;
+          g.walkTo(stage.W / 2 + 260, GAST_Y, { tempo: 260 }).then(() => { if (!g.destroyed) g.destroy(); });
+        }
+        fx.pulse(this.standBild);
+      });
+    });
+  }
+
+  // Note an der Leine: klingt beim Antippen
+  haengeAuf(n, nr) {
+    this.leineNoten[nr] = n;
+    tap(n, () => {
+      fx.wobble(n, 0.1);
+      note('glocke', LEINE_TOENE[nr], { vol: 0.24 });
+    }, { sound: null, squash: false, hitArea: new PIXI.Circle(0, 0, 360) });
+    n.eventMode = 'static';
+  }
+
+  // Die Leine zwischen den zwei runden Wandbildern
+  baueLeine() {
+    const hg = this.hg;
+    const t = hg.texture;
+    const bild = (px, py) => ({
+      x: hg.x + (px / 2829 - hg.anchor.x) * t.width * hg.scale.x,
+      y: hg.y + (py / 1600 - hg.anchor.y) * t.height * hg.scale.y,
+    });
+    const a = bild(570, 165);
+    const b = bild(2140, 170);
+    this.leine = { x0: a.x + 98, y0: a.y - 10, x1: b.x - 98, y1: b.y - 10, durchhang: 46 };
+    const L = this.leine;
+    const g = new PIXI.Graphics();
+    g.moveTo(L.x0, L.y0);
+    for (let k = 1; k <= 24; k++) {
+      const p = this.leinePunkt(k / 24);
+      g.lineTo(p.x, p.y);
+    }
+    g.stroke({ width: 7, color: 0xc48a4e, cap: 'round', join: 'round' });
+    for (let k = 0; k < LEINE_PLAETZE; k++) {
+      const p = this.leinePunkt(this.leineT(k));
+      g.roundRect(p.x - 7, p.y - 12, 14, 24, 5).fill(0xe9b45a).stroke({ width: 3, color: 0xb57b33 });
+    }
+    g.zIndex = 2;
+    g.eventMode = 'none';
+    this.welt.addChild(g);
+    this.leineNoten = new Array(LEINE_PLAETZE).fill(null);
+    this.notenZahl = clamp(Number(store.get('musik.noten', 0)) || 0, 0, 9999);
+    const n = Math.min(this.notenZahl, LEINE_PLAETZE);
+    for (let k = 0; k < n; k++) {
+      const p = this.leinePlatz(k);
+      const bild2 = k % 2 === 0 ? 'musik/note_gross_1' : 'musik/note_gross_2';
+      const s = spr(bild2, { anchor: 0.5, x: p.x, y: p.y, parent: this.welt, z: 3 });
+      s.scale.set(LEINE_SKALA);
+      s.rotation = rand(-0.12, 0.12);
+      this.haengeAuf(s, k);
+    }
+  }
+
+  leineT(k) {
+    return 0.07 + (0.86 * k) / (LEINE_PLAETZE - 1);
+  }
+
+  leinePunkt(t) {
+    const L = this.leine;
+    return { x: lerp(L.x0, L.x1, t), y: lerp(L.y0, L.y1, t) + L.durchhang * 4 * t * (1 - t) };
+  }
+
+  // Mitte einer Note, die am Platz k hängt
+  leinePlatz(k) {
+    const p = this.leinePunkt(this.leineT(k));
+    return { x: p.x, y: p.y + 58 };
   }
 
   // ---------------------------------------------------------------- Ablauf
@@ -544,6 +864,11 @@ export class Instrumente extends Seite {
     this.xyloLeiste.loslassen();
     this.klavierLeiste.loslassen();
     this.lied = null;
+    // Wer beim Vorspielen wegblättert, findet beim Zurückkommen das Nachspielen (Notenständer spielt es noch mal vor)
+    if (this.kette.phase === 'vorspielen') {
+      this.kette.phase = 'nachspielen';
+      this.kette.i = 0;
+    }
     for (const z of this.vorschauZeit) z.kill();
     this.vorschauZeit = [];
   }
@@ -563,11 +888,11 @@ export class Instrumente extends Seite {
     l.rest -= dt;
     if (l.rest > 0) return;
     l.i++;
-    if (l.i >= ENTCHEN.length) {
+    if (l.i >= l.noten.length) {
       this.liedEnde(true);
       return;
     }
-    const [stab, laenge] = ENTCHEN[l.i];
+    const [stab, laenge] = l.noten[l.i];
     l.rest += laenge * LIED_SCHLAG;
     if (this.instrument === 'klavier') {
       note('klavier', KLAVIER_TOENE[stab], { vol: 0.7, dauer: Math.min(0.9, laenge * LIED_SCHLAG * 0.85) });
@@ -581,12 +906,14 @@ export class Instrumente extends Seite {
     if (l.i % 4 === 0) this.vogel.singen = 1;
   }
 
-  // Leucht-Hilfe: der Stab/die Taste, die gerade dran ist, und – kurz vorher – die folgende.
-  // Linear in LICHT_ZEIT auf und ab: nie schneller als 0,5 s.
+  // Leucht-Hilfe: beim Vorspielen der Stab/die Taste, die gerade dran ist, und – kurz vorher – die folgende;
+  // beim Nachspielen der Stab, der als Nächstes dran ist. Linear in LICHT_ZEIT auf und ab: nie schneller als 0,5 s.
   leuchten(dt) {
     const l = this.lied && this.lied.laeuft ? this.lied : null;
-    const jetzt = l && l.i >= 0 ? ENTCHEN[l.i][0] : -1;
-    const folgende = l && l.i + 1 < ENTCHEN.length && l.rest <= LICHT_ZEIT + 0.05 ? ENTCHEN[l.i + 1][0] : -1;
+    let jetzt = l && l.i >= 0 ? l.noten[l.i][0] : -1;
+    const folgende = l && l.i + 1 < l.noten.length && l.rest <= LICHT_ZEIT + 0.05 ? l.noten[l.i + 1][0] : -1;
+    const k = this.kette;
+    if (!l && k.phase === 'nachspielen' && k.i < k.stueck.noten.length) jetzt = k.stueck.noten[k.i][0];
     const schritt = dt / LICHT_ZEIT;
     const liste = this.instrument === 'klavier' ? this.tasten : this.xylo.staebe;
     const andere = this.instrument === 'klavier' ? this.xylo.staebe : this.tasten;
@@ -609,9 +936,9 @@ export class Instrumente extends Seite {
     sch.sichtbar = clamp(sch.sichtbar + (l ? dt : -dt) / LICHT_ZEIT, 0, 1);
     sch.s.alpha = sch.sichtbar;
     if (sch.sichtbar <= 0) return;
-    let ziel = l && l.i >= 0 ? ENTCHEN[l.i][0] : 0;
+    let ziel = l && l.i >= 0 ? l.noten[l.i][0] : 0;
     // kurz vor dem folgenden Ton schon hinüber
-    if (l && l.i + 1 < ENTCHEN.length && l.rest < 0.22) ziel = ENTCHEN[l.i + 1][0];
+    if (l && l.i + 1 < l.noten.length && l.rest < 0.22) ziel = l.noten[l.i + 1][0];
     const st = this.xylo.staebe[ziel];
     const k = 1 - Math.exp(-dt * 14);
     sch.x += (st.x + 6 - sch.x) * k;
@@ -632,6 +959,9 @@ export class Instrumente extends Seite {
     const tief = 0.5 + 0.5 * Math.cos((b - Math.floor(b)) * Math.PI * 2);
     this.tanz.rotation = 0.08 * e * Math.sin(b * Math.PI);
     this.tanz.scale.set(1 + 0.015 * e * tief, 1 - 0.035 * e * tief);
+    // der Besuch wiegt sich mit (erst, wenn er angekommen ist)
+    const g = this.kette.gast;
+    if (g && g.da && !g.destroyed) g.rotation = 0.06 * Math.max(e, 0.4) * Math.sin(b * Math.PI);
   }
 
   vogelLeben(dt, t) {
@@ -671,6 +1001,21 @@ export class Instrumente extends Seite {
   // ---------------------------------------------------------------- Zeige-Hand
 
   hinweise() {
+    const k = this.kette;
+    if (k.phase === 'vorspielen') {
+      const l = this.lied;
+      return l && l.laeuft && l.i >= 0 ? [this.tasteFuer(l.noten[l.i][0])] : [this.stand];
+    }
+    if (k.phase === 'nachspielen') {
+      if (this.instrument === 'trommeln') return [this.wahlKnopf.xylo];
+      return [this.tasteFuer(k.stueck.noten[k.i][0]), this.stand];
+    }
+    if (k.phase === 'besuch') return k.gast && !k.gast.destroyed ? [k.gast] : [this.maus];
+    if (k.phase === 'note') {
+      const n = k.note;
+      if (n && !n.destroyed && !n.haengt) return [{ von: n, nach: this.leinePlatz(this.notenZahl % LEINE_PLAETZE) }];
+      return [this.maus];
+    }
     let ziel;
     if (this.instrument === 'klavier') ziel = this.tasten[2].c;
     else if (this.instrument === 'trommeln') ziel = this.grosseTrommel;

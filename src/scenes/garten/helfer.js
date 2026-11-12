@@ -1,7 +1,7 @@
 // Kleine Helfer für den Garten: gezeichneter Vogel, ruhig fliegende Tierchen (Biene, Schmetterlinge),
 // ziehende Wolken, Umhängen in einen anderen Container und ein weicher Bogenflug.
 
-import { spr, tex, meta, tap, sfx, note, animal, fx, rand, pick, clamp, PIXI } from '../../engine/index.js';
+import { spr, tex, meta, tap, sfx, note, animal, fx, rand, pick, clamp, stage, PIXI } from '../../engine/index.js';
 
 // ---------------------------------------------------------------- allgemeine Hilfen
 
@@ -76,6 +76,56 @@ export function bogen(seite, obj, x, y, { dauer = 0.6, höhe = 120, skala = null
       obj.rotation = von.r + dreh * p;
     },
   });
+}
+
+/** Zufällig aus der Liste, aber nie dasselbe wie `letztes` (wenn es eine Wahl gibt). */
+export function wähleAnders(liste, letztes) {
+  const rest = liste.filter((x) => x !== letztes);
+  return pick(rest.length ? rest : liste);
+}
+
+/**
+ * Zufällig aus der Liste, aber keins der letzten `merken` (verlauf = Array, wird ergänzt) – so kommt nicht
+ * dreimal in vier Runden derselbe Gast.
+ */
+export function wähleNeu(liste, verlauf, merken = 2) {
+  const zuletzt = verlauf.slice(-merken);
+  const rest = liste.filter((x) => !zuletzt.includes(x));
+  const wahl = pick(rest.length ? rest : liste);
+  verlauf.push(wahl);
+  if (verlauf.length > 8) verlauf.shift();
+  return wahl;
+}
+
+/**
+ * Ein Tier isst oder trinkt etwas: Das Ding (in tier.parent oder gleichwertig unverschobenem Container) fliegt im
+ * kleinen Bogen zum Maul, Pose eat, ein paar ruhige Bissen, es wird klein und verschwindet, dann freut sich das Tier.
+ * → Promise<boolean> (true = aufgegessen)
+ */
+export async function lassEssen(seite, tier, ding, { ton = 'common/mampf', bissen = 2, vol = 0.75 } = {}) {
+  if (!tier || tier.destroyed || !ding || ding.destroyed) return false;
+  ding.eventMode = 'none';
+  if (tier.parent && ding.parent !== tier.parent) umhängen(ding, tier.parent);
+  ding.zIndex = (tier.zIndex || 0) + 5;
+  const maul = tier.point('mouth') || { x: tier.x, y: tier.y - 150 };
+  const s0 = Math.abs(ding.scale.y);
+  await bogen(seite, ding, maul.x, maul.y, { dauer: 0.45, höhe: 70, skala: s0 * 0.85 });
+  if (ding.destroyed || tier.destroyed) return false;
+  tier.pose('eat');
+  for (let k = 0; k < bissen; k++) {
+    if (ding.destroyed) break;
+    sfx(ton, { vol });
+    await seite.tween(ding, { scale: Math.abs(ding.scale.y) * 0.72 }, 0.3, { ease: 'sineInOut' });
+    await seite.wait(0.14);
+  }
+  if (!ding.destroyed) {
+    await seite.tween(ding, { alpha: 0, scale: Math.abs(ding.scale.y) * 0.4 }, 0.25, { ease: 'quadIn' });
+    if (!ding.destroyed) ding.destroy({ children: true });
+  }
+  await seite.wait(0.2);
+  if (tier.destroyed) return false;
+  await tier.cheer({ parent: seite.vorn });
+  return true;
 }
 
 // ---------------------------------------------------------------- Vogel (gezeichnet)
@@ -180,10 +230,42 @@ export class Vogel {
 
 // ---------------------------------------------------------------- Flieger (Biene, Schmetterling)
 
+// Alle Flieger (abgebaute werden beim nächsten Weiterreichen vergessen)
+const alleFlieger = new Set();
+
+/**
+ * Ein Finger hat ein Tierchen getroffen: Er wirkt zusätzlich auf das antippbare Ding darunter (wie ein Aufsetzen
+ * dort) – Flieger selbst zählen dabei nicht. info = {x, y, pointerId} aus tap() (x, y im Eltern-Container).
+ */
+function weiterreichen(c, info) {
+  const renderer = stage.app?.renderer;
+  if (!renderer || !c.parent || c.destroyed) return;
+  const g = c.parent.toGlobal(new PIXI.Point(info.x, info.y));
+  const aus = [];
+  for (const f of alleFlieger) {
+    if (f.c.destroyed) { alleFlieger.delete(f); continue; }
+    if (f.c.eventMode !== 'none') { aus.push([f.c, f.c.eventMode]); f.c.eventMode = 'none'; }
+  }
+  let ziel = null;
+  try { ziel = renderer.events.rootBoundary.hitTest(g.x, g.y); } catch { ziel = null; }
+  for (const [o, m] of aus) if (!o.destroyed) o.eventMode = m;
+  for (let o = ziel; o && !o.destroyed; o = o.parent) {
+    if (!o.listenerCount?.('pointerdown')) continue;
+    const ev = {
+      type: 'pointerdown', pointerId: info.pointerId, pointerType: 'touch', global: g, target: ziel,
+      currentTarget: o, weitergereicht: true, stopPropagation() {}, preventDefault() {},
+    };
+    try { o.emit('pointerdown', ev); } catch (err) { console.error('[sigo] Fehler beim Weiterreichen:', err); }
+    return;
+  }
+}
+
 /**
  * Ein ruhig fliegendes Tierchen. Es fliegt weich zu Zielen, die `wähleZiel(flieger)` liefert
  * ({x, y, sitzen, dauer, ding}); sitzt es, wartet es `dauer` Sekunden. Antippen → flattert auf.
  * art 'biene' (Seitenansicht, schaut nach rechts) oder 'falter' (von oben, Flügelschlag).
+ * Ein Tipp auf das Tierchen geht außerdem an das, was darunter liegt (Blume, Pflanze, Korb): Es flattert auf, und
+ * die Blume wird trotzdem gegriffen – so verschluckt nie ein Schmetterling den Griff nach der Blüte.
  */
 export class Flieger {
   constructor(seite, id, { x, y, maß = 140, art = 'falter', tempo = 100, z = 400, parent, wähleZiel }) {
@@ -207,7 +289,11 @@ export class Flieger {
     this.eile = 1;           // > 1 kurz nach dem Aufflattern
     this.puls = 0;           // kurzes Größer-Werden beim Antippen (update() rechnet es ein)
     this.c.hitArea = new PIXI.Circle(0, 0, Math.max(125, maß * 0.75));
-    tap(this.c, () => this.aufflattern(), { sound: null, squash: false });
+    tap(this.c, (info) => {
+      this.aufflattern();
+      weiterreichen(this.c, info);
+    }, { sound: null, squash: false });
+    alleFlieger.add(this);
   }
 
   /** Fliegt es gerade (sitzt nicht)? */

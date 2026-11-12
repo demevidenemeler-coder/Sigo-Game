@@ -55,6 +55,61 @@ export function merker(parent) {
   return g;
 }
 
+// ---------------------------------------------------------------- Abwechslung und Flüge
+
+/** Zufällig aus der Liste, aber nie dasselbe wie `zuletzt` (wenn es eine Wahl gibt). */
+export function andere(liste, zuletzt) {
+  const frei = liste.filter((x) => x !== zuletzt);
+  return pick(frei.length ? frei : liste);
+}
+
+// Ruhe-Regel: nichts fliegt schneller als etwa so viele Einheiten/s (Spitze)
+const FLUG_TEMPO = 1200;
+
+/**
+ * Dauer eines Bogenflugs (Strecke dx/dy, Bogenhöhe h, Verlauf sineInOut): so lang, dass die schnellste Stelle des
+ * Flugs FLUG_TEMPO nicht überschreitet, mindestens `min` Sekunden. Weg = (dx·p, dy·p − 4h·p(1−p)); bei sineInOut ist
+ * dp/dt = (π/T)·√(p(1−p)), also Tempo = |Weg'(p)|·(π/T)·√(p(1−p)) – davon das Größte über p.
+ */
+export function flugDauer(dx, dy, h, min) {
+  let m = 0;
+  for (let i = 1; i < 40; i++) {
+    const p = i / 40;
+    const vy = dy - 4 * h * (1 - 2 * p);
+    m = Math.max(m, Math.hypot(dx, vy) * Math.sqrt(p * (1 - p)));
+  }
+  return Math.max(min, Math.PI * m / FLUG_TEMPO);
+}
+
+/**
+ * Ding im Bogen nach (x, y) fliegen lassen (Koordinaten seines Eltern-Containers), weich, höchstens FLUG_TEMPO.
+ * opt: {hoehe=120, min=0.5, skala (Endgröße, sonst bleibt sie), drehung (Enddrehung)} → Promise<boolean>
+ */
+export function bogenFlug(seite, obj, x, y, { hoehe = 120, min = 0.5, skala, drehung } = {}) {
+  const x0 = obj.x;
+  const y0 = obj.y;
+  const k0 = Math.abs(obj.scale.y);
+  const r0 = obj.rotation;
+  const proxy = { p: 0 };
+  return seite.tween(proxy, { p: 1 }, flugDauer(x - x0, y - y0, hoehe, min), {
+    ease: 'sineInOut',
+    onUpdate: () => {
+      if (obj.destroyed) return;
+      const p = proxy.p;
+      obj.x = x0 + (x - x0) * p;
+      obj.y = y0 + (y - y0) * p - hoehe * 4 * p * (1 - p);
+      if (skala !== undefined) {
+        const k = k0 + (skala - k0) * p;
+        obj.scale.set(Math.sign(obj.scale.x || 1) * k, k);
+      }
+      if (drehung !== undefined) obj.rotation = r0 + (drehung - r0) * p;
+    },
+  });
+}
+
+/** Weiche, ruhige Farben (Fahnen, Wimpel) */
+export const FARBEN = [0xf26b6b, 0x5fa8f0, 0xffcf3f, 0x6fcf6a, 0xb88ae8, 0xff9a45];
+
 // ---------------------------------------------------------------- Bilder
 
 /**

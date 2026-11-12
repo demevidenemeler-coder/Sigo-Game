@@ -218,6 +218,61 @@
       "ax": 0.497,
       "ay": 0.982,
       "desc": "freundlicher roter Krebs von vorn"
+    },
+    "nest": {
+      "ax": 0.507,
+      "ay": 0.984,
+      "desc": "leeres Schilfnest von vorn (Mulde sichtbar)"
+    },
+    "ei": {
+      "ax": 0.497,
+      "ay": 0.985,
+      "desc": "weißes Ei, steht (zum Einfärben)"
+    },
+    "ei_gepunktet": {
+      "ax": 0.5,
+      "ay": 0.985,
+      "desc": "cremefarbenes Ei mit braunen Tupfen"
+    },
+    "eierschale": {
+      "ax": 0.497,
+      "ay": 0.984,
+      "desc": "untere Hälfte einer Eierschale mit Zackenrand"
+    },
+    "halm": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "kleines Bündel Schilfhalme mit Rohrkolben (Nest-Baustoff)"
+    },
+    "korken": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Korken der Flaschenpost"
+    },
+    "flasche_offen": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Flaschenpost ohne Korken (Hals rechts oben offen), Brief noch drin"
+    },
+    "brief_offen": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "aufgerollter leerer Brief (Pergament, Ränder eingerollt)"
+    },
+    "brief_rolle": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "zusammengerollter Brief mit roter Schleife"
+    },
+    "schatzkiste_zu": {
+      "ax": 0.5,
+      "ay": 0.984,
+      "desc": "kleine Schatzkiste, geschlossen"
+    },
+    "feder": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "weiche weiße Entenfeder (Nest-Baustoff)"
     }
   },
   "audio": {}

@@ -233,6 +233,57 @@ export function tippStelle(parent, x, y, r, fn, opt = {}) {
   return c;
 }
 
+/**
+ * Denkblase mit Bild an einer festen Stelle (für Dinge, die keine Figur sind – z. B. das Auto „denkt" an den
+ * nächsten Schritt). (x, y) = kleinstes Bläschen in Koordinaten von seite.vorn. Eine neue Blase derselben Seite
+ * löst die alte weich ab. opt: {sek = 2.6, links = false, tint}. → Promise (wenn wieder weg)
+ */
+export async function zeigeBlase(seite, x, y, quelle, opt = {}) {
+  const alt = seite._feuerBlase;
+  if (alt && !alt.destroyed) {
+    seite._feuerBlase = null;
+    seite.tween(alt, { alpha: 0 }, 0.25, { ease: 'sineInOut' }).then(() => { if (!alt.destroyed) alt.destroy({ children: true }); });
+  }
+  const b = new Container({ label: 'blase' });
+  b.eventMode = 'none';
+  b.zIndex = 80;
+  const grund = spr('common/blase_denk', { parent: b });
+  const m = grund.texture;
+  const schwanz = [m.width * 0.1, m.height * 0.95];
+  const innen = [m.width * 0.55, m.height * 0.45];
+  grund.anchor.set(schwanz[0] / m.width, schwanz[1] / m.height);
+  const s = 330 / m.width;
+  const richtung = opt.links ? -1 : 1;
+  grund.scale.set(s * richtung, s);
+  const bild = spr(quelle, { parent: b });
+  bild.anchor.set(0.5);
+  bild.scale.set(170 / Math.max(bild.texture.width, bild.texture.height, 1));
+  if (opt.tint !== undefined) bild.tint = opt.tint;
+  bild.position.set((innen[0] - schwanz[0]) * s * richtung, (innen[1] - schwanz[1]) * s);
+  b.position.set(x, y);
+  b.scale.set(0.6);
+  b.alpha = 0;
+  seite.vorn.addChild(b);
+  seite._feuerBlase = b;
+  seite.tween(b, { alpha: 1 }, 0.35, { ease: 'sineInOut' });
+  const ok = await seite.tween(b, { scale: 1 }, 0.45, { ease: 'backOut' });
+  if (ok) await seite.wait(Math.max(0.6, opt.sek ?? 2.6));
+  if (!b.destroyed) await seite.tween(b, { alpha: 0, scale: 0.85 }, 0.45, { ease: 'sineInOut' });
+  if (!b.destroyed) b.destroy({ children: true });
+  if (seite._feuerBlase === b) seite._feuerBlase = null;
+  return ok;
+}
+
+/**
+ * Rand (pad) für actor.onTap, damit auch kleine Figuren (Entenkind, Frosch, Igel) eine Tippfläche von
+ * mindestens `breite` Einheiten haben (Regel für kleine Hände: lieber 260+). Gerechnet wie Actor.onTap.
+ */
+export function tippRand(figur, breite = 270, mindestens = 45) {
+  const s = figur.sprite;
+  const halb = s.texture.width * Math.max(s.anchor.x, 1 - s.anchor.x) * Math.abs(figur.scale.x);
+  return Math.max(mindestens, Math.ceil(breite / 2 - halb));
+}
+
 /** Ein kleines Geräusch, das sich nicht stapelt: höchstens alle `abstand` Sekunden. */
 export function entprellt(abstand = 0.6) {
   let zuletzt = -1e9;

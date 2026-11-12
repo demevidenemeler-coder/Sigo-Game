@@ -70,6 +70,12 @@ export class Decke {
     }
     this.leerC = new PIXI.Container();
     this.pinselC = new PIXI.Container();
+    // „Schotter abladen": alles rechts einer welligen Kante wird nach dem Füllen wieder weggenommen
+    this.kanteC = new PIXI.Container();
+    this.kanteG = new PIXI.Graphics();
+    this.kanteG.blendMode = 'erase';
+    this.kanteC.addChild(this.kanteG);
+    this._kante = [];
     this.pool = [];
 
     // Zellen für den Fortschritt
@@ -87,6 +93,33 @@ export class Decke {
   /** Volle Decke (ohne Einblenden – das macht die Seite mit sprite.alpha). */
   fuelle() {
     this.renderer.render({ container: this.fuellC, target: this.rt, clear: true, clearColor: [0, 0, 0, 0] });
+    for (const z of this.zellen) z.weg = false;
+    this.anteil = 0;
+  }
+
+  /**
+   * Decke nur links von xRechts (Koordinaten des Eltern-Containers), mit weicher, welliger Kante – so entsteht sie
+   * hinter dem Kipper, der Schotter ablädt. Zählt nicht als Walz-Fortschritt.
+   */
+  zeigeBis(xRechts) {
+    const kx = xRechts - this.x;
+    if (kx >= this.w) { this.fuelle(); return; }
+    this.renderer.render({ container: this.fuellC, target: this.rt, clear: true, clearColor: [0, 0, 0, 0] });
+    if (kx > -40) {
+      const p = this._kante;
+      p.length = 0;
+      const n = 9;
+      p.push(this.w + 10, -10);
+      for (let i = 0; i <= n; i++) {
+        const y = -10 + ((this.h + 20) * i) / n;
+        p.push(Math.max(0, kx + Math.sin(i * 1.7) * 22 + Math.sin(i * 0.6 + 1) * 12), y);
+      }
+      p.push(this.w + 10, this.h + 10);
+      this.kanteG.clear().poly(p).fill(0xffffff);
+    } else {
+      this.kanteG.clear().rect(-10, -10, this.w + 20, this.h + 20).fill(0xffffff);
+    }
+    this.renderer.render({ container: this.kanteC, target: this.rt, clear: false });
     for (const z of this.zellen) z.weg = false;
     this.anteil = 0;
   }
@@ -145,6 +178,7 @@ export class Decke {
     if (!this.sprite.destroyed) this.sprite.texture = PIXI.Texture.EMPTY;
     this.fuellC.destroy({ children: true });
     this.pinselC.destroy({ children: true });
+    this.kanteC.destroy({ children: true });
     this.leerC.destroy();
     this.ausschnitt?.destroy(false);
     this.rt.destroy(true);

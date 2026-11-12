@@ -1,36 +1,48 @@
-// Seite 1: die Feuerwache.
-// Glocke antippen → läutet, das Rolltor fährt weich hoch, der Fuchs mit Helm rutscht die Stange hinunter und hüpft
-// ins Auto. Auto antippen → Tatü, das Blaulicht glimmt, das Auto fährt hinaus → weiter zur Einsatz-Seite.
-// Kommt man zurück, fährt das Auto rückwärts wieder in die Garage und das Tor geht zu (endlose Schleife).
-// Drei Helme liegen bereit: auf Hund, Katze und Bär ziehen. Hydrant, Schlauchrolle, Eimer reagieren beim Antippen,
-// die Rutschstange auch (ist der Fuchs noch oben, baumeln seine Pfoten kurz aus dem Loch in der Decke).
+// Seite 1: die Feuerwache – Ablauf „Ausrücken" in fünf Schritten:
+//   1. Glocke antippen → sie läutet, das Rolltor fährt weich hoch, das Blaulicht glimmt, und eine Denkblase an der
+//      Glocke zeigt, was heute los ist (Feuer, Mülleimer, Katze, Ballon, Entenkind – nie zweimal dasselbe).
+//   2. Oben aus dem Loch baumeln die Pfoten des Fuchses: ihn an der Stange hinunterziehen (Antippen geht auch).
+//   3. Helme auf die Mannschaft ziehen (drei Tiere, jede Runde etwas andere). Waren sie schon behelmt: weiter.
+//   4. Die Mannschaft und der Fuchs steigen von selbst nacheinander ein.
+//   5. Auto antippen → Tatü, es fährt hinaus → weiter zur Einsatz-Seite.
+// Kommt das Auto zurück: Mannschaft steigt aus, legt die Helme zurück, der Orden vom Einsatz schwebt an die Wand
+// (die Orden-Reihe wächst über die Runden), das Auto fährt rückwärts in die Garage, das Tor geht zu, und ein Tier der
+// Mannschaft geht nach Hause – ein neues kommt. Hydrant, Schlauchrolle, Eimer, Stange, Orden reagieren beim Antippen.
 
-import { spr, sfx, voice, note, tap, drag, Actor, fx, rand, pick, PIXI } from '../../engine/index.js';
+import { spr, sfx, voice, note, tap, drag, Actor, fx, rand, pick, clamp, PIXI } from '../../engine/index.js';
 import { Seite } from '../../gemeinsam/seiten.js';
 import { belohne } from '../../gemeinsam/sticker.js';
 import { FeuerAuto, setzeHelm, helmSitz, helmSprite, kopfPunkt, freue, feuerSticker } from './auto.js';
-import { Vogel, Schmetterling, Wolken, tippStelle, entprellt } from './deko.js';
+import { Vogel, Schmetterling, Wolken, tippStelle, entprellt, zeigeBlase } from './deko.js';
+import { EINSAETZE, naechsterEinsatz, waehleMannschaft, MANNSCHAFT, ordenZahl, ordenDazu, ORDEN_MAX } from './einsaetze.js';
 
 const AUTO_SKALA = 0.8;
 const AUTO_Z_GARAGE = 10;     // in der Garage: hinter dem Rolltor (z 20)
 const AUTO_Z_DRAUSSEN = 35;   // draußen: vor Eimer (12), Hydrant (30), Fuchs (26); hinter den Tieren (40) und Helmen (45)
 const TOR = { links: -400, rechts: 576, oben: 772, unten: 1300 };  // Garagenöffnung (Szenen-Koordinaten)
 const AUS_TOR = { x: 330, y: 1372, scale: 0.86 };                  // Platz vor der Garage (schräg rechts davor)
-const WARTENDE = [
-  { id: 'hund', x: -890, y: 1478, scale: 0.31 },
-  { id: 'katze', x: -640, y: 1490, scale: 0.3 },
-  { id: 'baer', x: -395, y: 1482, scale: 0.3 },
+const PLAETZE = [
+  { x: -890, y: 1478 },
+  { x: -640, y: 1490 },
+  { x: -395, y: 1482 },
 ];
+const TIER_SKALA = { hund: 0.31, katze: 0.3, baer: 0.3, affe: 0.29, schwein: 0.28, hase: 0.3 };
 const HELM_PLAETZE = [{ x: 420, y: 1468 }, { x: 650, y: 1478 }, { x: 880, y: 1466 }];
 const HELM_SKALA = 0.68;
 const STANGE_X = 847;         // Mitte der gemalten Rutschstange (im Bild x 2250…2274, abgelesen)
 const FUCHS_X = STANGE_X - 30; // Anker des Fuchses beim Rutschen: sein Körper liegt dann mittig an der Stange
+// Orden-Reihe an der roten Wand links und rechts vom runden Fenster (Aufhängung oben)
+const ORDEN_PLAETZE = [-315, -195, -75, 345, 465, 585].map((x) => ({ x, y: 522 }));
+const ORDEN_SKALA = 0.3;
+// Denkblase an der Glocke (kleinstes Bläschen)
+const BLASE_GLOCKE = { x: -470, y: 640 };
 
 export class Wache extends Seite {
   static hg = 'feuerwehr/hg_wache';
 
   aufbau() {
-    this.zustand = 'zu';   // 'zu' | 'alarm' | 'bereit' | 'faehrt' | 'weg' | 'heim'
+    // 'zu' | 'alarm' | 'stange' | 'rutscht' | 'helme' | 'einsteigen' | 'bereit' | 'faehrt' | 'weg' | 'heim'
+    this.zustand = 'zu';
     this.klack = entprellt(0.5);
     this.bimmel = entprellt(1.0);
     this.spritz = entprellt(1.5);
@@ -50,6 +62,7 @@ export class Wache extends Seite {
     this.baueWartende();
     this.baueHelme();
     this.baueKleinkram();
+    this.baueOrden();
 
     this.vogel = new Vogel(this, {
       parent: this.welt,
@@ -100,7 +113,7 @@ export class Wache extends Seite {
     fx.pop(this.glocke, 0.1);
   }
 
-  // ---------------------------------------------------------------- Glocke
+  // ---------------------------------------------------------------- Glocke, Alarm
 
   baueGlocke() {
     const p = this.punkt('glocke', { x: -594, y: 720 });
@@ -116,21 +129,46 @@ export class Wache extends Seite {
     this.bimmel('common/glocke', { vol: 0.8 });   // entprellt: wildes Tippen läutet nicht zehnmal übereinander
     fx.wobble(g, 0.22);
     if (this.zustand === 'zu') this.alarm();
+    // während des Alarms zeigt die Glocke noch einmal, was los ist – aber nur, wenn gerade keine Blase zu sehen ist
+    // (Dauertippen baut sie sonst immer neu auf, und sie pulsiert zwischen halb durchsichtig und sichtbar)
+    else if (['alarm', 'stange', 'helme'].includes(this.zustand) && this.szene.einsatzWahl && !this.blaseZuSehen()) {
+      this.einsatzBlase();
+    }
+  }
+
+  blaseZuSehen() {
+    const b = this._feuerBlase;
+    return !!b && !b.destroyed;
+  }
+
+  einsatzBlase() {
+    const e = EINSAETZE[this.szene.einsatzWahl];
+    if (!e) return;
+    const tint = this.szene.einsatzWahl === 'ballon' ? 0xff7d7d : undefined;
+    zeigeBlase(this, BLASE_GLOCKE.x, BLASE_GLOCKE.y, e.icon, { sek: 3, tint });
   }
 
   async alarm() {
     this.zustand = 'alarm';
+    this.szene.einsatzWahl = naechsterEinsatz(this.szene);
     this.auto.blaulicht(true);
     // Tor rollt weich hoch
     this.after(0.35, () => sfx('common/rolltor', { vol: 0.75 }));
     this.tween(this.tor, { y: TOR.oben - 4 }, 2.3, { ease: 'sineInOut', delay: 0.3 });
-    // Fuchs rutscht die Stange hinunter
-    await this.wait(0.7);
-    await this.fuchsRutscht();
-    await this.wait(0.35);
-    await this.fuchsSteigtEin();
-    this.zustand = 'bereit';
-    fx.pop(this.auto.f.rumpf, 0.04);
+    // die Glocke zeigt den Einsatz
+    this.after(0.5, () => this.einsatzBlase());
+    await this.wait(2.0);
+    // Oben aus dem Loch baumeln die Pfoten des Fuchses: er wartet, dass man ihn hinunterzieht
+    await this.fuchsGuckt(true);
+    this.zustand = 'stange';
+    this.fuchsZiehbar(true);
+    this.stangeHinweis(2.5);
+  }
+
+  stangeHinweis(verz) {
+    this._hinweis?.kill();
+    const passt = () => this.aktiv && this.zustand === 'stange';
+    this._hinweis = this.after(verz, () => { if (passt()) voice('feuerwehr_stange', { nurWenn: passt }); });
   }
 
   // ---------------------------------------------------------------- Fuchs an der Stange
@@ -147,7 +185,10 @@ export class Wache extends Seite {
     this.fuchsMaske = new PIXI.Graphics().rect(oben.x - 260, oben.y - 20, 520, 900).fill(0xffffff);
     this.welt.addChild(this.fuchsMaske);
     this.fuchs.mask = this.fuchsMaske;
-    this.fuchs.onTap(() => freue(this, this.fuchs, { herzen: 3 }), { pad: 60 });
+    this.fuchs.onTap(() => {
+      if (this.zustand === 'stange') return;   // dann übernimmt das Ziehen (auch ein Tipp lässt ihn rutschen)
+      freue(this, this.fuchs, { herzen: 3 });
+    }, { pad: 60 });
 
     // Die gemalte Stange noch einmal VOR dem Fuchs (gleiche Farben wie im Hintergrund): Solange er an ihr
     // hinunterrutscht, umarmt er sie – sonst sähe es aus, als säße er oben auf einem Stiel.
@@ -169,6 +210,7 @@ export class Wache extends Seite {
     this.stangeVorn = g;
 
     // Die Stange selbst ist antippbar: Ist der Fuchs noch oben, baumeln kurz seine Pfoten aus dem Loch.
+    // Wartet er gerade auf das Hinunterziehen, rutscht er los.
     tippStelle(this.welt, STANGE_X, (oben.y + unten.y) / 2, 0, () => this.stangeAngetippt(), {
       label: 'stange', z: 3, breite: 210, hoehe: unten.y - oben.y,
     });
@@ -188,31 +230,78 @@ export class Wache extends Seite {
     this.pling('common/klack', { vol: 0.35 });
     note('glocke', pick([79, 83, 86]), { vol: 0.3 });
     this.burst('funkeln', STANGE_X, rand(850, 1150), { count: 2 });
+    if (this.zustand === 'stange') {
+      this.fuchsLos();
+      return;
+    }
+    if (this.zustand !== 'zu' || this.fuchs.visible || this.guckt) return;
+    // Fuchs schaut kurz von oben herunter: erst die Pfoten, dann wieder hinauf
+    this.fuchsGuckt(false);
+  }
+
+  // Pfoten aus dem Loch: bleiben = true (Alarm, er wartet) oder nur kurz schauen
+  async fuchsGuckt(bleiben) {
     const f = this.fuchs;
-    if (this.zustand !== 'zu' || f.visible || this.guckt) return;
-    // Fuchs schaut von oben herunter: erst die Pfoten, dann wieder hinauf
-    this.guckt = true;
     const { oben } = this.stange;
+    this.guckt = true;
     f.stop();
     f.mask = this.fuchsMaske;
     this.fuchsMaske.visible = true;
     f.schatten.visible = false;
-    f.position.set(FUCHS_X, oben.y - 20);
+    if (!f.visible) f.position.set(FUCHS_X, oben.y - 20);
+    f.x = FUCHS_X;
+    f.alpha = 1;
     f.visible = true;
     this.zeigeStangeVorn(true);
-    this.tween(f, { y: oben.y + 110 }, 0.6, { ease: 'sineOut' }).then(async (ok) => {
-      if (ok) {
-        f.sound();
-        await this.wait(0.9);
-        if (this.zustand === 'zu') ok = await this.tween(f, { y: oben.y - 20 }, 0.6, { ease: 'sineIn' });
-      }
+    let ok = await this.tween(f, { y: oben.y + (bleiben ? 150 : 110) }, 0.6, { ease: 'sineOut' });
+    if (ok) f.sound();
+    if (bleiben) {
       this.guckt = false;
-      // beim Alarm übernimmt das Rutschen – dann nichts verstecken
-      if (ok && this.zustand === 'zu') {
-        f.visible = false;
-        this.zeigeStangeVorn(false);
-      }
+      return ok;
+    }
+    if (ok) {
+      await this.wait(0.9);
+      if (this.zustand === 'zu') ok = await this.tween(f, { y: oben.y - 20 }, 0.6, { ease: 'sineIn' });
+    }
+    this.guckt = false;
+    // beim Alarm übernimmt das Rutschen – dann nichts verstecken
+    if (ok && this.zustand === 'zu') {
+      f.visible = false;
+      this.zeigeStangeVorn(false);
+    }
+    return ok;
+  }
+
+  // Der wartende Fuchs lässt sich an der Stange hinunterziehen (nur senkrecht). Loslassen oder Antippen: er rutscht
+  // den Rest von selbst – egal wie weit gezogen wurde.
+  fuchsZiehbar(an) {
+    this.fuchsZug?.off();
+    this.fuchsZug = null;
+    if (!an) return;
+    const f = this.fuchs;
+    const { oben, unten } = this.stange;
+    this.fuchsZug = drag(f, {
+      pad: 70,
+      lift: 1.04,
+      onMove: () => {
+        f.x = FUCHS_X;
+        f.y = clamp(f.y, oben.y + 60, unten.y + 8);
+        if (f.y > unten.y - 30) this.fuchsLos();   // ganz unten angekommen: das Ziehen endet von selbst
+      },
+      onDrop: (ziel, ctx) => {
+        ctx.erledigt = true;
+        f.zIndex = 26;
+        this.fuchsLos();
+      },
     });
+  }
+
+  fuchsLos() {
+    if (this.zustand !== 'stange') return;
+    this.zustand = 'rutscht';
+    this.fuchsZiehbar(false);
+    this.fuchs.zIndex = 26;
+    this.fuchsRutscht().then(() => this.nachDemRutschen());
   }
 
   async fuchsRutscht() {
@@ -227,13 +316,26 @@ export class Wache extends Seite {
     f.visible = true;
     this.zeigeStangeVorn(true);
     sfx('common/rutsch', { vol: 0.7 });
-    await this.tween(f, { y: unten.y + 8 }, 1.05, { ease: 'quadIn' });
+    const rest = clamp((unten.y + 8 - f.y) / (unten.y - oben.y), 0.2, 1);
+    await this.tween(f, { y: unten.y + 8 }, 1.05 * Math.sqrt(rest), { ease: 'quadIn' });
     f.mask = null;
     this.fuchsMaske.visible = false;
     f.schatten.visible = true;
     fx.pop(f, 0.1);
     sfx('common/landen', { vol: 0.7 });
     f.sound();
+    this.zeigeStangeVorn(false);
+  }
+
+  async nachDemRutschen() {
+    await this.wait(0.4);
+    if (this.tiere.every((t) => t.helm)) {
+      this.einsteigen();
+      return;
+    }
+    this.zustand = 'helme';
+    this.fuchs.bubble('feuerwehr/helm', 2.4, { seite: 'links' });
+    this.helmHinweis(2.5);
   }
 
   async fuchsSteigtEin() {
@@ -244,7 +346,6 @@ export class Wache extends Seite {
     const skalaZiel = Math.abs(fahrer.worldTransform.a / this.welt.worldTransform.a);
     f.schatten.visible = false;
     f.stop();
-    this.zeigeStangeVorn(false);   // er lässt die Stange los
     // eigener Bogen statt hopTo: hopTo würde den Fuchs umdrehen, der Helm sitzt aber auf der Blickrichtung
     const von = { x: f.x, y: f.y, s: f.scale.x };
     const p = { t: 0 };
@@ -277,11 +378,32 @@ export class Wache extends Seite {
     sfx('common/plopp', { vol: 0.6 });
   }
 
-  // ---------------------------------------------------------------- Losfahren und Heimkommen
+  // ---------------------------------------------------------------- Einsteigen, Losfahren, Heimkommen
+
+  async einsteigen() {
+    this.zustand = 'einsteigen';
+    // die Mannschaft hüpft nacheinander hinten ins Auto (verblasst dort)
+    for (const t of this.tiere) {
+      const heck = this.auto.punkt('heck', this.welt);
+      t.zIndex = 41;
+      t.schatten.visible = false;
+      sfx('common/hupf', { vol: 0.45 });
+      await t.hopTo(heck.x, heck.y + 60, { hoehe: 150, dauer: 0.6, staub: false });
+      sfx('common/plopp', { vol: 0.45 });
+      await this.tween(t, { alpha: 0 }, 0.25, { ease: 'sineIn' });
+      t.visible = false;
+      await this.wait(0.15);
+    }
+    await this.fuchsSteigtEin();
+    this.zustand = 'bereit';
+    fx.pop(this.auto.f.rumpf, 0.04);
+    this.auto.tatue(this, 0);
+  }
 
   async losfahren() {
     this.zustand = 'faehrt';
     const a = this.auto;
+    this.szene.mannschaft = this.tiere.map((t) => t.tierId);
     a.tatue(this, 0);
     fx.pop(a.fahrer, 0.1);
     // vor der Garage steht das Auto weiter vorn als Eimer, Hydrant und Schlauchrolle: also davor zeichnen
@@ -307,6 +429,29 @@ export class Wache extends Seite {
     a.blaulicht(false);
     await a.fahre(this, AUS_TOR, 2.2, 'sineOut');
     await this.wait(0.3);
+    // Mannschaft steigt hinten aus und hüpft an ihre Plätze, dann kommen die Helme zurück ins Regal
+    for (let i = 0; i < this.tiere.length; i++) {
+      const t = this.tiere[i];
+      if (t.visible) continue;
+      const heck = a.punkt('heck', this.welt);
+      t.position.set(heck.x, heck.y + 60);
+      t.visible = true;
+      t.alpha = 0;
+      t.zIndex = 40;
+      this.tween(t, { alpha: 1 }, 0.25, { ease: 'sineOut' });
+      sfx('common/hupf', { vol: 0.45 });
+      await t.hopTo(PLAETZE[i].x, PLAETZE[i].y, { hoehe: 160, dauer: 0.7 });
+      t.schatten.visible = true;
+      t.lookAt(t.x + 100);
+    }
+    await this.wait(0.3);
+    for (const t of this.tiere) {
+      if (!t.helm) continue;
+      await this.helmAb(t);
+      await this.wait(0.2);
+    }
+    // Orden vom Einsatz an die Wand
+    await this.ordenAnDieWand(true);
     // rückwärts schräg in die Garage
     await a.fahre(this, { x: this.garage.x, y: this.garage.y, scale: AUTO_SKALA }, 1.8, 'sineInOut');
     a.f.zIndex = AUTO_Z_GARAGE;   // wieder hinter dem Rolltor
@@ -315,27 +460,54 @@ export class Wache extends Seite {
     a.fahrer.visible = false;   // der Fuchs geht hinter dem Tor wieder nach oben
     this.klack('common/klack', { vol: 0.5 });
     this.zustand = 'zu';
+    this.szene.einsatzWahl = null;
+    this.helmAufgesetzt = false;
+    await this.wait(0.8);
+    this.mannschaftWechselt();
+  }
+
+  // Ein Tier der Mannschaft geht nach Hause, ein anderes kommt (nur, solange nichts anderes läuft)
+  async mannschaftWechselt() {
+    if (this.zustand !== 'zu' || this.tiere.some((t) => t.helm)) return;
+    const i = Math.floor(Math.random() * this.tiere.length);
+    const alt = this.tiere[i];
+    const neuId = pick(MANNSCHAFT.filter((id) => !this.tiere.some((t) => t.tierId === id)));
+    if (!neuId) return;
+    // gleich tauschen: läutet das Kind währenddessen, fährt schon das neue Tier mit
+    const neu = this.neuesTier(neuId, i, -1500);
+    this.tiere[i] = neu;
+    alt.eventMode = 'none';
+    alt.sound();
+    alt.walkTo(-1500, alt.y, { tempo: 330 }).then(() => { if (!alt.destroyed) alt.destroy({ children: true }); });
+    await this.wait(1.4);
+    if (await neu.walkTo(PLAETZE[i].x, PLAETZE[i].y, { tempo: 330 })) {
+      neu.lookAt(neu.x + 100);
+      neu.sound();
+    }
   }
 
   // ---------------------------------------------------------------- Tiere und Helme
 
   baueWartende() {
-    this.tiere = WARTENDE.map((w) => {
-      const a = new Actor(w.id, { x: w.x, y: w.y, scale: w.scale, parent: this.welt, z: 40 });
-      a.helm = null;
-      a.onTap(() => {
-        if (a.helm) freue(this, a, { herzen: 3 });
-        else {
-          fx.wobble(a);
-          a.sound();
-          a.bubble('feuerwehr/helm', 1.8);
-          // „Zieh einen Helm zu einem Tier" – nicht mehr, wenn das Kind schon einen Helm aufgesetzt hat oder
-          // weggeblättert ist, bis der Satz an der Reihe ist
-          voice('feuerwehr_helm', { nurWenn: () => this.aktiv && !this.helmAufgesetzt && this.tiere.some((t) => !t.helm) });
-        }
-      }, { pad: 40 });
-      return a;
-    });
+    this.tiere = waehleMannschaft(3).map((id, i) => this.neuesTier(id, i));
+  }
+
+  neuesTier(id, i, x) {
+    const p = PLAETZE[i];
+    const a = new Actor(id, { x: x ?? p.x, y: p.y, scale: TIER_SKALA[id] ?? 0.3, parent: this.welt, z: 40 });
+    a.helm = null;
+    a.onTap(() => {
+      if (a.helm) freue(this, a, { herzen: 3 });
+      else {
+        fx.wobble(a);
+        a.sound();
+        a.bubble('feuerwehr/helm', 1.8);
+        // „Zieh einen Helm zu einem Tier" – nicht mehr, wenn das Kind schon einen Helm aufgesetzt hat oder
+        // weggeblättert ist, bis der Satz an der Reihe ist
+        voice('feuerwehr_helm', { nurWenn: () => this.aktiv && !this.helmAufgesetzt && this.tiere.some((t) => !t.helm) });
+      }
+    }, { pad: 40 });
+    return a;
   }
 
   baueHelme() {
@@ -348,11 +520,10 @@ export class Wache extends Seite {
       h.rotation = [-0.12, 0.08, -0.05][i];
       h.heim = { x: p.x, y: p.y, rotation: h.rotation };
       h.schatten = schatten;
-      h.traeger = null;
       h.zug = drag(h, {
         pad: 45,
         lift: 1.12,
-        targets: () => this.tiere.filter((t) => !t.helm).map((t) => {
+        targets: () => this.tiere.filter((t) => !t.helm && t.visible).map((t) => {
           const k = kopfPunkt(t, this.welt);
           return { tier: t, x: k.x, y: k.y, radius: 230 };
         }),
@@ -395,11 +566,10 @@ export class Wache extends Seite {
     const k = kopfPunkt(mitte, this.welt);
     this.tiere.forEach((t, i) => this.after(i * 0.25, () => freue(this, t, { herzen: 3, laut: i === 1 })));
     belohne(this, feuerSticker('feuerwehr_helm'), k.x + 120, k.y - 380);
-    // nach einer Weile legen die Tiere die Helme wieder hin – dann geht es von vorn los
-    await this.wait(14);
-    for (const t of this.tiere) {
-      await this.helmAb(t);
-      await this.wait(0.3);
+    // Wartet der Ablauf auf die Helme (der Fuchs ist schon unten): jetzt steigen alle ein
+    if (this.zustand === 'helme') {
+      await this.wait(2.2);
+      if (this.zustand === 'helme') this.einsteigen();
     }
   }
 
@@ -427,6 +597,87 @@ export class Wache extends Seite {
     });
     fx.pop(h, 0.08);
     h.eventMode = 'static';
+  }
+
+  helmHinweis(verz) {
+    this._hinweis?.kill();
+    const passt = () => this.aktiv && this.zustand === 'helme' && !this.helmAufgesetzt;
+    this._hinweis = this.after(verz, () => { if (passt()) voice('feuerwehr_helm', { nurWenn: passt }); });
+  }
+
+  // ---------------------------------------------------------------- Orden an der Wand (wächst über die Runden)
+
+  baueOrden() {
+    this.orden = [];
+    const n = ordenZahl();
+    for (let i = 0; i < n; i++) this.ordenHaengt(i, false);
+  }
+
+  ordenHaengt(i, neu) {
+    const p = ORDEN_PLAETZE[i];
+    const o = spr('feuerwehr/stern_orden', { x: p.x, y: p.y, scale: ORDEN_SKALA, parent: this.welt, z: 8 });
+    o.anchor.set(0.5, 0.08);
+    o.rotation = [0.04, -0.03, 0.02, -0.04, 0.03, -0.02][i];
+    tap(o, () => {
+      this.pling('common/funkeln', { vol: 0.4 });
+      note('glocke', [79, 81, 83, 84, 86, 88][i], { vol: 0.3 });
+      fx.wobble(o, 0.12);
+    }, { sound: null, squash: false, pad: 75 });
+    this.orden[i] = o;
+    if (neu) fx.pop(o, 0.15);
+    return o;
+  }
+
+  // Geschaffte Einsätze bringen je einen Orden an die Wand: vom Auto aus (mitAuto) oder still erscheinend
+  async ordenAnDieWand(mitAuto) {
+    while (this.szene.ordenOffen > 0) {
+      this.szene.ordenOffen--;
+      const vorher = ordenZahl();
+      if (vorher >= ORDEN_MAX) {
+        // Wand ist voll: die Orden funkeln und klingen einmal reihum
+        for (let i = 0; i < this.orden.length; i++) {
+          this.after(i * 0.18, () => {
+            const o = this.orden[i];
+            if (!o || o.destroyed) return;
+            fx.wobble(o, 0.1);
+            this.burst('funkeln', o.x, o.y + 60, { count: 2 });
+          });
+        }
+        sfx('common/funkeln', { vol: 0.5 });
+        await this.wait(1.4);
+        continue;
+      }
+      const i = ordenDazu() - 1;
+      const p = ORDEN_PLAETZE[i];
+      const o = spr('feuerwehr/stern_orden', { parent: this.welt, z: 46 });
+      o.anchor.set(0.5, 0.08);
+      if (mitAuto) {
+        const tuer = this.auto.punkt('orden', this.welt);
+        o.position.set(tuer.x, tuer.y);
+        o.scale.set(0.45);
+      } else {
+        o.position.set(p.x, p.y - 60);
+        o.scale.set(ORDEN_SKALA);
+        o.alpha = 0;
+        this.tween(o, { alpha: 1 }, 0.5, { ease: 'sineInOut' });
+      }
+      sfx('common/funkeln', { vol: 0.5 });
+      const von = { x: o.x, y: o.y };
+      const q = { t: 0 };
+      this.tween(o, { scale: ORDEN_SKALA }, 1.4, { ease: 'sineInOut' });
+      await this.tween(q, { t: 1 }, mitAuto ? 1.4 : 0.8, {
+        ease: 'sineInOut',
+        onUpdate: () => {
+          o.x = von.x + (p.x - von.x) * q.t;
+          o.y = von.y + (p.y - von.y) * q.t - Math.sin(Math.PI * q.t) * (mitAuto ? 200 : 20);
+        },
+      });
+      o.destroy();
+      this.ordenHaengt(i, true);
+      sfx('common/plopp', { vol: 0.5 });
+      this.burst('funkeln', p.x, p.y + 60, { count: 4 });
+      await this.wait(0.5);
+    }
   }
 
   // ---------------------------------------------------------------- Hydrant, Schlauchrolle, Eimer
@@ -462,6 +713,9 @@ export class Wache extends Seite {
     const passt = () => this.aktiv && this.zustand === 'zu';
     this._hinweis = this.after(4, () => { if (passt()) voice('feuerwehr_glocke', { nurWenn: passt }); });
     if (this.zustand === 'weg') this.heimkommen();
+    else if (this.zustand === 'zu' && this.szene.ordenOffen > 0) this.after(1.2, () => { if (this.zustand === 'zu') this.ordenAnDieWand(false); });
+    else if (this.zustand === 'helme') this.helmHinweis(2);
+    else if (this.zustand === 'stange') this.stangeHinweis(2);
   }
 
   verlassen() {
@@ -477,13 +731,16 @@ export class Wache extends Seite {
   }
 
   hinweise() {
-    const freieHelme = this.helme.filter((h) => !h.traeger && h.eventMode !== 'none');
-    const ohneHelm = this.tiere.find((t) => !t.helm);
-    const liste = [];
-    if (this.zustand === 'zu') liste.push(this.glocke);
-    if (this.zustand === 'bereit') liste.push(this.auto.f.koerper);
-    if (freieHelme.length && ohneHelm) liste.push({ von: freieHelme[0], nach: ohneHelm });
-    return liste;
+    const freieHelme = this.helme.filter((h) => h.eventMode !== 'none');
+    const ohneHelm = this.tiere.find((t) => !t.helm && t.visible);
+    const helmHand = freieHelme.length && ohneHelm ? { von: freieHelme[0], nach: ohneHelm } : null;
+    switch (this.zustand) {
+      case 'zu': return helmHand ? [this.glocke, helmHand] : [this.glocke];
+      case 'stange': return [{ von: this.fuchs, nach: { x: FUCHS_X + 30, y: this.stange.unten.y - 180 } }];
+      case 'helme': return helmHand ? [helmHand] : [this.fuchs];
+      case 'bereit': return [this.auto.f.koerper];
+      // während etwas von selbst läuft: aufs Auto zeigen, nicht auf den Pfeil zur nächsten Seite
+      default: return [this.auto.f.koerper];
+    }
   }
 }
-

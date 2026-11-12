@@ -10,6 +10,10 @@ import { HINTEN_Y, VORNE_Y, Z, LOK_X } from './konst.js';
 
 const { Container, Graphics, Rectangle } = PIXI;
 
+// Tiere, die sich manchmal hinter einem Busch verstecken
+const VERSTECK_TIERE = ['hase', 'igel', 'eichhoernchen', 'fuchs', 'maus'];
+let letztesVersteck = null;
+
 // Pentatonik – passt immer zusammen
 const PENTA = [72, 74, 76, 79, 81, 84];
 
@@ -114,8 +118,11 @@ class DekoHinten extends Ding {
         });
         break;
       case 'busch':
+        // Manchmal versteckt sich ein kleines Tier dahinter: beim Antippen schaut es kurz heraus
+        if (Math.random() < 0.3) this.versteck(ziel);
         tippbar(ziel, () => {
           fx.wobble(ziel, 0.07);
+          this.guckHeraus();
           if (!ruhig(ziel, 0.8)) return;
           sfx('common/rascheln');
           fx.burst('blaetter', 0, this.y - ziel.height * 0.5, { count: 3, parent: this.c, z: 1000 });
@@ -172,6 +179,34 @@ class DekoHinten extends Ding {
       default:
         tippbar(ziel, () => fx.wobble(ziel, 0.05));
     }
+  }
+
+  /** Kleines Tier hinter den Busch setzen (nur die Ohren schauen bei niedrigen Büschen heraus). */
+  versteck(busch) {
+    const id = pick(VERSTECK_TIERE.filter((t) => t !== letztesVersteck));
+    letztesVersteck = id;
+    const a = new Actor(id, { x: rand(-35, 35), y: this.y - 4, scale: 0.15, parent: this.c, flip: Math.random() < 0.5 });
+    a.schatten.visible = false;
+    this.c.setChildIndex(a, 0);   // hinter dem Busch
+    this.tier = a;
+    this.tierY = a.y;
+    a.onTap(() => this.guckHeraus(), { pad: 70 });
+  }
+
+  guckHeraus() {
+    const a = this.tier;
+    if (!a || a.destroyed || this.guckt) return;
+    const s = this.s;
+    this.guckt = true;
+    // so weit hoch, dass Kopf und Schultern klar über dem Busch zu sehen sind (der Bauch bleibt versteckt)
+    const busch = this.bild || this.c;
+    const hoch = clamp(busch.height - 4 - a.height * 0.45, 105, 200);
+    s.tween(a, { y: this.tierY - hoch }, 0.5, { ease: 'backOut' });
+    s.after(0.25, () => { if (!a.destroyed) a.sound(); });
+    s.after(1.9, () => {
+      if (a.destroyed) return;
+      s.tween(a, { y: this.tierY }, 0.6, { ease: 'sineInOut' }).then(() => { this.guckt = false; });
+    });
   }
 
   huepf(ziel) {

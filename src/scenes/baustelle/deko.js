@@ -1,7 +1,164 @@
 // Kleine lebendige Nebensachen für die Baustelle: ziehende Wolken, ein Schmetterling, ein Spatz auf dem Zaun,
 // Tiere mit Bauhelm und ein Ton-Helfer, der gleiche Geräusche entprellt. Alles ruhig und langsam.
 
-import { spr, meta, sfx, note, animal, tap, fx, Actor, rand, pick, clamp, PIXI } from '../../engine/index.js';
+import { spr, meta, sfx, note, animal, tap, fx, Actor, store, rand, pick, clamp, PIXI } from '../../engine/index.js';
+
+// ---------------------------------------------------------------- Abwechslung
+
+/**
+ * Zieht Einträge zufällig, aber nie denselben zweimal hintereinander (auch nicht über das Neu-Mischen hinweg).
+ * Jeder Eintrag kommt einmal dran, bevor sich etwas wiederholt.
+ */
+export class Beutel {
+  constructor(liste) {
+    this.liste = liste.slice();
+    this.rest = [];
+    this.zuletzt = null;
+  }
+
+  ziehe() {
+    if (!this.rest.length) {
+      this.rest = this.liste.slice();
+      for (let i = this.rest.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [this.rest[i], this.rest[j]] = [this.rest[j], this.rest[i]];
+      }
+      // nicht mit dem Letzten der vorigen Runde anfangen
+      if (this.rest.length > 1 && this.rest[this.rest.length - 1] === this.zuletzt) {
+        this.rest.unshift(this.rest.pop());
+      }
+    }
+    this.zuletzt = this.rest.pop();
+    return this.zuletzt;
+  }
+}
+
+/**
+ * Farbfilter, der ein Bild in eine Farbe „umstreicht": Helligkeit bleibt (Ziegel-Fugen, Licht und Schatten),
+ * die Farbe kommt aus `farbe`. k und b heben die Helligkeit (dunkle rote Ziegel brauchen mehr als helle gelbe).
+ */
+export function einfaerben(farbe, { k = 1.2, b = 0.22 } = {}) {
+  const f = new PIXI.ColorMatrixFilter();
+  const r = ((farbe >> 16) & 255) / 255;
+  const g = ((farbe >> 8) & 255) / 255;
+  const bl = (farbe & 255) / 255;
+  const zeile = (c) => [c * 0.3 * k, c * 0.59 * k, c * 0.11 * k, 0, c * b];
+  f.matrix = [...zeile(r), ...zeile(g), ...zeile(bl), 0, 0, 0, 1, 0];
+  return f;
+}
+
+// ---------------------------------------------------------------- Wimpelkette
+
+const WIMPEL_FARBEN = [0xf26b5b, 0xffc94a, 0x6cc3f0, 0x8fd16a, 0xc69af0, 0xff9f5a];
+
+/**
+ * Wimpelkette am Bauzaun, die über die Runden wächst (ein Wimpel je geschaffter Runde, gespeichert unter `key`).
+ * punkte = Aufhänge-Punkte (Pfosten-Spitzen) in Seiten-Koordinaten; zwischen zwei Punkten hängt ein Bogen mit
+ * je `jeBogen` Wimpeln. Die Wimpel schaukeln ganz leicht; antippen → sie schaukeln etwas mehr, ein Glöckchen.
+ */
+export class Wimpelkette {
+  constructor(seite, { punkte, durchhang = 42, jeBogen = 3, key, z = 3 }) {
+    this.seite = seite;
+    this.key = key;
+    this.c = new PIXI.Container({ label: 'wimpelkette' });
+    this.c.zIndex = z;
+    seite.welt.addChild(this.c);
+    const schnur = new PIXI.Graphics();
+    this.orte = [];
+    for (let i = 0; i + 1 < punkte.length; i++) {
+      const a = punkte[i];
+      const e = punkte[i + 1];
+      const k = { x: (a.x + e.x) / 2, y: (a.y + e.y) / 2 + durchhang * 2 };
+      schnur.moveTo(a.x, a.y).quadraticCurveTo(k.x, k.y, e.x, e.y);
+      for (let j = 1; j <= jeBogen; j++) {
+        const t = j / (jeBogen + 1);
+        const u = 1 - t;
+        this.orte.push({ x: u * u * a.x + 2 * u * t * k.x + t * t * e.x, y: u * u * a.y + 2 * u * t * k.y + t * t * e.y });
+      }
+    }
+    schnur.stroke({ width: 6, color: 0x8a6a4a, cap: 'round' });
+    this.c.addChild(schnur);
+    for (const p of punkte) this.c.addChild(new PIXI.Graphics().circle(p.x, p.y, 8).fill(0x8a6a4a));
+    this.max = this.orte.length;
+    this.wimpel = [];
+    this.schwung = 0;
+    this.t = 0;
+    const n = clamp(Number(store.get(key, 0)) || 0, 0, this.max);
+    for (let i = 0; i < n; i++) this.neuerWimpel(false);
+    // Tippfläche: ein Band um die Schnur (Rechtecke je Bogen)
+    const minX = Math.min(...punkte.map((p) => p.x)) - 40;
+    const maxX = Math.max(...punkte.map((p) => p.x)) + 40;
+    const minY = Math.min(...punkte.map((p) => p.y)) - 40;
+    const maxY = Math.max(...punkte.map((p) => p.y)) + durchhang + 130;
+    this.c.hitArea = new PIXI.Rectangle(minX, minY, maxX - minX, maxY - minY);
+    tap(this.c, () => {
+      this.schwung = 1;
+      note('glocke', pick([79, 83, 86]), { vol: 0.22 });
+    }, { sound: null, squash: false });
+  }
+
+  get anzahl() { return this.wimpel.length; }
+
+  neuerWimpel(weich = true) {
+    if (this.wimpel.length >= this.max) {
+      // Kette ist voll: sie schaukelt vor Freude
+      this.schwung = 1;
+      return null;
+    }
+    const i = this.wimpel.length;
+    const o = this.orte[i];
+    const farbe = WIMPEL_FARBEN[i % WIMPEL_FARBEN.length];
+    const g = new PIXI.Graphics()
+      .poly([-36, 0, 36, 0, 0, 78]).fill(farbe).stroke({ width: 10, color: farbe, join: 'round' })
+      .circle(-8, 18, 8).fill({ color: 0xffffff, alpha: 0.35 });
+    g.position.set(o.x, o.y - 2);
+    g.phase = i * 0.9;
+    this.c.addChild(g);
+    this.wimpel.push(g);
+    if (weich) {
+      g.scale.set(0.01);
+      this.seite.tween(g, { scale: 1 }, 0.5, { ease: 'backOut' });
+      store.set(this.key, this.wimpel.length);
+    }
+    return g;
+  }
+
+  /** Ort des nächsten (bzw. letzten) Wimpels – für Funkeln. */
+  ortNeu() {
+    return this.orte[Math.max(0, Math.min(this.wimpel.length, this.max) - 1)];
+  }
+
+  update(dt) {
+    this.t += dt;
+    this.schwung = Math.max(0, this.schwung - dt * 0.4);
+    const a = 0.05 + 0.12 * this.schwung;
+    for (const w of this.wimpel) w.rotation = a * Math.sin(this.t * 1.4 + w.phase);
+  }
+}
+
+// ---------------------------------------------------------------- Startpunkt für Zieh-Hinweise
+
+/**
+ * Unsichtbarer Startpunkt für eine Zeige-Hand, die eine Wisch- oder Schiebe-Bewegung zeigt. Der Kern zeigt einen
+ * Zieh-Hinweis ({von, nach}) nur, wenn `von` ein sichtbares Anzeige-Objekt im Baum ist – ein reiner Punkt {x, y}
+ * fällt durch. Diese Marke ist ein winziges, fast durchsichtiges Feld (kein Sprite: die Hand trägt dann keine
+ * Bild-Kopie mit sich), das die Seite an die gewünschte Stelle setzt: `marke.bei(x, y)` → Anzeige-Objekt.
+ */
+export class HandStart {
+  constructor(parent) {
+    const g = new PIXI.Graphics().rect(-20, -20, 40, 40).fill({ color: 0xffffff, alpha: 0.001 });
+    g.label = 'handStart';
+    g.eventMode = 'none';
+    g.zIndex = -1000;
+    parent.addChild(g);
+    this.g = g;
+  }
+
+  bei(x, y) {
+    this.g.position.set(x, y);
+    return this.g;
+  }
+}
 
 // ---------------------------------------------------------------- Töne entprellen
 

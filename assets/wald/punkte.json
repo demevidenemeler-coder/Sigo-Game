@@ -258,6 +258,31 @@
       "ax": 0.5,
       "ay": 0.5,
       "desc": "Specht von der Seite, blickt nach rechts, Krallen rechts: links an einen Baumstamm setzen (Stamm rechts vom Vogel)"
+    },
+    "laterne_glas": {
+      "ax": 0.497,
+      "ay": 0.984,
+      "desc": "Leeres Einmachglas als Laterne mit Holzdeckel und Henkel (Glühwürmchen-Glas)"
+    },
+    "laubhaufen": {
+      "ax": 0.483,
+      "ay": 0.978,
+      "desc": "Weicher Laubhaufen aus bunten Herbstblättern (Versteck, Tierbett)"
+    },
+    "picknickdecke": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Ausgebreitete rot-weiß karierte Picknickdecke, schräg von vorn"
+    },
+    "holzteller": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Leerer runder Holzteller, schräg von vorn (Picknick)"
+    },
+    "picknickdecke_rolle": {
+      "ax": 0.504,
+      "ay": 0.977,
+      "desc": "Zusammengerollte rot-weiß karierte Picknickdecke mit Band"
     }
   },
   "audio": {}

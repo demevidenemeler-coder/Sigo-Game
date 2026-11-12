@@ -6,4 +6,10 @@ export default {
   eisdiele_saft: 'Leg das Wunsch-Obst in den Mixer.',
   eisdiele_mixen: 'Drück den Knopf, dann wird Saft daraus.',
   eisdiele_glas: 'Gib den Saft dem Tier.',
+  // neu (Aufnahmen folgen)
+  eisdiele_gefaess: 'Waffel oder Becher? Tipp drauf!',
+  eisdiele_muenze: 'Leg die Münze in die Kasse.',
+  eisdiele_eiswuerfel: 'Ein paar Eiswürfel ins Glas!',
+  eisdiele_strohhalm: 'Jetzt kommt ein Strohhalm hinein.',
+  eisdiele_deko: 'Und noch etwas Schönes obendrauf.',
 };

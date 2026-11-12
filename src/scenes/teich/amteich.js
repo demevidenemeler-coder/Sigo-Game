@@ -9,11 +9,14 @@
 //   treibt weiter), Schilf wiegt sich, Schmetterling (sitzt meist still), Vogel (selten), Wolken.
 // - Sticker: alle 4 gefütterten Krümel einer (tier_ente, dann teich_seerose), alle 6 vom Kind ausgelösten
 //   Froschsprünge tier_frosch. Der Sticker erscheint frei im Himmel.
+// - Haupttätigkeit (nest.js): Die linke Entenmama baut am Grasufer ein Nest, brütet Eier aus und bringt die Küken
+//   heim – die Familien wachsen von Runde zu Runde (gespeichert in 'teich.kueken').
 
-import { Actor, spr, tap, drag, fx, sfx, voice, note, killTweensOf, rand, pick, clamp, PIXI } from '../../engine/index.js';
+import { Actor, spr, tap, drag, fx, sfx, voice, note, store, killTweensOf, rand, pick, clamp, PIXI } from '../../engine/index.js';
 import { Seite } from '../../gemeinsam/seiten.js';
 import { belohne } from '../../gemeinsam/sticker.js';
-import { ton, laut, freue, naechsterSticker, Ringe, Vogel, Schmetterling, Wolken } from './deko.js';
+import { ton, laut, freue, naechsterSticker, flugDauer, Ringe, Vogel, Schmetterling, Wolken } from './deko.js';
+import { NestAblauf } from './nest.js';
 
 const WASSER_OBEN = 615;                 // hinteres Ufer (Szenen-y)
 const STICKER_ORT = { x: 0, y: 400 };   // dort erscheint ein neuer Sticker (freier Himmel über den Hügeln)
@@ -52,6 +55,7 @@ export class AmTeich extends Seite {
     this.baueEnten();
     this.baueBrot();
     this.baueDeko();
+    this.nest = new NestAblauf(this, WASSER_POLY);
 
     // Ab und zu hüpft der Frosch von selbst (zeigt, was geht) – nur wenn gerade niemand spielt
     // (zählt nicht für den Frosch-Sticker – den verdient nur das Kind)
@@ -197,8 +201,10 @@ export class AmTeich extends Seite {
     f.zIndex = 2500;
     ton('common/hupf', { vol: 0.5 });
     const groesse = ziel.skala * FROSCH_ANTEIL;
-    this.tween(f, { scale: groesse }, 0.75, { ease: 'sineInOut' });
-    const ok = await f.hopTo(this.sitzX(ziel), this.sitzY(ziel), { hoehe: 230, dauer: 0.75, staub: false });
+    // weite Sprünge dauern länger (Ruhe-Regel: nichts rast quer übers Bild)
+    const dauer = flugDauer(this.sitzX(ziel) - f.x, this.sitzY(ziel) - f.y, { hoehe: 230, ease: 'sine', min: 0.75, v: 1050 });
+    this.tween(f, { scale: groesse }, dauer, { ease: 'sineInOut' });
+    const ok = await f.hopTo(this.sitzX(ziel), this.sitzY(ziel), { hoehe: 230, dauer, staub: false });
     this.springt = false;
     this.froschBlatt = i;
     f.zIndex = ziel.zIndex + 10;
@@ -226,9 +232,12 @@ export class AmTeich extends Seite {
   // ---------------------------------------------------------------- Enten
 
   baueEnten() {
+    // Die Familien wachsen mit jeder Nest-Runde (gespeichert); anfangs 3 und 2 Küken
+    const zahl = store.get('teich.kueken', [3, 2]);
+    const n = (i, def) => clamp(Math.round(Number(Array.isArray(zahl) ? zahl[i] : def) || def), 1, 5);
     this.enten = [
-      this.neueEnte(0, -560, 760, 3, 1),
-      this.neueEnte(1, 520, 860, 2, -1),
+      this.neueEnte(0, -560, 760, n(0, 3), 1),
+      this.neueEnte(1, 520, 860, n(1, 2), -1),
     ];
   }
 
@@ -250,19 +259,59 @@ export class AmTeich extends Seite {
     }
     // Antippen: Ente quakt und wackelt, Küken piepen und hüpfen
     tap(e.c, () => {
+      if (this.nest?.enteGetippt(e)) return;
       laut('ente');
       fx.wobble(e.c, 0.08);
       this.ringe.ring(e.x, e.y, 300 * e.s);
     }, { sound: null, squash: false, hitArea: new PIXI.Rectangle(-170, -300, 340, 340) });
-    for (const k of e.kueken) {
-      tap(k.c, () => {
-        ton('common/kueken', { vol: 0.6 }, 0.3);
-        killTweensOf(k.hops);
-        this.tween(k.hops, { y: -40 }, 0.18, { ease: 'quadOut' })
-          .then((ok) => { if (ok) this.tween(k.hops, { y: 0 }, 0.35, { ease: 'bounceOut' }); });
-      }, { sound: null, squash: false, hitArea: new PIXI.Rectangle(-140, -230, 280, 290) });
-    }
+    for (const k of e.kueken) this.kuekenTippbar(k);
     return e;
+  }
+
+  // Küken piept und hüpft beim Antippen
+  kuekenTippbar(k) {
+    tap(k.c, () => {
+      ton('common/kueken', { vol: 0.6 }, 0.3);
+      this.huepfer(k, 40);
+    }, { sound: null, squash: false, hitArea: new PIXI.Rectangle(-140, -230, 280, 290) });
+  }
+
+  huepfer(w, h) {
+    killTweensOf(w.hops);
+    this.tween(w.hops, { y: -h }, 0.18, { ease: 'quadOut' })
+      .then((ok) => { if (ok) this.tween(w.hops, { y: 0 }, 0.4, { ease: 'bounceOut' }); });
+  }
+
+  /** Größe eines Schwimmers (faktor 1) bei Tiefe y – für Übergänge an Land/Wasser (nest.js) */
+  schwimmGroesse(y) {
+    return tiefe(y) * 1.15;
+  }
+
+  /** neues Küken (Schwimmer) im Wasser bei (x, y), schaut wie die Mama (nest.js) */
+  neuesKueken(e, x, y) {
+    const k = this.schwimmer('teich/kueken_schwimmt', x, y, 0.92, e.blick);
+    k.mutter = e;
+    this.kuekenTippbar(k);
+    return k;
+  }
+
+  /** Ein großes Küken schwimmt hinaus ins Weite (links aus dem Bild) und ist dann weg */
+  kuekenZiehtWeg(k) {
+    k.c.zIndex = 650;
+    k.bild.scale.x = -Math.abs(k.bild.scale.x);
+    this.tween(k.c, { x: -1450, y: 700 }, 9, { ease: 'sineInOut' });
+    this.tween(k.c, { alpha: 0 }, 2.5, { ease: 'sineInOut', delay: 6.5 }).then(() => { if (!k.c.destroyed) k.c.destroy({ children: true }); });
+  }
+
+  /** Mama und Küken freuen sich (Herzen, Quaken, alle hüpfen) */
+  freueFamilie(e) {
+    const kopfX = e.x + e.blick * 60 * e.s;
+    const kopfY = e.y - 380 * e.s;
+    this.burst('herzen', kopfX, kopfY - 40, { count: 5 });
+    laut('ente');
+    this.huepfer(e, 26);
+    for (const kk of e.kueken) this.after(rand(0.1, 0.6), () => this.huepfer(kk, 22));
+    ton('common/kueken', { vol: 0.45 }, 0.6);
   }
 
   // Ein Schwimmer: Container (Ort, z), darin Wellen-Ellipse und das Bild (Blickrichtung = scale.x)
@@ -306,6 +355,7 @@ export class AmTeich extends Seite {
 
   updateEnten(dt, t) {
     for (const e of this.enten) {
+      if (e.modus === 'nest') continue;   // die Nest-Mama und ihre großen Küken führt nest.js
       let tempo = 38;
       if (e.modus === 'holt') {
         const q = e.kruemel;
@@ -420,8 +470,9 @@ export class AmTeich extends Seite {
   // ---------------------------------------------------------------- Brot und Krümel
 
   baueBrot() {
+    // etwas rechts vom Ufer-Punkt: links daneben steht das Nest (nest.js)
     const p = this.punkt('ufer', { x: -695, y: 1420 });
-    this.brot = spr('teich/brot', { parent: this.welt, x: p.x - 120, y: p.y - 5 });
+    this.brot = spr('teich/brot', { parent: this.welt, x: p.x, y: p.y + 68 });
     this.brot.scale.set(0.55);
     this.brot.rotation = -0.12;
     this.brot.zIndex = p.y;
@@ -455,6 +506,7 @@ export class AmTeich extends Seite {
   // Ente (oder Küken) unter dem Punkt? → die Ente (Mutter), sonst null
   enteBei(x, y) {
     for (const e of this.enten) {
+      if (e.modus === 'nest') continue;
       for (const w of [e, ...e.kueken]) {
         const r = 300 * w.s;
         if (Math.abs(x - w.x) < r && y > w.y - 560 * w.s && y < w.y + 60) return e;
@@ -470,6 +522,8 @@ export class AmTeich extends Seite {
     if (bewegt < 40) { this.wirfKruemel(k); return; }
     const x = k.x;
     const y = k.y;
+    // haben die Küken im Nest Hunger (nest.js), bekommen sie den Krümel
+    if (this.nest.kruemelFuerKueken(k, x, y, false)) return;
     // Direkt auf eine Ente (oder ihr Küken) gelegt: der Krümel plumpst vor ihren Schnabel
     const ente = this.enteBei(x, y);
     if (ente) {
@@ -501,6 +555,7 @@ export class AmTeich extends Seite {
 
   // Brot nur angetippt: der Krümel fliegt im Bogen vor die Ente, die am längsten nichts bekam
   wirfKruemel(k) {
+    if (this.nest.kruemelFuerKueken(k, k.x, k.y, true)) return;
     const frei = this.enten.filter((e) => e.modus === 'schwimmt');
     const liste = frei.length ? frei : this.enten;
     const ente = liste.reduce((a, b) => ((a.zuletzt || 0) <= (b.zuletzt || 0) ? a : b));
@@ -510,7 +565,7 @@ export class AmTeich extends Seite {
     const y0 = k.y;
     const p = { t: 0 };
     ton('common/wusch', { vol: 0.3 }, 0.3);
-    this.tween(p, { t: 1 }, 0.8, {
+    this.tween(p, { t: 1 }, flugDauer(z.x - x0, z.y - y0, { hoehe: 260, min: 0.8, v: 1050 }), {
       ease: 'linear',
       onUpdate: () => {
         if (k.destroyed) return;
@@ -659,7 +714,9 @@ export class AmTeich extends Seite {
       sch.zIndex = y;
       sch.phase = i * 1.7;
       sch.extra = { w: 0 };
-      tap(sch, () => {
+      tap(sch, (e) => {
+        // Nest-Runde: aus dem Schilf entsteht ein Halm am Finger (nest.js)
+        if (this.nest?.halmVomSchilf(e)) { sch.extra.w = 0.08; this.tween(sch.extra, { w: 0 }, 1.2, { ease: 'sineInOut' }); return; }
         ton('common/rascheln', { vol: 0.5 }, 0.4);
         killTweensOf(sch.extra);
         sch.extra.w = 0.12;
@@ -705,9 +762,19 @@ export class AmTeich extends Seite {
     }, { sound: null, squash: false, hitArea: new PIXI.Rectangle(-170, -170, 340, 220) });
 
     this.vogel = new Vogel(this, this.welt, { yBereich: [150, 330] });
+    // Schmetterling sitzt auf den Blumen am fernen Ufer – links unten am Nest stört er die Nest-Runde nicht
     this.schmetterling = new Schmetterling(this, this.welt, [
-      { x: -1130, y: 1000 }, { x: -880, y: 1180 }, { x: -1180, y: 1300 },
+      { x: -845, y: 470 }, { x: -70, y: 455 }, { x: 860, y: 445 },
     ]);
+    // Trauerweide (im Hintergrund) antippen: Blätter rieseln; in der Nest-Runde mit Blättern segelt ein Zweig herab
+    const weide = new PIXI.Container({ label: 'weide' });
+    weide.zIndex = -90;
+    this.welt.addChild(weide);
+    tap(weide, (e) => {
+      const zweig = this.nest?.blattVomBaum(e);
+      this.burst('blaetter', e.x, e.y + 40, { count: zweig ? 2 : 4 });
+      if (!zweig) ton('common/rascheln', { vol: 0.45 }, 0.5);
+    }, { sound: null, squash: false, hitArea: new PIXI.Ellipse(-745, 290, 250, 175) });
     this.wolken = new Wolken(this, this.hinten, [
       { id: 'common/wolke2', x: -350, y: 160, breite: 380, tempo: 7 },
       { id: 'common/wolke1', x: 520, y: 200, breite: 230, tempo: 5 },
@@ -811,14 +878,19 @@ export class AmTeich extends Seite {
       this.frosch.y = this.sitzY(b);
     }
     this.updateEnten(dt, t);
+    this.nest.update(dt, t);
     this.updateKruemel(dt, t);
     this.updateDeko(dt, t);
   }
 
   hinweise() {
     const andere = this.blaetter.filter((_, i) => i !== this.froschBlatt);
-    const ente = this.enten.reduce((a, e) => (Math.hypot(e.x - this.brot.x, e.y - this.brot.y) <
+    const frei = this.enten.filter((e) => e.modus !== 'nest');
+    const ente = (frei.length ? frei : this.enten).reduce((a, e) => (Math.hypot(e.x - this.brot.x, e.y - this.brot.y) <
       Math.hypot(a.x - this.brot.x, a.y - this.brot.y) ? e : a));
+    const nest = this.nest.hinweis();
+    // läuft eine Nest-Runde, zeigt die Hand zuerst (zweimal) den nächsten Schritt
+    if (nest) return [nest, nest, andere[0], { von: this.brot, nach: ente.c }];
     return [andere[0], { von: this.brot, nach: ente.c }, this.frosch];
   }
 }

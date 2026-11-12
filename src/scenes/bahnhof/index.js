@@ -1,6 +1,7 @@
 // Bahnhof: Hier baut das Kind seinen Zug zusammen und fährt los.
 //
-// - Der gespeicherte Zug (ladeZug) rollt weich von links herein und hält am Bahnsteig.
+// - Der gespeicherte Zug (ladeZug) rollt weich von links herein und hält am Bahnsteig (bei 4 Wagen etwas weiter
+//   links, damit die Lok nicht vor der Gepäckkarre steht; wird er länger oder kürzer, rückt er weich nach).
 // - Oben vier große Auswahl-Knöpfe (Lok, Wagen, Tiere/Leute, Ladung). Ein Tipp öffnet unten eine Leiste:
 //     Lok antippen/zum Zug ziehen   → die Lok wechselt (alte pufft weg, neue hüpft hin)
 //     Wagen antippen/ziehen         → wird hinten angekuppelt (bei 4 Wagen wird der letzte ausgetauscht)
@@ -14,6 +15,10 @@
 // - Nebensachen: Turmuhr (Kuckuck, Zeiger drehen), Bank, Gepäckkarre, Bahnhofsglocke, Laterne, Baum,
 //   Bahnhofshaus (Gong), Vogel, Schmetterling, Wolken.
 // Jede Änderung am Zug wird gespeichert (speichereZug).
+//
+// Haupt-Ablauf jeder Runde (ablauf.js): Zwei Fahrgäste kommen, der Schaffner knipst ihre Fahrkarten, sie steigen in
+// ihren Wunsch-Wagen, die Gepäckkarre wird zum Zug geschoben, die Lok wird versorgt (Wasser, Putzen oder Dampf),
+// das Signal wird grün – dann hebt der Schaffner die Kelle. Der freie Zugbau oben bleibt jederzeit möglich.
 
 import {
   Scene, stage, spr, sfx, voice, tap, drag, Actor, fx, ui, store, killTweensOf, pick, clamp, PIXI,
@@ -25,6 +30,7 @@ import {
 } from '../../gemeinsam/zug.js';
 import { belohne, stickerFuerOrt } from '../../gemeinsam/sticker.js';
 import { Vogel, Schmetterling, Uhr, Wolken } from './deko.js';
+import { Abfahrt } from './ablauf.js';
 
 const { Container, Graphics, Circle, Rectangle, Point } = PIXI;
 
@@ -35,7 +41,12 @@ const GLEIS_Y = 1250;
 const SKALA = 0.5;               // Zug-Größe (Lok ≈ 470 breit, 4 Wagen ≈ 2100)
 const EINFAHRT_TEMPO = 520;      // Einheiten/s beim Hereinrollen (höchstens)
 const ABFAHRT_TEMPO = 450;
+const RANGIER_TEMPO = 200;       // Einheiten/s, wenn der Zug am Bahnsteig ein Stück vor- oder zurückrückt
 const MAX_WAGEN = 4;
+// Der Zug hält in der Mitte. Ist er so lang, dass die Lok vor der Gepäckkarre (ganz rechts, ab x ≈ 820) stünde, hält
+// er ein Stück weiter links – höchstens so weit, dass der letzte Wagen noch ganz im Bild bleibt (Tablet: bis -1280).
+const LOK_RECHTS_HOECHSTENS = 806;
+const ZUG_LINKS_MINDESTENS = -1235;
 const TUER_X = -490;             // Tür des gemalten Bahnhofshauses (genau unter der Turmuhr)
 const OFFENE = ['wagen_offen_rot', 'wagen_offen_blau', 'wagen_offen_gelb', 'wagen_offen_gruen', 'wagen_offen_lila', 'wagen_offen_orange'];
 const MENSCHEN = new Set(GAESTE_MENSCHEN);
@@ -60,6 +71,9 @@ const REIHE = ['lok', 'wagen', 'gast', 'ladung'];
 export default class Bahnhof extends Scene {
   static id = 'bahnhof';
   static packs = ['bahnhof', 'zug', 'tiere'];
+  // Alle Tiere, die hier zu sehen sein können: Auswahl-Leiste (alle Zug-Gäste), Fahrgäste, Wartehäuschen, gespeicherter Zug
+  static tiere = ['kuh', 'schaf', 'schwein', 'pferd', 'hund', 'katze', 'hase', 'huhn', 'ente', 'frosch', 'maus', 'igel',
+    'baer', 'affe', 'loewe', 'elefant', 'giraffe', 'pinguin', 'fuchs', 'eule', 'eichhoernchen', 'hahn'];
   static music = 'musik/fahrt';
 
   async enter() {
@@ -86,16 +100,17 @@ export default class Bahnhof extends Scene {
     this.baueKnoepfe();
     ui.albumKnopf(this);
     this.richteZiehenEin();
-    this.neuerWartegast(0.1);
+    // Die Abfahrts-Vorbereitung (Schaffner, Fahrgäste, Gepäckkarre, Signal, Girlande). Das Tier fürs Wartehäuschen
+    // kommt jetzt als Nachzügler, wenn die Fahrgäste eingestiegen sind (ablauf.einsteigen → neuerWartegast).
+    this.ablauf = new Abfahrt(this);
+    // „Zu früh auf Grün": Der erste Tipp zeigt, was noch fehlt (losHinweisZeit). Tippt das Kind danach mit etwas
+    // Abstand noch einmal (nicht nur Dauertippen), fährt der Zug trotzdem. Nach 12 s gilt wieder der erste Tipp.
+    this.losHinweisZeit = -99;
     this.every(1.5, () => this.pruefeWartegast());
 
-    // Begrüßung – aber nicht mehr, wenn der Zug schon abfährt (sie kann hinter einem Leisten-Satz warten)
+    // Begrüßung – aber nicht mehr, wenn der Zug schon abfährt (sie kann hinter einem Leisten-Satz warten).
+    // Die Hinweise zu den Schritten sagt der Ablauf selbst an (nur, solange das Kind den Schritt noch nicht tut).
     this.after(1.2, () => voice('bahnhof_hallo', { nurWenn: () => this.modus !== 'faehrt' }));
-    // Wartet das Kind, kommt nach der Begrüßung der Hinweis „Wer fährt mit? Zieh ein Tier in einen Wagen."
-    // (im Häuschen wartet ein Tier, die Zeige-Hand zeigt auf den Tiere-Knopf) – nur, solange das Kind noch nichts
-    // am Zug verändert und keine Leiste geöffnet hat (auch, wenn der Satz erst später an die Reihe kommt)
-    const nochNichts = () => this.modus !== 'faehrt' && this.aenderungen === 0 && !this.leiste;
-    this.after(5, () => { if (nochNichts()) voice('bahnhof_tiere', { nurWenn: nochNichts }); });
   }
 
   // ---------------------------------------------------------------- Bahnsteig und Nebensachen
@@ -174,19 +189,7 @@ export default class Bahnhof extends Scene {
       else this.ton('common/tuer', 0.6, { vol: 0.5 });
     }, { sound: null, pad: 30 });
 
-    // Gepäckkarre ganz rechts (im Kernbereich): hüpft, die Koffer plumpsen
-    this.karre = spr('bahnhof/gepaeckkarre', { x: 975, y: B + 4, scale: 0.46, parent: w, z: 2 });
-    tap(this.karre, () => {
-      const k = this.karre;
-      killTweensOf(k, ['y']);
-      const y0 = B + 4;
-      this.tween(k, { y: y0 - 26 }, 0.16, { ease: 'quadOut' }).then((ok) => {
-        if (!ok || k.destroyed) return;
-        this.tween(k, { y: y0 }, 0.22, { ease: 'quadIn' }).then((ok2) => {
-          if (ok2) { this.ton('common/landen', 0.3); fx.pop(k, 0.05); }
-        });
-      });
-    }, { sound: null, pad: 40 });
+    // Die Gepäckkarre (ganz rechts) gehört jetzt zum Ablauf (ablauf.js): Gepäck zum Zug schieben, leer hüpft sie.
 
     // Vogel: Bank-Lehne → Pfosten der Glocke → Dach des Wartehäuschens → zurück (alle drei bleiben über der Lok sichtbar).
     // Er liegt unter dem wartenden Tier (z 3): Sitzen beide auf der Bank, greift der Finger das Tier, nicht den Vogel.
@@ -218,6 +221,8 @@ export default class Bahnhof extends Scene {
         a.walkTo(platz.x, platz.y, { tempo: 200 }).then((ok) => { if (ok && !a.destroyed) a.flip = false; });
       }
       a.onTap(() => a.cheer(), { pad: 70 });
+      // Auf der Bank steht es hinter den Wagen: Ein Griff über dem Zug hält es greifbar (Fahrgäste ragen sonst davor)
+      this.ablauf?.griffFuerFigur(a, 0.2 * 900 * 0.97);
       drag(a, {
         lift: 1.08,
         targets: () => this.zugZiele(),
@@ -231,16 +236,18 @@ export default class Bahnhof extends Scene {
             a._ort = null;
           }
         },
-        onDrop: (ziel) => {
+        onDrop: (ziel, ctx) => {
           a._gezogen = false;
-          if (!ziel || this.modus === 'faehrt') return false;
+          // nur angetippt (kaum bewegt): freut sich nur, steigt nicht ein
+          if (Math.hypot(ctx.x - ctx.startX, ctx.y - ctx.startY) < 40) return false;
+          if (this.modus === 'faehrt' || (!ziel && !this.ueberZug(a.x, a.y))) return false;
           // Sitzt dieses Tier schon im Zug, freut sich das im Zug – das wartende bleibt (kein Doppelgänger)
           const schon = this.zug.wagen.find((x) => x.gastId === id);
           if (schon) {
             this.jubeln(schon.index);
             return false;
           }
-          if (!this.gastRein(id, ziel.w || null)) return false;
+          if (!this.gastRein(id, ziel?.w || null)) return false;
           a.eventMode = 'none';
           this.tween(a, { alpha: 0, scale: a.scale.x * 0.7 }, 0.25, { ease: 'sineInOut' })
             .then(() => { if (!a.destroyed) a.destroy({ children: true }); });
@@ -267,15 +274,48 @@ export default class Bahnhof extends Scene {
     return this.world.toLocal({ x: b.x, y: b.y }).x;
   }
 
+  // Liegt ein Ding (Fußpunkt x, y in world) über dem Zug? Großzügig: auch zwischen zwei Wagen und auf der Kupplung.
+  ueberZug(x, y) {
+    const z = this.zug;
+    if (this.modus !== 'steht' || !z) return false;
+    return x > z.x - z.laenge / 2 - 40 && x < this.lokRechts() + 40 && y > this.boden + 50 && y < GLEIS_Y + 220;
+  }
+
+  // Wo der Zug halten soll (Mitte des Zugs): in der Bildmitte – außer die Lok stünde dann vor der Gepäckkarre.
+  halteX() {
+    const z = this.zug;
+    const lok = z?.lok;
+    if (!lok || lok.destroyed) return 0;
+    const lokRechts = this.lokRechts() - z.x;   // rechte Lok-Kante, gemessen von der Zug-Mitte
+    const soll = Math.min(0, LOK_RECHTS_HOECHSTENS - lokRechts);
+    return Math.round(Math.max(soll, ZUG_LINKS_MINDESTENS + z.laenge / 2));
+  }
+
+  // Am Bahnsteig: Ist der Zug länger oder kürzer geworden, rückt er weich (mit drehenden Rädern) auf seinen Halteplatz.
+  rangiere(dt) {
+    const z = this.zug;
+    const rest = this.halteX() - z.x;
+    if (Math.abs(rest) < 1.5 && Math.abs(this.v) < 6) {
+      if (this.v !== 0 || z.geschwindigkeit !== 0) {
+        this.v = 0;
+        z.geschwindigkeit = 0;
+      }
+      return;
+    }
+    const soll = clamp(rest * 1.3, -RANGIER_TEMPO, RANGIER_TEMPO);
+    this.v += (soll - this.v) * (1 - Math.exp(-dt * 2.5));
+    z.geschwindigkeit = this.v;
+  }
+
   gastImZug(id) {
     return this.zug.wagen.some((w) => w.gastId === id);
   }
 
   // Wo wartet das Tier? Im Häuschen – steht dort (bei 3–4 Wagen) die hohe Lok davor, auf der Bank vor dem Haus.
-  // Beim Hereinrollen zählt schon die Endlage des Zugs (er hält bei x = 0).
+  // Beim Hereinrollen (und Rangieren) zählt schon die Endlage des Zugs.
   warteplatz() {
     const hx = this.haeuschen.x + 10;
-    const dx = this.modus === 'kommt' ? -this.zug.x : 0;
+    const dx = this.modus === 'faehrt' ? 0 : this.halteX() - this.zug.x;
     const links = this.lokLinks() + dx;
     const rechts = this.lokRechts() + dx;
     if (rechts < hx - 90 || links > hx + 90) return { ort: 'haeuschen', x: hx, y: this.boden };
@@ -324,7 +364,10 @@ export default class Bahnhof extends Scene {
     z.geschwindigkeit = EINFAHRT_TEMPO * 0.6;
     this.v = z.geschwindigkeit;
 
-    z.on('lok', (lok) => this.tippbareLok(lok));
+    z.on('lok', (lok) => {
+      this.tippbareLok(lok);
+      this.ablauf?.lokNeu(lok);
+    });
     z.on('wagen', (w) => this.tippbarerWagen(w));
     z.on('gast', (w) => this.tippbarerGast(w));
     z.on('ladung', (w) => this.tippbareLadung(w));
@@ -337,7 +380,9 @@ export default class Bahnhof extends Scene {
   }
 
   tippbareLok(lok) {
-    tap(lok, () => {
+    tap(lok, (e) => {
+      // Lok-Pflege „Dampf machen“: Festhalten lässt Dampf aufsteigen (statt des Pfiffs)
+      if (this.ablauf?.lokGedrueckt(e)) return;
       if (!this.zug.pfeife()) fx.wobble(lok.huepfer, 0.015);
     }, { sound: null });
   }
@@ -453,8 +498,9 @@ export default class Bahnhof extends Scene {
     this.aenderungen++;
     this.speichere();
     // „Tipp auf Grün" nur, solange der Zug noch steht (nicht, wenn das Kind schon auf Grün getippt hat)
-    const passt = () => this.modus === 'steht';
-    if (this.aenderungen >= 2 && this.zug.wagen.some((w) => w.gast)) {
+    // (und erst, wenn die Abfahrt fertig vorbereitet ist – sonst sagt der Ablauf den nächsten Schritt an)
+    const passt = () => this.modus === 'steht' && (!this.ablauf || this.ablauf.fertig);
+    if (this.aenderungen >= 2 && this.zug.wagen.some((w) => w.gast) && passt()) {
       this.after(1.5, () => { if (passt()) voice('bahnhof_los', { nurWenn: passt }); });
     }
   }
@@ -676,6 +722,7 @@ export default class Bahnhof extends Scene {
   }
 
   exit() {
+    this.ablauf?.exit();
     window.removeEventListener('pointermove', this._zugBewegt);
     window.removeEventListener('pointerup', this._zugEnde);
     window.removeEventListener('pointercancel', this._zugEnde);
@@ -835,7 +882,29 @@ export default class Bahnhof extends Scene {
       fx.wobble(this.losKnopf, 0.03);
       return;
     }
+    // Noch nicht alles vorbereitet: Der erste Tipp zeigt freundlich, was noch fehlt (Schaffner-Denkblase und Hand).
+    // Tippt das Kind danach noch einmal auf Grün (mit etwas Abstand, nicht nur Dauertippen, und innerhalb von 12 s),
+    // fährt der Zug trotzdem – niemand bleibt hängen. Kommen die Fahrgäste gerade erst, zählt ein Tipp noch nicht.
+    const a = this.ablauf;
+    if (a && !a.fertig && a.gestartet) {
+      const seit = this.t - this.losHinweisZeit;
+      if (a.schrittName === 'warten' || seit > 12 || seit < 1.5) {
+        fx.wobble(this.losKnopf, 0.03);
+        if (a.schrittName === 'warten') {
+          a.zeigeAnkunft();
+          return;
+        }
+        if (seit > 12) {
+          this.losHinweisZeit = this.t;
+          a.zeigeNaechstes();
+          const h = a.hinweise()[0];
+          if (h) this.after(0.4, () => { if (this.modus === 'steht') ui.hand(h); });
+        }
+        return;
+      }
+    }
     this.modus = 'faehrt';
+    this.ablauf?.abfahrt();
     this.schliesseLeiste();
     this.losKnopf.markiere(true);
     this.zuege.forEach((z) => z.ende());
@@ -858,17 +927,21 @@ export default class Bahnhof extends Scene {
   update(dt) {
     const z = this.zug;
     if (this.modus === 'kommt') {
-      // weich hereinrollen und genau in der Mitte anhalten
-      const rest = -z.x;
+      // weich hereinrollen und genau am Halteplatz anhalten
+      const ziel = this.halteX();
+      const rest = ziel - z.x;
       const soll = clamp(rest * 1.5, 0, EINFAHRT_TEMPO);
       this.v += (soll - this.v) * (1 - Math.exp(-dt * 2.5));
       if (rest < 1.5 && this.v < 6) {
         this.v = 0;
-        z.x = 0;
+        z.x = ziel;
         this.modus = 'steht';
         this.after(0.4, () => z.pfeife());
+        this.ablauf?.start();
       }
       z.geschwindigkeit = this.v;
+    } else if (this.modus === 'steht') {
+      this.rangiere(dt);
     }
     z.update(dt);
     if (this.modus === 'faehrt' && this.raus && z.x - z.laenge / 2 > stage.W / 2 - 250) {
@@ -877,6 +950,7 @@ export default class Bahnhof extends Scene {
     }
     this.wolken.update(dt);
     this.uhr.update(dt);
+    this.ablauf?.update(dt);
     this.vogel.update(dt);
     this.falter.update(dt);
   }
@@ -885,16 +959,22 @@ export default class Bahnhof extends Scene {
     if (this.modus !== 'steht') return [];
     const z = this.zug;
     const liste = [];
-    const gaeste = z.wagen.some((w) => w.gast);
-    if (this.aenderungen > 0 && gaeste) liste.push(this.losKnopf);
+    // Offene Leiste: erst zeigen, wohin ein Ding aus ihr gehört
     if (this.leiste) {
       const h = this.leistenHinweis();
       if (h) liste.push(h);
-    } else {
-      liste.push(this.knoepfe.gast, this.knoepfe.wagen);
     }
-    if (!liste.includes(this.losKnopf) && gaeste) liste.push(this.losKnopf);
-    if (this.wartegastSichtbar()) liste.push(this.wartegast);
+    // Dann der nächste Schritt der Abfahrts-Vorbereitung (zuletzt die grüne Kelle)
+    const schritte = this.ablauf ? this.ablauf.hinweise() : [];
+    for (const h of schritte) liste.push(h);
+    if (!schritte.length) {
+      // (noch) nichts vorzubereiten: wie früher Zug bauen und losfahren
+      if (!this.leiste) liste.push(this.knoepfe.gast, this.knoepfe.wagen);
+      if ((!this.ablauf || this.ablauf.fertig) && z.wagen.some((w) => w.gast)) liste.push(this.losKnopf);
+    }
+    // Das Tier im Wartehäuschen erst, wenn kein Schritt der Abfahrts-Vorbereitung offen ist – sonst zeigte jede
+    // zweite Hand auf das Häuschen statt auf den nächsten Schritt.
+    if ((!schritte.length || this.ablauf?.fertig) && this.wartegastSichtbar()) liste.push(this.wartegast);
     return liste;
   }
 

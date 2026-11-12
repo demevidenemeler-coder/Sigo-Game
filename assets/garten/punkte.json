@@ -342,6 +342,72 @@
       "ax": 0.5,
       "ay": 0.5,
       "desc": "freundlicher Regenwurm"
+    },
+    "loewenzahn": {
+      "ax": 0.531,
+      "ay": 0.985,
+      "desc": "Löwenzahn (Unkraut) mit gelber Blüte und Wurzel"
+    },
+    "pusteblume": {
+      "ax": 0.489,
+      "ay": 0.985,
+      "desc": "Pusteblume mit weißem Schirmchen-Ball"
+    },
+    "becher": {
+      "ax": 0.405,
+      "ay": 0.981,
+      "desc": "leerer cremeweißer Becher mit Herz, Öffnung sichtbar",
+      "pts": {
+        "oeffnung": [
+          130,
+          42
+        ]
+      }
+    },
+    "schleife": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "weiße Schleife (zum Einfärben mit tint)"
+    },
+    "vase": {
+      "ax": 0.498,
+      "ay": 0.985,
+      "desc": "hellblaue Vase mit weißen Punkten, leer",
+      "pts": {
+        "hals": [
+          160,
+          32
+        ]
+      }
+    },
+    "saftflasche": {
+      "ax": 0.5,
+      "ay": 0.982,
+      "desc": "Saftflasche mit Korken und Apfel-Bild"
+    },
+    "saftpresse_rad": {
+      "ax": 0.398,
+      "ay": 0.5,
+      "desc": "Kurbelrad der Saftpresse"
+    },
+    "saftpresse_koerper": {
+      "ax": 0.499,
+      "ay": 0.982,
+      "pts": {
+        "rad": [
+          445,
+          290
+        ],
+        "tuelle": [
+          250,
+          522
+        ],
+        "oben": [
+          250,
+          215
+        ]
+      },
+      "desc": "Saftpresse ohne Kurbelrad"
     }
   },
   "audio": {}

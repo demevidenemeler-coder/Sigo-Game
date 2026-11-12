@@ -20,6 +20,7 @@
     "bruecke": {"file": "bruecke.webp", "w": 1309, "h": 432, "ax": 0.5, "ay": 0.976, "pts": {"stab1": [137, 70], "stab2": [282, 70], "stab3": [428, 70], "stab4": [574, 70], "stab5": [720, 70], "stab6": [864, 70], "stab7": [1005, 70], "stab8": [1160, 70], "fahrbahn": [654, 10], "fahrbahn_l": [40, 10], "fahrbahn_r": [1268, 10]}, "desc": "Holzbrücke von der Seite, Fahrbahn aus 8 Regenbogen-Xylophonstäben, darunter Bögen und Wasser"},
     "busch1": {"file": "busch1.webp", "w": 400, "h": 352, "ax": 0.463, "ay": 0.982, "pts": {}, "desc": "Runder grüner Busch mit rosa Blüten"},
     "busch2": {"file": "busch2.webp", "w": 400, "h": 191, "ax": 0.484, "ay": 0.975, "pts": {}, "desc": "Breiter niedriger Busch mit gelben Beeren"},
+    "gueterschuppen": {"file": "gueterschuppen.webp", "w": 900, "h": 668, "ax": 0.498, "ay": 0.983, "pts": {"rampe": [450, 535], "tor": [470, 470]}, "desc": "Güterschuppen mit offenem Tor und leerer Holz-Laderampe davor (Ladeplatz)"},
     "haus_blau": {"file": "haus_blau.webp", "w": 800, "h": 728, "ax": 0.498, "ay": 0.982, "pts": {"tuer": [400, 545], "fenster_l": [195, 468], "fenster_r": [605, 468], "schornstein": [550, 20]}, "desc": "Rundes Häuschen mit blauem Pilzdach, gelbe Tür in der Mitte"},
     "haus_gelb": {"file": "haus_gelb.webp", "w": 800, "h": 726, "ax": 0.496, "ay": 0.983, "pts": {"tuer": [400, 545], "fenster_l": [195, 468], "fenster_r": [605, 468], "schornstein": [548, 20]}, "desc": "Rundes Häuschen mit gelbem Pilzdach, rote Tür in der Mitte"},
     "haus_rot": {"file": "haus_rot.webp", "w": 800, "h": 729, "ax": 0.498, "ay": 0.983, "pts": {"tuer": [400, 570], "fenster_l": [182, 483], "fenster_r": [620, 483], "schornstein": [556, 20]}, "desc": "Rundes Häuschen mit rotem Pilzdach, Tür in der Mitte"},
@@ -45,6 +46,7 @@
     "vogel": {"file": "vogel.webp", "w": 300, "h": 247, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Kleiner blauer Vogel fliegt nach rechts"},
     "vorn_gras": {"file": "vorn_gras.webp", "w": 599, "h": 260, "ax": 0.0, "ay": 1.0, "pts": {}, "desc": "Kachelstreifen unscharfe große Halme und Blüten ganz vorn (nahtlos)"},
     "waschbogen": {"file": "waschbogen.webp", "w": 1100, "h": 857, "ax": 0.5, "ay": 0.982, "pts": {"buerste_l": [255, 530], "buerste_r": [845, 530], "duesen": [550, 290], "gesicht": [550, 145], "durchfahrt_l": [345, 845], "durchfahrt_r": [755, 845], "durchfahrt_oben": [550, 250]}, "desc": "Zug-Waschanlage als Torbogen mit zwei blauen Bürstenwalzen und Düsen oben"},
+    "wasserturm": {"file": "wasserturm.webp", "w": 565, "h": 700, "ax": 0.473, "ay": 0.984, "pts": {"duese": [520, 395], "gesicht": [275, 300]}, "desc": "Wasserturm aus Holz mit Gesicht, Ausguss mit Brause rechts (Lok auftanken)"},
     "zaun": {"file": "zaun.webp", "w": 500, "h": 221, "ax": 0.5, "ay": 0.977, "pts": {}, "desc": "Stück Holzzaun, von der Seite (aneinanderreihbar)"}
   },
   "audio": {

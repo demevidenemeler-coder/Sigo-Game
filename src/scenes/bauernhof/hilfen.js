@@ -56,9 +56,15 @@ export function bildFigur(bild, tier, opt = {}) {
 
 // ---------------------------------------------------------------- Flug im Bogen
 
-/** obj fliegt im Bogen nach (x, y) (Koordinaten seines Eltern-Containers). → Promise */
-export function bogenFlug(seite, obj, x, y, { dauer = 0.6, hoehe = 120, skala = null, drehung = 0 } = {}) {
+/**
+ * obj fliegt im Bogen nach (x, y) (Koordinaten seines Eltern-Containers). → Promise
+ * Mit `tempo` (Einheiten/s im Mittel) richtet sich die Dauer nach der Länge des Bogens – `dauer` ist dann die
+ * kürzeste, `maxDauer` die längste Dauer. Ruhe-Regel: Flüge höchstens etwa 1000–1300 Einheiten/s; bei sineInOut ist
+ * die Spitze etwa 1,6 × das Mittel, also tempo ≤ ~780.
+ */
+export function bogenFlug(seite, obj, x, y, { dauer = 0.6, hoehe = 120, skala = null, drehung = 0, tempo = 0, maxDauer = 2.4 } = {}) {
   const von = { x: obj.x, y: obj.y, s: Math.abs(obj.scale.y), r: obj.rotation };
+  if (tempo > 0) dauer = clamp(bogenLaenge(von.x, von.y, x, y, hoehe) / tempo, dauer, Math.max(dauer, maxDauer));
   const p = { k: 0 };
   return seite.tween(p, { k: 1 }, dauer, {
     ease: 'sineInOut',
@@ -71,6 +77,22 @@ export function bogenFlug(seite, obj, x, y, { dauer = 0.6, hoehe = 120, skala = 
       if (drehung) obj.rotation = von.r + drehung * k;
     },
   });
+}
+
+/** Länge des Flugbogens (wie in bogenFlug), grob in 12 Stücken gemessen. */
+export function bogenLaenge(x0, y0, x1, y1, hoehe) {
+  let l = 0;
+  let px = x0;
+  let py = y0;
+  for (let i = 1; i <= 12; i++) {
+    const k = i / 12;
+    const qx = x0 + (x1 - x0) * k;
+    const qy = y0 + (y1 - y0) * k - hoehe * 4 * k * (1 - k);
+    l += Math.hypot(qx - px, qy - py);
+    px = qx;
+    py = qy;
+  }
+  return l;
 }
 
 // ---------------------------------------------------------------- Wolken

@@ -6,4 +6,11 @@ export default {
   waschanlage_spuelen: 'Jetzt mit der Brause abspülen.',
   waschanlage_sauber: 'Hurra, blitzblank!',
   waschanlage_wahl: 'Tipp an, wer als Nächstes kommt.',
+  // neue Schritte (Aufnahmen folgen)
+  waschanlage_schmutzig: 'Oh, ganz schön schmutzig! Wisch es weg.',
+  waschanlage_trocknen: 'Jetzt mit dem Handtuch trocken reiben.',
+  waschanlage_pumpen: 'Oh, der Reifen ist platt! Pump ihn auf.',
+  waschanlage_schmuck: 'Such einen Aufkleber aus.',
+  waschanlage_fund: 'Nanu, was hat sich da versteckt?',
+  waschanlage_tschuess: 'Tschüss, gute Fahrt!',
 };

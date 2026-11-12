@@ -6,4 +6,11 @@ export default {
   malhaus_stempel: 'Such dir einen Stempel aus und tipp aufs Blatt.',
   malhaus_schoen: 'Oh, wie schön bunt!',
   malhaus_rahmen: 'So ein schönes Bild! Das kommt in den Rahmen.',
+  // neu (Ablauf mit Besuch und Galerie) – Aufnahmen folgen
+  malhaus_besuch: 'Oh, Besuch! Schau mal, was er sich wünscht.',
+  malhaus_rahmen_aussuchen: 'Such dir einen schönen Rahmen aus.',
+  malhaus_geben: 'Gib dein Bild dem Besuch.',
+  malhaus_punkte: 'Fahr mit dem Finger über die Punkte.',
+  malhaus_wischen: 'Wisch mit dem Finger über das Blatt.',
+  malhaus_aufhaengen: 'Danke! Das Bild hängen wir auf.',
 };

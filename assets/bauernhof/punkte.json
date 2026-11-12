@@ -243,6 +243,21 @@
       "ax": 0.497,
       "ay": 0.983,
       "desc": "Strohballen mit roten Schnüren"
+    },
+    "strohhaufen": {
+      "ax": 0.483,
+      "ay": 0.977,
+      "desc": "lockerer Heuhaufen aus feinen Halmen, goldbraun (versteckt ein Ei)"
+    },
+    "handtuch_weiss": {
+      "ax": 0.515,
+      "ay": 0.979,
+      "desc": "weißes gefaltetes Handtuch (wird eingefärbt)"
+    },
+    "handtuch_haengend": {
+      "ax": 0.497,
+      "ay": 0.984,
+      "desc": "weißes Handtuch, über die Leine gehängt (wird eingefärbt)"
     }
   },
   "audio": {}

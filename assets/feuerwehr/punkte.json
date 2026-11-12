@@ -216,6 +216,61 @@
       "ax": 0.5,
       "ay": 0.5,
       "desc": "Goldene Medaille mit Stern an rot-weißem Band (Belohnung)"
+    },
+    "matsch_a": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Matschfleck a (Kopie aus waschanlage, damit das große Paket nicht mitgeladen wird)"
+    },
+    "matsch_b": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Matschfleck b (Kopie aus waschanlage; auch getönt als Ruß/Laub-Schmutz)"
+    },
+    "matsch_c": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Matschfleck c (Kopie aus waschanlage; auch getönt als Ruß/Laub-Schmutz)"
+    },
+    "matsch_d": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Matschfleck d (Kopie aus waschanlage; auch getönt als Ruß/Laub-Schmutz)"
+    },
+    "matsch_e": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Matschfleck e (Kopie aus waschanlage; auch getönt als Ruß/Laub-Schmutz)"
+    },
+    "schaum_a": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Breiter weißer Seifenschaum-Teppich (Kopie aus waschanlage)"
+    },
+    "schaum_b": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Runder weißer Seifenschaum-Haufen (Kopie aus waschanlage)"
+    },
+    "glanzstern": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Weicher weißer vierzackiger Glanz (Kopie aus waschanlage)"
+    },
+    "eimer_schaum": {
+      "ax": 0.496,
+      "ay": 0.985,
+      "desc": "Roter Eimer voll weißem Schaum, ohne Schwamm"
+    },
+    "ballon": {
+      "ax": 0.498,
+      "ay": 0.985,
+      "desc": "Heller cremeweißer Luftballon mit Schnur (zum Einfärben mit tint), Anker = Schnurende unten"
+    },
+    "schwamm_trocken": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Trockener gelber Spülschwamm mit feinen Poren und grüner Unterseite (vor dem Eintauchen)"
     }
   },
   "audio": {}

@@ -155,6 +155,48 @@ export function innenPunkte(id) {
 }
 
 /**
+ * Oberkante des Körper-Bildes an der Stelle x (Bildpunkte relativ zum Anker): erster deckender Bildpunkt von oben
+ * (Mittel über ±12 Bildpunkte). → y relativ zum Anker, oder null, wenn dort nichts ist.
+ */
+export function oberkante(id, x) {
+  const schluessel = id + '@' + Math.round(x);
+  if (cache.has(schluessel)) return cache.get(schluessel);
+  const m = meta(id);
+  let erg = null;
+  try {
+    const quelle = tex(id).source?.resource;
+    if (!quelle) throw new Error('keine Bildquelle');
+    const w = Math.round(m.w);
+    const h = Math.round(m.h);
+    const px = Math.round(x + m.ax * w);
+    if (!leinwand) {
+      leinwand = document.createElement('canvas');
+      kontext = leinwand.getContext('2d', { willReadFrequently: true });
+    }
+    const breite = 25;
+    leinwand.width = breite;
+    leinwand.height = h;
+    kontext.clearRect(0, 0, breite, h);
+    // die Bildquelle kann anders groß sein als in pack.json (verkleinert geladen)
+    const f = (quelle.width || w) / w;
+    kontext.drawImage(quelle, (px - 12) * f, 0, breite * f, h * f, 0, 0, breite, h);
+    const d = kontext.getImageData(0, 0, breite, h).data;
+    let summe = 0;
+    let n = 0;
+    for (let sx = 0; sx < breite; sx += 4) {
+      for (let y = 0; y < h; y++) {
+        if (d[(y * breite + sx) * 4 + 3] > 200) { summe += y; n++; break; }
+      }
+    }
+    if (n) erg = summe / n - m.ay * h;
+  } catch (err) {
+    console.warn(`[waschanlage] Oberkante von '${id}' nicht messbar.`, err?.message || err);
+  }
+  cache.set(schluessel, erg);
+  return erg;
+}
+
+/**
  * Punkte auf dem sichtbaren Körper eines Plans: innenPunkte ohne die Stellen, die von Rädern vor dem Körper
  * verdeckt werden (dort hätte Matsch/Schaum keinen Sinn – man sähe ihn nicht).
  */

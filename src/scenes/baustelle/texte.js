@@ -6,4 +6,11 @@ export default {
   baustelle_haus: 'Tipp ein Bauteil an. Der Kran hilft dir.',
   baustelle_walze: 'Fahr mit dem Finger über die Straße.',
   baustelle_linie: 'Jetzt malen wir weiße Striche.',
+  // neu (Mehr Schritte) – Aufnahmen folgen
+  baustelle_suchen: 'Da fehlt etwas! Der Bagger hilft suchen.',
+  baustelle_kippen: 'Halt den Kipper fest. Dann kippt er aus.',
+  baustelle_beton: 'Halt den Mischer fest. Der Beton läuft.',
+  baustelle_farbe: 'Such dir eine Farbe aus!',
+  baustelle_schotter: 'Schieb den Kipper über die Straße.',
+  baustelle_band: 'Die Straße ist fertig. Schneid das Band durch!',
 };

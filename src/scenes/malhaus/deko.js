@@ -105,7 +105,9 @@ export function baueDeko(seite) {
   };
   neuesZiel(true);
 
-  zone(welt, -1280, 930, 270, 360, () => {
+  // Blumen, Vase und Hocker (unter dem Fenster; der Pfeil links und die Wunschblase des Besuchs liegen darüber und
+  // haben Vorrang – über der Blase bleibt der Strauß selbst antippbar)
+  zone(welt, -1280, 680, 270, 610, () => {
     neuesZiel(true);
     d.sm.tempo = 110;
     sfx('common/rascheln', { vol: 0.35 });

@@ -4,6 +4,7 @@
 //   Vogel            gezeichneter kleiner Vogel, fliegt ab und zu ruhig über den Himmel
 //   Schmetterling    gezeichneter Schmetterling, gaukelt um eine Stelle
 //   Wolken           zwei Wolken, die langsam ziehen
+//   flugDauer()      Dauer eines Flugs, damit er ruhig bleibt (höchstens ~1050 Einheiten/s)
 //   naechsterSticker Sticker des Teichs, der noch fehlt (sonst der Wunsch)
 //   freue()          wie actor.cheer(), aber die Herzen liegen in der Seite (gleiten beim Blättern mit)
 
@@ -29,6 +30,20 @@ export function laut(tier, abstand = 0.9) {
   if (jetzt - (zuletzt.get(key) ?? -1e9) < abstand * 1000) return;
   zuletzt.set(key, jetzt);
   animal(tier);
+}
+
+// ---------------------------------------------------------------- Flugdauer (Ruhe-Regel)
+
+/**
+ * Dauer für einen Flug um (dx, dy) mit Bogenhöhe `hoehe`, so dass er nirgends schneller als `v` Einheiten/s ist
+ * (Ruhe-Regel: nichts rast quer übers Bild). ease 'linear' (gleichmäßig, Bogen am Anfang am steilsten) oder
+ * 'sine' (sineInOut: in der Mitte am schnellsten). Ergebnis zwischen min und max Sekunden.
+ */
+export function flugDauer(dx, dy, { hoehe = 0, ease = 'linear', min = 0.4, max = 3, v = 1050 } = {}) {
+  const strecke = ease === 'sine'
+    ? (Math.PI / 2) * Math.hypot(dx, Math.abs(dy) + 2 * hoehe)
+    : Math.hypot(dx, Math.abs(dy) + 4 * hoehe);
+  return Math.min(max, Math.max(min, strecke / v));
 }
 
 // ---------------------------------------------------------------- Sticker

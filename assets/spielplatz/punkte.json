@@ -137,7 +137,13 @@
     "federwippe": {
       "ax": 0.457,
       "ay": 0.984,
-      "desc": "Federwippe: Spielzeug-Pferdchen auf grüner Feder, schaut nach rechts"
+      "desc": "Federwippe: Spielzeug-Pferdchen auf grüner Feder, schaut nach rechts",
+      "pts": {
+        "sattel": [
+          215,
+          232
+        ]
+      }
     },
     "wippe_fuss": {
       "ax": 0.5,
@@ -285,6 +291,51 @@
       "ax": 0.5,
       "ay": 0.5,
       "desc": "Große gelbe Sandschaufel, aufrecht"
+    },
+    "sandturm": {
+      "ax": 0.497,
+      "ay": 0.985,
+      "desc": "Sandturm aus dem Eimer gestürzt, mit Zinnen und kleinem Tor",
+      "pts": {
+        "spitze": [
+          180,
+          78
+        ],
+        "deko_l": [
+          90,
+          204
+        ],
+        "deko_r": [
+          267,
+          204
+        ],
+        "deko_m": [
+          179,
+          180
+        ]
+      }
+    },
+    "eimer_leer": {
+      "ax": 0.497,
+      "ay": 0.985,
+      "desc": "Leerer roter Sandeimer mit gelbem Henkel",
+      "pts": {
+        "oeffnung": [
+          200,
+          112
+        ]
+      }
+    },
+    "fahne": {
+      "ax": 0.12,
+      "ay": 0.983,
+      "desc": "Weiße Wimpel-Fahne am Holzstab (zum Einfärben mit tint)",
+      "pts": {
+        "fuss": [
+          20,
+          295
+        ]
+      }
     }
   },
   "audio": {}

@@ -258,6 +258,31 @@
           452
         ]
       }
+    },
+    "farbeimer_blau": {
+      "ax": 0.501,
+      "ay": 0.983,
+      "desc": "Farbeimer (cremeweiß, Henkel) voll mit Farbe: blau"
+    },
+    "farbeimer_rosa": {
+      "ax": 0.501,
+      "ay": 0.98,
+      "desc": "Farbeimer (cremeweiß, Henkel) voll mit Farbe: rosa"
+    },
+    "farbeimer_gruen": {
+      "ax": 0.497,
+      "ay": 0.983,
+      "desc": "Farbeimer (cremeweiß, Henkel) voll mit Farbe: grün"
+    },
+    "farbeimer_lila": {
+      "ax": 0.501,
+      "ay": 0.983,
+      "desc": "Farbeimer (cremeweiß, Henkel) voll mit Farbe: lila"
+    },
+    "band": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Rotes Eröffnungsband waagrecht mit großer Schleife in der Mitte"
     }
   },
   "audio": {}

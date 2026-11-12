@@ -137,6 +137,26 @@
     },
     "mal_ente": {
       "desc": "Ausmalbild: Ente im Teich mit Schilf und Seerosenblatt"
+    },
+    "rahmen_herz": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Leerer Bilderrahmen (herz-Ecken), quer, innen durchsichtig, schmale gerade Seiten (9-Slice)"
+    },
+    "rahmen_stern": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Leerer Bilderrahmen (stern-Ecken), quer, innen durchsichtig, schmale gerade Seiten (9-Slice)"
+    },
+    "rahmen_blume": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Leerer Bilderrahmen (blume-Ecken), quer, innen durchsichtig, schmale gerade Seiten (9-Slice)"
+    },
+    "rahmen_holz": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Leerer Holz-Bilderrahmen mit Knäufen an den Ecken, quer, innen durchsichtig (9-Slice)"
     }
   },
   "audio": {}

@@ -146,6 +146,21 @@
       "ax": 0.5,
       "ay": 0.5,
       "desc": "Große korallrosa Achtelnote"
+    },
+    "vorhang_zu": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Geschlossene rote Vorhang-Bahn mit Goldborte unten (Seite 1, Konzert zu)"
+    },
+    "strauss": {
+      "ax": 0.504,
+      "ay": 0.984,
+      "desc": "Kleiner Blumenstrauß mit roter Schleife (Applaus, liegt vorn auf der Bühne)"
+    },
+    "kordel": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Goldene Vorhang-Kordel mit Quaste unten"
     }
   },
   "audio": {

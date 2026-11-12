@@ -61,6 +61,56 @@
       "ax": 0.5,
       "ay": 0.5,
       "desc": "grüne Abfahrts-Kelle (runde Scheibe am Holzgriff), aufrecht"
+    },
+    "schaffner_idle": {
+      "ax": 0.487,
+      "ay": 0.984,
+      "desc": "Schaffner in blauer Uniform mit Mütze, Pfeife und Knipszange, steht und lächelt (schaut nach rechts)",
+      "pts": {
+        "kopf": [
+          105,
+          18
+        ],
+        "hand": [
+          198,
+          240
+        ]
+      }
+    },
+    "karre_leer": {
+      "ax": 0.533,
+      "ay": 0.981,
+      "desc": "Leere Gepäckkarre von der Seite, Griff links, zwei rote Räder",
+      "pts": {
+        "lade_l": [
+          112,
+          181
+        ],
+        "lade_r": [
+          468,
+          181
+        ],
+        "griff": [
+          88,
+          32
+        ]
+      }
+    },
+    "fahrkarte": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Fahrkarte aus Pappe mit rotem Streifen und kleiner Lok (ohne Schrift)"
+    },
+    "schaffner_happy": {
+      "ax": 0.479,
+      "ay": 0.984,
+      "desc": "Schaffner lacht und hebt die grüne Kelle hoch (schaut nach rechts)",
+      "pts": {
+        "kopf": [
+          96,
+          36
+        ]
+      }
     }
   },
   "audio": {}

@@ -1,0 +1,25 @@
+{
+  "id": "schlafen",
+  "images": {
+    "bett": {"file": "bett.webp", "w": 700, "h": 480, "ax": 0.426, "ay": 0.98, "pts": {"kissen": [215, 180], "mitte": [390, 255]}, "desc": "Kleines Holzbett von der Seite (leicht schräg), Kissen links, ohne Decke"},
+    "buch_gutenacht": {"file": "buch_gutenacht.webp", "w": 305, "h": 360, "ax": 0.434, "ay": 0.985, "pts": {}, "desc": "Gute-Nacht-Bilderbuch, blauer Einband mit lächelndem Mond und Sternen, ohne Schrift"},
+    "decke_blau": {"file": "decke_blau.webp", "w": 600, "h": 315, "ax": 0.5, "ay": 0.977, "pts": {"mitte": [300, 163]}, "desc": "Steppdecke blau, wie decke_rot (gleiche Form); Punkt mitte gehört auf bett.mitte"},
+    "decke_gelb": {"file": "decke_gelb.webp", "w": 600, "h": 311, "ax": 0.5, "ay": 0.977, "pts": {"mitte": [300, 161]}, "desc": "Steppdecke gelb, wie decke_rot (gleiche Form); Punkt mitte gehört auf bett.mitte"},
+    "decke_gruen": {"file": "decke_gruen.webp", "w": 600, "h": 317, "ax": 0.5, "ay": 0.977, "pts": {"mitte": [300, 164]}, "desc": "Steppdecke grün, wie decke_rot (gleiche Form); Punkt mitte gehört auf bett.mitte"},
+    "decke_rot": {"file": "decke_rot.webp", "w": 600, "h": 308, "ax": 0.5, "ay": 0.977, "pts": {"mitte": [300, 160]}, "desc": "Rote Steppdecke, gewölbt wie über einem schlafenden Tier; Punkt mitte gehört auf bett.mitte (Breite etwa 0.85 × Bettbreite)"},
+    "hg_ruhe": {"file": "hg_ruhe.webp", "w": 2829, "h": 1600, "ax": 0.5, "ay": 0.5, "pts": {"mond": [1414, 380], "boden": [1414, 1360], "haus_fenster": [1840, 1240]}, "desc": "Ruhiger Nachthimmel mit vielen Sternen, sanfte Hügel, kleines Haus mit warmem Fenster rechts; Himmelsmitte frei für den Mond"},
+    "hg_schlafzimmer": {"file": "hg_schlafzimmer.webp", "w": 2829, "h": 1600, "ax": 0.5, "ay": 0.5, "pts": {"boden": [1414, 1400], "bett1": [715, 1400], "bett2": [1180, 1400], "bett3": [1650, 1400], "bett4": [2115, 1400], "fenster": [1410, 400], "fensterbank": [1410, 705], "lampe": [480, 0], "regal": [2470, 750], "regal_oben": [2470, 515]}, "desc": "Kinderzimmer am Abend: Holzboden mit rundem Teppich, großes Rundbogenfenster mit Abendhimmel (ohne Mond), Bücherregal rechts, Wand links oben frei für Lampe; ohne Betten"},
+    "kuscheltier_hase": {"file": "kuscheltier_hase.webp", "w": 347, "h": 360, "ax": 0.501, "ay": 0.985, "pts": {}, "desc": "Kuscheltier-Hase aus Filz, sitzt, cremeweiß mit blauer Schleife"},
+    "lampe_haenge": {"file": "lampe_haenge.webp", "w": 281, "h": 420, "ax": 0.5, "ay": 0.0, "pts": {"birne": [140, 385]}, "desc": "Hängelampe mit gelbem Stoffschirm, aus; Anker oben am Deckenteller"},
+    "lichtschein_warm": {"file": "lichtschein_warm.webp", "w": 900, "h": 889, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Großer weicher warmgelber Lichtschein, läuft durchsichtig aus (zum Überblenden mit alpha, z. B. unter Lampe oder Nachtlicht)"},
+    "mobile_sterne": {"file": "mobile_sterne.webp", "w": 350, "h": 500, "ax": 0.5, "ay": 0.0, "pts": {}, "desc": "Mobile mit lächelndem Mond und vier Sternen am Holzring; Anker oben an der Schnur"},
+    "nachtlicht": {"file": "nachtlicht.webp", "w": 314, "h": 350, "ax": 0.497, "ay": 0.984, "pts": {}, "desc": "Nachtlicht als schlafender Stern auf Holzsockel, leuchtet sanft"},
+    "schlafmond": {"file": "schlafmond.webp", "w": 542, "h": 600, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Großer freundlicher schlafender Mond mit blauer Zipfelmütze"},
+    "spieluhr": {"file": "spieluhr.webp", "w": 350, "h": 420, "ax": 0.41, "ay": 0.985, "pts": {"kurbel": [335, 290], "karussell": [150, 160]}, "desc": "Spieluhr: blaue Dose mit Kurbel rechts und kleinem Pferdchen-Karussell oben"},
+    "vorhang_l": {"file": "vorhang_l.webp", "w": 359, "h": 720, "ax": 0.5, "ay": 0.0, "pts": {}, "desc": "Vorhanghälfte, dunkelblau mit kleinen gelben Sternen, an Holzringen; Anker oben Mitte (gespiegelt = rechte Hälfte)"},
+    "zahnbuerste_becher": {"file": "zahnbuerste_becher.webp", "w": 223, "h": 360, "ax": 0.383, "ay": 0.985, "pts": {}, "desc": "Grüner Zahnputzbecher mit Blume und oranger Kinderzahnbürste"},
+    "zug_schlaeft_decke": {"file": "zug_schlaeft_decke.webp", "w": 1010, "h": 514, "ax": 0.516, "ay": 0.979, "pts": {}, "desc": "Bunte Patchwork-Decke über einer versteckten Lok (Führerhaus-Buckel links, Schornstein-Beule rechts); deckt lok_dampf ab, wenn etwa 1.1× so breit wie die Lok"}
+  },
+  "audio": {
+  }
+}

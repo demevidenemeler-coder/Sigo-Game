@@ -1,0 +1,37 @@
+{
+  "id": "baustelle",
+  "images": {
+    "bagger_arm": {"file": "bagger_arm.webp", "w": 900, "h": 634, "ax": 0.5, "ay": 0.5, "pts": {"gelenk": [825, 105], "schaufel": [140, 550]}, "desc": "Gelber Baggerarm mit leerer Schaufel (links unten), Gelenkauge rechts oben; um Punkt gelenk drehen"},
+    "bagger_koerper": {"file": "bagger_koerper.webp", "w": 662, "h": 681, "ax": 0.529, "ay": 0.981, "pts": {"gelenk": [32, 410]}, "desc": "Gelber Spielzeug-Bagger ohne Arm, von der Seite, Blick nach links, Gesicht, Kettenfahrwerk; Arm am Punkt gelenk ansetzen"},
+    "bauhelm": {"file": "bauhelm.webp", "w": 300, "h": 190, "ax": 0.478, "ay": 0.98, "pts": {}, "desc": "Gelber Bauhelm von der Seite"},
+    "hg_grube": {"file": "hg_grube.webp", "w": 2829, "h": 1600, "ax": 0.5, "ay": 0.5, "pts": {"boden": [1414, 1250], "sandberg": [620, 960], "bagger": [1250, 1250], "kipper": [2150, 1250]}, "desc": "Sandige Baugrube von der Seite: links großer Sandberg, gelb-weißer Bauzaun hinten, ebener Sandboden unten, blauer Himmel"},
+    "hg_rohbau": {"file": "hg_rohbau.webp", "w": 2829, "h": 1600, "ax": 0.5, "ay": 0.5, "pts": {"boden": [1414, 1200], "fundament_l": [660, 945], "fundament_r": [2170, 945], "lager": [620, 1330]}, "desc": "Bauplatz: leere helle Betonplatte in der Mitte (Oberkante y~945, x 642-2185), dahinter Bauzaun, halbfertige Ziegelmauern, Gerüst rechts, Häuschen; vorn große ebene Erdfläche"},
+    "hg_strasse": {"file": "hg_strasse.webp", "w": 2829, "h": 1600, "ax": 0.5, "ay": 0.5, "pts": {"boden": [1414, 1300], "strasse_l": [350, 1240], "strasse_r": [2480, 1240], "strasse_oben": [1414, 1055], "strasse_unten": [1414, 1425]}, "desc": "Neue Straße: breites leeres dunkelgraues Asphaltband (y 1050-1425) quer im unteren Drittel, darüber Bauzaun, Wiese, Häuschen, Windmühle"},
+    "holperdecke": {"file": "holperdecke.webp", "w": 1284, "h": 609, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Breite deckende Matte aus holpriger brauner Erde mit Kieseln, zum Wegwischen über der Straße"},
+    "kipper": {"file": "kipper.webp", "w": 958, "h": 615, "ax": 0.531, "ay": 0.98, "pts": {"rad1": [228, 575], "rad2": [655, 575], "mulde": [340, 250]}, "desc": "Blau-gelber Kipplaster ohne Räder, Front nach rechts, Gesicht, leere Mulde; Räder an rad1/rad2 setzen"},
+    "kran": {"file": "kran.webp", "w": 678, "h": 787, "ax": 0.33, "ay": 0.983, "pts": {"seil": [553, 245]}, "desc": "Gelber Turmdrehkran von der Seite, Ausleger nach rechts, ohne Seil und Haken; Seil am Punkt seil anhängen"},
+    "kranhaken": {"file": "kranhaken.webp", "w": 89, "h": 200, "ax": 0.5, "ay": 0.5, "pts": {"oben": [46, 3], "haken": [48, 168]}, "desc": "Roter Kranhaken mit Rolle und Öse; am Punkt oben ans Seil hängen"},
+    "linienrolle": {"file": "linienrolle.webp", "w": 450, "h": 334, "ax": 0.624, "ay": 0.978, "pts": {"duese": [397, 318], "griff": [30, 25]}, "desc": "Kleines Markierwägelchen mit Gesicht, Front nach rechts, Farbdüse vorn unten (Punkt duese) für weiße Straßenlinien"},
+    "mischer": {"file": "mischer.webp", "w": 900, "h": 591, "ax": 0.477, "ay": 0.98, "pts": {}, "desc": "Roter Betonmischer-Laster mit orange-weiß gestreifter Trommel, Front nach rechts, Gesicht, drei Räder"},
+    "pylon": {"file": "pylon.webp", "w": 291, "h": 360, "ax": 0.5, "ay": 0.982, "pts": {}, "desc": "Orange-weißer Pylon (Leitkegel)"},
+    "rad_lkw": {"file": "rad_lkw.webp", "w": 316, "h": 320, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Dicker schwarzer LKW-Reifen mit gelber Felge, rund, von der Seite (für Kipper, drehbar)"},
+    "sand_klumpen": {"file": "sand_klumpen.webp", "w": 300, "h": 178, "ax": 0.537, "ay": 0.979, "pts": {}, "desc": "Kleines Sandhäufchen (für die Baggerschaufel, fällt in den Kipper)"},
+    "sand_ladung": {"file": "sand_ladung.webp", "w": 500, "h": 153, "ax": 0.501, "ay": 0.971, "pts": {}, "desc": "Flacher Sandhaufen, passt in die Mulde des Kippers (Punkt kipper/mulde)"},
+    "schild_baustelle": {"file": "schild_baustelle.webp", "w": 298, "h": 400, "ax": 0.497, "ay": 0.985, "pts": {}, "desc": "Gelbes Baustellenschild am Pfosten mit Bild einer Schaufel im Sand, ohne Text"},
+    "schubkarre": {"file": "schubkarre.webp", "w": 450, "h": 221, "ax": 0.634, "ay": 0.977, "pts": {}, "desc": "Grüne Schubkarre von der Seite, Rad rechts, leer"},
+    "teil_dach": {"file": "teil_dach.webp", "w": 800, "h": 457, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Rotes Dreiecksdach, frontal, doppelt so breit wie ein Mauerblock (Haus-Puzzle)"},
+    "teil_fahne": {"file": "teil_fahne.webp", "w": 229, "h": 320, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Kleine orange-gelbe Wimpelfahne am Holzstab, frontal (Haus-Puzzle, oben drauf)"},
+    "teil_fenster": {"file": "teil_fenster.webp", "w": 340, "h": 337, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Blaues Fenster mit weißem Rahmen und Fensterkreuz, frontal (Haus-Puzzle)"},
+    "teil_schornstein": {"file": "teil_schornstein.webp", "w": 243, "h": 320, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Schornstein aus roten Ziegeln mit grauer Kappe, frontal (Haus-Puzzle, aufs Dach)"},
+    "teil_tuer": {"file": "teil_tuer.webp", "w": 286, "h": 380, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Grüne Holztür mit Rundbogen und goldenem Knauf, frontal (Haus-Puzzle)"},
+    "teil_turm": {"file": "teil_turm.webp", "w": 339, "h": 400, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Runder Turm-Block aus hellblauen und cremefarbenen Steinen mit Zinnen und Fensterbogen, frontal (Haus-Puzzle)"},
+    "teil_wand_gelb": {"file": "teil_wand_gelb.webp", "w": 400, "h": 398, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Quadratischer Mauerblock aus gelben Ziegeln, frontal (Haus-Puzzle)"},
+    "teil_wand_rot": {"file": "teil_wand_rot.webp", "w": 400, "h": 399, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Quadratischer Mauerblock aus roten Ziegeln, frontal (Haus-Puzzle)"},
+    "walze": {"file": "walze.webp", "w": 900, "h": 608, "ax": 0.527, "ay": 0.98, "pts": {"trommel": [650, 452]}, "desc": "Orange Straßenwalze von der Seite, Front nach rechts, Gesicht, Hinterrad; vorn leerer Bogen: walze_trommel mit Mitte auf Punkt trommel, Durchmesser ca. 300 (Trommel-Bild auf ~0.72 skalieren, gleiche Walzen-Skala)"},
+    "walze_ganz": {"file": "walze_ganz.webp", "w": 900, "h": 608, "ax": 0.527, "ay": 0.98, "pts": {}, "desc": "Ganze Straßenwalze mit Trommel in einem Bild (nur für den Sticker im Album; im Spiel walze + walze_trommel benutzen)"},
+    "walze_trommel": {"file": "walze_trommel.webp", "w": 410, "h": 420, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Große graue Stahltrommel der Straßenwalze, rund, von der Seite (drehbar, an walze/trommel setzen)"},
+    "ziegelstapel": {"file": "ziegelstapel.webp", "w": 400, "h": 362, "ax": 0.51, "ay": 0.979, "pts": {}, "desc": "Kleiner Stapel roter Spielzeug-Ziegel auf Holzpalette"}
+  },
+  "audio": {
+  }
+}

@@ -1,0 +1,275 @@
+{
+  "images": {
+    "hg_eisdiele": {
+      "pts": {
+        "boden": [
+          1414,
+          1520
+        ],
+        "theke_l": [
+          330,
+          960
+        ],
+        "theke_r": [
+          2810,
+          960
+        ],
+        "kunde": [
+          330,
+          1540
+        ],
+        "wanne1": [
+          1050,
+          960
+        ],
+        "wanne2": [
+          1400,
+          960
+        ],
+        "wanne3": [
+          1750,
+          960
+        ],
+        "wanne4": [
+          2100,
+          960
+        ],
+        "wanne5": [
+          2430,
+          960
+        ]
+      },
+      "desc": "Eisdiele von vorn: rosa-mintgrüne Theke quer (Fläche y 900-990), Regale, gestreifte Markise, Fenster links; Fliesenboden"
+    },
+    "hg_saftbar": {
+      "pts": {
+        "boden": [
+          1414,
+          1560
+        ],
+        "theke_l": [
+          130,
+          1060
+        ],
+        "theke_r": [
+          2770,
+          1060
+        ],
+        "mixer": [
+          1414,
+          1060
+        ],
+        "kunde": [
+          420,
+          1570
+        ],
+        "glas1": [
+          1850,
+          1060
+        ],
+        "glas2": [
+          2100,
+          1060
+        ],
+        "glas3": [
+          2350,
+          1060
+        ]
+      },
+      "desc": "Saftbar unter orangem Sonnenschirm: Holztheke quer (Fläche y 1000-1100), Obstkisten-Regal dahinter, Wiese und Mühle"
+    },
+    "waffel": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "leere Eiswaffel, Spitze nach unten",
+      "pts": {
+        "oben": [
+          130,
+          52
+        ]
+      }
+    },
+    "glas_leer": {
+      "ax": 0.496,
+      "ay": 0.985,
+      "desc": "hohes leeres Trinkglas",
+      "pts": {
+        "innen_oben": [
+          126,
+          40
+        ],
+        "innen_unten": [
+          126,
+          335
+        ]
+      }
+    },
+    "becher": {
+      "ax": 0.492,
+      "ay": 0.985,
+      "desc": "leerer rosa Eisbecher mit Fuß"
+    },
+    "mixer": {
+      "ax": 0.428,
+      "ay": 0.984,
+      "desc": "Standmixer mint mit leerem Glaskrug (innen x≈45-320, y 160-395) und gelbem Knopf",
+      "pts": {
+        "krug_oben": [
+          182,
+          160
+        ],
+        "krug_unten": [
+          182,
+          395
+        ],
+        "knopf": [
+          182,
+          580
+        ]
+      }
+    },
+    "kugel_erdbeer": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Eiskugel erdbeer (rosa)"
+    },
+    "kugel_schoko": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Eiskugel schoko (braun)"
+    },
+    "kugel_vanille": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Eiskugel vanille (hellgelb)"
+    },
+    "kugel_pistazie": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Eiskugel pistazie (hellgrün)"
+    },
+    "kugel_blaubeer": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Eiskugel blaubeer (lila-blau)"
+    },
+    "wanne_erdbeer": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Eiswanne Erdbeer von schräg oben"
+    },
+    "wanne_schoko": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Eiswanne Schoko von schräg oben"
+    },
+    "wanne_vanille": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Eiswanne Vanille von schräg oben"
+    },
+    "wanne_pistazie": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Eiswanne Pistazie von schräg oben"
+    },
+    "wanne_blaubeer": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Eiswanne Blaubeer von schräg oben"
+    },
+    "sahnehaube": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Sahnehaube, weißer Tupfen mit Spitze"
+    },
+    "kirsche": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "rote Kirsche mit Stiel (Eis-Deko)"
+    },
+    "schokosauce": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Klecks Schokosoße (Eis-Deko)"
+    },
+    "streusel_bunt": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Häufchen bunte Streusel"
+    },
+    "waffelroellchen": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Waffelröllchen (Eis-Deko)"
+    },
+    "eisloeffel": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Eisportionierer, Griff oben, Schale unten",
+      "pts": {
+        "spitze": [
+          69,
+          380
+        ]
+      }
+    },
+    "saft_fuellung": {
+      "ax": 0.5,
+      "ay": 0.983,
+      "desc": "Saft-Füllung hellgrau (zum Einfärben), passt in Mixer-Krug in gleichem Maßstab: Anker unten-Mitte auf krug_unten setzen",
+      "pts": {
+        "oben": [
+          139,
+          10
+        ]
+      }
+    },
+    "strohhalm": {
+      "ax": 0.165,
+      "ay": 0.985,
+      "desc": "Knickstrohhalm weiß-rosa gestreift"
+    },
+    "orange": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Orange mit Blatt"
+    },
+    "kiwi": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "halbe Kiwi"
+    },
+    "kirschen": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Kirschenpaar am Stiel"
+    },
+    "zitrone": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Zitrone mit Blatt"
+    },
+    "ananas": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "ganze Ananas mit Krone"
+    },
+    "blaubeeren": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Häufchen Blaubeeren"
+    },
+    "obstkorb": {
+      "ax": 0.5,
+      "ay": 0.981,
+      "desc": "leerer runder Obstkorb (Weide)"
+    },
+    "glocke_theke": {
+      "ax": 0.498,
+      "ay": 0.983,
+      "desc": "goldene Tischklingel auf mintgrünem Fuß"
+    }
+  },
+  "audio": {}
+}

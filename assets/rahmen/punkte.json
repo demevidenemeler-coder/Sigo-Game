@@ -1,0 +1,143 @@
+{
+  "images": {
+    "karte": {
+      "pts": {
+        "bahnhof": [
+          1415,
+          920
+        ],
+        "bauernhof": [
+          390,
+          460
+        ],
+        "feuerwehr": [
+          1940,
+          490
+        ],
+        "baustelle": [
+          850,
+          480
+        ],
+        "garten": [
+          1300,
+          470
+        ],
+        "teich": [
+          420,
+          900
+        ],
+        "musik": [
+          860,
+          880
+        ],
+        "malhaus": [
+          2480,
+          470
+        ],
+        "eisdiele": [
+          2000,
+          920
+        ],
+        "spielplatz": [
+          2560,
+          940
+        ],
+        "wald": [
+          690,
+          1290
+        ],
+        "waschanlage": [
+          1410,
+          1320
+        ],
+        "schlafen": [
+          2140,
+          1340
+        ],
+        "boden": [
+          1415,
+          920
+        ]
+      },
+      "desc": "Spielzeug-Landkarte von schräg oben, Holzgleis als ovale Schleife am Rand (oben y≈170, unten y≈1420, links x≈90, rechts x≈2740). Obere Reihe von links: Bauernhof (rote Scheune+Silo, 390/460), Baustelle (gelber Kran, Sand, 850/480), Gemüsegarten (Beete, Sonnenblumen, 1300/470), Feuerwache (rot mit Turm, 1940/490), Malhaus (Pinsel, Farbkleckse, 2480/470). Mittlere Reihe: Teich (Seerosen, Steg, 420/900), Musik-Bühne (roter Vorhang, 860/880), Bahnhof mit Uhrturm in der Mitte (1415/920), Eisdiele (Markise, Eis auf dem Dach, 2000/920), Spielplatz (Rutsche, Schaukel, 2560/940). Untere Reihe: Wald (Tannen, hohler Baum, 690/1290), Waschanlage (blauer Bogen mit Bürsten, 1410/1320), Schlafhaus (blaues Dach, Mond-Fahne, 2140/1340). Punkte = Mitte des Orts am Boden."
+    },
+    "start_hg": {
+      "pts": {
+        "boden": [
+          1414,
+          1250
+        ],
+        "gleis": [
+          1414,
+          1285
+        ],
+        "logo": [
+          1414,
+          480
+        ]
+      },
+      "desc": "Startbild: Morgenhimmel (obere Hälfte frei fürs Logo), Apfelbaum links, Hügel; leerer Schotterstreifen fürs Gleis bei y 1240-1320 über die ganze Breite, unten Blumen"
+    },
+    "logo": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Schriftzug SIGO aus bunten Holzbuchstaben (S rot, I gelb, G türkis, O orange mit Lok-Gesicht)"
+    },
+    "knopf_start": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "großer runder grüner Start-Knopf mit weißem Abspiel-Dreieck"
+    },
+    "zug_klein": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "kleiner Spielzeugzug von schräg oben für die Karte: rote Lok mit zwei Wagen, fährt nach rechts"
+    },
+    "album_hg": {
+      "pts": {
+        "seite_l_lo": [
+          200,
+          170
+        ],
+        "seite_l_ru": [
+          1340,
+          1450
+        ],
+        "seite_r_lo": [
+          1500,
+          170
+        ],
+        "seite_r_ru": [
+          2660,
+          1450
+        ],
+        "boden": [
+          1414,
+          1450
+        ]
+      },
+      "desc": "leeres aufgeschlagenes Stickerbuch von oben auf Holztisch: linke Seite (Rand korall/gelb) frei x 200-1340, rechte Seite (Rand türkis/grün) frei x 1500-2660, je y 170-1450; Mittelfalz bei x≈1414"
+    },
+    "ort_ring": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "weicher heller Leuchtring von schräg oben als Orts-Markierung auf der Karte"
+    },
+    "wolkenschatten": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "weiche weiße Wolke von oben, zieht langsam über die Karte"
+    },
+    "wegpunkt": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "kleiner runder Holzpunkt (Wegmarke)"
+    },
+    "sticker_rahmen": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "leerer runder Sticker-Platz, hellgrau gestrichelt"
+    }
+  },
+  "audio": {}
+}

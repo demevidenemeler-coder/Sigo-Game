@@ -1,0 +1,171 @@
+{
+  "images": {
+    "hg_buehne": {
+      "pts": {
+        "boden": [
+          1414,
+          1260
+        ],
+        "platz1": [
+          654,
+          1260
+        ],
+        "platz2": [
+          1034,
+          1260
+        ],
+        "platz3": [
+          1414,
+          1260
+        ],
+        "platz4": [
+          1794,
+          1260
+        ],
+        "platz5": [
+          2174,
+          1260
+        ]
+      },
+      "desc": "Holzbühne auf der Wiese am frühen Abend, roter Vorhang links/rechts, Lichterkette oben; Bühnenboden y≈1090-1400 (Vorderkante ≈1400), Mitte leer"
+    },
+    "hg_instrumente": {
+      "pts": {
+        "boden": [
+          1414,
+          1330
+        ],
+        "tisch": [
+          1414,
+          1100
+        ]
+      },
+      "desc": "Helles Musikzimmer: Holzboden ab y≈1210, grüne Täfelung, Regal mit Noten links, Fenster rechts; Mitte frei für große Instrumente"
+    },
+    "trommel": {
+      "ax": 0.498,
+      "ay": 0.984,
+      "desc": "Bunte Kindertrommel mit zwei Schlegeln obendrauf"
+    },
+    "bongos": {
+      "ax": 0.502,
+      "ay": 0.98,
+      "desc": "Zwei Bongos, orange und türkis"
+    },
+    "klavier_klein": {
+      "ax": 0.496,
+      "ay": 0.985,
+      "desc": "Kleines rotes Spielzeugklavier auf Beinchen"
+    },
+    "trompete": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Goldene Spielzeugtrompete, Trichter nach rechts"
+    },
+    "floete": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Hölzerne Blockflöte, senkrecht"
+    },
+    "gitarre": {
+      "ax": 0.502,
+      "ay": 0.984,
+      "desc": "Türkise Ukulele, aufrecht"
+    },
+    "rassel": {
+      "ax": 0.478,
+      "ay": 0.984,
+      "desc": "Zwei Maracas, rosa und gelb"
+    },
+    "triangel": {
+      "ax": 0.506,
+      "ay": 0.984,
+      "desc": "Triangel an rotem Band mit Schlägel"
+    },
+    "tamburin": {
+      "ax": 0.486,
+      "ay": 0.984,
+      "desc": "Tamburin mit goldenen Schellen"
+    },
+    "mikrofon": {
+      "ax": 0.5,
+      "ay": 0.984,
+      "desc": "Mikrofon auf lila Ständer"
+    },
+    "notenstaender": {
+      "ax": 0.498,
+      "ay": 0.984,
+      "desc": "Hölzerner Notenständer mit leerem Blatt"
+    },
+    "xylo_stab": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Einzelner Xylophon-Klangstab von oben, senkrecht, fast weiß (zum Einfärben)"
+    },
+    "xylo_rahmen": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Leerer trapezförmiger Xylophon-Rahmen von oben"
+    },
+    "schlegel": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Xylophon-Schlegel mit rotem Kopf"
+    },
+    "trommel_gross": {
+      "ax": 0.498,
+      "ay": 0.983,
+      "desc": "Große blaue Trommel von schräg oben, Fell gut sichtbar"
+    },
+    "becken": {
+      "ax": 0.502,
+      "ay": 0.984,
+      "desc": "Goldenes Becken auf lila Ständer"
+    },
+    "glockenspiel_glocke": {
+      "ax": 0.498,
+      "ay": 0.985,
+      "desc": "Goldene Handglocke mit rotem Griff"
+    },
+    "klaviertaste": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Einzelne weiße Klaviertaste von oben, senkrecht"
+    },
+    "scheinwerfer_schein": {
+      "ax": 0.5,
+      "ay": 0.0,
+      "desc": "Weicher warmgelber Lichtkegel, Anker oben (Spitze)"
+    },
+    "note_gross_2": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Große türkise Doppelnote"
+    },
+    "note_gross_1": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Große korallrosa Achtelnote"
+    }
+  },
+  "audio": {
+    "karte": {
+      "desc": "Musik Landkarte und Start: Ukulele, Glockenspiel, ruhig und fröhlich"
+    },
+    "wiese": {
+      "desc": "Musik Bauernhof, Garten, Teich, Wald: Gitarre und Flöte"
+    },
+    "fahrt": {
+      "desc": "Musik Zugfahrt und Bahnhof: sanfter Zug-Rhythmus, Mundharmonika"
+    },
+    "bau": {
+      "desc": "Musik Feuerwehr, Baustelle, Spielplatz, Waschanlage: verspielt, Tuba und Marimba"
+    },
+    "atelier": {
+      "desc": "Musik Malhaus, Eisdiele, Musik-Ort: sanfter Walzer"
+    },
+    "nacht": {
+      "desc": "Musik Schlafenszeit: Spieluhr-Wiegenlied"
+    }
+  }
+}

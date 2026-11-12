@@ -1,0 +1,291 @@
+{
+  "images": {
+    "hg_wiese": {
+      "pts": {
+        "boden": [
+          1414,
+          1400
+        ],
+        "decke": [
+          690,
+          1290
+        ]
+      },
+      "desc": "Sonnige Wiese, oben 70% Himmel mit wenigen Wolken, unten Hügel; Baum links, rot-weiße Picknickdecke links (Punkt decke)"
+    },
+    "hg_geraete": {
+      "pts": {
+        "boden": [
+          1414,
+          1250
+        ],
+        "schaukel": [
+          720,
+          1250
+        ],
+        "rutsche": [
+          1414,
+          1250
+        ],
+        "wippe": [
+          2110,
+          1250
+        ]
+      },
+      "desc": "Leerer Spielplatz von der Seite: Sandfläche (y 980-1380) vor Hecke und Bäumen, vorn Wiese mit Blumen; Standplätze schaukel/rutsche/wippe"
+    },
+    "hg_sandkasten": {
+      "pts": {
+        "sand_lo": [
+          330,
+          220
+        ],
+        "sand_ru": [
+          2590,
+          1320
+        ],
+        "sand_ro": [
+          2480,
+          220
+        ],
+        "sand_lu": [
+          210,
+          1320
+        ],
+        "boden": [
+          1414,
+          1320
+        ]
+      },
+      "desc": "Großer Sandkasten schräg von oben, Holzrand rundherum, glatter Sand innen (Trapez: sand_lo, sand_ro, sand_lu, sand_ru)"
+    },
+    "drachen": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Bunter Papierdrachen mit Schleifenschwanz"
+    },
+    "karussell": {
+      "ax": 0.5,
+      "ay": 0.983,
+      "desc": "Kleines Karussell von der Seite, rot-weißes Dach, drei leere Sitze"
+    },
+    "rutsche": {
+      "ax": 0.5,
+      "ay": 0.983,
+      "desc": "Bunte Rutsche von der Seite: links Leiter, rechts gelbe Rutschbahn",
+      "pts": {
+        "oben": [
+          520,
+          410
+        ],
+        "unten": [
+          990,
+          670
+        ],
+        "leiter_fuss": [
+          150,
+          770
+        ]
+      }
+    },
+    "sanddecke": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Glatte Sandfläche von oben (deckend, weicher Rand) zum Wegwischen"
+    },
+    "schaukel_gestell": {
+      "ax": 0.5,
+      "ay": 0.984,
+      "desc": "Holz-Schaukelgestell von vorn ohne Sitz und Seile",
+      "pts": {
+        "aufhaengung": [
+          555,
+          125
+        ]
+      }
+    },
+    "schaukel_sitz": {
+      "ax": 0.5,
+      "ay": 0.0,
+      "desc": "Rotes Schaukelbrett mit zwei parallelen Seilen, Anker oben Mitte (zum Pendeln)",
+      "pts": {
+        "sitz": [
+          234,
+          715
+        ]
+      }
+    },
+    "wippe_balken": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Waagrechter Wippenbalken mit zwei roten Sitzen und gelben Griffen",
+      "pts": {
+        "sitz_l": [
+          160,
+          100
+        ],
+        "sitz_r": [
+          960,
+          100
+        ],
+        "drehpunkt": [
+          550,
+          185
+        ]
+      }
+    },
+    "federwippe": {
+      "ax": 0.457,
+      "ay": 0.984,
+      "desc": "Federwippe: Spielzeug-Pferdchen auf grüner Feder, schaut nach rechts"
+    },
+    "wippe_fuss": {
+      "ax": 0.5,
+      "ay": 0.98,
+      "desc": "Dreieckige Holzstütze der Wippe mit Drehlager oben",
+      "pts": {
+        "lager": [
+          250,
+          110
+        ]
+      }
+    },
+    "ballon_rot": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Roter Luftballon mit kurzer Schnur"
+    },
+    "ballon_gelb": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Gelber Luftballon mit kurzer Schnur"
+    },
+    "ballon_gruen": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Grüner Luftballon mit kurzer Schnur"
+    },
+    "ballon_orange": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Oranger Luftballon mit kurzer Schnur"
+    },
+    "ueberraschung_stern": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Kleiner goldener Stern (fällt aus Ballon)"
+    },
+    "ueberraschung_herz": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Kleines rosarotes Herz (fällt aus Ballon)"
+    },
+    "ballon_blau": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Blauer Luftballon mit kurzer Schnur"
+    },
+    "ballon_lila": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Lila Luftballon mit kurzer Schnur"
+    },
+    "ueberraschung_blume": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Kleine rosa Blume mit Stiel (fällt aus Ballon)"
+    },
+    "seifenblasen_stab": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Seifenblasen-Pustestab: rosa Griff, gelber Ring oben (Punkt ring)",
+      "pts": {
+        "ring": [
+          102,
+          105
+        ]
+      }
+    },
+    "schatz_muschel": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Schatz im Sand: rosa Jakobsmuschel von oben"
+    },
+    "schatz_auto": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Schatz im Sand: rotes Spielzeugauto von oben"
+    },
+    "schatz_dino": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Schatz im Sand: kleiner grüner Spielzeug-Dino, lächelt"
+    },
+    "schatz_ente": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Schatz im Sand: gelbe Quietscheente"
+    },
+    "schatz_schaufel": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Schatz im Sand: kleine blaue Spielzeugschaufel von oben"
+    },
+    "schatz_stern": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Schatz im Sand: goldener Glitzerstern"
+    },
+    "schatz_schluessel": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Schatz im Sand: goldener Spielzeugschlüssel"
+    },
+    "schatz_ball": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Schatz im Sand: bunter Ball"
+    },
+    "schatz_ring": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Schatz im Sand: goldener Ring mit rosa Stein"
+    },
+    "schatz_krone": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Schatz im Sand: goldene Spielzeugkrone mit bunten Steinen"
+    },
+    "foermchen_stern": {
+      "ax": 0.485,
+      "ay": 0.984,
+      "desc": "Rosa Sandförmchen Stern, leer, schräg von oben"
+    },
+    "foermchen_fisch": {
+      "ax": 0.375,
+      "ay": 0.982,
+      "desc": "Türkises Sandförmchen Fisch (mit Gesicht), leer, schräg von oben"
+    },
+    "sandkuchen_stern": {
+      "ax": 0.494,
+      "ay": 0.981,
+      "desc": "Sandkuchen in Sternform"
+    },
+    "eimer_sand": {
+      "ax": 0.492,
+      "ay": 0.985,
+      "desc": "Roter Sandeimer mit gelbem Henkel, voll Sand"
+    },
+    "sandkuchen_fisch": {
+      "ax": 0.406,
+      "ay": 0.983,
+      "desc": "Sandkuchen in Fischform"
+    },
+    "schaufel_gross": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Große gelbe Sandschaufel, aufrecht"
+    }
+  },
+  "audio": {}
+}

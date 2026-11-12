@@ -1,0 +1,592 @@
+{
+  "images": {
+    "baum_apfel": {
+      "ax": 0.48,
+      "ay": 0.985,
+      "desc": "Apfelbaum ohne Äpfel (Äpfel als eigene Sprites dazu)",
+      "pts": {
+        "apfel1": [
+          190,
+          300
+        ],
+        "apfel2": [
+          340,
+          190
+        ],
+        "apfel3": [
+          520,
+          180
+        ],
+        "apfel4": [
+          640,
+          340
+        ],
+        "apfel5": [
+          440,
+          410
+        ],
+        "apfel6": [
+          250,
+          440
+        ]
+      }
+    },
+    "himmel": {
+      "ax": 0.0,
+      "ay": 1.0,
+      "desc": "Kachelbarer Himmel: weiches Blau, unten heller, zarte Wolkenschleier (waagrecht nahtlos)",
+      "pts": {
+        "boden": [
+          1245,
+          1600
+        ]
+      }
+    },
+    "berge_fern": {
+      "ax": 0.0,
+      "ay": 1.0,
+      "desc": "Kachelstreifen ferne blaugrüne Hügelkette, oben durchsichtig (nahtlos)"
+    },
+    "huegel_mitte": {
+      "ax": 0.0,
+      "ay": 1.0,
+      "desc": "Kachelstreifen grüne Wiesenhügel mit Baumgruppen und Blumen, oben durchsichtig (nahtlos)",
+      "pts": {
+        "boden": [
+          600,
+          540
+        ]
+      }
+    },
+    "boden": {
+      "ax": 0.0,
+      "ay": 1.0,
+      "desc": "Kachelstreifen ebene Wiese, Oberkante leicht gewellt, wenige Blümchen; hier liegt das Gleis (nahtlos)",
+      "pts": {
+        "boden": [
+          471,
+          160
+        ],
+        "oberkante": [
+          471,
+          40
+        ]
+      }
+    },
+    "vorn_gras": {
+      "ax": 0.0,
+      "ay": 1.0,
+      "desc": "Kachelstreifen unscharfe große Halme und Blüten ganz vorn (nahtlos)"
+    },
+    "apfel": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Roter Apfel mit Blatt (zum Pflücken vom Apfelbaum)"
+    },
+    "baum_rund": {
+      "ax": 0.501,
+      "ay": 0.985,
+      "desc": "Runder Laubbaum mit dicker grüner Krone"
+    },
+    "baum_tanne": {
+      "ax": 0.494,
+      "ay": 0.983,
+      "desc": "Runde Spielzeug-Tanne aus gestapelten Stufen"
+    },
+    "baum_birke": {
+      "ax": 0.494,
+      "ay": 0.983,
+      "desc": "Schlanke Birke mit weißem Stamm und hellgrüner Krone"
+    },
+    "busch1": {
+      "ax": 0.463,
+      "ay": 0.982,
+      "desc": "Runder grüner Busch mit rosa Blüten"
+    },
+    "busch2": {
+      "ax": 0.484,
+      "ay": 0.975,
+      "desc": "Breiter niedriger Busch mit gelben Beeren"
+    },
+    "haus_rot": {
+      "ax": 0.498,
+      "ay": 0.983,
+      "desc": "Rundes Häuschen mit rotem Pilzdach, Tür in der Mitte",
+      "pts": {
+        "tuer": [
+          400,
+          570
+        ],
+        "fenster_l": [
+          182,
+          483
+        ],
+        "fenster_r": [
+          620,
+          483
+        ],
+        "schornstein": [
+          556,
+          20
+        ]
+      }
+    },
+    "muehle_turm": {
+      "ax": 0.498,
+      "ay": 0.983,
+      "desc": "Windmühlen-Turm ohne Flügel, rotes Dach, Nabe vorn (Flügel als eigenes Sprite)",
+      "pts": {
+        "nabe": [
+          268,
+          192
+        ],
+        "tuer": [
+          268,
+          660
+        ]
+      }
+    },
+    "haus_blau": {
+      "ax": 0.498,
+      "ay": 0.982,
+      "desc": "Rundes Häuschen mit blauem Pilzdach, gelbe Tür in der Mitte",
+      "pts": {
+        "tuer": [
+          400,
+          545
+        ],
+        "fenster_l": [
+          195,
+          468
+        ],
+        "fenster_r": [
+          605,
+          468
+        ],
+        "schornstein": [
+          550,
+          20
+        ]
+      }
+    },
+    "haus_gelb": {
+      "ax": 0.496,
+      "ay": 0.983,
+      "desc": "Rundes Häuschen mit gelbem Pilzdach, rote Tür in der Mitte",
+      "pts": {
+        "tuer": [
+          400,
+          545
+        ],
+        "fenster_l": [
+          195,
+          468
+        ],
+        "fenster_r": [
+          605,
+          468
+        ],
+        "schornstein": [
+          548,
+          20
+        ]
+      }
+    },
+    "muehle_fluegel": {
+      "ax": 0.499,
+      "ay": 0.497,
+      "desc": "Vier Windmühlenflügel als Kreuz, frontal, dreht sich um die Mitte",
+      "pts": {
+        "nabe": [
+          347,
+          348
+        ]
+      }
+    },
+    "scheune": {
+      "ax": 0.506,
+      "ay": 0.983,
+      "desc": "Rote Scheune mit großem Tor (geschlossen)",
+      "pts": {
+        "tor": [
+          380,
+          600
+        ],
+        "tor_l": [
+          200,
+          600
+        ],
+        "tor_r": [
+          565,
+          600
+        ],
+        "luke": [
+          380,
+          265
+        ]
+      }
+    },
+    "heuballen": {
+      "ax": 0.505,
+      "ay": 0.981,
+      "desc": "Runder Heuballen, liegend"
+    },
+    "zaun": {
+      "ax": 0.5,
+      "ay": 0.977,
+      "desc": "Stück Holzzaun, von der Seite (aneinanderreihbar)"
+    },
+    "teich_klein": {
+      "ax": 0.502,
+      "ay": 0.983,
+      "desc": "Kleiner Teich mit Schilf und Seerose, schräg von oben",
+      "pts": {
+        "wasser": [
+          330,
+          330
+        ],
+        "seerose": [
+          540,
+          330
+        ]
+      }
+    },
+    "bruecke": {
+      "ax": 0.5,
+      "ay": 0.976,
+      "desc": "Holzbrücke von der Seite, Fahrbahn aus 8 Regenbogen-Xylophonstäben, darunter Bögen und Wasser",
+      "pts": {
+        "stab1": [
+          137,
+          70
+        ],
+        "stab2": [
+          282,
+          70
+        ],
+        "stab3": [
+          428,
+          70
+        ],
+        "stab4": [
+          574,
+          70
+        ],
+        "stab5": [
+          720,
+          70
+        ],
+        "stab6": [
+          864,
+          70
+        ],
+        "stab7": [
+          1005,
+          70
+        ],
+        "stab8": [
+          1160,
+          70
+        ],
+        "fahrbahn": [
+          654,
+          10
+        ],
+        "fahrbahn_l": [
+          40,
+          10
+        ],
+        "fahrbahn_r": [
+          1268,
+          10
+        ]
+      }
+    },
+    "berg_tunnel": {
+      "ax": 0.5,
+      "ay": 0.98,
+      "desc": "Runder grüner Berg mit Felsen und Tunnelloch unten in der Mitte",
+      "pts": {
+        "einfahrt_l": [
+          30,
+          562
+        ],
+        "einfahrt_r": [
+          975,
+          562
+        ],
+        "loch_l": [
+          345,
+          565
+        ],
+        "loch_r": [
+          655,
+          565
+        ],
+        "loch_mitte": [
+          500,
+          440
+        ]
+      }
+    },
+    "bahnuebergang_strasse": {
+      "ax": 0.499,
+      "ay": 0.971,
+      "desc": "Kurzes Stück graue Landstraße, führt von vorn nach hinten übers Gleis"
+    },
+    "auto_rot": {
+      "ax": 0.469,
+      "ay": 0.98,
+      "desc": "Rundes rotes Spielzeugauto mit Gesicht, fährt nach rechts (für Bahnübergang)",
+      "pts": {
+        "rad_l": [
+          135,
+          312
+        ],
+        "rad_r": [
+          345,
+          312
+        ],
+        "gesicht": [
+          440,
+          215
+        ]
+      }
+    },
+    "bahnhof_klein_rot": {
+      "ax": 0.5,
+      "ay": 0.983,
+      "desc": "Kleine Haltestelle mit Bahnsteig und großem ROTEM Dach",
+      "pts": {
+        "bahnsteig": [
+          450,
+          665
+        ],
+        "bank": [
+          590,
+          570
+        ],
+        "lampe": [
+          630,
+          395
+        ],
+        "dach": [
+          450,
+          180
+        ],
+        "fenster": [
+          280,
+          455
+        ]
+      }
+    },
+    "auto_gelb": {
+      "ax": 0.468,
+      "ay": 0.978,
+      "desc": "Rundes gelbes Spielzeugauto mit Gesicht, fährt nach rechts (für Bahnübergang)"
+    },
+    "bahnhof_klein_blau": {
+      "ax": 0.499,
+      "ay": 0.983,
+      "desc": "Kleine Haltestelle mit Bahnsteig und großem BLAUEM Dach",
+      "pts": {
+        "bahnsteig": [
+          450,
+          665
+        ],
+        "bank": [
+          590,
+          570
+        ],
+        "lampe": [
+          630,
+          395
+        ],
+        "dach": [
+          450,
+          180
+        ],
+        "fenster": [
+          280,
+          455
+        ]
+      }
+    },
+    "bahnhof_klein_gelb": {
+      "ax": 0.499,
+      "ay": 0.983,
+      "desc": "Kleine Haltestelle mit Bahnsteig und großem GELBEM Dach",
+      "pts": {
+        "bahnsteig": [
+          450,
+          665
+        ],
+        "bank": [
+          590,
+          570
+        ],
+        "lampe": [
+          630,
+          395
+        ],
+        "dach": [
+          450,
+          180
+        ],
+        "fenster": [
+          280,
+          455
+        ]
+      }
+    },
+    "luftballon_rot": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Roter Luftballon mit Schnur",
+      "pts": {
+        "schnur_ende": [
+          74,
+          295
+        ]
+      }
+    },
+    "heissluftballon": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Bunter Heißluftballon mit Korb, schwebt"
+    },
+    "vogel": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Kleiner blauer Vogel fliegt nach rechts"
+    },
+    "schmetterling": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Orange-gelber Schmetterling, Flügel offen"
+    },
+    "luftballon_blau": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Blauer Luftballon mit Schnur"
+    },
+    "luftballon_gelb": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Gelber Luftballon mit Schnur"
+    },
+    "blume_gross_1": {
+      "ax": 0.423,
+      "ay": 0.983,
+      "desc": "Große rosa Blume am Stiel"
+    },
+    "blume_gross_2": {
+      "ax": 0.466,
+      "ay": 0.983,
+      "desc": "Große gelbe Sonnenblume am Stiel"
+    },
+    "pfuetze": {
+      "ax": 0.491,
+      "ay": 0.965,
+      "desc": "Flache Wasserpfütze"
+    },
+    "schneemann": {
+      "ax": 0.48,
+      "ay": 0.986,
+      "desc": "Freundlicher Schneemann mit Schal und Mütze"
+    },
+    "waschbogen": {
+      "ax": 0.5,
+      "ay": 0.982,
+      "desc": "Zug-Waschanlage als Torbogen mit zwei blauen Bürstenwalzen und Düsen oben",
+      "pts": {
+        "buerste_l": [
+          255,
+          530
+        ],
+        "buerste_r": [
+          845,
+          530
+        ],
+        "duesen": [
+          550,
+          290
+        ],
+        "gesicht": [
+          550,
+          145
+        ],
+        "durchfahrt_l": [
+          345,
+          845
+        ],
+        "durchfahrt_r": [
+          755,
+          845
+        ],
+        "durchfahrt_oben": [
+          550,
+          250
+        ]
+      }
+    },
+    "kuhweide_schild": {
+      "ax": 0.497,
+      "ay": 0.985,
+      "desc": "Holzschild mit Kuhbild (Kuhweide)"
+    },
+    "hebel": {
+      "ax": 0.5,
+      "ay": 0.984,
+      "desc": "Großer Fahr-Hebel mit rotem Kugelgriff auf Sockel (Bedienung)",
+      "pts": {
+        "drehpunkt": [
+          153,
+          390
+        ],
+        "griff": [
+          153,
+          85
+        ]
+      }
+    },
+    "hebel_griff": {
+      "ax": 0.497,
+      "ay": 0.928,
+      "pts": {
+        "drehpunkt": [
+          83,
+          387
+        ],
+        "griff": [
+          83,
+          85
+        ]
+      },
+      "desc": "Nur Hebelstange mit rotem Kugelgriff; Anker = Drehpunkt, zum Drehen hinter hebel_sockel legen"
+    },
+    "hebel_sockel": {
+      "ax": 0.5,
+      "ay": 0.98,
+      "pts": {
+        "drehpunkt": [
+          151,
+          75
+        ]
+      },
+      "desc": "Nur Sockel des Fahr-Hebels mit Drehbolzen; Hebel (hebel_griff) mit Anker auf drehpunkt dahinter"
+    },
+    "pfeife_seil": {
+      "ax": 0.5,
+      "ay": 0.0,
+      "pts": {
+        "griff": [
+          40,
+          245
+        ]
+      },
+      "desc": "Rot-weiße Kordel mit Holzgriff zum Ziehen (Pfeife); Anker oben = Aufhängepunkt"
+    }
+  },
+  "audio": {}
+}

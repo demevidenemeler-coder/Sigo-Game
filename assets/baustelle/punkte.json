@@ -1,0 +1,264 @@
+{
+  "images": {
+    "hg_grube": {
+      "pts": {
+        "boden": [
+          1414,
+          1250
+        ],
+        "sandberg": [
+          620,
+          960
+        ],
+        "bagger": [
+          1250,
+          1250
+        ],
+        "kipper": [
+          2150,
+          1250
+        ]
+      },
+      "desc": "Sandige Baugrube von der Seite: links großer Sandberg, gelb-weißer Bauzaun hinten, ebener Sandboden unten, blauer Himmel"
+    },
+    "hg_strasse": {
+      "pts": {
+        "boden": [
+          1414,
+          1300
+        ],
+        "strasse_l": [
+          350,
+          1240
+        ],
+        "strasse_r": [
+          2480,
+          1240
+        ],
+        "strasse_oben": [
+          1414,
+          1055
+        ],
+        "strasse_unten": [
+          1414,
+          1425
+        ]
+      },
+      "desc": "Neue Straße: breites leeres dunkelgraues Asphaltband (y 1050-1425) quer im unteren Drittel, darüber Bauzaun, Wiese, Häuschen, Windmühle"
+    },
+    "bagger_koerper": {
+      "ax": 0.529,
+      "ay": 0.981,
+      "desc": "Gelber Spielzeug-Bagger ohne Arm, von der Seite, Blick nach links, Gesicht, Kettenfahrwerk; Arm am Punkt gelenk ansetzen",
+      "pts": {
+        "gelenk": [
+          32,
+          410
+        ]
+      }
+    },
+    "kipper": {
+      "ax": 0.531,
+      "ay": 0.98,
+      "desc": "Blau-gelber Kipplaster ohne Räder, Front nach rechts, Gesicht, leere Mulde; Räder an rad1/rad2 setzen",
+      "pts": {
+        "rad1": [
+          228,
+          575
+        ],
+        "rad2": [
+          655,
+          575
+        ],
+        "mulde": [
+          340,
+          250
+        ]
+      }
+    },
+    "bagger_arm": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Gelber Baggerarm mit leerer Schaufel (links unten), Gelenkauge rechts oben; um Punkt gelenk drehen",
+      "pts": {
+        "gelenk": [
+          825,
+          105
+        ],
+        "schaufel": [
+          140,
+          550
+        ]
+      }
+    },
+    "kran": {
+      "ax": 0.33,
+      "ay": 0.983,
+      "desc": "Gelber Turmdrehkran von der Seite, Ausleger nach rechts, ohne Seil und Haken; Seil am Punkt seil anhängen",
+      "pts": {
+        "seil": [
+          553,
+          245
+        ]
+      }
+    },
+    "mischer": {
+      "ax": 0.477,
+      "ay": 0.98,
+      "desc": "Roter Betonmischer-Laster mit orange-weiß gestreifter Trommel, Front nach rechts, Gesicht, drei Räder"
+    },
+    "hg_rohbau": {
+      "pts": {
+        "boden": [
+          1414,
+          1200
+        ],
+        "fundament_l": [
+          660,
+          945
+        ],
+        "fundament_r": [
+          2170,
+          945
+        ],
+        "lager": [
+          620,
+          1330
+        ]
+      },
+      "desc": "Bauplatz: leere helle Betonplatte in der Mitte (Oberkante y~945, x 642-2185), dahinter Bauzaun, halbfertige Ziegelmauern, Gerüst rechts, Häuschen; vorn große ebene Erdfläche"
+    },
+    "rad_lkw": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Dicker schwarzer LKW-Reifen mit gelber Felge, rund, von der Seite (für Kipper, drehbar)"
+    },
+    "teil_wand_rot": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Quadratischer Mauerblock aus roten Ziegeln, frontal (Haus-Puzzle)"
+    },
+    "walze_trommel": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Große graue Stahltrommel der Straßenwalze, rund, von der Seite (drehbar, an walze/trommel setzen)"
+    },
+    "teil_wand_gelb": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Quadratischer Mauerblock aus gelben Ziegeln, frontal (Haus-Puzzle)"
+    },
+    "teil_dach": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Rotes Dreiecksdach, frontal, doppelt so breit wie ein Mauerblock (Haus-Puzzle)"
+    },
+    "teil_tuer": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Grüne Holztür mit Rundbogen und goldenem Knauf, frontal (Haus-Puzzle)"
+    },
+    "teil_fenster": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Blaues Fenster mit weißem Rahmen und Fensterkreuz, frontal (Haus-Puzzle)"
+    },
+    "teil_schornstein": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Schornstein aus roten Ziegeln mit grauer Kappe, frontal (Haus-Puzzle, aufs Dach)"
+    },
+    "teil_turm": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Runder Turm-Block aus hellblauen und cremefarbenen Steinen mit Zinnen und Fensterbogen, frontal (Haus-Puzzle)"
+    },
+    "teil_fahne": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Kleine orange-gelbe Wimpelfahne am Holzstab, frontal (Haus-Puzzle, oben drauf)"
+    },
+    "sand_klumpen": {
+      "ax": 0.537,
+      "ay": 0.979,
+      "desc": "Kleines Sandhäufchen (für die Baggerschaufel, fällt in den Kipper)"
+    },
+    "sand_ladung": {
+      "ax": 0.501,
+      "ay": 0.971,
+      "desc": "Flacher Sandhaufen, passt in die Mulde des Kippers (Punkt kipper/mulde)"
+    },
+    "pylon": {
+      "ax": 0.5,
+      "ay": 0.982,
+      "desc": "Orange-weißer Pylon (Leitkegel)"
+    },
+    "holperdecke": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Breite deckende Matte aus holpriger brauner Erde mit Kieseln, zum Wegwischen über der Straße"
+    },
+    "kranhaken": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Roter Kranhaken mit Rolle und Öse; am Punkt oben ans Seil hängen",
+      "pts": {
+        "oben": [
+          46,
+          3
+        ],
+        "haken": [
+          48,
+          168
+        ]
+      }
+    },
+    "bauhelm": {
+      "ax": 0.478,
+      "ay": 0.98,
+      "desc": "Gelber Bauhelm von der Seite"
+    },
+    "schild_baustelle": {
+      "ax": 0.497,
+      "ay": 0.985,
+      "desc": "Gelbes Baustellenschild am Pfosten mit Bild einer Schaufel im Sand, ohne Text"
+    },
+    "schubkarre": {
+      "ax": 0.634,
+      "ay": 0.977,
+      "desc": "Grüne Schubkarre von der Seite, Rad rechts, leer"
+    },
+    "ziegelstapel": {
+      "ax": 0.51,
+      "ay": 0.979,
+      "desc": "Kleiner Stapel roter Spielzeug-Ziegel auf Holzpalette"
+    },
+    "linienrolle": {
+      "ax": 0.624,
+      "ay": 0.978,
+      "desc": "Kleines Markierwägelchen mit Gesicht, Front nach rechts, Farbdüse vorn unten (Punkt duese) für weiße Straßenlinien",
+      "pts": {
+        "duese": [
+          397,
+          318
+        ],
+        "griff": [
+          30,
+          25
+        ]
+      }
+    },
+    "walze": {
+      "ax": 0.527,
+      "ay": 0.98,
+      "desc": "Orange Straßenwalze von der Seite, Front nach rechts, Gesicht, Hinterrad; vorn leerer Bogen: walze_trommel mit Mitte auf Punkt trommel, Durchmesser ca. 300 (Trommel-Bild auf ~0.72 skalieren, gleiche Walzen-Skala)",
+      "pts": {
+        "trommel": [
+          650,
+          452
+        ]
+      }
+    }
+  },
+  "audio": {}
+}

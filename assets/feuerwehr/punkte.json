@@ -1,0 +1,222 @@
+{
+  "images": {
+    "hg_wache": {
+      "pts": {
+        "boden": [
+          1414,
+          1400
+        ],
+        "garage": [
+          1500,
+          1290
+        ],
+        "stange_oben": [
+          2265,
+          725
+        ],
+        "stange_unten": [
+          2265,
+          1280
+        ],
+        "glocke": [
+          820,
+          720
+        ]
+      },
+      "desc": "Feuerwache von vorn: rotes Haus, offenes leeres Garagentor (x 1015-1990, y 770-1295), Rutschstange rechts, Schlauchturm links, Pflasterhof"
+    },
+    "hg_waschplatz": {
+      "pts": {
+        "boden": [
+          1414,
+          1300
+        ],
+        "auto": [
+          1414,
+          1300
+        ],
+        "hahn": [
+          490,
+          700
+        ],
+        "abfluss": [
+          2380,
+          1095
+        ]
+      },
+      "desc": "Waschplatz hinter der Wache: Wasserhahn und Eimer-Regal links, Abfluss rechts, leerer Pflasterplatz in der Mitte"
+    },
+    "rad_auto": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Rad für das Feuerwehrauto: schwarzer Reifen, rote Felge, frontal (zum Drehen)"
+    },
+    "hg_einsatz": {
+      "pts": {
+        "boden": [
+          1414,
+          1200
+        ],
+        "fenster1": [
+          1757,
+          603
+        ],
+        "fenster2": [
+          2017,
+          603
+        ],
+        "fenster3": [
+          2030,
+          886
+        ],
+        "tuer": [
+          1757,
+          957
+        ],
+        "ast": [
+          560,
+          738
+        ],
+        "auto": [
+          700,
+          1430
+        ]
+      },
+      "desc": "Einsatzort: Dorfstraße von der Seite, Apfelbaum links mit langem Ast nach links, gelbes Haus mittig-rechts (x 1510-2270) mit drei Fenstern und Tür, Straße unten frei"
+    },
+    "rolltor": {
+      "ax": 0.501,
+      "ay": 0.98,
+      "desc": "Rotes Rolltor als Platte mit Rillen (vor die Garagenöffnung von hg_wache, ca. 980x525 skalieren)"
+    },
+    "feuerwehrauto": {
+      "ax": 0.5,
+      "ay": 0.979,
+      "desc": "Feuerwehrauto von der Seite, Front rechts, freundliches Gesicht, Blaulicht-Kuppel, Wasserwerfer; ohne Räder (Radkästen leer, rad_auto auf ca. 200 px Durchmesser), ohne Leiter; Fenster durchsichtig",
+      "pts": {
+        "rad1": [
+          205,
+          540
+        ],
+        "rad2": [
+          625,
+          540
+        ],
+        "leiter": [
+          110,
+          215
+        ],
+        "duese": [
+          615,
+          115
+        ],
+        "blaulicht": [
+          652,
+          85
+        ]
+      }
+    },
+    "leiter": {
+      "ax": 0.075,
+      "ay": 0.338,
+      "desc": "Lange silbergraue Leiter waagrecht, roter Drehfuß links (Anker = Drehpunkt)",
+      "pts": {
+        "fuss": [
+          75,
+          50
+        ],
+        "spitze": [
+          990,
+          62
+        ]
+      }
+    },
+    "helm": {
+      "ax": 0.5,
+      "ay": 0.85,
+      "desc": "Roter Feuerwehrhelm, schräg von vorn"
+    },
+    "alarmglocke": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Goldene Alarmglocke an rotem Wandhalter",
+      "pts": {
+        "wand": [
+          45,
+          80
+        ],
+        "aufhaengung": [
+          160,
+          110
+        ]
+      }
+    },
+    "flamme1": {
+      "ax": 0.498,
+      "ay": 0.983,
+      "desc": "Kleines rundes freundliches Flämmchen (Tropfenform)"
+    },
+    "flamme2": {
+      "ax": 0.492,
+      "ay": 0.983,
+      "desc": "Kleines freundliches Flämmchen mit zwei Spitzen, nach links geneigt"
+    },
+    "flamme3": {
+      "ax": 0.496,
+      "ay": 0.983,
+      "desc": "Kleines rundliches Flämmchen mit drei Spitzen"
+    },
+    "leiterkorb": {
+      "ax": 0.601,
+      "ay": 0.982,
+      "desc": "Kleiner roter Rettungskorb für die Leiterspitze, oben offen",
+      "pts": {
+        "halter": [
+          32,
+          147
+        ]
+      }
+    },
+    "blaulicht_schein": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Weicher runder blauer Lichtschein, nach außen durchsichtig (über das Blaulicht legen, sanft ein- und ausblenden)"
+    },
+    "rauchwolke": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Weiche hellgraue Rauchwolke"
+    },
+    "hydrant": {
+      "ax": 0.493,
+      "ay": 0.985,
+      "desc": "Roter Hydrant, stehend"
+    },
+    "schlauchrolle": {
+      "ax": 0.5,
+      "ay": 0.985,
+      "desc": "Rote Schlauchrolle auf Ständer mit aufgerolltem Schlauch und Messingdüse"
+    },
+    "eimer_rot": {
+      "ax": 0.484,
+      "ay": 0.983,
+      "desc": "Roter Eimer mit Henkel, leer"
+    },
+    "wasserstrahl_stueck": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Kurzes Stück hellblauer Wasserstrahl, waagrecht, mit Tropfen (mehrfach aneinander oder gestreckt)"
+    },
+    "pfuetze_blau": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Flache hellblaue Wasserpfütze"
+    },
+    "stern_orden": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Goldene Medaille mit Stern an rot-weißem Band (Belohnung)"
+    }
+  },
+  "audio": {}
+}

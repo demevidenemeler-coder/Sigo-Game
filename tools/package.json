@@ -1,0 +1,10 @@
+{
+  "name": "sigo-werkzeuge",
+  "private": true,
+  "type": "module",
+  "description": "Hilfsprogramme zum Bauen und Testen (werden nicht mit dem Spiel ausgeliefert)",
+  "dependencies": {
+    "pixi.js": "^8.23.0",
+    "puppeteer-core": "^25.17.0"
+  }
+}

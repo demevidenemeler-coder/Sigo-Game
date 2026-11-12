@@ -1,2 +1,9 @@
 __pycache__/
 .claude/
+tools/node_modules/
+# Rohbilder aus Higgsfield (groß) – die fertigen Spielbilder liegen in assets/
+art/
+# Testfotos vom Spiel
+shots/
+# Stimm-Proben zum Aussuchen
+stimmproben/

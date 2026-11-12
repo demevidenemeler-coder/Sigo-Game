@@ -1,0 +1,879 @@
+{
+  "images": {
+    "lok_dampf": {
+      "ax": 0.5,
+      "ay": 0.982,
+      "pts": {
+        "kupplung_h": [
+          10,
+          499
+        ],
+        "kupplung_v": [
+          938,
+          585
+        ],
+        "schornstein": [
+          650,
+          88
+        ],
+        "gesicht": [
+          805,
+          375
+        ],
+        "rad1": [
+          240,
+          603
+        ],
+        "rad2": [
+          562,
+          603
+        ]
+      },
+      "desc": "Rote Dampflok mit türkisem Kessel und Gesicht, fährt nach rechts, ohne Räder (zwei leere Radbögen)"
+    },
+    "lok_diesel": {
+      "ax": 0.5,
+      "ay": 0.986,
+      "pts": {
+        "kupplung_h": [
+          6,
+          490
+        ],
+        "kupplung_v": [
+          931,
+          489
+        ],
+        "schornstein": [
+          550,
+          28
+        ],
+        "gesicht": [
+          820,
+          370
+        ],
+        "rad1": [
+          267,
+          547
+        ],
+        "rad2": [
+          610,
+          547
+        ]
+      },
+      "desc": "Blaue Diesellok mit gelben Streifen und Gesicht, fährt nach rechts, ohne Räder"
+    },
+    "lok_gruen": {
+      "ax": 0.5,
+      "ay": 0.987,
+      "pts": {
+        "kupplung_h": [
+          7,
+          547
+        ],
+        "kupplung_v": [
+          900,
+          546
+        ],
+        "schornstein": [
+          650,
+          140
+        ],
+        "gesicht": [
+          810,
+          410
+        ],
+        "rad1": [
+          265,
+          614
+        ],
+        "rad2": [
+          618,
+          614
+        ]
+      },
+      "desc": "Kleine grüne Lok mit großem Führerhaus und Gesicht, fährt nach rechts, ohne Räder"
+    },
+    "lok_schnell": {
+      "ax": 0.5,
+      "ay": 0.983,
+      "pts": {
+        "kupplung_h": [
+          7,
+          363
+        ],
+        "kupplung_v": [
+          956,
+          345
+        ],
+        "schornstein": [
+          300,
+          10
+        ],
+        "gesicht": [
+          870,
+          320
+        ],
+        "rad1": [
+          267,
+          456
+        ],
+        "rad2": [
+          580,
+          456
+        ]
+      },
+      "desc": "Weiß-roter Schnellzug-Triebkopf mit Gesicht an der runden Nase, fährt nach rechts, ohne Räder (hat keinen Schornstein: Punkt = Dachmitte)"
+    },
+    "wagen_offen_rot": {
+      "ax": 0.5,
+      "ay": 0.981,
+      "pts": {
+        "kupplung_h": [
+          7,
+          299
+        ],
+        "kupplung_v": [
+          793,
+          298
+        ],
+        "sitz_l": [
+          75,
+          62
+        ],
+        "sitz_r": [
+          718,
+          62
+        ],
+        "rad1": [
+          232,
+          361
+        ],
+        "rad2": [
+          560,
+          361
+        ]
+      },
+      "desc": "Roter offener Holz-Wannenwagen, leer, ohne Räder"
+    },
+    "wagen_offen_rot_vorn": {
+      "ax": 0.5,
+      "ay": 0.981,
+      "pts": {
+        "kupplung_h": [
+          7,
+          299
+        ],
+        "kupplung_v": [
+          793,
+          298
+        ],
+        "sitz_l": [
+          75,
+          62
+        ],
+        "sitz_r": [
+          718,
+          62
+        ],
+        "rad1": [
+          232,
+          361
+        ],
+        "rad2": [
+          560,
+          361
+        ]
+      },
+      "desc": "Nur die Vorderwand von wagen_offen_rot (gleiche Größe und Lage) – über Tiere legen, damit sie im Wagen sitzen"
+    },
+    "wagen_offen_blau": {
+      "ax": 0.5,
+      "ay": 0.98,
+      "pts": {
+        "kupplung_h": [
+          6,
+          263
+        ],
+        "kupplung_v": [
+          793,
+          264
+        ],
+        "sitz_l": [
+          101,
+          58
+        ],
+        "sitz_r": [
+          696,
+          58
+        ],
+        "rad1": [
+          250,
+          348
+        ],
+        "rad2": [
+          541,
+          348
+        ]
+      },
+      "desc": "Blauer offener Holz-Wannenwagen, leer, ohne Räder"
+    },
+    "wagen_offen_blau_vorn": {
+      "ax": 0.5,
+      "ay": 0.98,
+      "pts": {
+        "kupplung_h": [
+          6,
+          263
+        ],
+        "kupplung_v": [
+          793,
+          264
+        ],
+        "sitz_l": [
+          101,
+          58
+        ],
+        "sitz_r": [
+          696,
+          58
+        ],
+        "rad1": [
+          250,
+          348
+        ],
+        "rad2": [
+          541,
+          348
+        ]
+      },
+      "desc": "Nur die Vorderwand von wagen_offen_blau (gleiche Größe und Lage) – über Tiere legen, damit sie im Wagen sitzen"
+    },
+    "wagen_offen_gelb": {
+      "ax": 0.5,
+      "ay": 0.979,
+      "pts": {
+        "kupplung_h": [
+          6,
+          223
+        ],
+        "kupplung_v": [
+          793,
+          222
+        ],
+        "sitz_l": [
+          139,
+          54
+        ],
+        "sitz_r": [
+          659,
+          54
+        ],
+        "rad1": [
+          260,
+          322
+        ],
+        "rad2": [
+          533,
+          322
+        ]
+      },
+      "desc": "Gelber offener Holz-Wannenwagen, leer, ohne Räder"
+    },
+    "wagen_offen_gelb_vorn": {
+      "ax": 0.5,
+      "ay": 0.979,
+      "pts": {
+        "kupplung_h": [
+          6,
+          223
+        ],
+        "kupplung_v": [
+          793,
+          222
+        ],
+        "sitz_l": [
+          139,
+          54
+        ],
+        "sitz_r": [
+          659,
+          54
+        ],
+        "rad1": [
+          260,
+          322
+        ],
+        "rad2": [
+          533,
+          322
+        ]
+      },
+      "desc": "Nur die Vorderwand von wagen_offen_gelb (gleiche Größe und Lage) – über Tiere legen, damit sie im Wagen sitzen"
+    },
+    "wagen_offen_gruen": {
+      "ax": 0.5,
+      "ay": 0.98,
+      "pts": {
+        "kupplung_h": [
+          6,
+          278
+        ],
+        "kupplung_v": [
+          793,
+          278
+        ],
+        "sitz_l": [
+          112,
+          58
+        ],
+        "sitz_r": [
+          686,
+          58
+        ],
+        "rad1": [
+          245,
+          342
+        ],
+        "rad2": [
+          550,
+          342
+        ]
+      },
+      "desc": "Grüner offener Holz-Wannenwagen, leer, ohne Räder"
+    },
+    "wagen_offen_gruen_vorn": {
+      "ax": 0.5,
+      "ay": 0.98,
+      "pts": {
+        "kupplung_h": [
+          6,
+          278
+        ],
+        "kupplung_v": [
+          793,
+          278
+        ],
+        "sitz_l": [
+          112,
+          58
+        ],
+        "sitz_r": [
+          686,
+          58
+        ],
+        "rad1": [
+          245,
+          342
+        ],
+        "rad2": [
+          550,
+          342
+        ]
+      },
+      "desc": "Nur die Vorderwand von wagen_offen_gruen (gleiche Größe und Lage) – über Tiere legen, damit sie im Wagen sitzen"
+    },
+    "wagen_offen_lila": {
+      "ax": 0.5,
+      "ay": 0.983,
+      "pts": {
+        "kupplung_h": [
+          6,
+          292
+        ],
+        "kupplung_v": [
+          793,
+          289
+        ],
+        "sitz_l": [
+          76,
+          52
+        ],
+        "sitz_r": [
+          723,
+          52
+        ],
+        "rad1": [
+          245,
+          342
+        ],
+        "rad2": [
+          551,
+          342
+        ]
+      },
+      "desc": "Lila offener Holz-Wannenwagen, leer, ohne Räder"
+    },
+    "wagen_offen_lila_vorn": {
+      "ax": 0.5,
+      "ay": 0.983,
+      "pts": {
+        "kupplung_h": [
+          6,
+          292
+        ],
+        "kupplung_v": [
+          793,
+          289
+        ],
+        "sitz_l": [
+          76,
+          52
+        ],
+        "sitz_r": [
+          723,
+          52
+        ],
+        "rad1": [
+          245,
+          342
+        ],
+        "rad2": [
+          551,
+          342
+        ]
+      },
+      "desc": "Nur die Vorderwand von wagen_offen_lila (gleiche Größe und Lage) – über Tiere legen, damit sie im Wagen sitzen"
+    },
+    "wagen_offen_orange": {
+      "ax": 0.5,
+      "ay": 0.979,
+      "pts": {
+        "kupplung_h": [
+          6,
+          269
+        ],
+        "kupplung_v": [
+          793,
+          267
+        ],
+        "sitz_l": [
+          101,
+          50
+        ],
+        "sitz_r": [
+          699,
+          50
+        ],
+        "rad1": [
+          251,
+          331
+        ],
+        "rad2": [
+          548,
+          331
+        ]
+      },
+      "desc": "Oranger offener Holz-Wannenwagen, leer, ohne Räder"
+    },
+    "wagen_offen_orange_vorn": {
+      "ax": 0.5,
+      "ay": 0.979,
+      "pts": {
+        "kupplung_h": [
+          6,
+          269
+        ],
+        "kupplung_v": [
+          793,
+          267
+        ],
+        "sitz_l": [
+          101,
+          50
+        ],
+        "sitz_r": [
+          699,
+          50
+        ],
+        "rad1": [
+          251,
+          331
+        ],
+        "rad2": [
+          548,
+          331
+        ]
+      },
+      "desc": "Nur die Vorderwand von wagen_offen_orange (gleiche Größe und Lage) – über Tiere legen, damit sie im Wagen sitzen"
+    },
+    "wagen_tier": {
+      "ax": 0.5,
+      "ay": 0.979,
+      "pts": {
+        "kupplung_h": [
+          6,
+          247
+        ],
+        "kupplung_v": [
+          793,
+          247
+        ],
+        "sitz_l": [
+          100,
+          45
+        ],
+        "sitz_r": [
+          700,
+          45
+        ],
+        "rad1": [
+          243,
+          330
+        ],
+        "rad2": [
+          552,
+          330
+        ]
+      },
+      "desc": "Tierwagen mit weißem Lattenzaun und Stroh, leer, ohne Räder"
+    },
+    "wagen_tier_vorn": {
+      "ax": 0.5,
+      "ay": 0.979,
+      "pts": {
+        "kupplung_h": [
+          6,
+          247
+        ],
+        "kupplung_v": [
+          793,
+          247
+        ],
+        "sitz_l": [
+          100,
+          45
+        ],
+        "sitz_r": [
+          700,
+          45
+        ],
+        "rad1": [
+          243,
+          330
+        ],
+        "rad2": [
+          552,
+          330
+        ]
+      },
+      "desc": "Nur der vordere Teil von wagen_tier ab Zaunoberkante (gleiche Größe) – über Tiere legen"
+    },
+    "wagen_flach": {
+      "ax": 0.5,
+      "ay": 0.979,
+      "pts": {
+        "kupplung_h": [
+          5,
+          221
+        ],
+        "kupplung_v": [
+          794,
+          221
+        ],
+        "ladeflaeche_l": [
+          160,
+          140
+        ],
+        "ladeflaeche_r": [
+          680,
+          140
+        ],
+        "rad1": [
+          235,
+          283
+        ],
+        "rad2": [
+          560,
+          283
+        ]
+      },
+      "desc": "Flacher Güterwagen: Holzplattform mit vier roten Rungen, leer, ohne Räder"
+    },
+    "wagen_personen": {
+      "ax": 0.5,
+      "ay": 0.987,
+      "pts": {
+        "kupplung_h": [
+          6,
+          411
+        ],
+        "kupplung_v": [
+          793,
+          411
+        ],
+        "rad1": [
+          235,
+          458
+        ],
+        "rad2": [
+          555,
+          458
+        ]
+      },
+      "desc": "Creme-roter Personenwagen mit drei warm erleuchteten leeren Fenstern, ohne Räder"
+    },
+    "wagen_schluss": {
+      "ax": 0.5,
+      "ay": 0.986,
+      "pts": {
+        "kupplung_h": [
+          6,
+          490
+        ],
+        "kupplung_v": [
+          793,
+          500
+        ],
+        "rad1": [
+          242,
+          548
+        ],
+        "rad2": [
+          550,
+          548
+        ]
+      },
+      "desc": "Roter Schlusswagen mit Aussichtskanzel und Laterne hinten links, ohne Räder"
+    },
+    "wagen_musik": {
+      "ax": 0.5,
+      "ay": 0.985,
+      "pts": {
+        "kupplung_h": [
+          5,
+          315
+        ],
+        "kupplung_v": [
+          794,
+          315
+        ],
+        "rad1": [
+          241,
+          383
+        ],
+        "rad2": [
+          551,
+          383
+        ]
+      },
+      "desc": "Flachwagen mit buntem Xylophon (5 Stäbe in Regenbogenfarben), ohne Räder"
+    },
+    "wagen_kran": {
+      "ax": 0.5,
+      "ay": 0.987,
+      "pts": {
+        "kupplung_h": [
+          6,
+          448
+        ],
+        "kupplung_v": [
+          793,
+          448
+        ],
+        "rad1": [
+          247,
+          526
+        ],
+        "rad2": [
+          552,
+          526
+        ]
+      },
+      "desc": "Wagen mit kleinem gelbem Kran, Haken oben, ohne Räder"
+    },
+    "wagen_tank": {
+      "ax": 0.5,
+      "ay": 0.989,
+      "pts": {
+        "kupplung_h": [
+          6,
+          423
+        ],
+        "kupplung_v": [
+          793,
+          423
+        ],
+        "rad1": [
+          245,
+          522
+        ],
+        "rad2": [
+          550,
+          522
+        ]
+      },
+      "desc": "Runder Milch-Tankwagen, weiß mit blauen Kuhflecken, ohne Räder"
+    },
+    "rad_gross": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Großes Rad: türkiser Reifen, rote Speichenscheibe, gelbe Nabe (kreisrund, zum Drehen)"
+    },
+    "rad_klein": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Rad: roter Reifen, türkise Lochscheibe, gelbe Nabe (kreisrund, zum Drehen)"
+    },
+    "rad_blau": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Rad: blauer Reifen, gelbe Speichen, rote Nabe (kreisrund, zum Drehen)"
+    },
+    "rad_gruen": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Rad: grüner Reifen, cremefarbene Scheibe mit 5 Löchern, orange Nabe (kreisrund, zum Drehen)"
+    },
+    "kuppelstange": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "pts": {
+        "auge_l": [
+          64,
+          66
+        ],
+        "auge_r": [
+          435,
+          66
+        ]
+      },
+      "desc": "Goldgelbe Kuppelstange, waagrecht, mit zwei Augen"
+    },
+    "schiene": {
+      "ax": 0.0,
+      "ay": 0.0,
+      "desc": "Holz-Spielzeugschiene von der Seite mit Schwellen und Kiesbett, waagrecht kachelbar"
+    },
+    "signal_rot": {
+      "ax": 0.51,
+      "ay": 0.983,
+      "desc": "Lichtsignal am rot-weißen Mast, oberes Licht rot"
+    },
+    "signal_gruen": {
+      "ax": 0.502,
+      "ay": 0.983,
+      "desc": "Lichtsignal am rot-weißen Mast, unteres Licht grün"
+    },
+    "schranke_zu": {
+      "ax": 0.165,
+      "ay": 0.982,
+      "desc": "Bahnschranke geschlossen (Baum waagrecht nach rechts), Anker = Mitte Sockel"
+    },
+    "schranke_offen": {
+      "ax": 0.487,
+      "ay": 0.983,
+      "desc": "Dieselbe Bahnschranke offen (Baum senkrecht), Anker = Mitte Sockel"
+    },
+    "bahnhofsuhr": {
+      "ax": 0.497,
+      "ay": 0.983,
+      "desc": "Bahnhofsuhr am Pfosten, ohne Ziffern, nur Zeiger"
+    },
+    "bahnsteig": {
+      "ax": 0.5,
+      "ay": 0.982,
+      "desc": "Kurzer Bahnsteig mit rotem Dach, Bank und Lampe (mit Gleisstück darunter)"
+    },
+    "tunnel_portal": {
+      "ax": 0.457,
+      "ay": 0.984,
+      "desc": "Runder Steinbogen-Tunnel mit Moos und Blümchen, Gleis führt hinein (leicht schräg)"
+    },
+    "prellbock": {
+      "ax": 0.5,
+      "ay": 0.982,
+      "desc": "Holz-Prellbock mit gelben Puffern nach links, auf Gleisstück"
+    },
+    "ladung_ball": {
+      "ax": 0.492,
+      "ay": 0.984,
+      "desc": "Bunter Wasserball"
+    },
+    "ladung_kiste": {
+      "ax": 0.5,
+      "ay": 0.984,
+      "desc": "Geschlossene Holzkiste"
+    },
+    "ladung_geschenk": {
+      "ax": 0.49,
+      "ay": 0.984,
+      "desc": "Geschenk, türkis gepunktet mit roter Schleife"
+    },
+    "ladung_milchkanne": {
+      "ax": 0.5,
+      "ay": 0.984,
+      "desc": "Blaugraue Milchkanne"
+    },
+    "ladung_apfelkorb": {
+      "ax": 0.495,
+      "ay": 0.984,
+      "desc": "Weidenkorb voller Äpfel"
+    },
+    "ladung_fass": {
+      "ax": 0.5,
+      "ay": 0.984,
+      "desc": "Kleines Holzfass"
+    },
+    "ladung_koffer": {
+      "ax": 0.498,
+      "ay": 0.984,
+      "desc": "Gelber Reisekoffer mit Riemen"
+    },
+    "ladung_heuballen": {
+      "ax": 0.5,
+      "ay": 0.984,
+      "desc": "Runder Heuballen"
+    },
+    "ladung_bausteine": {
+      "ax": 0.479,
+      "ay": 0.984,
+      "desc": "Drei Holzbausteine (rot, blau, gelbes Dach)"
+    },
+    "ladung_teddy": {
+      "ax": 0.5,
+      "ay": 0.984,
+      "desc": "Sitzender Teddy mit roter Schleife"
+    },
+    "kind_m_idle": {
+      "ax": 0.537,
+      "ay": 0.984,
+      "desc": "Mädchen mit Zöpfen im gelben Kleid, steht und lächelt"
+    },
+    "kind_m_happy": {
+      "ax": 0.492,
+      "ay": 0.984,
+      "desc": "Mädchen winkt mit erhobenem Arm und lacht"
+    },
+    "kind_j_idle": {
+      "ax": 0.541,
+      "ay": 0.984,
+      "desc": "Junge in roter Latzhose, steht und lächelt"
+    },
+    "kind_j_happy": {
+      "ax": 0.481,
+      "ay": 0.984,
+      "desc": "Junge winkt mit erhobenem Arm und lacht"
+    },
+    "oma_idle": {
+      "ax": 0.521,
+      "ay": 0.984,
+      "desc": "Oma mit Dutt, Brille und lila Strickjacke, steht und lächelt"
+    },
+    "oma_happy": {
+      "ax": 0.454,
+      "ay": 0.984,
+      "desc": "Oma winkt mit erhobenem Arm und lacht"
+    },
+    "papa_idle": {
+      "ax": 0.526,
+      "ay": 0.984,
+      "desc": "Papa mit kurzem Bart und grünem Pulli, steht und lächelt"
+    },
+    "papa_happy": {
+      "ax": 0.476,
+      "ay": 0.984,
+      "desc": "Papa winkt mit erhobenem Arm und lacht"
+    }
+  },
+  "audio": {}
+}

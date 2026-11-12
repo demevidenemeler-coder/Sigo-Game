@@ -1,0 +1,67 @@
+{
+  "images": {
+    "icon_lok": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Auswahl-Knopf: kleine Lok auf runder Scheibe"
+    },
+    "icon_wagen": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Auswahl-Knopf: gelber Wagen auf runder Scheibe"
+    },
+    "icon_ladung": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Auswahl-Knopf: Geschenk und Ball auf runder Scheibe"
+    },
+    "gepaeckkarre": {
+      "ax": 0.582,
+      "ay": 0.983,
+      "desc": "Gepäckkarre mit zwei Koffern, von der Seite"
+    },
+    "wartehaeuschen": {
+      "ax": 0.5,
+      "ay": 0.984,
+      "desc": "kleines offenes Wartehäuschen mit rotem Dach, leer"
+    },
+    "bank": {
+      "ax": 0.5,
+      "ay": 0.981,
+      "desc": "Holzbank mit roten Beinen, leer"
+    },
+    "bahnhofsglocke": {
+      "ax": 0.277,
+      "ay": 0.984,
+      "desc": "Bahnhofsglocke am Pfosten mit Zugseil"
+    },
+    "hg_bahnhof": {
+      "pts": {
+        "boden": [
+          1414,
+          1085
+        ],
+        "gleis": [
+          1414,
+          1325
+        ],
+        "uhr": [
+          925,
+          442
+        ]
+      },
+      "desc": "Spielzeug-Bahnhof von der Seite: Bahnhofshaus mit Uhrturm links, langer Holzbahnsteig (Oberfläche y≈1040-1100), leerer Schotterstreifen y≈1215-1440 für das Gleis, Hügel und Himmel"
+    },
+    "icon_tiere": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Auswahl-Knopf: Kuhkopf und Kükenkopf auf runder Scheibe"
+    },
+    "fahne_gruen": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "grüne Abfahrts-Kelle (runde Scheibe am Holzgriff), aufrecht"
+    }
+  },
+  "audio": {}
+}

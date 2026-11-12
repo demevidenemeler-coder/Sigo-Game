@@ -1,0 +1,36 @@
+{
+  "id": "musik",
+  "images": {
+    "becken": {"file": "becken.webp", "w": 326, "h": 500, "ax": 0.502, "ay": 0.984, "pts": {}, "desc": "Goldenes Becken auf lila Ständer"},
+    "bongos": {"file": "bongos.webp", "w": 500, "h": 308, "ax": 0.502, "ay": 0.98, "pts": {}, "desc": "Zwei Bongos, orange und türkis"},
+    "floete": {"file": "floete.webp", "w": 198, "h": 500, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Hölzerne Blockflöte, senkrecht"},
+    "gitarre": {"file": "gitarre.webp", "w": 221, "h": 500, "ax": 0.502, "ay": 0.984, "pts": {}, "desc": "Türkise Ukulele, aufrecht"},
+    "glockenspiel_glocke": {"file": "glockenspiel_glocke.webp", "w": 255, "h": 400, "ax": 0.498, "ay": 0.985, "pts": {}, "desc": "Goldene Handglocke mit rotem Griff"},
+    "hg_buehne": {"file": "hg_buehne.webp", "w": 2829, "h": 1600, "ax": 0.5, "ay": 0.5, "pts": {"boden": [1414, 1260], "platz1": [654, 1260], "platz2": [1034, 1260], "platz3": [1414, 1260], "platz4": [1794, 1260], "platz5": [2174, 1260]}, "desc": "Holzbühne auf der Wiese am frühen Abend, roter Vorhang links/rechts, Lichterkette oben; Bühnenboden y≈1090-1400 (Vorderkante ≈1400), Mitte leer"},
+    "hg_instrumente": {"file": "hg_instrumente.webp", "w": 2829, "h": 1600, "ax": 0.5, "ay": 0.5, "pts": {"boden": [1414, 1330], "tisch": [1414, 1100]}, "desc": "Helles Musikzimmer: Holzboden ab y≈1210, grüne Täfelung, Regal mit Noten links, Fenster rechts; Mitte frei für große Instrumente"},
+    "klavier_klein": {"file": "klavier_klein.webp", "w": 500, "h": 378, "ax": 0.496, "ay": 0.985, "pts": {}, "desc": "Kleines rotes Spielzeugklavier auf Beinchen"},
+    "klaviertaste": {"file": "klaviertaste.webp", "w": 157, "h": 500, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Einzelne weiße Klaviertaste von oben, senkrecht"},
+    "mikrofon": {"file": "mikrofon.webp", "w": 195, "h": 500, "ax": 0.5, "ay": 0.984, "pts": {}, "desc": "Mikrofon auf lila Ständer"},
+    "note_gross_1": {"file": "note_gross_1.webp", "w": 330, "h": 400, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Große korallrosa Achtelnote"},
+    "note_gross_2": {"file": "note_gross_2.webp", "w": 400, "h": 385, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Große türkise Doppelnote"},
+    "notenstaender": {"file": "notenstaender.webp", "w": 319, "h": 500, "ax": 0.498, "ay": 0.984, "pts": {}, "desc": "Hölzerner Notenständer mit leerem Blatt"},
+    "rassel": {"file": "rassel.webp", "w": 479, "h": 500, "ax": 0.478, "ay": 0.984, "pts": {}, "desc": "Zwei Maracas, rosa und gelb"},
+    "scheinwerfer_schein": {"file": "scheinwerfer_schein.webp", "w": 665, "h": 866, "ax": 0.5, "ay": 0.0, "pts": {}, "desc": "Weicher warmgelber Lichtkegel, Anker oben (Spitze)"},
+    "schlegel": {"file": "schlegel.webp", "w": 149, "h": 400, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Xylophon-Schlegel mit rotem Kopf"},
+    "tamburin": {"file": "tamburin.webp", "w": 414, "h": 500, "ax": 0.486, "ay": 0.984, "pts": {}, "desc": "Tamburin mit goldenen Schellen"},
+    "triangel": {"file": "triangel.webp", "w": 478, "h": 500, "ax": 0.506, "ay": 0.984, "pts": {}, "desc": "Triangel an rotem Band mit Schlägel"},
+    "trommel": {"file": "trommel.webp", "w": 461, "h": 500, "ax": 0.498, "ay": 0.984, "pts": {}, "desc": "Bunte Kindertrommel mit zwei Schlegeln obendrauf"},
+    "trommel_gross": {"file": "trommel_gross.webp", "w": 565, "h": 600, "ax": 0.498, "ay": 0.983, "pts": {}, "desc": "Große blaue Trommel von schräg oben, Fell gut sichtbar"},
+    "trompete": {"file": "trompete.webp", "w": 500, "h": 261, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Goldene Spielzeugtrompete, Trichter nach rechts"},
+    "xylo_rahmen": {"file": "xylo_rahmen.webp", "w": 1208, "h": 600, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Leerer trapezförmiger Xylophon-Rahmen von oben"},
+    "xylo_stab": {"file": "xylo_stab.webp", "w": 186, "h": 700, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Einzelner Xylophon-Klangstab von oben, senkrecht, fast weiß (zum Einfärben)"}
+  },
+  "audio": {
+    "atelier": {"file": "atelier.ogg", "desc": "Musik Malhaus, Eisdiele, Musik-Ort: sanfter Walzer"},
+    "bau": {"file": "bau.ogg", "desc": "Musik Feuerwehr, Baustelle, Spielplatz, Waschanlage: verspielt, Tuba und Marimba"},
+    "fahrt": {"file": "fahrt.ogg", "desc": "Musik Zugfahrt und Bahnhof: sanfter Zug-Rhythmus, Mundharmonika"},
+    "karte": {"file": "karte.ogg", "desc": "Musik Landkarte und Start: Ukulele, Glockenspiel, ruhig und fröhlich"},
+    "nacht": {"file": "nacht.ogg", "desc": "Musik Schlafenszeit: Spieluhr-Wiegenlied"},
+    "wiese": {"file": "wiese.ogg", "desc": "Musik Bauernhof, Garten, Teich, Wald: Gitarre und Flöte"}
+  }
+}

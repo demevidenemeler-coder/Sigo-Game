@@ -1,0 +1,28 @@
+{
+  "id": "feuerwehr",
+  "images": {
+    "alarmglocke": {"file": "alarmglocke.webp", "w": 254, "h": 350, "ax": 0.5, "ay": 0.5, "pts": {"wand": [45, 80], "aufhaengung": [160, 110]}, "desc": "Goldene Alarmglocke an rotem Wandhalter"},
+    "blaulicht_schein": {"file": "blaulicht_schein.webp", "w": 400, "h": 398, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Weicher runder blauer Lichtschein, nach außen durchsichtig (über das Blaulicht legen, sanft ein- und ausblenden)"},
+    "eimer_rot": {"file": "eimer_rot.webp", "w": 250, "h": 300, "ax": 0.484, "ay": 0.983, "pts": {}, "desc": "Roter Eimer mit Henkel, leer"},
+    "feuerwehrauto": {"file": "feuerwehrauto.webp", "w": 919, "h": 554, "ax": 0.5, "ay": 0.979, "pts": {"rad1": [205, 540], "rad2": [625, 540], "leiter": [110, 215], "duese": [615, 115], "blaulicht": [652, 85]}, "desc": "Feuerwehrauto von der Seite, Front rechts, freundliches Gesicht, Blaulicht-Kuppel, Wasserwerfer; ohne Räder (Radkästen leer, rad_auto auf ca. 200 px Durchmesser), ohne Leiter; Fenster durchsichtig"},
+    "flamme1": {"file": "flamme1.webp", "w": 248, "h": 300, "ax": 0.498, "ay": 0.983, "pts": {}, "desc": "Kleines rundes freundliches Flämmchen (Tropfenform)"},
+    "flamme2": {"file": "flamme2.webp", "w": 260, "h": 300, "ax": 0.492, "ay": 0.983, "pts": {}, "desc": "Kleines freundliches Flämmchen mit zwei Spitzen, nach links geneigt"},
+    "flamme3": {"file": "flamme3.webp", "w": 262, "h": 300, "ax": 0.496, "ay": 0.983, "pts": {}, "desc": "Kleines rundliches Flämmchen mit drei Spitzen"},
+    "helm": {"file": "helm.webp", "w": 300, "h": 270, "ax": 0.5, "ay": 0.85, "pts": {}, "desc": "Roter Feuerwehrhelm, schräg von vorn"},
+    "hg_einsatz": {"file": "hg_einsatz.webp", "w": 2829, "h": 1600, "ax": 0.5, "ay": 0.5, "pts": {"boden": [1414, 1200], "fenster1": [1757, 603], "fenster2": [2017, 603], "fenster3": [2030, 886], "tuer": [1757, 957], "ast": [560, 738], "auto": [700, 1430]}, "desc": "Einsatzort: Dorfstraße von der Seite, Apfelbaum links mit langem Ast nach links, gelbes Haus mittig-rechts (x 1510-2270) mit drei Fenstern und Tür, Straße unten frei"},
+    "hg_wache": {"file": "hg_wache.webp", "w": 2829, "h": 1600, "ax": 0.5, "ay": 0.5, "pts": {"boden": [1414, 1400], "garage": [1500, 1290], "stange_oben": [2265, 725], "stange_unten": [2265, 1280], "glocke": [820, 720]}, "desc": "Feuerwache von vorn: rotes Haus, offenes leeres Garagentor (x 1015-1990, y 770-1295), Rutschstange rechts, Schlauchturm links, Pflasterhof"},
+    "hg_waschplatz": {"file": "hg_waschplatz.webp", "w": 2829, "h": 1600, "ax": 0.5, "ay": 0.5, "pts": {"boden": [1414, 1300], "auto": [1414, 1300], "hahn": [490, 700], "abfluss": [2380, 1095]}, "desc": "Waschplatz hinter der Wache: Wasserhahn und Eimer-Regal links, Abfluss rechts, leerer Pflasterplatz in der Mitte"},
+    "hydrant": {"file": "hydrant.webp", "w": 295, "h": 400, "ax": 0.493, "ay": 0.985, "pts": {}, "desc": "Roter Hydrant, stehend"},
+    "leiter": {"file": "leiter.webp", "w": 1000, "h": 148, "ax": 0.075, "ay": 0.338, "pts": {"fuss": [75, 50], "spitze": [990, 62]}, "desc": "Lange silbergraue Leiter waagrecht, roter Drehfuß links (Anker = Drehpunkt)"},
+    "leiterkorb": {"file": "leiterkorb.webp", "w": 350, "h": 241, "ax": 0.601, "ay": 0.982, "pts": {"halter": [32, 147]}, "desc": "Kleiner roter Rettungskorb für die Leiterspitze, oben offen"},
+    "pfuetze_blau": {"file": "pfuetze_blau.webp", "w": 500, "h": 106, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Flache hellblaue Wasserpfütze"},
+    "rad_auto": {"file": "rad_auto.webp", "w": 311, "h": 320, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Rad für das Feuerwehrauto: schwarzer Reifen, rote Felge, frontal (zum Drehen)"},
+    "rauchwolke": {"file": "rauchwolke.webp", "w": 400, "h": 201, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Weiche hellgraue Rauchwolke"},
+    "rolltor": {"file": "rolltor.webp", "w": 797, "h": 589, "ax": 0.501, "ay": 0.98, "pts": {}, "desc": "Rotes Rolltor als Platte mit Rillen (vor die Garagenöffnung von hg_wache, ca. 980x525 skalieren)"},
+    "schlauchrolle": {"file": "schlauchrolle.webp", "w": 336, "h": 400, "ax": 0.5, "ay": 0.985, "pts": {}, "desc": "Rote Schlauchrolle auf Ständer mit aufgerolltem Schlauch und Messingdüse"},
+    "stern_orden": {"file": "stern_orden.webp", "w": 224, "h": 400, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Goldene Medaille mit Stern an rot-weißem Band (Belohnung)"},
+    "wasserstrahl_stueck": {"file": "wasserstrahl_stueck.webp", "w": 500, "h": 195, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Kurzes Stück hellblauer Wasserstrahl, waagrecht, mit Tropfen (mehrfach aneinander oder gestreckt)"}
+  },
+  "audio": {
+  }
+}

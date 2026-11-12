@@ -1,0 +1,538 @@
+{
+  "images": {
+    "knopf_rund": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Leere runde cremeweiße Holz-Knopfplatte, frontal (Unterlage für Symbole)"
+    },
+    "icon_karte": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Gefaltete Landkarte mit Weg und rotem Punkt"
+    },
+    "icon_zurueck": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Dicker blauer runder Pfeil, biegt nach links (zurück)"
+    },
+    "icon_album": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Rotes Stickerbuch mit gelbem Stern"
+    },
+    "icon_los": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Grüne Abfahrts-Kelle mit Holzgriff"
+    },
+    "icon_haken": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Dicker grüner Haken"
+    },
+    "icon_pfeil_links": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Dicker orangefarbener Pfeil nach links"
+    },
+    "icon_pfeil_rechts": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Dicker orangefarbener Pfeil nach rechts"
+    },
+    "icon_sonne": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Lächelnde Sonne (Wetter/Tag)"
+    },
+    "icon_abend": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Orange Sonne halb hinter grünem Hügel (Abend)"
+    },
+    "icon_mond": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Schlafender Mond mit blauer Zipfelmütze (Nacht)"
+    },
+    "icon_regen": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Wolke mit drei blauen Tropfen"
+    },
+    "icon_schnee": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Wolke mit drei Schneeflocken"
+    },
+    "icon_klar": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Runde Scheibe mit blauem Himmel und kleiner Wolke (klares Wetter)"
+    },
+    "icon_zahnrad": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Graublaues Zahnrad (Eltern-Einstellungen)"
+    },
+    "icon_musik": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Zwei bunte Musiknoten mit Gesichtern"
+    },
+    "icon_schwamm": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Gelber Schwamm mit Schaum (Symbol)"
+    },
+    "icon_korb": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Leerer geflochtener Korb mit Henkel"
+    },
+    "icon_muelleimer": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Kleiner türkisgrüner Eimer mit Deckel (Mülleimer)"
+    },
+    "icon_stift": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Dicker roter Buntstift, Spitze nach unten links"
+    },
+    "icon_kamera": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Hellblaue Spielzeug-Fotokamera, frontal"
+    },
+    "hand": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Weiße Comic-Handschuh-Hand, Zeigefinger zeigt nach oben links (Punkt spitze = Fingerspitze)",
+      "pts": {
+        "spitze": [
+          12,
+          32
+        ]
+      }
+    },
+    "blase_denk": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Leere weiße Denkblase, drei Bläschen unten links (innen = Mitte der Fläche, schwanz = kleinstes Bläschen)",
+      "pts": {
+        "innen": [
+          330,
+          260
+        ],
+        "schwanz": [
+          45,
+          540
+        ]
+      }
+    },
+    "blase_sprech": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Leere weiße Sprechblase, Spitze unten links (innen = Mitte der Fläche, schwanz = Spitze)",
+      "pts": {
+        "innen": [
+          320,
+          250
+        ],
+        "schwanz": [
+          70,
+          500
+        ]
+      }
+    },
+    "p_herz": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Teilchen: rotes glänzendes Herz"
+    },
+    "p_stern": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Teilchen: gelber runder Stern"
+    },
+    "p_funke": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Teilchen: weiches weiß-gelbes vierzackiges Funkeln"
+    },
+    "p_blase": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Teilchen: schimmernde durchsichtige Seifenblase"
+    },
+    "p_tropfen": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Teilchen: blauer Wassertropfen"
+    },
+    "p_blatt": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Teilchen: grünes Blatt"
+    },
+    "p_blatt_herbst": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Teilchen: orangefarbenes Herbstblatt"
+    },
+    "p_rauch": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Teilchen: weißes Dampfwölkchen"
+    },
+    "p_note1": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Teilchen: rote Achtelnote"
+    },
+    "p_note2": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Teilchen: türkise Doppelnote"
+    },
+    "p_zzz": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Teilchen: weiches blaues Z (Schlafen)"
+    },
+    "p_staub": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Teilchen: beiges Staubwölkchen"
+    },
+    "p_schneeflocke": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Teilchen: weiße Schneeflocke"
+    },
+    "p_konfetti": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Teilchen: fünf bunte runde Konfetti-Punkte"
+    },
+    "p_schaum": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Teilchen: weißer Seifenschaum-Klecks"
+    },
+    "wolke1": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Große flauschige weiße Wolke"
+    },
+    "wolke2": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Lange flache weiße Wolke"
+    },
+    "wolke3": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Kleine runde weiße Wolke"
+    },
+    "sonne": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Große lächelnde Sonne mit Strahlenkranz"
+    },
+    "mond": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Freundlicher schlafender Sichelmond"
+    },
+    "stern_himmel": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Kleiner weicher gelber Stern für den Nachthimmel"
+    },
+    "regenbogen": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Weicher Regenbogen-Bogen mit Wölkchen an den Enden"
+    },
+    "futter_heu": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Heubündel mit Schnur"
+    },
+    "futter_karotte": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Karotte mit Grün"
+    },
+    "futter_apfel": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Roter Apfel mit Blatt"
+    },
+    "futter_banane": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Gelbe Banane"
+    },
+    "futter_koerner": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Holzschüssel mit Körnern"
+    },
+    "futter_fisch": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Freundlicher hellblauer Spielzeug-Fisch, schaut nach rechts"
+    },
+    "futter_knochen": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Cremeweißer Hundeknochen"
+    },
+    "futter_blatt": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Zweig mit saftigen grünen Blättern"
+    },
+    "futter_kaese": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Käsestück mit Löchern"
+    },
+    "futter_nuss": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Eichel"
+    },
+    "futter_salat": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Salatkopf"
+    },
+    "futter_honig": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Honigtopf mit Honiglöffel"
+    },
+    "futter_milch": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Milchfläschchen mit Sauger"
+    },
+    "futter_erdbeere": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Erdbeere"
+    },
+    "futter_wurm": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Lustiger rosa Wurm mit Gesicht"
+    },
+    "futter_brot": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Rundes Brot"
+    },
+    "eimer_wasser": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Blauer Eimer mit Wasser"
+    },
+    "giesskanne": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Grüne Gießkanne mit freundlichem Gesicht, Tülle nach rechts oben (Punkt tuelle = Brausekopf-Mitte)",
+      "pts": {
+        "tuelle": [
+          385,
+          88
+        ]
+      }
+    },
+    "schwamm": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Gelber Schwamm mit Schaum"
+    },
+    "buerste": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Bürste mit Holzgriff"
+    },
+    "handtuch": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Gefaltetes Handtuch"
+    }
+  },
+  "audio": {
+    "melken": {
+      "desc": "Milch spritzt in den Eimer (zwei Spritzer)"
+    },
+    "kueken": {
+      "desc": "Küken piept"
+    },
+    "schermaschine": {
+      "desc": "Schermaschine summt leise (Schleife)"
+    },
+    "traktor": {
+      "desc": "Traktor tuckert"
+    },
+    "rolltor": {
+      "desc": "Rolltor fährt hoch"
+    },
+    "zisch": {
+      "desc": "Flämmchen geht aus: Zischen"
+    },
+    "sand": {
+      "desc": "Sand rieselt von der Schaufel"
+    },
+    "kran": {
+      "desc": "Kran-Motor surrt (auch für Mixer, Leiter)"
+    },
+    "klack": {
+      "desc": "Holzklotz wird aufgesetzt (kurzes Klack, auch Stempel)"
+    },
+    "walze": {
+      "desc": "Walze rumpelt über Schotter (Schleife)"
+    },
+    "giessen": {
+      "desc": "Gießkanne plätschert"
+    },
+    "wachsen": {
+      "desc": "kurzer Blubb: Pflanze wächst"
+    },
+    "rupf": {
+      "desc": "Plopp beim Herausziehen (Karotte)"
+    },
+    "biene": {
+      "desc": "Biene summt vorbei"
+    },
+    "angel": {
+      "desc": "Angelrolle kurbelt"
+    },
+    "pinsel": {
+      "desc": "Pinselstrich"
+    },
+    "klingel": {
+      "desc": "Thekenklingel: Ding"
+    },
+    "ballon": {
+      "desc": "weiches Ballon-Plopp"
+    },
+    "quietsch": {
+      "desc": "Schaukel quietscht leise hin und her"
+    },
+    "rutsch": {
+      "desc": "Rutsch-Pfeifen abwärts"
+    },
+    "graben": {
+      "desc": "Schaufel gräbt im Sand"
+    },
+    "rascheln": {
+      "desc": "Busch raschelt"
+    },
+    "specht": {
+      "desc": "Specht klopft"
+    },
+    "grillen": {
+      "desc": "Nacht: Grillen zirpen (Schleife)"
+    },
+    "schrubben": {
+      "desc": "Schwamm schrubbt mit Schaum"
+    },
+    "klick": {
+      "desc": "Lichtschalter-Klick"
+    },
+    "gong": {
+      "desc": "Bahnhofs-Gong (drei Töne)"
+    },
+    "applaus": {
+      "desc": "Kinder klatschen leise"
+    },
+    "kippen": {
+      "desc": "Kipper schüttet Sand aus"
+    },
+    "spritz": {
+      "desc": "kurzer Wasserstoß aus dem Schlauch"
+    },
+    "kuckuck": {
+      "desc": "Kuckucksuhr ruft"
+    },
+    "tipp": {
+      "desc": "Antippen (Standard)"
+    },
+    "plopp": {
+      "desc": "weiches Plopp (erscheinen, einrasten)"
+    },
+    "wusch": {
+      "desc": "weiches Wusch (Bewegung, Seite blättern)"
+    },
+    "freude": {
+      "desc": "kleiner Freuden-Jingle (Belohnung)"
+    },
+    "funkeln": {
+      "desc": "Glitzer-Klang"
+    },
+    "nein": {
+      "desc": "freundliches Nö (passt nicht)"
+    },
+    "platsch": {
+      "desc": "Wasser-Platsch"
+    },
+    "wisch": {
+      "desc": "Wischen"
+    },
+    "hupf": {
+      "desc": "Hüpfer"
+    },
+    "mampf": {
+      "desc": "Fressen/Mampfen"
+    },
+    "pfiff": {
+      "desc": "Lok-Pfeife"
+    },
+    "zug_fahren": {
+      "desc": "Zug rattert (Schleife)"
+    },
+    "dampf": {
+      "desc": "Dampf-Zischen"
+    },
+    "kupplung": {
+      "desc": "Wagen kuppelt an (Klonk)"
+    },
+    "glocke": {
+      "desc": "Glocke (Bahnhof, Alarm)"
+    },
+    "wasserstrahl": {
+      "desc": "Wasserstrahl (Schleife)"
+    },
+    "regen": {
+      "desc": "Regen (Schleife)"
+    },
+    "tatue": {
+      "desc": "freundliches Tatü-Tata"
+    },
+    "motor": {
+      "desc": "Motor brummt (Schleife)"
+    },
+    "hupe": {
+      "desc": "Hupe"
+    },
+    "schnarchen": {
+      "desc": "leises Schnarchen"
+    },
+    "blubber": {
+      "desc": "Blubbern"
+    },
+    "tuer": {
+      "desc": "Tür geht auf"
+    },
+    "landen": {
+      "desc": "weiches Landen/Aufsetzen"
+    }
+  }
+}

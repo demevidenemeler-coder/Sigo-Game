@@ -1,0 +1,819 @@
+{
+  "images": {
+    "loewe_idle": {
+      "ax": 0.506,
+      "ay": 0.985,
+      "desc": "Junger Löwe sitzt, schaut freundlich lächelnd nach vorn",
+      "pts": {
+        "mouth": [
+          515,
+          395
+        ]
+      }
+    },
+    "elefant_idle": {
+      "ax": 0.523,
+      "ay": 0.985,
+      "desc": "Kleiner Elefant sitzt, schaut freundlich lächelnd nach vorn",
+      "pts": {
+        "mouth": [
+          530,
+          418
+        ]
+      }
+    },
+    "giraffe_idle": {
+      "ax": 0.433,
+      "ay": 0.983,
+      "desc": "Kleine Giraffe steht, schaut freundlich lächelnd nach vorn",
+      "pts": {
+        "mouth": [
+          385,
+          378
+        ]
+      }
+    },
+    "affe_idle": {
+      "ax": 0.583,
+      "ay": 0.985,
+      "desc": "Kleiner Affe sitzt, schaut freundlich lächelnd nach vorn",
+      "pts": {
+        "mouth": [
+          505,
+          405
+        ]
+      }
+    },
+    "pinguin_idle": {
+      "ax": 0.514,
+      "ay": 0.983,
+      "desc": "Kleiner Pinguin steht, schaut freundlich lächelnd nach vorn",
+      "pts": {
+        "mouth": [
+          420,
+          325
+        ]
+      }
+    },
+    "baer_idle": {
+      "ax": 0.533,
+      "ay": 0.985,
+      "desc": "Teddybär mit blauer Lokführer-Mütze sitzt, schaut freundlich nach vorn",
+      "pts": {
+        "mouth": [
+          390,
+          400
+        ]
+      }
+    },
+    "kuh_idle": {
+      "ax": 0.448,
+      "ay": 0.983,
+      "desc": "Kuh steht in Dreiviertelansicht, lächelt den Betrachter an",
+      "pts": {
+        "mouth": [
+          705,
+          445
+        ]
+      }
+    },
+    "fuchs_idle": {
+      "ax": 0.534,
+      "ay": 0.985,
+      "desc": "Fuchsjunges sitzt, schaut freundlich lächelnd nach vorn",
+      "pts": {
+        "mouth": [
+          595,
+          430
+        ]
+      }
+    },
+    "eule_idle": {
+      "ax": 0.512,
+      "ay": 0.985,
+      "desc": "Kleine Eule steht, schaut mit großen Augen freundlich nach vorn",
+      "pts": {
+        "mouth": [
+          405,
+          375
+        ]
+      }
+    },
+    "igel_idle": {
+      "ax": 0.558,
+      "ay": 0.983,
+      "desc": "Kleiner Igel sitzt, schaut freundlich lächelnd nach vorn",
+      "pts": {
+        "mouth": [
+          550,
+          470
+        ]
+      }
+    },
+    "eichhoernchen_idle": {
+      "ax": 0.601,
+      "ay": 0.985,
+      "desc": "Eichhörnchen sitzt, schaut freundlich lächelnd nach vorn",
+      "pts": {
+        "mouth": [
+          620,
+          405
+        ]
+      }
+    },
+    "maus_idle": {
+      "ax": 0.568,
+      "ay": 0.983,
+      "desc": "Kleine graue Maus sitzt, schaut freundlich lächelnd nach vorn",
+      "pts": {
+        "mouth": [
+          545,
+          455
+        ]
+      }
+    },
+    "loewe_happy": {
+      "ax": 0.476,
+      "ay": 0.983,
+      "desc": "Löwe freut sich riesig, Pfoten hoch, lacht"
+    },
+    "loewe_eat": {
+      "ax": 0.502,
+      "ay": 0.983,
+      "desc": "Löwe beugt sich vor, Maul weit offen zum Füttern",
+      "pts": {
+        "mouth": [
+          545,
+          440
+        ]
+      }
+    },
+    "loewe_sleep": {
+      "ax": 0.5,
+      "ay": 0.982,
+      "desc": "Löwe schläft eingerollt, lächelt"
+    },
+    "loewe_seite": {
+      "ax": 0.49,
+      "ay": 0.983,
+      "desc": "Löwe von der Seite, läuft nach rechts"
+    },
+    "elefant_sleep": {
+      "ax": 0.474,
+      "ay": 0.982,
+      "desc": "Elefant schläft zusammengekuschelt, lächelt"
+    },
+    "elefant_eat": {
+      "ax": 0.513,
+      "ay": 0.983,
+      "desc": "Elefant beugt sich vor, Rüssel hoch, Maul weit offen zum Füttern",
+      "pts": {
+        "mouth": [
+          525,
+          410
+        ]
+      }
+    },
+    "elefant_happy": {
+      "ax": 0.542,
+      "ay": 0.983,
+      "desc": "Elefant freut sich riesig, Beine und Rüssel hoch, lacht"
+    },
+    "elefant_seite": {
+      "ax": 0.414,
+      "ay": 0.983,
+      "desc": "Elefant von der Seite, läuft nach rechts"
+    },
+    "giraffe_happy": {
+      "ax": 0.45,
+      "ay": 0.985,
+      "desc": "Giraffe freut sich riesig, hüpft, lacht"
+    },
+    "giraffe_eat": {
+      "ax": 0.434,
+      "ay": 0.983,
+      "desc": "Giraffe beugt sich vor, Maul weit offen zum Füttern",
+      "pts": {
+        "mouth": [
+          455,
+          400
+        ]
+      }
+    },
+    "giraffe_sleep": {
+      "ax": 0.501,
+      "ay": 0.983,
+      "desc": "Giraffe liegt und schläft, lächelt"
+    },
+    "giraffe_seite": {
+      "ax": 0.44,
+      "ay": 0.985,
+      "desc": "Giraffe von der Seite, läuft nach rechts"
+    },
+    "kuh_happy": {
+      "ax": 0.537,
+      "ay": 0.983,
+      "desc": "Kuh freut sich riesig, Arme hoch, lacht mit offenem Mund"
+    },
+    "kuh_eat": {
+      "ax": 0.445,
+      "ay": 0.985,
+      "desc": "Kuh beugt sich vor, Maul weit offen, wartet auf Futter",
+      "pts": {
+        "mouth": [
+          705,
+          450
+        ]
+      }
+    },
+    "kuh_sleep": {
+      "ax": 0.497,
+      "ay": 0.981,
+      "desc": "Kuh liegt eingekuschelt und schläft, Augen zu"
+    },
+    "kuh_seite": {
+      "ax": 0.461,
+      "ay": 0.983,
+      "desc": "Kuh von der Seite, läuft nach rechts"
+    },
+    "schwein_idle": {
+      "ax": 0.428,
+      "ay": 0.983,
+      "desc": "Schwein steht in Dreiviertelansicht, lächelt den Betrachter an",
+      "pts": {
+        "mouth": [
+          600,
+          435
+        ]
+      }
+    },
+    "schwein_happy": {
+      "ax": 0.464,
+      "ay": 0.985,
+      "desc": "Schwein freut sich riesig, Arme hoch, lacht mit offenem Mund"
+    },
+    "schwein_eat": {
+      "ax": 0.447,
+      "ay": 0.983,
+      "desc": "Schwein beugt sich vor, Maul weit offen, wartet auf Futter",
+      "pts": {
+        "mouth": [
+          660,
+          470
+        ]
+      }
+    },
+    "schwein_sleep": {
+      "ax": 0.516,
+      "ay": 0.981,
+      "desc": "Schwein liegt eingekuschelt und schläft, Augen zu"
+    },
+    "schwein_seite": {
+      "ax": 0.407,
+      "ay": 0.983,
+      "desc": "Schwein von der Seite, läuft nach rechts"
+    },
+    "schaf_idle": {
+      "ax": 0.466,
+      "ay": 0.985,
+      "desc": "Schaf sitzt in Dreiviertelansicht, lächelt den Betrachter an",
+      "pts": {
+        "mouth": [
+          490,
+          390
+        ]
+      }
+    },
+    "schaf_happy": {
+      "ax": 0.513,
+      "ay": 0.985,
+      "desc": "Schaf freut sich riesig, Arme hoch, lacht mit offenem Mund"
+    },
+    "schaf_eat": {
+      "ax": 0.391,
+      "ay": 0.983,
+      "desc": "Schaf beugt sich vor, Maul weit offen, wartet auf Futter",
+      "pts": {
+        "mouth": [
+          590,
+          425
+        ]
+      }
+    },
+    "schaf_sleep": {
+      "ax": 0.465,
+      "ay": 0.981,
+      "desc": "Schaf liegt eingekuschelt und schläft, Augen zu"
+    },
+    "schaf_seite": {
+      "ax": 0.463,
+      "ay": 0.983,
+      "desc": "Schaf von der Seite, läuft nach rechts"
+    },
+    "pferd_idle": {
+      "ax": 0.488,
+      "ay": 0.985,
+      "desc": "Fohlen steht in Dreiviertelansicht, lächelt den Betrachter an",
+      "pts": {
+        "mouth": [
+          635,
+          395
+        ]
+      }
+    },
+    "affe_happy": {
+      "ax": 0.519,
+      "ay": 0.982,
+      "desc": "Affe freut sich riesig, Arme hoch, lacht"
+    },
+    "pferd_happy": {
+      "ax": 0.458,
+      "ay": 0.985,
+      "desc": "Fohlen freut sich riesig, Arme hoch, lacht mit offenem Mund"
+    },
+    "affe_eat": {
+      "ax": 0.541,
+      "ay": 0.985,
+      "desc": "Affe beugt sich vor, Mund weit offen zum Füttern",
+      "pts": {
+        "mouth": [
+          495,
+          430
+        ]
+      }
+    },
+    "pferd_eat": {
+      "ax": 0.491,
+      "ay": 0.985,
+      "desc": "Fohlen beugt sich vor, Maul weit offen, wartet auf Futter",
+      "pts": {
+        "mouth": [
+          690,
+          410
+        ]
+      }
+    },
+    "affe_sleep": {
+      "ax": 0.5,
+      "ay": 0.982,
+      "desc": "Affe schläft eingerollt, lächelt"
+    },
+    "pferd_sleep": {
+      "ax": 0.496,
+      "ay": 0.982,
+      "desc": "Fohlen liegt eingekuschelt und schläft, Augen zu"
+    },
+    "pferd_seite": {
+      "ax": 0.473,
+      "ay": 0.983,
+      "desc": "Fohlen von der Seite, läuft nach rechts"
+    },
+    "affe_seite": {
+      "ax": 0.561,
+      "ay": 0.983,
+      "desc": "Affe von der Seite, geht aufrecht nach rechts"
+    },
+    "hund_idle": {
+      "ax": 0.499,
+      "ay": 0.982,
+      "desc": "Hund sitzt in Dreiviertelansicht, lächelt den Betrachter an",
+      "pts": {
+        "mouth": [
+          530,
+          365
+        ]
+      }
+    },
+    "pinguin_happy": {
+      "ax": 0.509,
+      "ay": 0.985,
+      "desc": "Pinguin freut sich riesig, Flügel hoch, lacht"
+    },
+    "hund_happy": {
+      "ax": 0.472,
+      "ay": 0.985,
+      "desc": "Hund freut sich riesig, Arme hoch, lacht mit offenem Mund"
+    },
+    "pinguin_eat": {
+      "ax": 0.497,
+      "ay": 0.983,
+      "desc": "Pinguin beugt sich vor, Schnabel weit offen zum Füttern",
+      "pts": {
+        "mouth": [
+          455,
+          420
+        ]
+      }
+    },
+    "hund_eat": {
+      "ax": 0.536,
+      "ay": 0.983,
+      "desc": "Hund beugt sich vor, Maul weit offen, wartet auf Futter",
+      "pts": {
+        "mouth": [
+          545,
+          410
+        ]
+      }
+    },
+    "hund_sleep": {
+      "ax": 0.47,
+      "ay": 0.981,
+      "desc": "Hund liegt eingekuschelt und schläft, Augen zu"
+    },
+    "pinguin_sleep": {
+      "ax": 0.5,
+      "ay": 0.982,
+      "desc": "Pinguin liegt auf dem Bauch und schläft, lächelt"
+    },
+    "hund_seite": {
+      "ax": 0.47,
+      "ay": 0.983,
+      "desc": "Hund von der Seite, läuft nach rechts"
+    },
+    "pinguin_seite": {
+      "ax": 0.477,
+      "ay": 0.985,
+      "desc": "Pinguin von der Seite, watschelt nach rechts"
+    },
+    "katze_idle": {
+      "ax": 0.368,
+      "ay": 0.983,
+      "desc": "Katze sitzt in Dreiviertelansicht, lächelt den Betrachter an",
+      "pts": {
+        "mouth": [
+          390,
+          360
+        ]
+      }
+    },
+    "baer_happy": {
+      "ax": 0.518,
+      "ay": 0.985,
+      "desc": "Teddybär mit Mütze freut sich riesig, Arme hoch, lacht"
+    },
+    "katze_happy": {
+      "ax": 0.416,
+      "ay": 0.985,
+      "desc": "Katze freut sich riesig, Arme hoch, lacht mit offenem Mund"
+    },
+    "katze_eat": {
+      "ax": 0.435,
+      "ay": 0.985,
+      "desc": "Katze beugt sich vor, Maul weit offen, wartet auf Futter",
+      "pts": {
+        "mouth": [
+          420,
+          410
+        ]
+      }
+    },
+    "baer_eat": {
+      "ax": 0.533,
+      "ay": 0.985,
+      "desc": "Teddybär mit Mütze beugt sich vor, Mund weit offen zum Füttern",
+      "pts": {
+        "mouth": [
+          420,
+          440
+        ]
+      }
+    },
+    "katze_sleep": {
+      "ax": 0.376,
+      "ay": 0.982,
+      "desc": "Katze liegt eingekuschelt und schläft, Augen zu"
+    },
+    "katze_seite": {
+      "ax": 0.477,
+      "ay": 0.983,
+      "desc": "Katze von der Seite, läuft nach rechts"
+    },
+    "huhn_idle": {
+      "ax": 0.523,
+      "ay": 0.985,
+      "desc": "Huhn steht in Dreiviertelansicht, lächelt den Betrachter an",
+      "pts": {
+        "mouth": [
+          500,
+          280
+        ]
+      }
+    },
+    "huhn_happy": {
+      "ax": 0.48,
+      "ay": 0.983,
+      "desc": "Huhn freut sich riesig, Arme hoch, lacht mit offenem Mund"
+    },
+    "huhn_eat": {
+      "ax": 0.458,
+      "ay": 0.985,
+      "desc": "Huhn beugt sich vor, Maul weit offen, wartet auf Futter",
+      "pts": {
+        "mouth": [
+          625,
+          380
+        ]
+      }
+    },
+    "huhn_sleep": {
+      "ax": 0.517,
+      "ay": 0.983,
+      "desc": "Huhn liegt eingekuschelt und schläft, Augen zu"
+    },
+    "huhn_seite": {
+      "ax": 0.562,
+      "ay": 0.985,
+      "desc": "Huhn von der Seite, läuft nach rechts"
+    },
+    "hahn_idle": {
+      "ax": 0.559,
+      "ay": 0.985,
+      "desc": "Hahn steht in Dreiviertelansicht, lächelt den Betrachter an",
+      "pts": {
+        "mouth": [
+          585,
+          335
+        ]
+      }
+    },
+    "hahn_happy": {
+      "ax": 0.513,
+      "ay": 0.985,
+      "desc": "Hahn freut sich riesig, Arme hoch, lacht mit offenem Mund"
+    },
+    "hahn_eat": {
+      "ax": 0.499,
+      "ay": 0.985,
+      "desc": "Hahn beugt sich vor, Maul weit offen, wartet auf Futter",
+      "pts": {
+        "mouth": [
+          650,
+          400
+        ]
+      }
+    },
+    "hahn_sleep": {
+      "ax": 0.555,
+      "ay": 0.983,
+      "desc": "Hahn liegt eingekuschelt und schläft, Augen zu"
+    },
+    "hahn_seite": {
+      "ax": 0.597,
+      "ay": 0.983,
+      "desc": "Hahn von der Seite, läuft nach rechts"
+    },
+    "ente_idle": {
+      "ax": 0.495,
+      "ay": 0.983,
+      "desc": "Entchen steht in Dreiviertelansicht, lächelt den Betrachter an",
+      "pts": {
+        "mouth": [
+          400,
+          370
+        ]
+      }
+    },
+    "ente_happy": {
+      "ax": 0.467,
+      "ay": 0.985,
+      "desc": "Entchen freut sich riesig, Arme hoch, lacht mit offenem Mund"
+    },
+    "ente_eat": {
+      "ax": 0.423,
+      "ay": 0.983,
+      "desc": "Entchen beugt sich vor, Maul weit offen, wartet auf Futter",
+      "pts": {
+        "mouth": [
+          500,
+          440
+        ]
+      }
+    },
+    "ente_sleep": {
+      "ax": 0.519,
+      "ay": 0.982,
+      "desc": "Entchen liegt eingekuschelt und schläft, Augen zu"
+    },
+    "ente_seite": {
+      "ax": 0.471,
+      "ay": 0.983,
+      "desc": "Entchen von der Seite, läuft nach rechts"
+    },
+    "hase_idle": {
+      "ax": 0.597,
+      "ay": 0.985,
+      "desc": "Hase sitzt in Dreiviertelansicht, lächelt den Betrachter an",
+      "pts": {
+        "mouth": [
+          395,
+          455
+        ]
+      }
+    },
+    "hase_happy": {
+      "ax": 0.555,
+      "ay": 0.985,
+      "desc": "Hase freut sich riesig, Arme hoch, lacht mit offenem Mund"
+    },
+    "hase_eat": {
+      "ax": 0.6,
+      "ay": 0.983,
+      "desc": "Hase beugt sich vor, Maul weit offen, wartet auf Futter",
+      "pts": {
+        "mouth": [
+          450,
+          465
+        ]
+      }
+    },
+    "hase_sleep": {
+      "ax": 0.486,
+      "ay": 0.981,
+      "desc": "Hase liegt eingekuschelt und schläft, Augen zu"
+    },
+    "hase_seite": {
+      "ax": 0.292,
+      "ay": 0.983,
+      "desc": "Hase von der Seite, läuft nach rechts"
+    },
+    "frosch_idle": {
+      "ax": 0.453,
+      "ay": 0.983,
+      "desc": "Frosch sitzt in Dreiviertelansicht, lächelt den Betrachter an",
+      "pts": {
+        "mouth": [
+          400,
+          260
+        ]
+      }
+    },
+    "frosch_happy": {
+      "ax": 0.489,
+      "ay": 0.983,
+      "desc": "Frosch freut sich riesig, Arme hoch, lacht mit offenem Mund"
+    },
+    "frosch_eat": {
+      "ax": 0.464,
+      "ay": 0.983,
+      "desc": "Frosch beugt sich vor, Maul weit offen, wartet auf Futter",
+      "pts": {
+        "mouth": [
+          450,
+          340
+        ]
+      }
+    },
+    "frosch_sleep": {
+      "ax": 0.479,
+      "ay": 0.98,
+      "desc": "Frosch liegt eingekuschelt und schläft, Augen zu"
+    },
+    "frosch_seite": {
+      "ax": 0.464,
+      "ay": 0.982,
+      "desc": "Frosch von der Seite, läuft nach rechts"
+    },
+    "baer_sleep": {
+      "ax": 0.5,
+      "ay": 0.982,
+      "desc": "Teddybär mit Mütze schläft eingerollt, lächelt"
+    },
+    "baer_seite": {
+      "ax": 0.458,
+      "ay": 0.985,
+      "desc": "Teddybär mit Mütze von der Seite, geht aufrecht nach rechts"
+    },
+    "fuchs_happy": {
+      "ax": 0.487,
+      "ay": 0.985,
+      "desc": "Fuchs freut sich riesig, Pfoten hoch, lacht"
+    },
+    "fuchs_eat": {
+      "ax": 0.61,
+      "ay": 0.985,
+      "desc": "Fuchs beugt sich vor, Maul weit offen zum Füttern",
+      "pts": {
+        "mouth": [
+          565,
+          460
+        ]
+      }
+    },
+    "fuchs_sleep": {
+      "ax": 0.491,
+      "ay": 0.983,
+      "desc": "Fuchs schläft eingerollt im Schwanz, lächelt"
+    },
+    "fuchs_seite": {
+      "ax": 0.544,
+      "ay": 0.984,
+      "desc": "Fuchs von der Seite, läuft nach rechts"
+    },
+    "eule_happy": {
+      "ax": 0.499,
+      "ay": 0.985,
+      "desc": "Eule freut sich riesig, Flügel hoch, lacht"
+    },
+    "eule_eat": {
+      "ax": 0.446,
+      "ay": 0.985,
+      "desc": "Eule beugt sich vor, Schnabel weit offen zum Füttern",
+      "pts": {
+        "mouth": [
+          535,
+          450
+        ]
+      }
+    },
+    "eule_sleep": {
+      "ax": 0.479,
+      "ay": 0.983,
+      "desc": "Eule kuschelt sich zusammen und schläft, lächelt"
+    },
+    "eule_seite": {
+      "ax": 0.502,
+      "ay": 0.983,
+      "desc": "Eule von der Seite, hüpft nach rechts"
+    },
+    "igel_happy": {
+      "ax": 0.509,
+      "ay": 0.983,
+      "desc": "Igel freut sich riesig, Pfötchen hoch, lacht"
+    },
+    "igel_eat": {
+      "ax": 0.554,
+      "ay": 0.983,
+      "desc": "Igel beugt sich vor, Mund weit offen zum Füttern",
+      "pts": {
+        "mouth": [
+          545,
+          480
+        ]
+      }
+    },
+    "igel_sleep": {
+      "ax": 0.506,
+      "ay": 0.985,
+      "desc": "Igel schläft eingerollt, lächelt"
+    },
+    "igel_seite": {
+      "ax": 0.471,
+      "ay": 0.982,
+      "desc": "Igel von der Seite, läuft nach rechts"
+    },
+    "eichhoernchen_happy": {
+      "ax": 0.561,
+      "ay": 0.983,
+      "desc": "Eichhörnchen freut sich riesig, Pfötchen hoch, lacht"
+    },
+    "eichhoernchen_eat": {
+      "ax": 0.582,
+      "ay": 0.985,
+      "desc": "Eichhörnchen beugt sich vor, Mund weit offen zum Füttern",
+      "pts": {
+        "mouth": [
+          640,
+          450
+        ]
+      }
+    },
+    "eichhoernchen_sleep": {
+      "ax": 0.509,
+      "ay": 0.985,
+      "desc": "Eichhörnchen schläft eingerollt im Schwanz, lächelt"
+    },
+    "eichhoernchen_seite": {
+      "ax": 0.418,
+      "ay": 0.983,
+      "desc": "Eichhörnchen von der Seite, läuft nach rechts"
+    },
+    "maus_happy": {
+      "ax": 0.559,
+      "ay": 0.983,
+      "desc": "Maus freut sich riesig, Pfötchen hoch, lacht"
+    },
+    "maus_eat": {
+      "ax": 0.536,
+      "ay": 0.985,
+      "desc": "Maus beugt sich vor, Mund weit offen zum Füttern",
+      "pts": {
+        "mouth": [
+          525,
+          460
+        ]
+      }
+    },
+    "maus_sleep": {
+      "ax": 0.439,
+      "ay": 0.983,
+      "desc": "Maus schläft eingerollt, lächelt"
+    },
+    "maus_seite": {
+      "ax": 0.503,
+      "ay": 0.982,
+      "desc": "Maus von der Seite, läuft nach rechts"
+    }
+  },
+  "audio": {}
+}

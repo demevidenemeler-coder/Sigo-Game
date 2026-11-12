@@ -1,0 +1,143 @@
+{
+  "images": {
+    "hg_atelier": {
+      "pts": {
+        "blatt_lo": [
+          618,
+          185
+        ],
+        "blatt_ru": [
+          2192,
+          1196
+        ],
+        "boden": [
+          1414,
+          1480
+        ]
+      },
+      "desc": "Maler-Atelier: Holzboden, Fenster links, Farbregal rechts, Staffelei mit großem leeren weißen Blatt in der Mitte"
+    },
+    "farbtopf": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Offener weißer Farbtopf mit fast weißer Farbe (zum Einfärben per tint)"
+    },
+    "bilderrahmen": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Leerer goldener Holz-Bilderrahmen, quer, innen durchsichtig"
+    },
+    "pinsel_dick": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Dicker Pinsel schräg, Spitze unten links",
+      "pts": {
+        "spitze": [
+          12,
+          465
+        ]
+      }
+    },
+    "radierschwamm": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Weicher Radierschwamm (hellblau mit gelbem Griff)"
+    },
+    "stempel_stern": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Stempelbild Stern, gelb"
+    },
+    "stift_dick": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Dicker heller Wachsmalstift schräg, Spitze unten links",
+      "pts": {
+        "spitze": [
+          10,
+          484
+        ]
+      }
+    },
+    "stempel_herz": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Stempelbild Herz, rot"
+    },
+    "stempel_blume": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Stempelbild Blume, rosa"
+    },
+    "stempel_auto": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Stempelbild Auto von der Seite, hellblau"
+    },
+    "stempel_katze": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Stempelbild Katzenkopf, orange"
+    },
+    "stempel_sonne": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Stempelbild Sonne, orange"
+    },
+    "stempel_fisch": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Stempelbild Fisch, türkis"
+    },
+    "stempel_baum": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Stempelbild Baum, grün"
+    },
+    "blatt_neu": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Symbol: leeres weißes Blatt mit Eselsohr (neues Blatt)"
+    },
+    "icon_ausmalen": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Symbol: Malbuchseite mit Stift (Ausmalen)"
+    },
+    "icon_freimalen": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Symbol: Pinsel mit Regenbogenstrich (frei malen)"
+    },
+    "icon_stempel": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Symbol: Stempel mit Stern (Stempeln)"
+    },
+    "mal_zug": {
+      "desc": "Ausmalbild: Spielzeuglok mit zwei Wagen (1536x1024, schwarz-weiß)"
+    },
+    "mal_kuh": {
+      "desc": "Ausmalbild: lächelnde Kuh auf Wiese mit Sonne"
+    },
+    "mal_feuerwehr": {
+      "desc": "Ausmalbild: Feuerwehrauto mit Leiter"
+    },
+    "mal_haus": {
+      "desc": "Ausmalbild: Haus mit Baum und Wolke"
+    },
+    "mal_schmetterling": {
+      "desc": "Ausmalbild: großer Schmetterling mit drei Blumen"
+    },
+    "mal_bagger": {
+      "desc": "Ausmalbild: Bagger mit Erdhaufen"
+    },
+    "mal_fisch": {
+      "desc": "Ausmalbild: Fisch mit Blasen, Seestern und Seegras"
+    },
+    "mal_ente": {
+      "desc": "Ausmalbild: Ente im Teich mit Schilf und Seerosenblatt"
+    }
+  },
+  "audio": {}
+}

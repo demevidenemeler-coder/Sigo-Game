@@ -1,0 +1,33 @@
+{
+  "id": "malhaus",
+  "images": {
+    "bilderrahmen": {"file": "bilderrahmen.webp", "w": 900, "h": 612, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Leerer goldener Holz-Bilderrahmen, quer, innen durchsichtig"},
+    "blatt_neu": {"file": "blatt_neu.webp", "w": 279, "h": 360, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Symbol: leeres weißes Blatt mit Eselsohr (neues Blatt)"},
+    "farbtopf": {"file": "farbtopf.webp", "w": 360, "h": 334, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Offener weißer Farbtopf mit fast weißer Farbe (zum Einfärben per tint)"},
+    "hg_atelier": {"file": "hg_atelier.webp", "w": 2829, "h": 1600, "ax": 0.5, "ay": 0.5, "pts": {"blatt_lo": [618, 185], "blatt_ru": [2192, 1196], "boden": [1414, 1480]}, "desc": "Maler-Atelier: Holzboden, Fenster links, Farbregal rechts, Staffelei mit großem leeren weißen Blatt in der Mitte"},
+    "icon_ausmalen": {"file": "icon_ausmalen.webp", "w": 360, "h": 351, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Symbol: Malbuchseite mit Stift (Ausmalen)"},
+    "icon_freimalen": {"file": "icon_freimalen.webp", "w": 360, "h": 241, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Symbol: Pinsel mit Regenbogenstrich (frei malen)"},
+    "icon_stempel": {"file": "icon_stempel.webp", "w": 352, "h": 360, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Symbol: Stempel mit Stern (Stempeln)"},
+    "mal_bagger": {"file": "mal_bagger.png", "w": 1536, "h": 1024, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Ausmalbild: Bagger mit Erdhaufen"},
+    "mal_ente": {"file": "mal_ente.png", "w": 1536, "h": 1024, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Ausmalbild: Ente im Teich mit Schilf und Seerosenblatt"},
+    "mal_feuerwehr": {"file": "mal_feuerwehr.png", "w": 1536, "h": 1024, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Ausmalbild: Feuerwehrauto mit Leiter"},
+    "mal_fisch": {"file": "mal_fisch.png", "w": 1536, "h": 1024, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Ausmalbild: Fisch mit Blasen, Seestern und Seegras"},
+    "mal_haus": {"file": "mal_haus.png", "w": 1536, "h": 1024, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Ausmalbild: Haus mit Baum und Wolke"},
+    "mal_kuh": {"file": "mal_kuh.png", "w": 1536, "h": 1024, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Ausmalbild: lächelnde Kuh auf Wiese mit Sonne"},
+    "mal_schmetterling": {"file": "mal_schmetterling.png", "w": 1536, "h": 1024, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Ausmalbild: großer Schmetterling mit drei Blumen"},
+    "mal_zug": {"file": "mal_zug.png", "w": 1536, "h": 1024, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Ausmalbild: Spielzeuglok mit zwei Wagen (1536x1024, schwarz-weiß)"},
+    "pinsel_dick": {"file": "pinsel_dick.webp", "w": 500, "h": 497, "ax": 0.5, "ay": 0.5, "pts": {"spitze": [12, 465]}, "desc": "Dicker Pinsel schräg, Spitze unten links"},
+    "radierschwamm": {"file": "radierschwamm.webp", "w": 360, "h": 311, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Weicher Radierschwamm (hellblau mit gelbem Griff)"},
+    "stempel_auto": {"file": "stempel_auto.webp", "w": 360, "h": 284, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Stempelbild Auto von der Seite, hellblau"},
+    "stempel_baum": {"file": "stempel_baum.webp", "w": 346, "h": 360, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Stempelbild Baum, grün"},
+    "stempel_blume": {"file": "stempel_blume.webp", "w": 360, "h": 353, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Stempelbild Blume, rosa"},
+    "stempel_fisch": {"file": "stempel_fisch.webp", "w": 360, "h": 327, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Stempelbild Fisch, türkis"},
+    "stempel_herz": {"file": "stempel_herz.webp", "w": 360, "h": 320, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Stempelbild Herz, rot"},
+    "stempel_katze": {"file": "stempel_katze.webp", "w": 360, "h": 342, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Stempelbild Katzenkopf, orange"},
+    "stempel_sonne": {"file": "stempel_sonne.webp", "w": 360, "h": 360, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Stempelbild Sonne, orange"},
+    "stempel_stern": {"file": "stempel_stern.webp", "w": 360, "h": 345, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Stempelbild Stern, gelb"},
+    "stift_dick": {"file": "stift_dick.webp", "w": 483, "h": 500, "ax": 0.5, "ay": 0.5, "pts": {"spitze": [10, 484]}, "desc": "Dicker heller Wachsmalstift schräg, Spitze unten links"}
+  },
+  "audio": {
+  }
+}

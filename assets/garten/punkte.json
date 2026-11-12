@@ -1,0 +1,348 @@
+{
+  "images": {
+    "hg_beet": {
+      "pts": {
+        "boden": [
+          1414,
+          1320
+        ],
+        "beet1": [
+          434,
+          1035
+        ],
+        "beet2": [
+          857,
+          1035
+        ],
+        "beet3": [
+          1274,
+          1035
+        ],
+        "beet4": [
+          1692,
+          1035
+        ],
+        "beet5": [
+          2104,
+          1035
+        ],
+        "hase": [
+          2550,
+          1190
+        ]
+      },
+      "desc": "Gemüsegarten: Zaun, Gartenhaus, langes Holzbeet mit fünf leeren Erdhügeln, vorn unscharfe Blumen"
+    },
+    "hg_obst": {
+      "pts": {
+        "boden": [
+          1414,
+          1420
+        ],
+        "frucht1": [
+          900,
+          560
+        ],
+        "frucht2": [
+          1150,
+          340
+        ],
+        "frucht3": [
+          1420,
+          240
+        ],
+        "frucht4": [
+          1680,
+          340
+        ],
+        "frucht5": [
+          1930,
+          560
+        ],
+        "frucht6": [
+          1100,
+          720
+        ],
+        "frucht7": [
+          1420,
+          500
+        ],
+        "frucht8": [
+          1750,
+          720
+        ],
+        "korb_l": [
+          700,
+          1400
+        ],
+        "korb_r": [
+          2120,
+          1400
+        ],
+        "stamm": [
+          1400,
+          1100
+        ]
+      },
+      "desc": "Obstgarten: großer Baum mit breiter Krone ohne Früchte in der Mitte, Wiese, Zaun hinten"
+    },
+    "hg_wiese": {
+      "pts": {
+        "boden": [
+          1414,
+          1500
+        ],
+        "blume1": [
+          600,
+          1130
+        ],
+        "blume2": [
+          1150,
+          1130
+        ],
+        "blume3": [
+          1700,
+          1130
+        ],
+        "blume4": [
+          2250,
+          1130
+        ],
+        "blume5": [
+          870,
+          1420
+        ],
+        "blume6": [
+          1420,
+          1420
+        ],
+        "blume7": [
+          1970,
+          1420
+        ]
+      },
+      "desc": "Blumenwiese: sanfte Hügel, blauer Himmel, untere Hälfte leere grüne Wiese"
+    },
+    "karotte_2": {
+      "ax": 0.499,
+      "ay": 0.98,
+      "desc": "Karottengrün, halb gewachsen"
+    },
+    "blume_rot_zu": {
+      "ax": 0.477,
+      "ay": 0.983,
+      "desc": "rote Blume, Knospe geschlossen"
+    },
+    "blume_gelb_zu": {
+      "ax": 0.476,
+      "ay": 0.983,
+      "desc": "gelbe Blume, Knospe geschlossen"
+    },
+    "blume_blau_zu": {
+      "ax": 0.477,
+      "ay": 0.985,
+      "desc": "blaue Blume, Knospe geschlossen"
+    },
+    "blume_rosa_zu": {
+      "ax": 0.483,
+      "ay": 0.983,
+      "desc": "rosa Blume, Knospe geschlossen"
+    },
+    "blume_lila_zu": {
+      "ax": 0.478,
+      "ay": 0.983,
+      "desc": "lila Blume, Knospe geschlossen"
+    },
+    "blume_orange_zu": {
+      "ax": 0.482,
+      "ay": 0.983,
+      "desc": "orange Blume, Knospe geschlossen"
+    },
+    "blume_weiss_zu": {
+      "ax": 0.498,
+      "ay": 0.983,
+      "desc": "weiße Blume, Knospe geschlossen"
+    },
+    "blume_rot_auf": {
+      "ax": 0.478,
+      "ay": 0.985,
+      "desc": "rote Blume, offen"
+    },
+    "blume_lila_auf": {
+      "ax": 0.478,
+      "ay": 0.985,
+      "desc": "lila Blume, offen"
+    },
+    "blume_gelb_auf": {
+      "ax": 0.472,
+      "ay": 0.985,
+      "desc": "gelbe Blume, offen"
+    },
+    "blume_blau_auf": {
+      "ax": 0.452,
+      "ay": 0.983,
+      "desc": "blaue Blume, offen"
+    },
+    "blume_orange_auf": {
+      "ax": 0.488,
+      "ay": 0.985,
+      "desc": "orange Blume, offen"
+    },
+    "blume_weiss_auf": {
+      "ax": 0.496,
+      "ay": 0.983,
+      "desc": "weiße Blume, offen"
+    },
+    "keim": {
+      "ax": 0.448,
+      "ay": 0.978,
+      "desc": "kleiner Keimling mit zwei Blättern"
+    },
+    "sonnenblume_2": {
+      "ax": 0.351,
+      "ay": 0.984,
+      "desc": "Sonnenblume halb gewachsen, grüne Knospe"
+    },
+    "erdbeere_2": {
+      "ax": 0.422,
+      "ay": 0.982,
+      "desc": "Erdbeerpflanze halb gewachsen, weiße Blüten"
+    },
+    "blume_rosa_auf": {
+      "ax": 0.476,
+      "ay": 0.985,
+      "desc": "rosa Blume, offen"
+    },
+    "tomate_2": {
+      "ax": 0.615,
+      "ay": 0.982,
+      "desc": "Tomatenpflanze halb gewachsen, gelbe Blüten"
+    },
+    "kuerbis_2": {
+      "ax": 0.512,
+      "ay": 0.982,
+      "desc": "Kürbispflanze halb gewachsen, gelbe Blüte"
+    },
+    "karotte_3": {
+      "ax": 0.484,
+      "ay": 0.982,
+      "desc": "Karottengrün mit oranger Karotte, die aus der Erde schaut"
+    },
+    "sonnenblume_3": {
+      "ax": 0.51,
+      "ay": 0.984,
+      "desc": "große lächelnde Sonnenblume, reif"
+    },
+    "erdbeere_3": {
+      "ax": 0.496,
+      "ay": 0.983,
+      "desc": "Erdbeerpflanze mit roten Erdbeeren, reif"
+    },
+    "tomate_3": {
+      "ax": 0.58,
+      "ay": 0.984,
+      "desc": "Tomatenstaude mit roten Tomaten, reif"
+    },
+    "kuerbis_3": {
+      "ax": 0.511,
+      "ay": 0.981,
+      "desc": "Kürbisranke mit großem orangem Kürbis, reif"
+    },
+    "ernte_tomate": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "geerntete Tomate"
+    },
+    "ernte_kuerbis": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "geernteter Kürbis"
+    },
+    "ernte_sonnenblume": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Sonnenblumenkopf, geerntet"
+    },
+    "apfel_rot": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "roter Apfel"
+    },
+    "birne_gelb": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "gelbe Birne"
+    },
+    "korb_rot": {
+      "ax": 0.498,
+      "ay": 0.983,
+      "desc": "Korb mit rotem Band und Apfel-Bild"
+    },
+    "tuete_karotte": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Samentüte mit Karotten-Bild"
+    },
+    "schmetterling_blau": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "blauer Schmetterling von oben, Flügel offen"
+    },
+    "korb_gelb": {
+      "ax": 0.499,
+      "ay": 0.983,
+      "desc": "Korb mit gelbem Band und Birnen-Bild"
+    },
+    "tuete_sonnenblume": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Samentüte mit Sonnenblumen-Bild"
+    },
+    "tuete_erdbeere": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Samentüte mit Erdbeer-Bild"
+    },
+    "tuete_tomate": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Samentüte mit Tomaten-Bild"
+    },
+    "tuete_kuerbis": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Samentüte mit Kürbis-Bild"
+    },
+    "schmetterling_gelb": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "gelber Schmetterling von oben, Flügel offen"
+    },
+    "schmetterling_rosa": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "rosa Schmetterling von oben, Flügel offen"
+    },
+    "biene": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "freundliche Hummel/Biene von der Seite"
+    },
+    "marienkaefer": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Marienkäfer von oben"
+    },
+    "schnecke": {
+      "ax": 0.423,
+      "ay": 0.979,
+      "desc": "Schnecke von der Seite, kriecht nach rechts"
+    },
+    "regenwurm": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "freundlicher Regenwurm"
+    }
+  },
+  "audio": {}
+}

@@ -1,0 +1,11 @@
+{
+  "id": "demo",
+  "images": {
+    "hintergrund": {"file": "hintergrund.webp", "w": 2829, "h": 1600, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Hintergrund Wiese (Stil-Probe look-a, weichgezeichnet)"},
+    "lok": {"file": "lok.webp", "w": 929, "h": 636, "ax": 0.518, "ay": 0.981, "pts": {"rad1": [212, 535], "rad2": [548, 538]}, "desc": "Kleine Dampflok von der Seite"},
+    "rad": {"file": "rad.webp", "w": 296, "h": 300, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Rad (zum Drehen)"},
+    "schaf_idle": {"file": "schaf_idle.webp", "w": 671, "h": 800, "ax": 0.521, "ay": 0.984, "pts": {"mouth": [447, 375], "kopf": [380, 40]}, "desc": "Schaf steht, schaut nach vorn"}
+  },
+  "audio": {
+  }
+}

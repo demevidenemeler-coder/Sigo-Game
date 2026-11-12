@@ -1,0 +1,43 @@
+{
+  "images": {
+    "schaf_idle": {
+      "ax": 0.521,
+      "ay": 0.984,
+      "desc": "Schaf steht, schaut nach vorn",
+      "pts": {
+        "mouth": [
+          447,
+          375
+        ],
+        "kopf": [
+          380,
+          40
+        ]
+      }
+    },
+    "lok": {
+      "ax": 0.518,
+      "ay": 0.981,
+      "desc": "Kleine Dampflok von der Seite",
+      "pts": {
+        "rad1": [
+          212,
+          535
+        ],
+        "rad2": [
+          548,
+          538
+        ]
+      }
+    },
+    "rad": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Rad (zum Drehen)"
+    },
+    "hintergrund": {
+      "desc": "Hintergrund Wiese (Stil-Probe look-a, weichgezeichnet)"
+    }
+  },
+  "audio": {}
+}

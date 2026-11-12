@@ -1,395 +1,85 @@
-# Sigo – Züge bauen, schmücken und fahren lassen
+# Sigo – ein ruhiges Bilderbuch-Spiel
 
-Ein 3D-Tablet-Spiel für kleine Kinder (ab ca. 3 Jahren): eigenen Zug zusammenbauen,
-anmalen, schmücken, beladen – dann mit dem Finger eine Strecke malen und losfahren.
+Sigo ist ein Spiel für Kinder von etwa 3–4 Jahren, gemacht für ein Tablet im Querformat (Huawei MatePad 11).
+Ein kleiner Zug fährt über eine Landkarte zu vielen Orten – Bauernhof, Bahnhof, Feuerwehr, Baustelle, Garten,
+Teich, Wald, Spielplatz, Malhaus, Eisdiele, Musik, Waschanlage und zum Schluss ins Schlafzimmer. Überall wird in
+gemalten Bildern gespielt: antippen, ziehen, wischen, halten.
 
-Ohne Punkte, ohne Zeitdruck, ohne Werbung, ohne Internet – und mit eingebautem Ende.
+- Kein Text zum Lesen, keine Punkte, keine Zeit, kein Scheitern, keine Werbung, kein Internet nötig.
+- Alles ist ruhig: kein Blinken, kein Blitzen, leise Musik, wenige gesprochene Sätze.
+- Gesammelte Sticker landen im Album (Knopf oben rechts). Die Landkarte erreicht man immer oben links.
+- **Schlafenszeit:** Im Schlafzimmer bringt das Kind vier müde Tiere ins Bett, deckt sie zu und macht das Licht aus.
+  Danach kommt ein ruhiges Nachtbild mit schlafendem Mond.
 
-## Die Bereiche (Knöpfe oben links)
+## Für Eltern
 
-### 🛠️ Werkstatt
-Unten: oben eine Reihe Fächer (mit Beschriftung), darunter große Karten – mit ◀ ▶ blättern (oder wischen).
+### Eltern-Bereich
+Unten rechts auf dem Startbild, auf der Landkarte und im Nachtbild sitzt ein kleines, blasses **Zahnrad**.
+**3 Sekunden mit einem Finger darauf halten** (ein Ring füllt sich) – kurzes Tippen lässt es nur wackeln; liegt
+dabei eine ganze Hand oder ein zweiter Finger auf dem Bildschirm, beginnt der Ring von vorn. Danach kommt eine
+kleine Aufgabe für Erwachsene („Tippe auf die Zahl sieben"). Ein falscher Tipp, ein Tipp neben das Fenster oder
+30 Sekunden Warten führen zurück ins Spiel. Solange der Bereich offen ist, steht das Spiel still; nach 3 Minuten
+ohne Berührung schließt er sich von selbst. Dort lässt sich einstellen:
 
-| Fach | Inhalt |
+| | |
 |---|---|
-| 🚂 Loks | Dampflok, Diesellok, E-Lok, Schnellzug |
-| 🚃 Wagen | Tierwagen zuerst: Haustier-, Stall-, Hühner-, Teich-, Zoo-, Affen-, Zirkuswagen; dann Personen-, Güter-, Rungen-, Milch-, Schluss-, Kranwagen, Autotransporter (max. 6) |
-| 🎨 Farben | 10 Farben – Topf wählen, dann ein Teil antippen (Kessel, Dach, Räder …) oder den Topf auf den Zug ziehen |
-| 🛞 Räder | 12 verspielte Radmuster (Speichen, Stern, Herz, Blume, Punkte, Regenbogen, Sonne, Spirale, Lachgesicht, Donut, Ball, Zahnrad) + Farbtöpfe nur für die Räder |
-| ⭐ Schmuck | Gesicht, Stern, Herz, Blume, Lampe, Lichterkette, Glocke, Fähnchen, Luftballon, Regenbogen |
-| 🐄 Tiere | Kuh, Schwein, Schaf, Pferd, Hund, Katze, Huhn, Hahn, Ente, Hase, Frosch, Löwe, Elefant, Giraffe, Affe, Pinguin |
-| 🧸 Mitfahrer | Kind, Papa, Oma, Teddy, Ball, Kiste, Geschenk, Milchkanne, Apfel |
-| 🥕 Futter | Heu, Karotte, Apfel, Banane, Körner, Fisch, Knochen, Fleisch, Blätter, Fliege |
+| Lautstärke | Musik, Geräusche und Stimme getrennt; „Stimme erklärt bei jedem Besuch" (sonst erklärt sie jeden Ort einmal am Tag; hat das Kind nach einem Hinweis lange nichts getan, kommt er einmal wieder) |
+| Spielzeit pro Tag | Aus, 15, 20, 30 (Standard), 45 oder 60 Minuten; Anzeige „heute gespielt". Ausschalten oder Erhöhen mit Nachfrage |
+| Noch 10 Minuten | verlängert die heutige Spielzeit (mit Nachfrage) |
+| Spielzeit zurücksetzen | heute wieder bei 0 beginnen (mit Nachfrage) |
+| Sätze wieder sprechen | die Stimme erklärt alles wieder wie beim ersten Mal |
+| Sticker-Album leeren, Zug zurücksetzen | mit Nachfrage |
+| Vollbild | an/aus |
 
-**Wer fährt wo mit:** Jedes Tier hat seinen Wagen – ein Elefant gehört nicht in den Teichwagen.
-| Wagen | Wer darf hinein |
-|---|---|
-| Stallwagen | Kuh, Pferd, Schaf, Schwein |
-| Haustierwagen | Hund, Katze, Hase |
-| Hühnerwagen | Huhn, Hahn |
-| Teichwagen | Ente, Frosch, Pinguin |
-| Zoowagen | Löwe, Elefant, Giraffe, Affe |
-| Affenwagen (Käfig mit Klettergerüst, Autoreifen und Schaukel – wer auf Platz 2 sitzt, schaukelt) | Affe |
-| Musikwagen (Xylophon mit fünf Stäben, Trommel, drei Glocken – beim Fahren antippen: Ton, und alle Mitfahrer tanzen) | – |
-| Zirkuswagen | Löwe, Elefant, Affe |
-| Personen-, Schlusswagen | Kind, Papa, Oma, Teddy |
-| Güter-, Rungenwagen | Ball, Kiste, Geschenk, Milchkanne, Apfel |
+### Wie die Spielzeit funktioniert
+Gezählt wird nur, solange das Spiel sichtbar ist und das Kind in der letzten Minute etwas berührt hat.
+Ist die Zeit um, wird nicht mitten im Spiel abgebrochen: Beim nächsten ruhigen Moment (spätestens nach einer
+Minute) geht es ins Schlafzimmer – „Sigo ist müde. Bringen wir alle ins Bett." Nach dem Gute-Nacht-Ritual bleibt
+das Nachtbild stehen. Jeder Neustart an diesem Tag führt direkt dorthin, bis Sie im Eltern-Bereich
+„Noch 10 Minuten" oder „Spielzeit zurücksetzen" wählen. Am nächsten Tag beginnt die Zeit von vorn.
 
-Im richtigen Wagen freut sich das Tier (Herzchen + Hüpfer). Im falschen erscheint es kurz, **schüttelt den Kopf** und hüpft
-wieder hinunter; der passende Wagen im Zug hüpft – gibt es keinen, zeigt eine **Denkblase den Wunschwagen** und er wird benannt.
-Antippen eines Tiers in der Leiste setzt es gleich in einen passenden Wagen. Am Bahnhof steigen Wartende nur in passende
-Wagen ein (sonst Kopfschütteln + Denkblase); neue Wartende passen meistens zum Zug, wer nie mitkann, geht irgendwann heim.
-Alte Spielstände: Hoftiere im früheren „Tierwagen“ ziehen automatisch in einen Stallwagen um.
+### Auf das Tablet bringen
+Sigo ist eine Web-App und braucht für Installation und Offline-Betrieb eine **https-Adresse**, z. B. GitHub Pages:
 
-**Ziehen:** Beim Ziehen leuchtet ein Ring unter dem Wagen, auf dem es landen wird – man muss nicht genau treffen.
-**Wegnehmen:** Mitfahrer, Schmuck oder Wagen vom Zug **in die Leiste ziehen** → weg. Auf einen anderen Wagen ziehen → umsetzen.
-**Antippen am Zug** ist immer harmlos: Tiere machen ihr (echtes) Geräusch und werden benannt, der Lokführer winkt und pfeift,
-der Kran schwenkt, die Glocke läutet, die Spielzeugautos hupen.
-**Tiere füttern (Fach 🥕):** Die Kamera fährt dicht an die Tiere heran, und **alle Tiere sperren abwechselnd den Mund auf und zu**
-(„Gib mir Futter!“). Futter auf ein Tier ziehen (es wird größer, der Mund geht ganz weit auf: „Für mich?“; beim Füttern
-fährt die Kamera noch näher heran) – oder Futter
-antippen, dann bekommt es das erste Tier, das es mag. Mag das Tier das Futter, mampft es in drei Bissen, Herzchen steigen auf
-und es ruft – beim Mampfen klappt der Mund dreimal auf und zu. Mag es das Futter nicht, presst es den Mund zu, schüttelt es den Kopf („Bäh!“), das Futter fällt herunter, eine **Denkblase zeigt das
-Lieblingsfutter** und dieses wackelt in der Leiste. Kein Scheitern – nur ein Hinweis. (Kuh/Schaf: Heu, Hase: Karotte,
-Katze/Pinguin: Fisch, Hund: Knochen, Löwe: Fleisch, Hühner/Ente: Körner, Frosch: Fliege, Giraffe: Blätter …)
-**Zeige-Hand:** Bei jedem neuen Fach macht eine Hand einmal vor, wie man etwas auf den Zug zieht. Passiert eine Weile
-nichts, zeigt sie abwechselnd: vormachen → ein noch nicht besuchtes Fach → den Fahren-Knopf. Auch beim Fahren (▶, Wartende, Wetter) und Waschen (Eimer) zeigt sie, was geht.
-Nach ein paar Hinweisen ohne Reaktion ist Ruhe, bis wieder getippt wird.
-**Mitfahrer greifen:** Wer neben ein Tier tippt (z. B. auf den Zaun), greift das Tier – nicht den ganzen Wagen.
+1. Auf GitHub: *Settings → Pages → Source: Deploy from a branch → `main` / `(root)`* → Speichern.
+2. Nach etwa einer Minute ist das Spiel unter `https://<benutzername>.github.io/<repo-name>/` erreichbar.
+3. Auf dem Tablet in **Chrome** öffnen → Menü ⋮ → **„App installieren"** bzw. **„Zum Startbildschirm hinzufügen"**.
+4. Einmal mit Internet starten und kurz warten – danach läuft Sigo auch ohne Internet (im Eltern-Bereich steht
+   unten „offline spielbar"). Neue Fassungen lädt das Tablet still im Hintergrund, sobald Internet da ist; sie
+   gelten erst, wenn Sigo neu startet oder im Hintergrund lag – nie mitten im Spiel. Bricht das Laden ab
+   (wackliges WLAN), bleibt die alte, vollständige Fassung, und es wird beim nächsten Start erneut versucht.
 
-### 🧽 Waschen
-- Ein Wagen ganz nah. **Mit dem Finger (Schwamm) über den Matsch wischen** → es schäumt und quietscht,
-  die Flecken werden blasser und verschwinden, der Lack wird wieder sauber.
-- Ist alles weg: Wasser spült den Schaum ab, es glitzert – „Blitzsauber!“ – und es geht von selbst zum nächsten schmutzigen Wagen.
-- **🪣 Eimer** = Matsch an den Wagen werfen (zum Nochmal-Waschen). **◀ ▶** = anderer Wagen.
-- Liegt der Schwamm still, wackelt er über dem Wagen und zeigt, was zu tun ist.
-- Der Schmutz vom Fahren (Regen!) ist derselbe – hier oder in der Waschanlage an der Strecke wird er wieder sauber.
+Tipps: Lautstärke des Tablets vorher auf ein ruhiges Maß stellen. Mit der **App-Fixierung** des Tablets
+(*Einstellungen → Sicherheit → App-Fixierung*) kommt das Kind nicht aus dem Spiel heraus.
 
-### Gerätetest für bewegliche Tiere
+## Für Entwickler
 
-Beim Start prüft das Spiel, ob das Gerät Skelett-Animation richtig zeichnet (`js/game/skinCheck.js`). Fällt der Test
-durch, bleiben die Tiere starr – sonst stünden sie auf manchen Tablets im Boden oder schwebten. Im Eltern-Bereich
-lässt sich „Tiere bewegen sich“ auch von Hand ausschalten; dort stehen das Testergebnis und der Name des Grafikchips.
+Reines HTML + JavaScript-Module mit [PixiJS 8](https://pixijs.com) (`vendor/pixi.min.mjs`, MIT-Lizenz), **kein
+Build-Schritt**. Die Bau-Regeln stehen in [`ENTWICKLUNG.md`](ENTWICKLUNG.md), die Hilfsprogramme in
+[`tools/README.md`](tools/README.md).
 
-### Musik
-
-Das Gute-Nacht-Lied stoppt, sobald eine neue Spielzeit beginnt. Die Katze auf dem Baum miaut nur noch, wenn man sie antippt.
-
-Vier kurze Lieder wechseln sich ab (`js/music.js`): Zuglied, Hopser, Sonnenschein, Zirkusmarsch. Verlässt man das
-Spiel (Home-Taste, andere App, Bildschirm aus), werden Musik, Geräusche und Stimme angehalten.
-
-### 🏗️ Bauen
-Die Kamera steht nah an der Baustelle; unten liegt eine Leiste (`js/game/modes/build.js`, Teile in `js/game/buildParts.js` und `buildMore.js`,
-Gebäude in `js/game/buildSite.js`).
-
-- **Zwölf Themen mit zusammen 209 Teilen**, dazu 13 Anbauten, 8 Muster und 18 Bewohner. Der Themen-Knopf (links in der oberen Reihe) klappt die Auswahl auf; bei
-  leerem Bauplatz ist sie gleich offen: 🏠 Haus · 🏰 Burg · 🎪 Zirkus · 🚀 Rakete · 🍦 Laden · 🍄 Märchen · 🚜 Bauernhof ·
-  ⚓ Piraten · ⛵ Meer (Leuchtturm, Strandhaus, Sandburg) · 👑 Schloss · ⛄ Winter · 🌴 Dschungel.
-  Die Themen sind nur Fächer zum Aussuchen: alles lässt sich frei mischen (Burgturm mit Pilzdach und Eiswaffel obendrauf).
-- **Neun Fächer** je Thema: Stockwerke (bis fünf übereinander; eckig, rund, schmal) · Türen · Fenster · Muster · Dächer ·
-  Spitzen · Anbauten · Schmuck · Bewohner. Beispiele: Scheune mit Mansarddach, Silo, Traktor, Heuballen, Kuh und Huhn · Schiffsrumpf, Segel am Mast,
-  Kanonenluken, Piratenflagge, Schatzkiste, Hai, der seine Runden dreht · Leuchtturm mit drehendem Licht, Möwe, Ruderboot,
-  Krabbe · Schlossturm mit Kronendach, Balkonfenster, Springbrunnen, Kutsche · Lebkuchenhaus, Iglu, Schneedach mit
-  Eiszapfen, Tannenbaum mit blinkenden Lichtern, fallende Flocken · Bambushütte, Blätterdach, Lianen, Reifenschaukel, Affe.
-  Dazu u. a. Fachwerk, Glashaus, Container, Wolken- und Kürbishaus · Herztür, Schwingtür, Iglu-Tunnel · Fenster mit Läden,
-  buntes Glas, Mond, Blume · Pagode, Dachgarten, Solardach, Glaskuppel, Stufenpyramide · Uhrtürmchen (die Zeiger laufen),
-  Glocke, Windsack, Drachen an der Schnur, UFO, Vogelnest · Teich mit Ente, Hundehütte, Wäscheleine, Fahrrad, Auto,
-  Lagerfeuer, Trampolin, Planschbecken, Grill, Schmetterlinge, Wolken.
-  Weitere Teile ergänzen: in `js/game/buildMore.js` eintragen (dort stehen die sechs neueren Themen und die Zusatzteile).
-- **Drei Bauplätze** an der Strecke (beim Dorf, im Westen am Wald, im Nordosten bei den Sonnenblumen; Lage in
-  `LAYOUT.sites`, `js/game/zones.js`). Der Zahlen-Knopf neben dem Themen-Knopf wechselt zum nächsten Bauplatz; beim Fahren
-  führt ein Tipp auf einen Bauplatz genau dorthin. Jeder Bauplatz hat sein eigenes Gebäude und seinen eigenen Speicherstand.
-- **Anbauten** (in allen Themen gleich): Seitenflügel, Garage mit Auto, Turm, Wintergarten, Schuppen, Windmühle (dreht sich),
-  Wasserrad (dreht sich), Zelt, Außentreppe, Unterstand mit Heu, Verkaufsstand, Baumhaus, Rutschturm. Sie kommen abwechselnd rechts und links ans unterste Stockwerk, bis zu zwei je Seite
-  (der zweite steht außen neben dem ersten); ein fünfter ersetzt den ältesten. Nochmal antippen = wieder weg. Die Dächer der Anbauten übernehmen die Farbe des Hausdachs.
-- **Bewohner:** bis zu sechs Figuren (Kind, Oma, Papa, Teddy und 14 Tiere; die zum Thema passenden stehen vorne) ziehen vor
-  das Gebäude. Antippen → sie hüpfen und rufen bzw. werden benannt. **Fährt der Zug vorbei, winken und hüpfen sie.**
-- **Muster** (in allen Themen gleich): Punkte, Streifen, Karo, Herzen, Sterne, Blumen, Wellen, Zickzack – legen sich in Weiß
-  über alle Stockwerke; die Wandfarbe darunter lässt sich weiter durch Antippen wechseln. Nochmal antippen = Muster weg.
-- **Album (📷):** zeigt unten zuerst 📸 „Foto machen“ (legt das Gebäude ins Album, bis zu zwölf eigene), dann die eigenen
-  Fotos und zwölf **Vorlagen** (💡, zu jedem Thema ein fertiges Gebäude). Antippen → das Gebäude wird auf den Bauplatz
-  gesetzt und kann umgebaut werden (↩️ holt das vorherige zurück). Gespeichert wird nur die Beschreibung, die Bilder
-  werden bei Bedarf neu gerendert (`housePreview` in `js/game/buildSite.js`, Vorlagen in `js/game/buildMore.js`).
-- **Oberfläche (neu):** Unten ein Fenster mit einer Kopfzeile (Bauplatz wechseln, Thema, ↩️ Zurück, ✅ Fertig),
-  einer Reihe großer Kategorien mit Namen (Stockwerke … Garten, Tiere, Album, Abreißen) und darunter den Teilen.
-  Das nächste sinnvolle Fach wackelt leicht. Passen nicht alle Teile ins Bild: wischen oder ◀ ▶ antippen.
-- **Tierstation** (Fach ganz rechts, Tierbild): bis zu drei Tiere vor dem Beet. Tier antippen: Mit Futter aus dem Korb
-  frisst es, wenn es das mag, sonst hüpft es, ruft und bekommt Herzchen. Kuh gibt Milch, Huhn ein Ei – je einmal
-  alle 40 Sekunden. Der Zähler (🥛 🥚) steht in der Leiste; was man damit macht, ist noch nicht eingebaut.
-- **Garten** (letztes Fach, `js/game/garden.js`): rechts neben dem Gebäude liegt ein Beet mit sechs Plätzen. Pflanze in der
-  Leiste antippen = säen (Karotte, Apfelbaum, Bananenstaude, Sonnenblume, Salat, Gras). Pflanze im Beet antippen =
-  die Gießkanne gießt, die Pflanze wächst eine Stufe (dreimal bis reif). Reife Pflanzen wippen; antippen = ernten,
-  die Frucht hüpft in den Korb. Die Ernte erscheint rechts in der Leiste (🧺, mit Anzahl): antippen füttert einen
-  Bewohner, der das mag (Karotte, Apfel, Banane, Körner, Blatt, Heu – wer was mag, steht in `LIKES` in `js/catalog.js`).
-  Mag es keiner, zeigt ein Bewohner in der Denkblase sein Lieblingsfutter; wohnt noch niemand da, wackelt das Fach Bewohner.
-- **Bauen:** Teil antippen → es fliegt vom Steinstapel heran und wird festgehämmert. Die Leiste springt zum nächsten
-  sinnvollen Fach (erste Mauer → Türen → Fenster → Dächer → Spitzen → Schmuck); man kann jederzeit selbst wechseln.
-  Was gerade nicht passt (z. B. Spitze ohne Dach), ist blass; ein Tipp darauf zeigt, welches Fach vorher dran ist.
-  Tür, Fenster, Dach und Spitze lassen sich jederzeit austauschen, Schmuck an- und abwählen.
-- **Schmücken:** Teil am Gebäude antippen → nächste Farbe (jedes Stockwerk, Tür, Dach und viele Spitzen einzeln).
-- **Abbauen:** ↩️ nimmt den letzten Schritt zurück · 💥 (oder der Bagger) reißt alles ab, es poltert und staubt.
-- **✅ Fertig:** es glitzert, Feuerwerksraketen steigen auf; wohnt schon jemand hier, jubeln die Bewohner, sonst zieht
-  passend zum Thema jemand ein (im Zirkus z. B. Affe, Löwe oder Elefant).
-- **Kamera:** Finger ziehen = ums Gebäude herum schauen (auch höher/tiefer), zwei Finger = näher/weiter. Der Ausschnitt
-  wächst mit dem Gebäude mit. Steht der Zug gerade vor der Baustelle, wird er solange ausgeblendet.
-- Das Gebäude bleibt gespeichert und steht beim Fahren an der Strecke (abends leuchten die Fenster).
-
-### 🛤️ Die große Strecke (fest)
-- Es gibt **keinen Zeichenmodus** mehr. Eine feste, große Strecke führt einmal durch die ganze Welt
-  (`js/game/route.js`): am **Dorf** mit Dorfbahnhof und Ententeich vorbei, südlich um den **Bauernhof** (Weide direkt
-  an der Strecke), über die Landstraße (Bahnübergang mit Schranke), über den **Fluss** (Musikbrücke), an der
-  **Waschanlage** vorbei, durch den **Berg** (Tunnel), an den **Feldern** entlang, an der **Obstwiese** vorbei,
-  noch einmal über Fluss und Straße und zurück ins Dorf.
-- **Vier feste Bahnhöfe:** rot = Dorf, blau = Obstwiese, gelb = Bauernhof, grün = Felder.
-- Brücken, Tunnel und Bahnübergänge entstehen automatisch dort, wo die Strecke Fluss, Berg oder Straße kreuzt.
-- Der zweite Zug fährt auf einer kleinen Schlaufe auf der Wiese innerhalb der großen Strecke.
-
-### 🚂 Fahren
-- ▶ = losfahren / ⏸ anhalten · 📯 = pfeifen · 🎥 = Kamera fährt mit · unten links: 🌞 → 🌇 → 🌙 Tag / Abend / Nacht (weicher Übergang, Abendrot, Sonne wandert), 🌤️/🌧️/❄️ Wetter – die Knöpfe zeigen immer den aktuellen Zustand
-- **Bahnhof:** Der Zug hält von selbst („Bahnhof! Wer steigt ein?“). Wartende antippen → hüpfen in den Zug.
-  Mitfahrer im Zug antippen → steigen aus. ▶ blinkt = weiterfahren.
-- **Mitzählen:** Bei jedem Halt zählt eine Stimme beim Einsteigen mit („eins, zwei, drei …“), ebenso beim Aussteigen,
-  und eine große Zahl steigt über dem Fahrgast auf. Ohne Zwang, nur Begleitung – im Eltern-Bereich abschaltbar.
-- **Fahrgäste mit Ziel:** Gibt es mindestens zwei Bahnhöfe, zeigt jeder Wartende eine **Sprechblase in einer Bahnhofsfarbe**.
-  Er fährt mit und **steigt am Bahnhof dieser Farbe von selbst aus** („Danke!“) und geht ins Bahnhofshaus.
-  Farben zuordnen statt Punkte zählen – kein Druck, nichts kann falsch gemacht werden.
-- **Waschanlage:** Der Zug wird beim Fahren schmutzig (bei Regen schneller). In der Waschanlage drehen sich die Bürsten, es schäumt – blitzsauber.
-- **Tunnel:** drinnen wird es dunkel, die Lampen gehen an, die Pfeife hallt.
-- **Musik-Brücke:** Die Brücken haben bunte Xylophon-Stäbe (tief = rot und breit, hoch = lila und schmal).
-  Fährt die Lok drüber, spielt jeder Stab seinen Ton – eine Melodie. Stäbe antippen spielt sie auch. Manchmal springt ein Fisch.
-- **Wetterfolgen:** Regen macht nass – **Pfützen** wachsen auf und neben der Strecke. Fährt der Zug hindurch, **spritzt** es
-  (und er wird schmutzig → Waschen!). Pfützen antippen = platsch. Mit Sonne trocknen sie langsam.
-  Hört der Regen am Tag auf, erscheint ein **Regenbogen**. **Schnee bleibt liegen**, Pfützen frieren zu Eis, und neben den
-  Bahnhöfen und an der Strecke bauen sich **Schneemänner** auf (Kugel für Kugel; antippen → der Hut hüpft).
-  Danach schmilzt alles langsam – das Schmelzwasser gibt wieder Pfützen.
-- **Bahnübergang:** Kommt der Zug, gehen die Schranken zu, Licht blinkt, Glocke bimmelt – die Autos auf der Landstraße halten und warten.
-  Autos antippen → hupen.
-- **Zugbegegnung:** Auf einer kleinen Nebenstrecke fährt ein zweiter Zug (blaue Lok, rosa Wagen mit Hase und Katze) im Kreis.
-  Kommt der Zug des Kindes in seine Nähe, **winken sich beide Lokführer und Fahrgäste zu und hupen**. Die Nebenstrecke sucht
-  sich selbst einen freien Platz nahe der Strecke und verschwindet, wenn kein Platz da ist. Antippen → winkt und hupt.
-- Tiere auf der Weide antippen → sie rufen; Bäume und Häuser wackeln.
-- **Bauernhof zum Anfassen:** Scheunentor → knarrt, ein Tier kommt heraus und ruft · Traktor → tuckert, pufft Rauch und
-  fährt ein Stück vor und zurück · Heuballen → Stroh fliegt, manchmal hat sich ein Hase, eine Katze oder ein Huhn versteckt ·
-  Windmühle → dreht sich ein paar Sekunden ganz schnell.
-- Jede Lok fährt anders schnell (Schnellzug am schnellsten).
-
-**Tiergeräusche** sind echte Aufnahmen (gemeinfrei, CC0 – Quellen in `sounds/QUELLEN.md`) für Kuh, Schwein, Schaf,
-Hund, Katze, Huhn, Hahn und Frosch. Auch Löwe, Elefant, Pferd, Ente, Pinguin und Affe sind echte Aufnahmen (Wikimedia Commons,
-teils mit Namensnennung). Nur die Entdecker-Tiere sind per Stimm-Synthese nachgebaut
-(`js/animalSynth.js`: Stimmpulse mit Zittern + Atem + Formanten).
-Besser: im Eltern-Bereich unter **Eigene Stimme** selbst einsprechen – die eigene Aufnahme hat immer Vorrang (Mikrofon-Erlaubnis nötig).
-Eigene Aufnahmen (MP3) lassen sich auch in `sounds/` ablegen und in `js/audio.js` (ANIMAL_SAMPLES) eintragen.
-
-Leise Xylophon-Musik läuft im Hintergrund (im Eltern-Bereich abschaltbar).
-Zug, Strecke und alles an der Strecke bleiben gespeichert.
-
-## Weniger Worte, mehr Geräusche
-
-Wenn alles kommentiert wird, hört ein Kind irgendwann weg. Deshalb wird jedes Wort und jeder Satz nur bei den **ersten beiden
-Malen** gesprochen (danach nur noch jedes 9. Mal zur Erinnerung); dazwischen antworten Geräusche (Tierlaute, Klacken, Plopp).
-Zwischen zwei gesprochenen Dingen liegt immer eine Pause von mindestens 2,6 Sekunden. Die Schlafenszeit-Sätze werden immer
-gesprochen. Im Eltern-Bereich lässt sich das auf „Immer“ stellen.
-
-## Schlafenszeit (Spielende)
-
-Ist die Spielzeit um, wird der Zug nicht einfach abgeschaltet: In den letzten 3 Minuten wird es im Spiel langsam Abend
-(warmes Licht), dann bringt das Kind den Zug **ins Bett** – eine bunte Decke liegt bereit, **irgendwo auf den Bildschirm
-tippen und zum Zug ziehen** (oder einfach loslassen), und der Zug wird zugedeckt. Die Lampe wird dunkel, eine Spieluhr spielt
-ein Wiegenlied, leises Schnarchen, kleine „Z“ steigen auf – „Gute Nacht, kleiner Zug!“ Danach folgt der Ruhe-Bildschirm.
-Tut das Kind nichts, deckt sich der Zug nach einer Weile von selbst zu. So wird aus „Zeit ist um“ ein Ritual.
-
-## Eltern-Bereich
-
-**Zahnrad oben rechts 3 Sekunden gedrückt halten.**
-
-| Einstellung | Standard |
-|---|---|
-| Sprache (Deutsch / English) | Deutsch |
-| Spielzeit (10 / 15 / 20 / 30 Min. / unbegrenzt) | 15 Min. |
-| Pause danach | 30 Min. |
-| Stimme / Sprechtempo / Geräusche | an / normal / an |
-| **Wie oft sprechen?** | Nur bei Neuem (empfohlen) / Immer |
-| Musik / Musik-Lautstärke | an / mittel |
-| Zug zurücksetzen | – |
-| **Eigene Stimme** | Tierlaute, Namen und Sätze selbst einsprechen (🎙 / ▶ / 🗑) – Aufnahmen bleiben auf dem Gerät |
-
-Ist die Spielzeit um, sagt die App „Der Zug ist müde …“ und der Zug schläft (Mond-Bildschirm).
-Erst nach der Pause – oder über den Eltern-Bereich – geht es weiter.
-
-## Auf das Android-Tablet bringen
-
-Die App ist eine Web-App (PWA) und braucht für Installation und Offline-Betrieb eine **https-Adresse**.
-
-**GitHub Pages (kostenlos):**
-1. Den Branch in `main` mergen.
-2. Auf GitHub: *Settings → Pages → Source: Deploy from a branch → `main` / `(root)`* → Speichern.
-   (Bei privaten Repos braucht Pages ein kostenpflichtiges GitHub-Konto. Alternativ das Repo öffentlich machen – es enthält keine privaten Daten.)
-3. Nach ca. 1 Minute: `https://<benutzername>.github.io/<repo-name>/`
-4. Auf dem Tablet in **Chrome** öffnen → Menü ⋮ → **„App installieren“ / „Zum Startbildschirm hinzufügen“**.
-5. Einmal mit Internet öffnen – danach läuft sie offline. Updates kommen automatisch, sobald wieder Internet da ist.
-
-**Zum Ausprobieren am Computer:**
+**Starten am Rechner:**
 ```bash
-python3 -m http.server 8000
-# dann http://localhost:8000 öffnen
+python -m http.server 8000
+# dann http://localhost:8000/ öffnen
 ```
+Auf `localhost` ist der Offline-Speicher absichtlich aus (man sieht immer die frischen Dateien); mit `?sw=1`
+lässt er sich zum Ausprobieren einschalten.
 
-### Wichtige Tablet-Einstellungen
-- **Deutsche Stimme:** *Einstellungen → System → Sprachen → Sprachausgabe* → Google Sprachausgabe, Deutsch installieren.
-  Im Eltern-Bereich steht, ob eine Stimme gefunden wurde.
-- **App fixieren** (damit das Kind nicht herauskommt): *Einstellungen → Sicherheit → App-Fixierung*.
-- **Lautstärke** vorher auf ein ruhiges Maß stellen.
+**Testen:**
+- `http://localhost:8000/?szene=schlafen&test=1` startet direkt in einem Ort; `test=1` schaltet die
+  Spielzeit-Begrenzung aus und legt `window.__sigo` zum Fernsteuern an.
+- `&spielzeit=20` setzt im Testbetrieb eine Grenze von 20 Sekunden; `?szene=schlafen&ende=1` bzw. `&ruhe=1`
+  zeigt das Schlafzimmer nach Ablauf der Spielzeit bzw. gleich das Nachtbild.
+- Testfotos mit echtem Chrome: `node tools/shot.mjs --szene schlafen --out shots/x.jpg --aktionen '…'`
+  (einmalig vorher `cd tools && npm install`).
 
-## Technik (zum Erweitern)
-
-Reines HTML/JavaScript mit [three.js](https://threejs.org) (liegt in `vendor/`, MIT-Lizenz). Kein Build-Schritt.
-Alle Modelle sind aus einfachen Formen gebaut; die meisten Geräusche werden live erzeugt (nur Tierlaute sind Aufnahmen).
-
+**Veröffentlichen:** Nach jeder Änderung an Code, Bildern oder Tönen einmal
+```bash
+python tools/sw_liste.py            # schreibt sw-dateien.js neu
+python tools/sw_liste.py --pruefen  # Kontrolle vor dem Push: Exit-Code 1, wenn sw-dateien.js veraltet ist
 ```
-index.html                 Einstiegsseite
-css/style.css              Aussehen der Knöpfe und Leisten
-js/app.js                  Start, Spielzeit/Pause, Eltern-Bereich
-js/catalog.js              Loks, Wagen, Farben, Schmuck, Ladung
-js/i18n.js                 Alle Texte und Namen je Sprache
-js/audio.js                Geräusche, Zuggeräusche + Sprachausgabe
-js/music.js                Xylophon-Hintergrundmusik (live erzeugt)
-js/settings.js             Speichern auf dem Gerät
-js/game/game.js            3D-Kern: Kamera, Bildschleife, Eingabe
-js/game/trainModel.js      3D-Modelle von Loks und Wagen, Schmuck
-js/game/figures.js         3D-Tiere, Menschen, Ladung
-js/game/animalLife.js      Lebendige Tiere: Skelett + Verhalten (laufen, grasen, picken, wedeln …)
-js/game/textures.js        Per Code gezeichnete Texturen (Holz, Gras, Schotter, Wasser)
-js/game/train.js           Zug anordnen / auf Strecke setzen
-js/game/track.js           Aus Fingerstrich wird Schienenstrecke
-js/game/world.js           Werkstatt und Landschaft
-js/game/features.js        Feste Landschaft: Fluss, Landstraße mit Verkehr, Berge
-js/game/crossings.js       Automatische Brücken, Tunnel, Bahnübergänge
-js/game/trackObjects.js    Bahnhof (farbig), Waschanlage
-js/game/environment.js     Tag/Nacht, Regen, Schnee, Tunnel-Dunkelheit, nasser Boden, liegender Schnee
-js/game/weatherFx.js       Wetterfolgen: Pfützen, Spritzen, Regenbogen, Schneemänner
-js/game/foods.js           Futter-Modelle
-js/game/feeding.js         Tiere füttern (Fressen, Kopfschütteln, Denkblase)
-js/game/wheelStyles.js     Radmuster
-js/game/hint.js            Zeige-Hand
-js/game/sideTrain.js       Zugbegegnung (zweiter Zug auf Nebenstrecke)
-js/game/merge.js           Leistung: Teile zusammenfassen, Instanzen
-js/animalSynth.js          Nachgebaute Tierstimmen
-js/recordings.js           Eigene Aufnahmen (Mikrofon, IndexedDB)
-js/voiceStudio.js          Eltern-Bereich „Eigene Stimme“
-js/game/bedroom.js         Schlafzimmer-Szene
-js/game/modes/bed.js       Zug ins Bett bringen
-js/game/lamps.js           Lampen, die nachts heller leuchten
-sounds/                    Tiergeräusche (MP3, CC0) + QUELLEN.md
-js/game/modes/*.js         Werkstatt, Waschen, Fahren, Schlafenszeit
-js/game/route.js           feste Strecke und Bahnhöfe
-js/game/tray.js            Leiste unten (Fächer + Karten mit Blätter-Pfeilen)
-sw.js                      Offline-Speicher (neue Dateien in ASSETS eintragen)
-```
-
-- **Neuer Wagen:** Eintrag in `WAGONS` (`catalog.js`), Bau-Funktion in `trainModel.js` (`BUILDERS`), Name in `i18n.js`.
-- **Neue Ladung / neuer Schmuck:** Eintrag in `CARGO` bzw. `DECOR` + Name in `i18n.js`.
-- **Neue Sprache:** Block in `LANGUAGES` (`i18n.js`).
-
-## Ehrliche Grenzen
-
-- Ente, Pferd, Löwe, Elefant, Pinguin und Affe sind echte Aufnahmen von Wikimedia Commons (teils mit Namensnennung, siehe
-  `sounds/QUELLEN.md`). Die Laute der Entdecker-Tiere (Eule, Fuchs, Reh …) sind weiter nachgebaut.
-- Die Tierbewegungen sind Spielzeug-Animationen ohne echte Knie/Gelenke: Beine schwingen als Ganzes, bei großen
-  Bewegungen dehnt sich das Fell an den Übergängen etwas.
-- Die Grafik ist auf neuere Tablets ausgelegt. Damit es flüssig läuft: unbewegliche Teile werden zu wenigen großen Teilen
-  zusammengefasst, Bäume als Instanzen gezeichnet, Schatten aus der Vogelperspektive seltener berechnet und alle Shader beim
-  Start vorab übersetzt. Ruckelt es trotzdem, senkt die App stufenweise selbst: Auflösung → Schattenqualität → Schatten aus.
-- Selbstkreuzende Strecken (Acht) sind erlaubt, aber dort entsteht keine Brücke – der Zug fährt „durch“ die Kreuzung.
-- Malt man sehr viel an Fluss oder Straße entlang, werden Brücke/Übergang sehr lang und es bleibt wenig Platz für Bahnhöfe („Alles voll!“).
-
-## Ideen für später
-- Lieferaufträge mit Kran (Kisten am Bauernhof abholen)
-- Tiere auf den Gleisen, Lok ins Bett bringen (schönes Spielende)
-- Landschaft selbst gestalten (Bäume, Tiere setzen); mehrere Bauplätze
-- Eigene Fotos als Fahrgäste, selbst eingesprochene Laute
-- Weichen / zwei Züge (eher für ältere Kinder)
-
-## Modelle aus Blender
-
-Alle Tiere, der Teddy und die Menschen (Kind, Oma, Papa, Lokführer) kommen als fertige Modelle aus Blender:
-weich verschmolzene Körper mit scharf abgesetzten Teilen (Augen, Schnauzen, Flecken …), ein Teil pro Figur.
-Winke-Arme bleiben im Spiel beweglich; Münder (Füttern) setzt das Spiel automatisch an die Schnauze.
-
-- Skript: `tools/blender/tiere.py` (alle Figuren), Helfer in `tools/blender/common.py`
-- Erzeugen ohne Blender-Oberfläche: `pip install bpy==4.2.0` (Python 3.11), dann
-  `python3 tools/blender/tiere.py` (alle) oder `python3 tools/blender/tiere.py kuh hund` (einzelne)
-- Ergebnis: `models/<id>.sigm` (kleines eigenes Format: Ecken, Normalen, Eckfarben, Dreiecke; zusammen ~1,8 MB)
-- Laden: `js/game/models.js` (`MODEL_IDS`); fehlt ein Modell, wird die alte, gebaute Figur benutzt
-- Neue Modelldateien in `sw.js` (ASSETS) eintragen, damit sie offline funktionieren
-
-## Lebendige Tiere
-
-Alle Tiere (auch Affe und Entdecker-Tiere) haben ein kleines Skelett: Körper, Kopf/Hals, Schwanz, Beine, Ohren,
-Flügel, Rüssel, Arme. Die Gewichte rechnet `js/game/animalLife.js` beim Laden aus der Lage der Ecken (Bereiche mit
-weichen Übergängen je Tier in `RIGS`) – die Blender-Modelle bleiben unverändert.
-
-- **Immer:** atmen, Kopf bewegt sich leicht, Schwanz pendelt, Elefant schwingt den Rüssel und fächelt mit den Ohren.
-- **Eigene Aktionen** (zufällig, je Tierart): grasen (Kuh, Schaf, Pferd, Reh), wühlen (Schwein), picken (Huhn, Ente),
-  schnüffeln + wedeln (Hund), strecken + putzen (Katze), gähnen (Löwe), trompeten (Elefant), Blätter zupfen (Giraffe),
-  hoppeln (Hase, Frosch), flattern (Vögel, Pinguin), Kopf ganz herumdrehen (Eule), am Kopf kratzen, klatschen,
-  winken (Affe), Ohr zucken, Schwanz schlagen, einen Schritt machen – und manchmal **schaut das Tier zur Kamera**.
-- **Laufen:** Wer ein Tier bewegt, setzt `life.speed` – Vierbeiner im Kreuzgang, Vögel watscheln, Hasen hoppeln.
-  Auf Weide und Hof suchen sich die Tiere freie Plätze (sie laufen nicht ineinander) und bleiben länger stehen.
-- **Antippen / Rufen:** Kopf hoch, Maul auf und zu (Hahn kräht, Elefant trompetet, Hund wedelt, Affe klatscht).
-- **Füttern:** Das Tier hält still, der Mund sitzt am Kopf- bzw. Rüsselknochen und geht mit.
-- Bewegt wird nur, was gerade gezeichnet wird (`onBeforeRender`): ~0,15 ms pro Bild für alle Tiere zusammen.
-
-## Entdecker-Album
-
-Zehn Tiere verstecken sich in der Landschaft (Fuchs, Igel, Eichhörnchen, Storch auf der Kirche, Fisch im Fluss,
-Maulwurf, Reh, Eule – nur nachts –, Schnecke im Kohlfeld, Biber). Kleine Spuren sind immer zu sehen (Bau, Nest,
-Erdhügel, Damm …). Kommt der Zug nah, schaut das Tier heraus; Antippen → Sticker fliegt ins Album (📖 oben rechts,
-in Werkstatt und beim Fahren). Im Album: gefundene Tiere bunt, fehlende als Umriss mit Hinweis, wo man suchen kann.
-Code: `js/game/discover.js`, gespeichert in `localStorage` (`sigo.album.v1`).
-
-## Jahreszeiten
-
-„Wie draußen“ (nach Kalender) oder fest im Eltern-Bereich: Frühling (Apfelblüte, fallende Blütenblätter),
-Sommer, Herbst (bunte Bäume, fallendes Laub), Winter (bereifte Bäume, Schnee bleibt liegen).
-
-## Dorf
-
-Häuser um den Platz mit Brunnen, Linde, Bänken, Laternen, Kirche (mit Storchennest), Marktstand, Gärten mit Hecken
-und Briefkästen, Spielplatz (Rutsche, Schaukel mit Teddy, Sandkasten). Oma, Papa und das Kind spazieren über den
-Platz und winken, wenn der Zug vorbeifährt (`js/game/village.js`).
-Zum Anfassen: Haus antippen → jemand kommt heraus und winkt; Kirche → Glocken; Brunnen → Platschen;
-Marktstand → Apfel hüpft; Briefkasten → Brief fliegt. Dazu Bäckerei, Wimpelketten, Wäscheleine,
-Katze auf dem Dach und ein Hund, der den Zug anbellt.
-**Baustelle** an der Strecke westlich vom Dorf: siehe Bereich 🏗️ Bauen. Beim Fahren führt ein Tipp auf die Baustelle dorthin.
-
-**Feuerwehr** neben dem Dorfbahnhof (rote Wache mit Schlauchturm und Blaulicht): Antippen → Tatütata, das Rolltor
-fährt hoch, das Feuerwehrauto (mit Feuerwehrmann) fährt mit Blaulicht heraus, die Leiter geht hoch, Wasser marsch –
-dann fährt alles wieder zurück.
-**Katze auf dem Baum:** Neben der Wache sitzt eine Katze auf einem Ast und miaut, wenn der Zug vorbeikommt. Katze, Baum oder
-Wache antippen → die Feuerwehr rückt aus, dreht die Leiter zur Katze, richtet sie auf und fährt sie aus; die Katze springt
-in den Korb, fährt mit herunter, springt ab und freut sich. Nach etwa 45 Sekunden klettert sie wieder hinauf (nochmal!).
-**Einsatzfahrt:** Beim Fahren rückt die Feuerwehr etwa alle 2,5–3,5 Minuten von selbst aus (erstmals nach ca. 50 Sekunden):
-Tor auf, über die gepflasterte Zufahrt auf die Landstraße, ein Stück die Straße entlang (hält an geschlossenen Schranken),
-wenden, zurück und rückwärts in die Halle. Die Autos fahren dabei an den Rand und bremsen (Rettungsgasse).
-Tatütata ertönt beim Ausrücken, beim Wenden und wenn der Zug in der Nähe ist (`js/game/firePatrol.js`).
-Die Zeige-Hand zeigt zuerst auf die Katze (bis sie einmal gerettet wurde), dann auf die Wache (bis sie einmal benutzt wurde).
-**Ententeich** neben dem Dorf (nah an der Strecke) mit Schilf, Seerosen, Steg und drei Enten.
-
-## Tiere rufen sich zu
-
-Fährt ein Tier im Zug an seinen Artgenossen in der Landschaft vorbei (Kuh/Schaf/Schwein an der Weide, Huhn/Hahn am Hof,
-Ente am Dorfteich, Hund und Katze im Dorf), ruft erst das Tier draußen und hüpft, dann antwortet das Tier im Zug
-(`js/game/greetings.js`, pro Tierart höchstens alle 30 Sekunden).
-
-## Landschaft
-
-- `js/game/groundPaint.js`: gemalter Boden (Wiesenflecken, Feldwege, Dorfplatz, Felder) + feine Halm-Struktur
-- `js/game/zones.js`: Lage der Bereiche (Dorf, Hof, Felder, Waldstücke, Obstwiese, Blumenwiesen) und ihre Bauteile
-- `js/game/workshopDeco.js`: Spielzimmer-Werkstatt (Teppich, Sonnenflecken, Spielsachen)
-- `js/game/ambient.js`: Schmetterlinge, Vogelschwärme, Schornsteinrauch; nachts Glühwürmchen
-- `js/game/beams.js`: nachts Fernlicht (Lichtkegel + Lichtfleck) für Lok, zweiten Zug und Autos, Lichtschein unter Laternen
-- Mitfahr-Kamera: mit dem Finger wischen = um den Zug herum schauen (hoch/runter geht auch);
-  nach 7 Sekunden ohne Finger schwenkt sie langsam zurück
-- Schwache Geräte: die Qualitätsautomatik lässt zuerst jede zweite Blume / jedes zweite Grasbüschel weg
-- Was der festen Strecke im Weg stünde, wird ausgeblendet; beim Mitfahren schrumpfen
-  Bäume/Häuser zwischen Kamera und Zug weich weg.
+laufen lassen. Das Skript schreibt `sw-dateien.js` neu (Liste aller Spieldateien mit Prüfsummen und ein
+Versions-Stempel). Nur wenn sich dieser Stempel ändert, bekommt das Tablet die neue Fassung – ohne neuen Stempel
+**nie**. Dabei holt es nur die geänderten Dateien aus dem Netz, unveränderte übernimmt es aus dem alten Speicher.
+Danach wie gewohnt committen und auf `main` pushen.

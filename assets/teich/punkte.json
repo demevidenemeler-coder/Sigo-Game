@@ -1,0 +1,224 @@
+{
+  "images": {
+    "hg_teich": {
+      "pts": {
+        "boden": [
+          420,
+          1430
+        ],
+        "ufer": [
+          720,
+          1420
+        ],
+        "wasser_mitte": [
+          1415,
+          1080
+        ],
+        "blatt1": [
+          800,
+          1160
+        ],
+        "blatt2": [
+          1150,
+          1040
+        ],
+        "blatt3": [
+          1500,
+          1180
+        ],
+        "blatt4": [
+          1850,
+          1050
+        ],
+        "blatt5": [
+          2200,
+          1170
+        ]
+      },
+      "desc": "Teich von schräg oben: Wasser unten zwei Drittel, hinten Ufer mit Weiden/Schilf, vorn links kleines Grasufer mit Sandrand"
+    },
+    "kruemel": {
+      "ax": 0.555,
+      "ay": 0.975,
+      "desc": "ein paar Brotkrümel"
+    },
+    "seerosenblatt": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "grünes Seerosenblatt von schräg oben"
+    },
+    "seerose_bluete": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "rosa Seerosenblüte"
+    },
+    "brot": {
+      "ax": 0.477,
+      "ay": 0.984,
+      "desc": "Scheibe Brot (ohne Gesicht)"
+    },
+    "hg_angeln": {
+      "pts": {
+        "boden": [
+          600,
+          455
+        ],
+        "steg": [
+          820,
+          455
+        ],
+        "eimer": [
+          420,
+          455
+        ],
+        "wasserlinie": [
+          1415,
+          560
+        ],
+        "grund": [
+          1415,
+          1500
+        ]
+      },
+      "desc": "Angeln im Querschnitt: oben Himmel, links Holzsteg (Deck bis x≈960, Oberkante y≈455), darunter helles Unterwasser mit Sandgrund"
+    },
+    "wasserring": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "heller ovaler Wellenring auf dem Wasser"
+    },
+    "ente_schwimmt": {
+      "ax": 0.443,
+      "ay": 0.982,
+      "desc": "gelbe Ente schwimmt nach rechts (Unterkante = Wasserlinie)"
+    },
+    "schilf": {
+      "ax": 0.476,
+      "ay": 0.983,
+      "desc": "Schilfbüschel mit zwei Rohrkolben"
+    },
+    "kueken_schwimmt": {
+      "ax": 0.446,
+      "ay": 0.982,
+      "desc": "gelbes Entenküken schwimmt nach rechts (Unterkante = Wasserlinie)"
+    },
+    "fisch_orange": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "oranger Spielzeugfisch schwimmt nach rechts"
+    },
+    "fisch_blau": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "hellblauer Spielzeugfisch schwimmt nach rechts"
+    },
+    "fisch_gelb": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "gelber Spielzeugfisch schwimmt nach rechts"
+    },
+    "fisch_streifen": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "mintgrüner Spielzeugfisch mit lila-weißen Streifen, schwimmt nach rechts"
+    },
+    "fisch_rosa": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "rosa Spielzeugfisch schwimmt nach rechts"
+    },
+    "libelle": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "freundliche türkise Libelle fliegt nach rechts"
+    },
+    "stiefel": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "roter Gummistiefel (Angel-Überraschung)"
+    },
+    "flaschenpost": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Flaschenpost mit Korken und Papierrolle (Angel-Überraschung)"
+    },
+    "schatzkiste_klein": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "kleine Schatzkiste mit Goldmünzen (Angel-Überraschung)"
+    },
+    "krone": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "goldene Spielzeugkrone (Angel-Überraschung)"
+    },
+    "seestern": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "freundlicher Seestern (Angel-Überraschung)"
+    },
+    "muschel": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "rosa Muschel mit Perle (Angel-Überraschung)"
+    },
+    "gummiente": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "gelbe Gummiente (Angel-Überraschung)"
+    },
+    "schluessel_gold": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "goldener Schlüssel (Angel-Überraschung)"
+    },
+    "angel": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Spielzeug-Angelrute schräg nach rechts oben, ohne Schnur",
+      "pts": {
+        "griff": [
+          130,
+          680
+        ],
+        "spitze": [
+          765,
+          40
+        ]
+      }
+    },
+    "angelhaken": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "runder roter Magnet-Köder mit Öse (statt Haken)",
+      "pts": {
+        "oben": [
+          50,
+          4
+        ]
+      }
+    },
+    "eimer_wasser_gross": {
+      "ax": 0.495,
+      "ay": 0.983,
+      "desc": "großer durchsichtiger Glaseimer mit Wasser für gefangene Fische (Punkt innen = Wassermitte)",
+      "pts": {
+        "innen": [
+          228,
+          440
+        ]
+      }
+    },
+    "papierboot": {
+      "ax": 0.461,
+      "ay": 0.981,
+      "desc": "Papierboot fährt nach rechts (Unterkante = Wasserlinie)"
+    },
+    "krebs": {
+      "ax": 0.497,
+      "ay": 0.982,
+      "desc": "freundlicher roter Krebs von vorn"
+    }
+  },
+  "audio": {}
+}

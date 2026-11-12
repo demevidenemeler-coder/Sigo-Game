@@ -1,0 +1,156 @@
+{
+  "images": {
+    "hg_waschanlage": {
+      "pts": {
+        "boden": [
+          1414,
+          1380
+        ],
+        "fahrzeug": [
+          1414,
+          1390
+        ],
+        "eimer": [
+          2080,
+          1420
+        ],
+        "dusche": [
+          1522,
+          345
+        ],
+        "abfluss": [
+          1400,
+          1330
+        ]
+      },
+      "desc": "Waschanlage draussen: Fliesenboden, blaue Wand mit gelben Rohren und Düsen, bunte Bürsten links/rechts, Rohrende oben Mitte für Brause"
+    },
+    "matsch_a": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Matschfleck a (flache Auflage zum Wegwischen)"
+    },
+    "matsch_b": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Matschfleck b (flache Auflage zum Wegwischen)"
+    },
+    "matsch_c": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Matschfleck c (flache Auflage zum Wegwischen)"
+    },
+    "matsch_d": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Matschfleck d (flache Auflage zum Wegwischen)"
+    },
+    "matsch_e": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Matschfleck e, sternfoermiger Spritzer (flache Auflage zum Wegwischen)"
+    },
+    "schaum_a": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Breiter weisser Seifenschaum-Teppich (Auflage)"
+    },
+    "schaum_b": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Runder weisser Seifenschaum-Haufen (Auflage)"
+    },
+    "brause": {
+      "ax": 0.5,
+      "ay": 0.0,
+      "pts": {
+        "duese": [
+          148,
+          385
+        ]
+      },
+      "desc": "Grosser gelber Duschkopf an Rohr (Anker oben am Rohrende), Duesen unten"
+    },
+    "wasserfaden": {
+      "ax": 0.5,
+      "ay": 0.0,
+      "desc": "Buendel feiner hellblauer Wasserstrahlen nach unten, unten durchsichtig auslaufend (Anker oben)"
+    },
+    "buerste_walze": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Grosse flauschige blaue Waschbuerste frontal, rund (zum Drehen)"
+    },
+    "eimer_schaum": {
+      "ax": 0.496,
+      "ay": 0.985,
+      "desc": "Roter Eimer voll Schaum mit gelbem Schwamm"
+    },
+    "auto_klein": {
+      "ax": 0.491,
+      "ay": 0.98,
+      "desc": "Rotes rundes Spielzeugauto von der Seite, Front rechts, mit Gesicht, ohne Raeder (Radkaesten leer)",
+      "pts": {
+        "rad1": [
+          212,
+          560
+        ],
+        "rad2": [
+          562,
+          560
+        ]
+      }
+    },
+    "traktor_ohne": {
+      "ax": 0.515,
+      "ay": 0.98,
+      "desc": "Gruener Traktor von der Seite, Front rechts, mit Gesicht, ohne Raeder (hinten grosser, vorn kleiner Radkasten)",
+      "pts": {
+        "rad_gross": [
+          232,
+          530
+        ],
+        "rad_klein": [
+          615,
+          555
+        ]
+      }
+    },
+    "rad_klein_auto": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Schwarzer Autoreifen mit weisser Felge, rund frontal (dreht sich)"
+    },
+    "rad_traktor_gross": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Grosses Traktorrad mit grobem Profil und roter Felge, rund frontal"
+    },
+    "glanzstern": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Weicher weisser vierzackiger Glanz (sauber!)"
+    },
+    "rad_traktor_klein": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Kleines Traktor-Vorderrad, passend zum grossen"
+    },
+    "icon_zug_wahl": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Rundes Auswahl-Symbol: Lok"
+    },
+    "icon_auto_wahl": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Rundes Auswahl-Symbol: rotes Auto"
+    },
+    "icon_traktor_wahl": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Rundes Auswahl-Symbol: gruener Traktor"
+    }
+  },
+  "audio": {}
+}

@@ -1,0 +1,249 @@
+{
+  "images": {
+    "hg_futter": {
+      "pts": {
+        "boden": [
+          1414,
+          1230
+        ],
+        "platz1": [
+          664,
+          1240
+        ],
+        "platz2": [
+          1164,
+          1240
+        ],
+        "platz3": [
+          1664,
+          1240
+        ],
+        "platz4": [
+          2164,
+          1240
+        ]
+      },
+      "desc": "Futterplatz: rote Scheune links, Zaun, breiter leerer Erdplatz vorn"
+    },
+    "hg_melken": {
+      "pts": {
+        "boden": [
+          1414,
+          1250
+        ],
+        "kuh": [
+          1414,
+          1240
+        ],
+        "eimer": [
+          1375,
+          1290
+        ],
+        "kanne": [
+          2280,
+          1260
+        ],
+        "katze": [
+          560,
+          1400
+        ]
+      },
+      "desc": "Melkstand im Stall: Holzwand, zwei Fenster, Heuraufe, Heuhaufen links, leerer Holzboden"
+    },
+    "hg_huehner": {
+      "pts": {
+        "boden": [
+          1414,
+          1450
+        ],
+        "nest1": [
+          614,
+          850
+        ],
+        "nest2": [
+          1014,
+          850
+        ],
+        "nest3": [
+          1414,
+          850
+        ],
+        "nest4": [
+          1814,
+          850
+        ],
+        "nest5": [
+          2214,
+          850
+        ],
+        "korb": [
+          2250,
+          1480
+        ]
+      },
+      "desc": "Hühnerstall innen: Holzwand, rundes Fenster, langes leeres Regalbrett (Oberkante y≈830), Strohboden"
+    },
+    "hg_waschen": {
+      "pts": {
+        "boden": [
+          1414,
+          1300
+        ],
+        "pfuetze": [
+          460,
+          1205
+        ],
+        "waschplatz": [
+          1420,
+          1250
+        ],
+        "schafplatz": [
+          2330,
+          1270
+        ],
+        "hahn": [
+          1313,
+          910
+        ]
+      },
+      "desc": "Waschplatz draußen: Matschpfütze links, Pflaster mit Wasserhahn und Schlauchhalter an der Mauer, Wiese rechts"
+    },
+    "schaf_geschoren": {
+      "ax": 0.427,
+      "ay": 0.983,
+      "desc": "Schaf frisch geschoren, kurze glatte Wolle, Kopflocken, von der Seite nach rechts"
+    },
+    "nest_leer": {
+      "ax": 0.475,
+      "ay": 0.98,
+      "desc": "leeres Strohnest, leicht von oben"
+    },
+    "kuh_melken": {
+      "ax": 0.434,
+      "ay": 0.983,
+      "desc": "Kuh steht genau von der Seite, Kopf rechts, rosa Euter sichtbar (zum Melken)",
+      "pts": {
+        "euter": [
+          395,
+          740
+        ],
+        "mouth": [
+          975,
+          430
+        ]
+      }
+    },
+    "traktor": {
+      "ax": 0.481,
+      "ay": 0.983,
+      "desc": "roter Traktor mit Gesicht von der Seite, nach rechts, mit Rädern"
+    },
+    "eimer_leer": {
+      "ax": 0.497,
+      "ay": 0.985,
+      "desc": "leerer Blecheimer"
+    },
+    "eierkorb": {
+      "ax": 0.498,
+      "ay": 0.984,
+      "desc": "großer leerer Weidenkorb mit Henkel und rotem Tuch"
+    },
+    "eimer_halb": {
+      "ax": 0.494,
+      "ay": 0.985,
+      "desc": "Blecheimer halb voll Milch"
+    },
+    "kueken": {
+      "ax": 0.479,
+      "ay": 0.983,
+      "desc": "gelbes Küken in halber Eierschale, schaut nach vorn"
+    },
+    "eimer_voll": {
+      "ax": 0.499,
+      "ay": 0.985,
+      "desc": "Blecheimer randvoll Milch"
+    },
+    "milchkanne": {
+      "ax": 0.498,
+      "ay": 0.985,
+      "desc": "große Milchkanne aus Blech"
+    },
+    "schale_milch": {
+      "ax": 0.5,
+      "ay": 0.981,
+      "desc": "Schälchen mit Milch für die Katze"
+    },
+    "ei": {
+      "ax": 0.496,
+      "ay": 0.984,
+      "desc": "weißes Ei, steht"
+    },
+    "matsch1": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Matschklecks rund mit Tropfen (Auflage zum Wegwischen)"
+    },
+    "ei_braun": {
+      "ax": 0.496,
+      "ay": 0.984,
+      "desc": "braunes Ei, steht"
+    },
+    "matsch2": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Matschfleck oval mit Tropfen (Auflage zum Wegwischen)"
+    },
+    "matsch3": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Matschfleck aus drei Klecksen (Auflage zum Wegwischen)"
+    },
+    "schaumdecke": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "weißer Seifenschaum-Teppich (Auflage)"
+    },
+    "schlauch_duese": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "grüne Schlauchdüse mit Griff, Spitze nach rechts",
+      "pts": {
+        "spitze": [
+          372,
+          95
+        ]
+      }
+    },
+    "wolle_ballen": {
+      "ax": 0.483,
+      "ay": 0.984,
+      "desc": "flauschiger Wollballen"
+    },
+    "wollsack": {
+      "ax": 0.503,
+      "ay": 0.986,
+      "desc": "Jutesack voll Wolle"
+    },
+    "schermaschine": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "freundliche Spielzeug-Schermaschine, Kopf nach rechts"
+    },
+    "scheunentor": {
+      "ax": 0.501,
+      "ay": 0.983,
+      "desc": "rotes zweiflügeliges Scheunentor, geschlossen"
+    },
+    "futtertrog": {
+      "ax": 0.5,
+      "ay": 0.979,
+      "desc": "leerer Holz-Futtertrog auf Beinen"
+    },
+    "strohballen": {
+      "ax": 0.497,
+      "ay": 0.983,
+      "desc": "Strohballen mit roten Schnüren"
+    }
+  },
+  "audio": {}
+}

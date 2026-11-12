@@ -1,0 +1,197 @@
+{
+  "images": {
+    "hg_schlafzimmer": {
+      "pts": {
+        "boden": [
+          1414,
+          1400
+        ],
+        "bett1": [
+          715,
+          1400
+        ],
+        "bett2": [
+          1180,
+          1400
+        ],
+        "bett3": [
+          1650,
+          1400
+        ],
+        "bett4": [
+          2115,
+          1400
+        ],
+        "fenster": [
+          1410,
+          400
+        ],
+        "fensterbank": [
+          1410,
+          705
+        ],
+        "lampe": [
+          480,
+          0
+        ],
+        "regal": [
+          2470,
+          750
+        ],
+        "regal_oben": [
+          2470,
+          515
+        ]
+      },
+      "desc": "Kinderzimmer am Abend: Holzboden mit rundem Teppich, großes Rundbogenfenster mit Abendhimmel (ohne Mond), Bücherregal rechts, Wand links oben frei für Lampe; ohne Betten"
+    },
+    "hg_ruhe": {
+      "pts": {
+        "mond": [
+          1414,
+          380
+        ],
+        "boden": [
+          1414,
+          1360
+        ],
+        "haus_fenster": [
+          1840,
+          1240
+        ]
+      },
+      "desc": "Ruhiger Nachthimmel mit vielen Sternen, sanfte Hügel, kleines Haus mit warmem Fenster rechts; Himmelsmitte frei für den Mond"
+    },
+    "bett": {
+      "ax": 0.426,
+      "ay": 0.98,
+      "desc": "Kleines Holzbett von der Seite (leicht schräg), Kissen links, ohne Decke",
+      "pts": {
+        "kissen": [
+          215,
+          180
+        ],
+        "mitte": [
+          390,
+          255
+        ]
+      }
+    },
+    "lampe_haenge": {
+      "ax": 0.5,
+      "ay": 0.0,
+      "desc": "Hängelampe mit gelbem Stoffschirm, aus; Anker oben am Deckenteller",
+      "pts": {
+        "birne": [
+          140,
+          385
+        ]
+      }
+    },
+    "lichtschein_warm": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Großer weicher warmgelber Lichtschein, läuft durchsichtig aus (zum Überblenden mit alpha, z. B. unter Lampe oder Nachtlicht)"
+    },
+    "nachtlicht": {
+      "ax": 0.497,
+      "ay": 0.984,
+      "desc": "Nachtlicht als schlafender Stern auf Holzsockel, leuchtet sanft"
+    },
+    "spieluhr": {
+      "ax": 0.41,
+      "ay": 0.985,
+      "desc": "Spieluhr: blaue Dose mit Kurbel rechts und kleinem Pferdchen-Karussell oben",
+      "pts": {
+        "kurbel": [
+          335,
+          290
+        ],
+        "karussell": [
+          150,
+          160
+        ]
+      }
+    },
+    "mobile_sterne": {
+      "ax": 0.5,
+      "ay": 0.0,
+      "desc": "Mobile mit lächelndem Mond und vier Sternen am Holzring; Anker oben an der Schnur"
+    },
+    "decke_rot": {
+      "ax": 0.5,
+      "ay": 0.977,
+      "desc": "Rote Steppdecke, gewölbt wie über einem schlafenden Tier; Punkt mitte gehört auf bett.mitte (Breite etwa 0.85 × Bettbreite)",
+      "pts": {
+        "mitte": [
+          300,
+          160
+        ]
+      }
+    },
+    "decke_blau": {
+      "ax": 0.5,
+      "ay": 0.977,
+      "desc": "Steppdecke blau, wie decke_rot (gleiche Form); Punkt mitte gehört auf bett.mitte",
+      "pts": {
+        "mitte": [
+          300,
+          163
+        ]
+      }
+    },
+    "decke_gelb": {
+      "ax": 0.5,
+      "ay": 0.977,
+      "desc": "Steppdecke gelb, wie decke_rot (gleiche Form); Punkt mitte gehört auf bett.mitte",
+      "pts": {
+        "mitte": [
+          300,
+          161
+        ]
+      }
+    },
+    "decke_gruen": {
+      "ax": 0.5,
+      "ay": 0.977,
+      "desc": "Steppdecke grün, wie decke_rot (gleiche Form); Punkt mitte gehört auf bett.mitte",
+      "pts": {
+        "mitte": [
+          300,
+          164
+        ]
+      }
+    },
+    "buch_gutenacht": {
+      "ax": 0.434,
+      "ay": 0.985,
+      "desc": "Gute-Nacht-Bilderbuch, blauer Einband mit lächelndem Mond und Sternen, ohne Schrift"
+    },
+    "schlafmond": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Großer freundlicher schlafender Mond mit blauer Zipfelmütze"
+    },
+    "kuscheltier_hase": {
+      "ax": 0.501,
+      "ay": 0.985,
+      "desc": "Kuscheltier-Hase aus Filz, sitzt, cremeweiß mit blauer Schleife"
+    },
+    "zug_schlaeft_decke": {
+      "ax": 0.516,
+      "ay": 0.979,
+      "desc": "Bunte Patchwork-Decke über einer versteckten Lok (Führerhaus-Buckel links, Schornstein-Beule rechts); deckt lok_dampf ab, wenn etwa 1.1× so breit wie die Lok"
+    },
+    "zahnbuerste_becher": {
+      "ax": 0.383,
+      "ay": 0.985,
+      "desc": "Grüner Zahnputzbecher mit Blume und oranger Kinderzahnbürste"
+    },
+    "vorhang_l": {
+      "ax": 0.5,
+      "ay": 0.0,
+      "desc": "Vorhanghälfte, dunkelblau mit kleinen gelben Sternen, an Holzringen; Anker oben Mitte (gespiegelt = rechte Hälfte)"
+    }
+  },
+  "audio": {}
+}

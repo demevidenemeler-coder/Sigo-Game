@@ -69,3 +69,17 @@ python tools/sw_liste.py --pruefen  # nur prüfen: Exit-Code 1, wenn sw-dateien.
 Schreibt die Liste aller Spieldateien, je Datei eine kurze Prüfsumme und den Versions-Stempel. Ohne neuen Stempel
 bekommt ein installiertes Tablet keine Änderungen; mit Prüfsummen holt es beim Update nur geänderte Dateien.
 Vor jedem Veröffentlichen laufen lassen (oder mit `--pruefen` kontrollieren).
+
+## Test mit einem älteren Chrome (wie auf dem Tablet)
+
+Der Chrome auf dem Rechner ist neuer als der Browser auf dem Tablet. Vor dem Veröffentlichen einmal mit einer älteren
+Fassung prüfen, ob das Spiel startet:
+
+```
+npx @puppeteer/browsers install chrome@114 --path <ordner>
+CHROME=<ordner>/chrome/win64-114…/chrome-win64/chrome.exe node tools/alt_chrome.mjs <projektordner> "index.html?szene=karte&test=1" 9
+```
+
+Ausgabe: `{stand: {laden, bereit, szene, sigoFehler, meldung}, fehler: […]}`. `laden: true` heißt: Das Spiel hängt bei
+den drei Punkten. So fiel am 12.11.2026 auf, dass die Import-Karte in index.html vor `modulepreload` stehen muss.
+

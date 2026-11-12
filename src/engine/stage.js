@@ -83,6 +83,7 @@ export async function initStage(parent = document.body) {
     gcMaxUnusedTime: 10 * 60000,
   });
   stage.app = app;
+  sichertZeichnen(app);
   parent.appendChild(app.canvas);
   app.canvas.addEventListener('contextmenu', (e) => e.preventDefault());
 
@@ -131,6 +132,49 @@ export async function initStage(parent = document.body) {
   stage.pauseWatch(3);
   app.ticker.add(waechter);
   return stage;
+}
+
+// ---------------------------------------------------------------- Sicherheitsnetz beim Zeichnen
+
+// Wirft das Zeichnen (z. B. ein Sprite, dessen Textur schon zerstört ist), bleibt Pixis Ticker für immer stehen:
+// kein Bild, keine Tweens – die Blende bliebe zu und das Spiel stünde still hinter der Wolkendecke. Darum zeichnet
+// der Kern selbst: Wirft es, bekommen alle Dinge mit kaputter Textur eine leere (sie werden unsichtbar), der Fehler
+// wird gemeldet (Ereignis 'zeichenfehler', einmal je Fehlerart) und es geht im nächsten Bild weiter.
+function sichertZeichnen(app) {
+  const ticker = app.ticker;
+  ticker.remove(app.render, app);
+  const gemeldet = new Set();
+  ticker.add(() => {
+    try {
+      app.render();
+    } catch (e) {
+      // Hilft das Heilen nicht (anderer Fehler), fehlt eben dieses Bild – der Ticker läuft weiter (Tweens, Blende,
+      // Eingabe), die Blende geht also trotzdem auf.
+      const geheilt = heileTexturen(app.stage);
+      const art = String(e?.message || e);
+      if (!gemeldet.has(art)) {
+        gemeldet.add(art);
+        stage.emit('zeichenfehler', e, geheilt);
+      }
+    }
+  }, null, -25);   // UPDATE_PRIORITY.LOW – wie Pixis eigenes Zeichnen: nach allen Tweens dieses Bildes
+}
+
+// Dinge mit zerstörter Textur (oder ohne Quelle) bekommen Texture.EMPTY. → Anzahl
+function heileTexturen(wurzel) {
+  let n = 0;
+  const gehe = (o) => {
+    if (!o || o.destroyed) return;
+    if (o.texture instanceof Texture) {   // Sprite, TilingSprite, Mesh … (nicht Graphics)
+      const t = o.texture;
+      if (t !== Texture.EMPTY && (t.destroyed || !t.source || t.source.destroyed)) {
+        try { o.texture = Texture.EMPTY; n++; } catch { /* egal */ }
+      }
+    }
+    for (const k of o.children || []) gehe(k);
+  };
+  gehe(wurzel);
+  return n;
 }
 
 // ---------------------------------------------------------------- Maße

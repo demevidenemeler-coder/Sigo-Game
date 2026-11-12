@@ -120,6 +120,7 @@ function wunschSeite(params) {
 export default class Album extends Scene {
   static id = 'album';
   static packs = ['rahmen', 'tiere', 'zug'];
+  static tiere = ['affe_happy', 'baer_happy', 'eichhoernchen_happy', 'elefant_happy', 'ente_happy', 'eule_happy', 'frosch_happy', 'fuchs_happy', 'giraffe_happy', 'hahn_happy', 'hase_happy', 'huhn_happy', 'hund_happy', 'igel_happy', 'katze_happy', 'kuh_happy', 'loewe_happy', 'maus_happy', 'pferd_happy', 'pinguin_happy', 'schaf_happy', 'schwein_happy'];
   static music = 'musik/karte';
 
   async enter(params) {

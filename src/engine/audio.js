@@ -34,6 +34,7 @@ const SFX_ZU_SPAET = 0.4;      // ein Geräusch, das so lange laden musste, wird
 const MUSIK_BLENDE = 1.5;      // Überblenden beim Musikwechsel (s)
 const MUSIK_RUNDEN_BLENDE = 2; // Überblenden am Schleifenende, wenn das Stück aus- oder einblendet (s)
 const MUSIK_IM_SPEICHER = 2;   // so viele entpackte Musikstücke bleiben im Speicher
+const MUSIK_VORAB_NACH = 2.5;  // s: vor der ersten Berührung wird die Musik erst so spät vorab geholt
 const STIMME_PAUSE = 1.2;      // Mindestpause zwischen zwei Sätzen (s)
 const WARTEN_MAX = 6;          // ein Satz, der in diese Pause fällt, wartet höchstens so lange (s)
 const WIEDERHOLEN_NACH = 25;   // so lange nichts getan nach einem Hinweis: er kommt einmal wieder (s)
@@ -616,7 +617,9 @@ export function music(id, { vol = 1 } = {}) {
     warneEinmal(id, 'unbekannte Musik');
   }
   if (!ctx) {
-    if (url) holeRohdaten(url);
+    // Vor der ersten Berührung klingt noch nichts: die Musik erst nach den Bildern holen (beim ersten Besuch
+    // nimmt sie dem Startbild sonst die Leitung weg). Kommt die Berührung früher, lädt sie dann sofort.
+    if (url) setTimeout(() => { if (!ctx && musikWunsch.id === id) holeRohdaten(url); }, MUSIK_VORAB_NACH * 1000);
     return;
   }
   if (laufend && laufend.id === id) {

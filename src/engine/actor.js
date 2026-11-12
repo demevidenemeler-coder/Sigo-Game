@@ -19,7 +19,7 @@
 
 import { Container, Rectangle, Sprite, Texture } from 'pixi';
 import { stage } from './stage.js';
-import { tex, hasTex, meta } from './assets.js';
+import { tex, hasTex, meta, bildBekannt } from './assets.js';
 import { tween, killTweensOf, ease, after, scaleFeedback } from './tween.js';
 import { tap } from './input.js';
 import { animal } from './audio.js';
@@ -167,9 +167,15 @@ export class Actor extends Container {
     return `${this.pack}/${this.tierId}_${pose}`;
   }
 
-  /** Gibt es diese Pose als Bild? */
+  /**
+   * Gibt es diese Pose als (geladenes) Bild? Steht sie in pack.json, ist aber noch nicht geladen (Tier fehlt in
+   * `static tiere`), wird sie jetzt nachgeladen – bis dahin bleibt die jetzige Pose (kein durchsichtiges Bild).
+   */
   hasPose(pose) {
-    return hasTex(this._texId(pose));
+    const id = this._texId(pose);
+    if (hasTex(id)) return true;
+    if (bildBekannt(id)) tex(id);
+    return false;
   }
 
   _setzeTextur(pose) {
@@ -178,7 +184,7 @@ export class Actor extends Container {
     const t = tex(id);
     const m = meta(id);
     this.sprite.texture = t;
-    this.sprite.anchor.set(m.ax ?? 0.5, hasTex(id) ? m.ay ?? 0.97 : 0.97);
+    this.sprite.anchor.set(m.ax ?? 0.5, hasTex(id) || bildBekannt(id) ? m.ay ?? 0.97 : 0.97);
     // Schatten passend zur Breite der Figur
     const breite = t.width * 0.62;
     this._schattenBasis = { x: breite / 128, y: (breite * 0.2) / 128 };
@@ -508,9 +514,10 @@ export class Actor extends Container {
     const id = this._aktuelleTex;
     const t = this.sprite.texture;
     const m = meta(id);
-    const w = hasTex(id) ? m.w ?? t.width : t.width;
-    const h = hasTex(id) ? m.h ?? t.height : t.height;
-    const pts = hasTex(id) ? m.pts || {} : {};
+    const echt = hasTex(id) || bildBekannt(id);
+    const w = echt ? m.w ?? t.width : t.width;
+    const h = echt ? m.h ?? t.height : t.height;
+    const pts = echt ? m.pts || {} : {};
     let p = pts[name];
     if (!p && name === 'mund') p = pts.mouth;
     if (!p && name === 'mouth') p = pts.mund;

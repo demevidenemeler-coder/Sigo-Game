@@ -164,6 +164,7 @@ function szeneLaedt(id) {
 export default class Karte extends Scene {
   static id = 'karte';
   static packs = ['rahmen', 'zug', 'tiere'];
+  static tiere = ['kuh', 'schaf', 'hase'];
   static music = 'musik/karte';
 
   async enter() {

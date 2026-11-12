@@ -73,6 +73,7 @@ const FENSTER_STERNE = [
 export default class Schlafen extends Scene {
   static id = 'schlafen';
   static packs = ['schlafen', 'tiere', 'zug'];
+  static tiere = ['hase', 'katze', 'hund', 'baer', 'schaf', 'pinguin', 'schwein', 'pferd', 'kuh', 'elefant', 'eule'];
   static music = 'musik/nacht';
 
   async enter(params = {}) {

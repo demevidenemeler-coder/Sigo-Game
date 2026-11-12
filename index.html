@@ -13,10 +13,12 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icons/icon-192.png">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
-  <link rel="modulepreload" href="vendor/pixi.min.mjs">
+  <!-- Die Import-Karte muss VOR allem stehen, was Module lädt (auch vor modulepreload): Ältere Browser
+       (Chromium vor 133, z. B. der Huawei-Browser) verwerfen sie sonst, und das Spiel startet nicht. -->
   <script type="importmap">
     { "imports": { "pixi": "./vendor/pixi.min.mjs" } }
   </script>
+  <link rel="modulepreload" href="vendor/pixi.min.mjs">
   <style>
     html, body {
       margin: 0;
@@ -57,6 +59,23 @@
       pointer-events: none;
     }
     #laden.weg { opacity: 0; }
+    /* Meldung für Eltern, falls das Spiel nicht startet (erscheint erst nach langem Warten oder bei einem Fehler) */
+    #ladefehler {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 12vh;
+      z-index: 11;
+      padding: 0 8vw;
+      text-align: center;
+      font: 16px/1.5 system-ui, sans-serif;
+      color: #7a6a52;
+      opacity: 0;
+      transition: opacity 1s ease;
+      pointer-events: none;
+      white-space: pre-line;
+    }
+    #ladefehler.da { opacity: 1; }
     #laden span {
       width: 3vmin;
       height: 3vmin;
@@ -78,7 +97,37 @@
 </head>
 <body>
   <div id="laden" aria-hidden="true"><span></span><span></span><span></span></div>
+  <div id="ladefehler"></div>
   <script>
+    // Startet das Spiel nicht, sehen die Eltern nach einer Weile, woran es liegt (statt endlos drei Punkte).
+    (function () {
+      var fehler = [];
+      var feld = document.getElementById('ladefehler');
+      function laedtNoch() { return !!document.getElementById('laden'); }
+      function zeige(text) {
+        if (!laedtNoch() || !feld) return;
+        feld.textContent = text + (fehler.length ? ' – ' + fehler.slice(0, 3).join(' – ') : '');
+        feld.classList.add('da');
+      }
+      function merke(text) {
+        if (!laedtNoch() || fehler.length >= 3) return;
+        fehler.push(String(text).slice(0, 200));
+        zeige('Das Spiel konnte nicht starten.');
+      }
+      window.addEventListener('error', function (e) {
+        var ziel = e.target;
+        if (ziel && ziel !== window && (ziel.src || ziel.href)) merke('Datei fehlt: ' + (ziel.src || ziel.href));
+        else merke((e.message || 'Fehler') + (e.filename ? ' (' + e.filename.split('/').pop() + ':' + e.lineno + ')' : ''));
+      }, true);
+      window.addEventListener('unhandledrejection', function (e) {
+        merke(e.reason && e.reason.message ? e.reason.message : e.reason);
+      });
+      setTimeout(function () { zeige('Das Laden dauert lange. Bitte das WLAN prüfen und das Spiel neu öffnen.'); }, 25000);
+      // Ist das Spiel gestartet (Lade-Punkte weg), verschwindet auch die Meldung
+      var schau = setInterval(function () {
+        if (!laedtNoch()) { clearInterval(schau); if (feld) feld.remove(); }
+      }, 1000);
+    })();
     // kein Kontextmenü, kein Zoomen per Geste, kein Markieren
     document.addEventListener('contextmenu', (e) => e.preventDefault());
     document.addEventListener('gesturestart', (e) => e.preventDefault());

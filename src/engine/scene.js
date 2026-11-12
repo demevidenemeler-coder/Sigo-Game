@@ -10,17 +10,31 @@ import {
   tween, deadTween, after, every, wait, killOwner, updateTweens, setDefaultOwner, ease,
 } from './tween.js';
 import { tap, setInputLocked, setInputOwner, offInputs, onInput, updateInput, anyPointerDown } from './input.js';
-import { loadPack, unloadPack, loadedPacks, hasTex, tex } from './assets.js';
+import {
+  hasTex, tex, bedarfFuer, ladeBedarf, raeumeAuf, setzeWechsel, paketMpx, loadedPacks, beginneProbe, endeProbe,
+} from './assets.js';
 import { clamp } from './util.js';
 import { recordError, isTest } from './test.js';
 
 const KERN = Symbol('kern');                       // Besitzer für Tweens des Kerns (Blende)
-const BLEIBEN = new Set(['common', 'tiere', 'zug']); // diese Pakete bleiben immer geladen
-// Ruhe-Regel: Die Helligkeit des ganzen Bildes ändert sich gleichmäßig über die ganze Blende (10–90 % in ≈ 0,8 s),
-// nicht in einem kurzen Fenster in der Mitte.
-const BLENDE_ZU = 1.0;                               // Sekunden
-const BLENDE_AUF = 1.0;
+// Diese Pakete bleiben immer geladen ('tiere': das Paket bleibt, seine Bilder werden je Szene verwaltet –
+// static tiere). 'rahmen' (Karte, Start, Album) bleibt, damit der Weg zurück zur Karte nur die Blende kostet.
+const BLEIBEN = new Set(['common', 'tiere', 'zug', 'rahmen']);
+// Zuletzt benutzte Orts-Pakete bleiben im Speicher (schneller zweiter Besuch, Album und zurück), solange die
+// gebrauchten und die behaltenen Orts-Pakete zusammen höchstens VORRAT_MPX Millionen Bildpunkte haben.
+const VORRAT_ANZAHL = 2;
+const VORRAT_MPX = 45;
+const TIER_VORRAT = 30;                              // so viele nicht gebrauchte Tierbilder bleiben (zuletzt benutzt)
+// Ruhe-Regel: Helligkeitswechsel ≥ 0,5 s. Die Helligkeit des ganzen Bildes ändert sich gleichmäßig über die ganze
+// Blende (weiche Kurve, kein kurzes Fenster in der Mitte). Gemessen wie früher von 10 % bis 90 % Deckkraft: bei
+// 0,7 s sind das ≈ 0,52 s (die weichen Enden kosten je ≈ 0,09 s). Geladen wird schon ab dem Tipp.
+const BLENDE_ZU = 0.7;                               // Sekunden
+const BLENDE_AUF = 0.7;
+const HOCHLADEN_JE_BILD = 6e6;                       // Bildpunkte, die hinter der Blende je Bild hochgeladen werden
+const HOCHLADEN_HOECHSTENS = 0.8;                    // s: länger wartet die Blende nicht aufs Hochladen
+const VORAUS_NACH = 1.2;                             // s nach dem Öffnen der Blende beginnt das Vorausladen
 const NIE = new Promise(() => {});                  // Promise, das nie auslöst
+const naechsteAufgabe = () => new Promise((weiter) => setTimeout(weiter, 0));
 
 // ---------------------------------------------------------------- Scene
 
@@ -259,6 +273,12 @@ class Verwalter {
     this._schliesst = false;       // die Blende schließt gerade (die laufende Szene wird gleich verlassen)
     this._erstes = true;
     this._vorige = null;           // id der zuletzt erfolgreich gestarteten Szene (für den Rückfall)
+    this._wechselHoerer = new Set();
+    this._benutzt = new Map();     // Paket → Zeit, zu der eine Szene es zuletzt benutzt hat (für den Vorrat)
+    this._danach = {};           // Szene → wahrscheinlich nächste Szenen (Vorausladen), '*' = von überall
+    this._vorausUhr = 0;
+    this._ersteBilder = null;      // schneller erster Start: { id, liste: Set, merke(ids) } (siehe ersteBilder())
+    this.phase = null;             // nur zum Messen: 'schliessen' | 'laden' | 'aufbau' | 'hochladen' | 'oeffnen'
     this.ready = new Promise((res) => { this._ready = res; });
   }
 
@@ -299,6 +319,7 @@ class Verwalter {
       }
     });
     onInput(() => this._idleZurueck());
+    stage.on('zeichenfehler', (e, ersetzt) => recordError(`Fehler beim Zeichnen (${ersetzt} kaputte Texturen durch leere ersetzt)`, e));
     stage.app.ticker.add((ticker) => this._tick(ticker));
   }
 
@@ -333,10 +354,65 @@ class Verwalter {
     return () => this._leave.delete(cb);
   }
 
+  /** cb(true) wenn ein Szenenwechsel beginnt, cb(false) wenn die Blende wieder offen ist. → Abmelde-Funktion */
+  onWechsel(cb) {
+    this._wechselHoerer.add(cb);
+    return () => this._wechselHoerer.delete(cb);
+  }
+
+  _meldeWechsel(an) {
+    for (const cb of this._wechselHoerer) {
+      try { cb(an); } catch (e) { console.error('[sigo] onWechsel:', e); }
+    }
+  }
+
+  /**
+   * Wahrscheinlich nächste Szenen: danach({ start: ['karte'], bahnhof: ['fahrt'], '*': ['karte'] }).
+   * Ist eine Szene zu sehen, lädt der Kern deren Bilder still im Hintergrund vor (in kleinen Häppchen).
+   */
+  danach(tabelle) {
+    Object.assign(this._danach, tabelle);
+  }
+
+  /**
+   * Schneller erster Start: Für die allererste Szene (id) wartet der Kern nur auf die Bilder in `liste`
+   * ('pack/name', z. B. was sie beim letzten Mal angefasst hat) – alle anderen Bilder ihrer Pakete laden leise
+   * hinterher. Fasst die Szene beim Aufbau doch ein noch nicht geladenes Bild an (tex/hasTex), baut der Kern sie
+   * unsichtbar hinter der Blende mit allen Bildern noch einmal auf (nie ein falsches Bild). merke(ids) bekommt
+   * danach, was die Szene wirklich angefasst hat (zum Speichern für den nächsten Start).
+   */
+  ersteBilder(id, liste, merke = null) {
+    this._ersteBilder = { id, liste: new Set(Array.isArray(liste) ? liste : []), merke };
+  }
+
+  // Liste für den schnellen ersten Start – nur beim allerersten Wechsel und nur für die eingestellte Szene
+  _zuerstFuer(id) {
+    const e = this._ersteBilder;
+    return this._erstes && e?.id === id && e.liste.size ? e.liste : null;
+  }
+
+  /**
+   * Eine Szene still vorausladen (Code und Bilder, in kleinen Häppchen, nur wenn die Bildrate stimmt).
+   * {nurCode: true} lädt nur ihr Modul, {sofort: true} lädt nicht leise, sondern gleich mit voller Kraft (beim
+   * Start, solange die Grafik noch hochfährt). Ein späterer Wechsel dorthin kostet dann nur die Blende. → Promise
+   */
+  async vorausladen(id, { nurCode = false, sofort = false } = {}) {
+    const laden = this.registry.get(id);
+    if (!laden) return false;
+    try {
+      const Klasse = (await laden()).default;
+      if (nurCode || typeof Klasse !== 'function' || !(Klasse.prototype instanceof Scene)) return true;
+      await ladeBedarf(bedarfFuer(Klasse), { leise: !sofort, zuerst: sofort ? this._zuerstFuer(id) : null });
+      return true;
+    } catch {
+      return false;   // beim echten Wechsel kommt die Fehlermeldung
+    }
+  }
+
   /** Szenenwechsel mit weicher Blende. Während eines Wechsels werden weitere Wünsche ignoriert. */
   go(id, params = {}) {
     if (this._wechsel) return this._wechsel;
-    this._wechsel = this._wechsle(id, params).finally(() => { this._wechsel = null; });
+    this._wechsel = this._wechsle(id, params).finally(() => { this._wechsel = null; this.phase = null; });
     return this._wechsel;
   }
 
@@ -344,7 +420,14 @@ class Verwalter {
     stage.pauseWatch(5);
     setInputLocked(true);
     this.blende.sperre(true);
+    clearTimeout(this._vorausUhr);
+    setzeWechsel(true);
+    this._meldeWechsel(true);
     const alt = this.current;
+    // Laden beginnt sofort beim Tipp – die Blende schließt derweil (freigegeben wird erst, wenn die alte Szene weg
+    // ist). Ist alles schon da (Vorrat, Vorausladen), kostet der Wechsel nur die Blende.
+    this.phase = 'schliessen';
+    const vorbereitet = this._bereite(id);
     if (alt) {
       this._schliesst = true;
       for (const cb of this._leave) {
@@ -362,21 +445,107 @@ class Verwalter {
     const versuche = [id, ...this._rueckfaelle(id)];
     let geschafft = false;
     for (let i = 0; i < versuche.length && !geschafft; i++) {
-      geschafft = await this._starte(versuche[i], i === 0 ? params : {});
+      geschafft = await this._starte(versuche[i], i === 0 ? params : {}, i === 0 ? vorbereitet : null);
     }
     if (!geschafft) recordError('Keine Szene ließ sich starten.');
+
+    // Bilder der neuen Szene schon hinter der geschlossenen Blende in die Grafikkarte (sonst ruckt das Öffnen)
+    this.phase = 'hochladen';
+    if (this.current) await this._ladeHoch(this.current);
 
     this.blende.zeigePunkte(false);
     if (this.current) this.current._shown = true;
     stage.pauseWatch(2);
+    this.phase = 'oeffnen';
+    setzeWechsel(false, this.current?.id);
     await this.blende.oeffnen();
     this.blende.sperre(false);
     setInputLocked(false);
+    this.phase = null;
+    this._meldeWechsel(false);
     if (this._erstes) {
       this._erstes = false;
       this._ready(true); // ohne Bezug auf die Szene (sonst bliebe sie für immer im Speicher)
     }
+    this._planeVoraus();
     return this.current;
+  }
+
+  // Szenen-Modul holen und Laden ihrer Bilder anstoßen (ohne etwas freizugeben).
+  // → { Klasse, bedarf, laeuft } | { fehler, e }
+  async _bereite(id) {
+    const laden = this.registry.get(id);
+    if (!laden) return { fehler: `Szene '${id}' ist nicht angemeldet.` };
+    let Klasse;
+    try {
+      const modul = await laden();
+      Klasse = modul.default;
+      if (typeof Klasse !== 'function' || !(Klasse.prototype instanceof Scene)) {
+        throw new Error('default-Export ist keine Scene-Klasse');
+      }
+    } catch (e) {
+      return { fehler: `Szene '${id}' lässt sich nicht laden`, e };
+    }
+    const bedarf = bedarfFuer(Klasse);
+    const zuerst = this._zuerstFuer(id);
+    return { Klasse, bedarf, zuerst, laeuft: ladeBedarf(bedarf, { zuerst }) };
+  }
+
+  // Welche nicht gebrauchten Pakete bleiben im Speicher? Die zuletzt benutzten, solange es in den Vorrat passt.
+  _vorrat(bedarf) {
+    let mpx = [...bedarf.packs].filter((p) => !BLEIBEN.has(p)).reduce((s, p) => s + paketMpx(p), 0);
+    const kandidaten = loadedPacks().filter((p) => !bedarf.packs.has(p) && !BLEIBEN.has(p))
+      .sort((a, b) => (this._benutzt.get(b) ?? -1) - (this._benutzt.get(a) ?? -1));
+    const behalten = new Set();
+    for (const p of kandidaten) {
+      const m = paketMpx(p);
+      if (behalten.size >= VORRAT_ANZAHL || mpx + m > VORRAT_MPX) continue;
+      behalten.add(p);
+      mpx += m;
+    }
+    return behalten;
+  }
+
+  // Nach dem Öffnen: still vorausladen, was wahrscheinlich als Nächstes kommt
+  _planeVoraus() {
+    const s = this.current;
+    if (!s) return;
+    const ziele = [...(this._danach[s.id] || []), ...(this._danach['*'] || [])]
+      .filter((z) => z !== s.id && this.has(z));
+    if (!ziele.length) return;
+    this._vorausUhr = setTimeout(async () => {
+      for (const z of [...new Set(ziele)]) {
+        if (this.current !== s || this._wechsel) return;
+        await this.vorausladen(z);
+      }
+    }, VORAUS_NACH * 1000);
+  }
+
+  // Bilder der sichtbaren Ebenen hochladen, verteilt auf wenige Bilder (die Blende ist noch zu)
+  async _ladeHoch(s) {
+    const r = stage.app?.renderer;
+    if (!r?.texture?.initSource) return;
+    const quellen = new Set();
+    const sammle = (o) => {
+      if (!o || o.destroyed || o.visible === false) return;
+      const q = o.texture?.source;
+      if (q && !q.destroyed && q.uploadMethodId === 'image' && q.resource && !q._gpuData?.[r.uid]) quellen.add(q);
+      for (const k of o.children || []) sammle(k);
+    };
+    for (const e of [s.bg, s.world, s.front, s.hud]) sammle(e);
+    const ende = performance.now() + HOCHLADEN_HOECHSTENS * 1000;
+    let budget = 0;
+    for (const q of quellen) {
+      if (!s._alive || performance.now() > ende) return;
+      if (q.destroyed || q._gpuData?.[r.uid]) continue;
+      if (budget > HOCHLADEN_JE_BILD) {
+        budget = 0;
+        await new Promise((weiter) => requestAnimationFrame(() => weiter()));
+        if (!s._alive || q.destroyed) continue;
+      }
+      try { r.texture.initSource(q); } catch { /* lädt dann eben beim Zeichnen */ }
+      budget += (q.pixelWidth || 0) * (q.pixelHeight || 0);
+    }
   }
 
   // Wohin, wenn eine Szene fehlt oder scheitert: Karte, dann die vorige Szene, dann jede andere angemeldete.
@@ -387,31 +556,34 @@ class Verwalter {
     return [...new Set(liste)];
   }
 
-  async _starte(id, params) {
-    const laden = this.registry.get(id);
-    if (!laden) {
-      recordError(`Szene '${id}' ist nicht angemeldet.`);
+  async _starte(id, params, vorbereitet = null) {
+    this.phase = 'laden';
+    const v = await (vorbereitet || this._bereite(id));
+    if (v.fehler) {
+      recordError(v.fehler, v.e);
       return false;
     }
-    let Klasse;
-    try {
-      const modul = await laden();
-      Klasse = modul.default;
-      if (typeof Klasse !== 'function' || !(Klasse.prototype instanceof Scene)) {
-        throw new Error('default-Export ist keine Scene-Klasse');
-      }
-    } catch (e) {
-      recordError(`Szene '${id}' lässt sich nicht laden`, e);
-      return false;
-    }
+    const { Klasse, bedarf } = v;
 
-    // Pakete: alte freigeben, die die neue nicht braucht; neue laden
-    const noetig = new Set(['common', ...(Klasse.packs || [])]);
-    await Promise.all(loadedPacks().filter((p) => !noetig.has(p) && !BLEIBEN.has(p)).map((p) => unloadPack(p)));
+    // Pakete: alte freigeben, die die neue Szene nicht braucht (außer dem Vorrat); die neuen laden schon
+    raeumeAuf(bedarf, { bleiben: BLEIBEN, behalten: this._vorrat(bedarf), tierVorrat: TIER_VORRAT });
     const punkte = after(0.8, () => this.blende.zeigePunkte(true), { owner: KERN });
-    await Promise.all([...noetig].map((p) => loadPack(p)));
+    await v.laeuft;
+    // falls beim Aufräumen etwas Gebrauchtes erwischt wurde (kostet sonst nichts)
+    await ladeBedarf(bedarf, { zuerst: v.zuerst });
+    // Erst eine eigene Aufgabe abwarten: Was die alte Szene in exit() für „gleich danach" angesetzt hat
+    // (setTimeout 0, z. B. das Album gibt seine eigenen Bilder frei), ist dann erledigt. Sonst holt eine sofort
+    // folgende Szene (Album → Album) ein Bild aus dem Speicher, das die alte im selben Augenblick zerstört.
+    await naechsteAufgabe();
     punkte.kill();
+    const jetzt = performance.now();
+    for (const p of bedarf.packs) this._benutzt.set(p, jetzt);
+    setzeWechsel(true, id);
+    this.phase = 'aufbau';
 
+    // Schneller erster Start: beim Aufbau mitschreiben, welche Bilder die Szene anfasst
+    const mitProbe = this._erstes && this._ersteBilder?.id === id;
+    if (mitProbe) beginneProbe();
     let s;
     try {
       s = new Klasse();
@@ -434,6 +606,19 @@ class Verwalter {
       const fertig = Promise.resolve(s.enter(params));
       // Ist enter nach 1,2 s noch nicht fertig (z. B. wartet auf eine Einleitung), geht die Blende trotzdem auf.
       const ergebnis = await Promise.race([fertig.then(() => 'fertig'), wait(1.2, { owner: KERN }).then(() => 'zeit')]);
+      if (mitProbe) {
+        const pr = endeProbe();
+        if (v.zuerst && pr.verfehlt.length && this.current === s) {
+          // Die Szene brauchte ein Bild, das noch nicht da war (z. B. ein anderer Zug als beim letzten Mal): mit
+          // allen Bildern neu aufbauen – unsichtbar, die Blende ist noch zu. Kostet nur dieses eine Mal Zeit.
+          console.info(`[sigo] Schneller Start: ${pr.verfehlt.length} Bild(er) fehlten (${pr.verfehlt.slice(0, 3).join(', ')}) – Aufbau mit allen Bildern.`);
+          this._beende();
+          this.phase = 'laden';
+          await ladeBedarf(bedarf);
+          return this._starte(id, params, { Klasse, bedarf, zuerst: null, laeuft: Promise.resolve() });
+        }
+        try { this._ersteBilder?.merke?.(pr.beruehrt); } catch (e) { console.warn('[sigo] ersteBilder:', e); }
+      }
       if (ergebnis === 'zeit') {
         fertig.catch((e) => {
           if (this.current !== s || !s._alive) return;
@@ -445,6 +630,7 @@ class Verwalter {
       this._vorige = id;
       return true;
     } catch (e) {
+      if (mitProbe) endeProbe();
       recordError(`Fehler beim Aufbau der Szene '${id}'`, e);
       if (s && this.current === s) this._beende();
       return false;

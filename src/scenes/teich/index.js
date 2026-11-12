@@ -11,6 +11,7 @@ import { Angeln } from './angeln.js';
 export default class Teich extends SeitenSzene {
   static id = 'teich';
   static packs = ['teich', 'tiere'];
+  static tiere = ['ente', 'frosch', 'katze', 'pinguin'];
   static music = 'musik/wiese';
   static seiten = [AmTeich, Angeln];
 

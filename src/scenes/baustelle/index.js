@@ -13,6 +13,7 @@ import { Strasse } from './strasse.js';
 export default class Baustelle extends SeitenSzene {
   static id = 'baustelle';
   static packs = ['baustelle', 'tiere'];
+  static tiere = ['affe', 'pinguin', 'hund', 'ente', 'schwein', 'hase', 'katze', 'maus', 'schaf', 'igel', 'fuchs'];
   static music = 'musik/bau';
   static seiten = [Grube, Hausbau, Strasse];
 

@@ -13,6 +13,7 @@ import { Obst } from './obst.js';
 export default class Garten extends SeitenSzene {
   static id = 'garten';
   static packs = ['garten', 'tiere'];
+  static tiere = ['hase', 'igel', 'maus'];
   static music = 'musik/wiese';
   static seiten = [Beet, Wiese, Obst];
 

@@ -9,7 +9,11 @@
           515,
           395
         ]
-      }
+      },
+      "einheiten": [
+        715,
+        900
+      ]
     },
     "elefant_idle": {
       "ax": 0.523,
@@ -20,7 +24,11 @@
           530,
           418
         ]
-      }
+      },
+      "einheiten": [
+        887,
+        900
+      ]
     },
     "giraffe_idle": {
       "ax": 0.433,
@@ -31,7 +39,11 @@
           385,
           378
         ]
-      }
+      },
+      "einheiten": [
+        542,
+        900
+      ]
     },
     "affe_idle": {
       "ax": 0.583,
@@ -42,7 +54,11 @@
           505,
           405
         ]
-      }
+      },
+      "einheiten": [
+        769,
+        900
+      ]
     },
     "pinguin_idle": {
       "ax": 0.514,
@@ -53,7 +69,11 @@
           420,
           325
         ]
-      }
+      },
+      "einheiten": [
+        683,
+        900
+      ]
     },
     "baer_idle": {
       "ax": 0.533,
@@ -64,7 +84,11 @@
           390,
           400
         ]
-      }
+      },
+      "einheiten": [
+        625,
+        900
+      ]
     },
     "kuh_idle": {
       "ax": 0.448,
@@ -75,7 +99,11 @@
           705,
           445
         ]
-      }
+      },
+      "einheiten": [
+        900,
+        891
+      ]
     },
     "fuchs_idle": {
       "ax": 0.534,
@@ -86,7 +114,11 @@
           595,
           430
         ]
-      }
+      },
+      "einheiten": [
+        761,
+        900
+      ]
     },
     "eule_idle": {
       "ax": 0.512,
@@ -97,7 +129,11 @@
           405,
           375
         ]
-      }
+      },
+      "einheiten": [
+        616,
+        900
+      ]
     },
     "igel_idle": {
       "ax": 0.558,
@@ -108,7 +144,11 @@
           550,
           470
         ]
-      }
+      },
+      "einheiten": [
+        727,
+        900
+      ]
     },
     "eichhoernchen_idle": {
       "ax": 0.601,
@@ -119,7 +159,11 @@
           620,
           405
         ]
-      }
+      },
+      "einheiten": [
+        800,
+        900
+      ]
     },
     "maus_idle": {
       "ax": 0.568,
@@ -130,12 +174,20 @@
           545,
           455
         ]
-      }
+      },
+      "einheiten": [
+        716,
+        900
+      ]
     },
     "loewe_happy": {
       "ax": 0.476,
       "ay": 0.983,
-      "desc": "Löwe freut sich riesig, Pfoten hoch, lacht"
+      "desc": "Löwe freut sich riesig, Pfoten hoch, lacht",
+      "einheiten": [
+        758,
+        900
+      ]
     },
     "loewe_eat": {
       "ax": 0.502,
@@ -146,22 +198,38 @@
           545,
           440
         ]
-      }
+      },
+      "einheiten": [
+        730,
+        900
+      ]
     },
     "loewe_sleep": {
       "ax": 0.5,
       "ay": 0.982,
-      "desc": "Löwe schläft eingerollt, lächelt"
+      "desc": "Löwe schläft eingerollt, lächelt",
+      "einheiten": [
+        900,
+        794
+      ]
     },
     "loewe_seite": {
       "ax": 0.49,
       "ay": 0.983,
-      "desc": "Löwe von der Seite, läuft nach rechts"
+      "desc": "Löwe von der Seite, läuft nach rechts",
+      "einheiten": [
+        884,
+        900
+      ]
     },
     "elefant_sleep": {
       "ax": 0.474,
       "ay": 0.982,
-      "desc": "Elefant schläft zusammengekuschelt, lächelt"
+      "desc": "Elefant schläft zusammengekuschelt, lächelt",
+      "einheiten": [
+        900,
+        640
+      ]
     },
     "elefant_eat": {
       "ax": 0.513,
@@ -172,22 +240,38 @@
           525,
           410
         ]
-      }
+      },
+      "einheiten": [
+        877,
+        900
+      ]
     },
     "elefant_happy": {
       "ax": 0.542,
       "ay": 0.983,
-      "desc": "Elefant freut sich riesig, Beine und Rüssel hoch, lacht"
+      "desc": "Elefant freut sich riesig, Beine und Rüssel hoch, lacht",
+      "einheiten": [
+        875,
+        900
+      ]
     },
     "elefant_seite": {
       "ax": 0.414,
       "ay": 0.983,
-      "desc": "Elefant von der Seite, läuft nach rechts"
+      "desc": "Elefant von der Seite, läuft nach rechts",
+      "einheiten": [
+        900,
+        827
+      ]
     },
     "giraffe_happy": {
       "ax": 0.45,
       "ay": 0.985,
-      "desc": "Giraffe freut sich riesig, hüpft, lacht"
+      "desc": "Giraffe freut sich riesig, hüpft, lacht",
+      "einheiten": [
+        564,
+        900
+      ]
     },
     "giraffe_eat": {
       "ax": 0.434,
@@ -198,22 +282,38 @@
           455,
           400
         ]
-      }
+      },
+      "einheiten": [
+        586,
+        900
+      ]
     },
     "giraffe_sleep": {
       "ax": 0.501,
       "ay": 0.983,
-      "desc": "Giraffe liegt und schläft, lächelt"
+      "desc": "Giraffe liegt und schläft, lächelt",
+      "einheiten": [
+        760,
+        900
+      ]
     },
     "giraffe_seite": {
       "ax": 0.44,
       "ay": 0.985,
-      "desc": "Giraffe von der Seite, läuft nach rechts"
+      "desc": "Giraffe von der Seite, läuft nach rechts",
+      "einheiten": [
+        735,
+        900
+      ]
     },
     "kuh_happy": {
       "ax": 0.537,
       "ay": 0.983,
-      "desc": "Kuh freut sich riesig, Arme hoch, lacht mit offenem Mund"
+      "desc": "Kuh freut sich riesig, Arme hoch, lacht mit offenem Mund",
+      "einheiten": [
+        724,
+        900
+      ]
     },
     "kuh_eat": {
       "ax": 0.445,
@@ -224,17 +324,29 @@
           705,
           450
         ]
-      }
+      },
+      "einheiten": [
+        873,
+        900
+      ]
     },
     "kuh_sleep": {
       "ax": 0.497,
       "ay": 0.981,
-      "desc": "Kuh liegt eingekuschelt und schläft, Augen zu"
+      "desc": "Kuh liegt eingekuschelt und schläft, Augen zu",
+      "einheiten": [
+        900,
+        639
+      ]
     },
     "kuh_seite": {
       "ax": 0.461,
       "ay": 0.983,
-      "desc": "Kuh von der Seite, läuft nach rechts"
+      "desc": "Kuh von der Seite, läuft nach rechts",
+      "einheiten": [
+        900,
+        826
+      ]
     },
     "schwein_idle": {
       "ax": 0.428,
@@ -245,12 +357,20 @@
           600,
           435
         ]
-      }
+      },
+      "einheiten": [
+        837,
+        893
+      ]
     },
     "schwein_happy": {
       "ax": 0.464,
       "ay": 0.985,
-      "desc": "Schwein freut sich riesig, Arme hoch, lacht mit offenem Mund"
+      "desc": "Schwein freut sich riesig, Arme hoch, lacht mit offenem Mund",
+      "einheiten": [
+        748,
+        900
+      ]
     },
     "schwein_eat": {
       "ax": 0.447,
@@ -261,17 +381,29 @@
           660,
           470
         ]
-      }
+      },
+      "einheiten": [
+        866,
+        900
+      ]
     },
     "schwein_sleep": {
       "ax": 0.516,
       "ay": 0.981,
-      "desc": "Schwein liegt eingekuschelt und schläft, Augen zu"
+      "desc": "Schwein liegt eingekuschelt und schläft, Augen zu",
+      "einheiten": [
+        900,
+        629
+      ]
     },
     "schwein_seite": {
       "ax": 0.407,
       "ay": 0.983,
-      "desc": "Schwein von der Seite, läuft nach rechts"
+      "desc": "Schwein von der Seite, läuft nach rechts",
+      "einheiten": [
+        900,
+        827
+      ]
     },
     "schaf_idle": {
       "ax": 0.466,
@@ -282,12 +414,20 @@
           490,
           390
         ]
-      }
+      },
+      "einheiten": [
+        766,
+        900
+      ]
     },
     "schaf_happy": {
       "ax": 0.513,
       "ay": 0.985,
-      "desc": "Schaf freut sich riesig, Arme hoch, lacht mit offenem Mund"
+      "desc": "Schaf freut sich riesig, Arme hoch, lacht mit offenem Mund",
+      "einheiten": [
+        730,
+        900
+      ]
     },
     "schaf_eat": {
       "ax": 0.391,
@@ -298,17 +438,29 @@
           590,
           425
         ]
-      }
+      },
+      "einheiten": [
+        838,
+        900
+      ]
     },
     "schaf_sleep": {
       "ax": 0.465,
       "ay": 0.981,
-      "desc": "Schaf liegt eingekuschelt und schläft, Augen zu"
+      "desc": "Schaf liegt eingekuschelt und schläft, Augen zu",
+      "einheiten": [
+        900,
+        628
+      ]
     },
     "schaf_seite": {
       "ax": 0.463,
       "ay": 0.983,
-      "desc": "Schaf von der Seite, läuft nach rechts"
+      "desc": "Schaf von der Seite, läuft nach rechts",
+      "einheiten": [
+        786,
+        900
+      ]
     },
     "pferd_idle": {
       "ax": 0.488,
@@ -319,17 +471,29 @@
           635,
           395
         ]
-      }
+      },
+      "einheiten": [
+        741,
+        900
+      ]
     },
     "affe_happy": {
       "ax": 0.519,
       "ay": 0.982,
-      "desc": "Affe freut sich riesig, Arme hoch, lacht"
+      "desc": "Affe freut sich riesig, Arme hoch, lacht",
+      "einheiten": [
+        807,
+        900
+      ]
     },
     "pferd_happy": {
       "ax": 0.458,
       "ay": 0.985,
-      "desc": "Fohlen freut sich riesig, Arme hoch, lacht mit offenem Mund"
+      "desc": "Fohlen freut sich riesig, Arme hoch, lacht mit offenem Mund",
+      "einheiten": [
+        682,
+        900
+      ]
     },
     "affe_eat": {
       "ax": 0.541,
@@ -340,7 +504,11 @@
           495,
           430
         ]
-      }
+      },
+      "einheiten": [
+        753,
+        900
+      ]
     },
     "pferd_eat": {
       "ax": 0.491,
@@ -351,27 +519,47 @@
           690,
           410
         ]
-      }
+      },
+      "einheiten": [
+        863,
+        900
+      ]
     },
     "affe_sleep": {
       "ax": 0.5,
       "ay": 0.982,
-      "desc": "Affe schläft eingerollt, lächelt"
+      "desc": "Affe schläft eingerollt, lächelt",
+      "einheiten": [
+        900,
+        843
+      ]
     },
     "pferd_sleep": {
       "ax": 0.496,
       "ay": 0.982,
-      "desc": "Fohlen liegt eingekuschelt und schläft, Augen zu"
+      "desc": "Fohlen liegt eingekuschelt und schläft, Augen zu",
+      "einheiten": [
+        900,
+        705
+      ]
     },
     "pferd_seite": {
       "ax": 0.473,
       "ay": 0.983,
-      "desc": "Fohlen von der Seite, läuft nach rechts"
+      "desc": "Fohlen von der Seite, läuft nach rechts",
+      "einheiten": [
+        885,
+        900
+      ]
     },
     "affe_seite": {
       "ax": 0.561,
       "ay": 0.983,
-      "desc": "Affe von der Seite, geht aufrecht nach rechts"
+      "desc": "Affe von der Seite, geht aufrecht nach rechts",
+      "einheiten": [
+        692,
+        900
+      ]
     },
     "hund_idle": {
       "ax": 0.499,
@@ -382,17 +570,29 @@
           530,
           365
         ]
-      }
+      },
+      "einheiten": [
+        773,
+        900
+      ]
     },
     "pinguin_happy": {
       "ax": 0.509,
       "ay": 0.985,
-      "desc": "Pinguin freut sich riesig, Flügel hoch, lacht"
+      "desc": "Pinguin freut sich riesig, Flügel hoch, lacht",
+      "einheiten": [
+        691,
+        900
+      ]
     },
     "hund_happy": {
       "ax": 0.472,
       "ay": 0.985,
-      "desc": "Hund freut sich riesig, Arme hoch, lacht mit offenem Mund"
+      "desc": "Hund freut sich riesig, Arme hoch, lacht mit offenem Mund",
+      "einheiten": [
+        725,
+        900
+      ]
     },
     "pinguin_eat": {
       "ax": 0.497,
@@ -403,7 +603,11 @@
           455,
           420
         ]
-      }
+      },
+      "einheiten": [
+        721,
+        900
+      ]
     },
     "hund_eat": {
       "ax": 0.536,
@@ -414,27 +618,47 @@
           545,
           410
         ]
-      }
+      },
+      "einheiten": [
+        836,
+        900
+      ]
     },
     "hund_sleep": {
       "ax": 0.47,
       "ay": 0.981,
-      "desc": "Hund liegt eingekuschelt und schläft, Augen zu"
+      "desc": "Hund liegt eingekuschelt und schläft, Augen zu",
+      "einheiten": [
+        900,
+        641
+      ]
     },
     "pinguin_sleep": {
       "ax": 0.5,
       "ay": 0.982,
-      "desc": "Pinguin liegt auf dem Bauch und schläft, lächelt"
+      "desc": "Pinguin liegt auf dem Bauch und schläft, lächelt",
+      "einheiten": [
+        900,
+        647
+      ]
     },
     "hund_seite": {
       "ax": 0.47,
       "ay": 0.983,
-      "desc": "Hund von der Seite, läuft nach rechts"
+      "desc": "Hund von der Seite, läuft nach rechts",
+      "einheiten": [
+        900,
+        885
+      ]
     },
     "pinguin_seite": {
       "ax": 0.477,
       "ay": 0.985,
-      "desc": "Pinguin von der Seite, watschelt nach rechts"
+      "desc": "Pinguin von der Seite, watschelt nach rechts",
+      "einheiten": [
+        605,
+        900
+      ]
     },
     "katze_idle": {
       "ax": 0.368,
@@ -445,17 +669,29 @@
           390,
           360
         ]
-      }
+      },
+      "einheiten": [
+        635,
+        900
+      ]
     },
     "baer_happy": {
       "ax": 0.518,
       "ay": 0.985,
-      "desc": "Teddybär mit Mütze freut sich riesig, Arme hoch, lacht"
+      "desc": "Teddybär mit Mütze freut sich riesig, Arme hoch, lacht",
+      "einheiten": [
+        717,
+        900
+      ]
     },
     "katze_happy": {
       "ax": 0.416,
       "ay": 0.985,
-      "desc": "Katze freut sich riesig, Arme hoch, lacht mit offenem Mund"
+      "desc": "Katze freut sich riesig, Arme hoch, lacht mit offenem Mund",
+      "einheiten": [
+        702,
+        900
+      ]
     },
     "katze_eat": {
       "ax": 0.435,
@@ -466,7 +702,11 @@
           420,
           410
         ]
-      }
+      },
+      "einheiten": [
+        655,
+        900
+      ]
     },
     "baer_eat": {
       "ax": 0.533,
@@ -477,17 +717,29 @@
           420,
           440
         ]
-      }
+      },
+      "einheiten": [
+        630,
+        900
+      ]
     },
     "katze_sleep": {
       "ax": 0.376,
       "ay": 0.982,
-      "desc": "Katze liegt eingekuschelt und schläft, Augen zu"
+      "desc": "Katze liegt eingekuschelt und schläft, Augen zu",
+      "einheiten": [
+        900,
+        749
+      ]
     },
     "katze_seite": {
       "ax": 0.477,
       "ay": 0.983,
-      "desc": "Katze von der Seite, läuft nach rechts"
+      "desc": "Katze von der Seite, läuft nach rechts",
+      "einheiten": [
+        900,
+        885
+      ]
     },
     "huhn_idle": {
       "ax": 0.523,
@@ -498,12 +750,20 @@
           500,
           280
         ]
-      }
+      },
+      "einheiten": [
+        723,
+        900
+      ]
     },
     "huhn_happy": {
       "ax": 0.48,
       "ay": 0.983,
-      "desc": "Huhn freut sich riesig, Arme hoch, lacht mit offenem Mund"
+      "desc": "Huhn freut sich riesig, Arme hoch, lacht mit offenem Mund",
+      "einheiten": [
+        817,
+        900
+      ]
     },
     "huhn_eat": {
       "ax": 0.458,
@@ -514,17 +774,29 @@
           625,
           380
         ]
-      }
+      },
+      "einheiten": [
+        767,
+        900
+      ]
     },
     "huhn_sleep": {
       "ax": 0.517,
       "ay": 0.983,
-      "desc": "Huhn liegt eingekuschelt und schläft, Augen zu"
+      "desc": "Huhn liegt eingekuschelt und schläft, Augen zu",
+      "einheiten": [
+        900,
+        868
+      ]
     },
     "huhn_seite": {
       "ax": 0.562,
       "ay": 0.985,
-      "desc": "Huhn von der Seite, läuft nach rechts"
+      "desc": "Huhn von der Seite, läuft nach rechts",
+      "einheiten": [
+        714,
+        900
+      ]
     },
     "hahn_idle": {
       "ax": 0.559,
@@ -535,12 +807,20 @@
           585,
           335
         ]
-      }
+      },
+      "einheiten": [
+        724,
+        900
+      ]
     },
     "hahn_happy": {
       "ax": 0.513,
       "ay": 0.985,
-      "desc": "Hahn freut sich riesig, Arme hoch, lacht mit offenem Mund"
+      "desc": "Hahn freut sich riesig, Arme hoch, lacht mit offenem Mund",
+      "einheiten": [
+        825,
+        900
+      ]
     },
     "hahn_eat": {
       "ax": 0.499,
@@ -551,17 +831,29 @@
           650,
           400
         ]
-      }
+      },
+      "einheiten": [
+        761,
+        900
+      ]
     },
     "hahn_sleep": {
       "ax": 0.555,
       "ay": 0.983,
-      "desc": "Hahn liegt eingekuschelt und schläft, Augen zu"
+      "desc": "Hahn liegt eingekuschelt und schläft, Augen zu",
+      "einheiten": [
+        868,
+        900
+      ]
     },
     "hahn_seite": {
       "ax": 0.597,
       "ay": 0.983,
-      "desc": "Hahn von der Seite, läuft nach rechts"
+      "desc": "Hahn von der Seite, läuft nach rechts",
+      "einheiten": [
+        733,
+        900
+      ]
     },
     "ente_idle": {
       "ax": 0.495,
@@ -572,12 +864,20 @@
           400,
           370
         ]
-      }
+      },
+      "einheiten": [
+        561,
+        900
+      ]
     },
     "ente_happy": {
       "ax": 0.467,
       "ay": 0.985,
-      "desc": "Entchen freut sich riesig, Arme hoch, lacht mit offenem Mund"
+      "desc": "Entchen freut sich riesig, Arme hoch, lacht mit offenem Mund",
+      "einheiten": [
+        663,
+        900
+      ]
     },
     "ente_eat": {
       "ax": 0.423,
@@ -588,17 +888,29 @@
           500,
           440
         ]
-      }
+      },
+      "einheiten": [
+        662,
+        900
+      ]
     },
     "ente_sleep": {
       "ax": 0.519,
       "ay": 0.982,
-      "desc": "Entchen liegt eingekuschelt und schläft, Augen zu"
+      "desc": "Entchen liegt eingekuschelt und schläft, Augen zu",
+      "einheiten": [
+        696,
+        900
+      ]
     },
     "ente_seite": {
       "ax": 0.471,
       "ay": 0.983,
-      "desc": "Entchen von der Seite, läuft nach rechts"
+      "desc": "Entchen von der Seite, läuft nach rechts",
+      "einheiten": [
+        579,
+        900
+      ]
     },
     "hase_idle": {
       "ax": 0.597,
@@ -609,12 +921,20 @@
           395,
           455
         ]
-      }
+      },
+      "einheiten": [
+        571,
+        900
+      ]
     },
     "hase_happy": {
       "ax": 0.555,
       "ay": 0.985,
-      "desc": "Hase freut sich riesig, Arme hoch, lacht mit offenem Mund"
+      "desc": "Hase freut sich riesig, Arme hoch, lacht mit offenem Mund",
+      "einheiten": [
+        614,
+        900
+      ]
     },
     "hase_eat": {
       "ax": 0.6,
@@ -625,17 +945,29 @@
           450,
           465
         ]
-      }
+      },
+      "einheiten": [
+        589,
+        900
+      ]
     },
     "hase_sleep": {
       "ax": 0.486,
       "ay": 0.981,
-      "desc": "Hase liegt eingekuschelt und schläft, Augen zu"
+      "desc": "Hase liegt eingekuschelt und schläft, Augen zu",
+      "einheiten": [
+        900,
+        666
+      ]
     },
     "hase_seite": {
       "ax": 0.292,
       "ay": 0.983,
-      "desc": "Hase von der Seite, läuft nach rechts"
+      "desc": "Hase von der Seite, läuft nach rechts",
+      "einheiten": [
+        801,
+        900
+      ]
     },
     "frosch_idle": {
       "ax": 0.453,
@@ -646,12 +978,20 @@
           400,
           260
         ]
-      }
+      },
+      "einheiten": [
+        779,
+        804
+      ]
     },
     "frosch_happy": {
       "ax": 0.489,
       "ay": 0.983,
-      "desc": "Frosch freut sich riesig, Arme hoch, lacht mit offenem Mund"
+      "desc": "Frosch freut sich riesig, Arme hoch, lacht mit offenem Mund",
+      "einheiten": [
+        889,
+        878
+      ]
     },
     "frosch_eat": {
       "ax": 0.464,
@@ -662,32 +1002,56 @@
           450,
           340
         ]
-      }
+      },
+      "einheiten": [
+        800,
+        857
+      ]
     },
     "frosch_sleep": {
       "ax": 0.479,
       "ay": 0.98,
-      "desc": "Frosch liegt eingekuschelt und schläft, Augen zu"
+      "desc": "Frosch liegt eingekuschelt und schläft, Augen zu",
+      "einheiten": [
+        900,
+        580
+      ]
     },
     "frosch_seite": {
       "ax": 0.464,
       "ay": 0.982,
-      "desc": "Frosch von der Seite, läuft nach rechts"
+      "desc": "Frosch von der Seite, läuft nach rechts",
+      "einheiten": [
+        900,
+        758
+      ]
     },
     "baer_sleep": {
       "ax": 0.5,
       "ay": 0.982,
-      "desc": "Teddybär mit Mütze schläft eingerollt, lächelt"
+      "desc": "Teddybär mit Mütze schläft eingerollt, lächelt",
+      "einheiten": [
+        900,
+        775
+      ]
     },
     "baer_seite": {
       "ax": 0.458,
       "ay": 0.985,
-      "desc": "Teddybär mit Mütze von der Seite, geht aufrecht nach rechts"
+      "desc": "Teddybär mit Mütze von der Seite, geht aufrecht nach rechts",
+      "einheiten": [
+        506,
+        900
+      ]
     },
     "fuchs_happy": {
       "ax": 0.487,
       "ay": 0.985,
-      "desc": "Fuchs freut sich riesig, Pfoten hoch, lacht"
+      "desc": "Fuchs freut sich riesig, Pfoten hoch, lacht",
+      "einheiten": [
+        816,
+        900
+      ]
     },
     "fuchs_eat": {
       "ax": 0.61,
@@ -698,22 +1062,38 @@
           565,
           460
         ]
-      }
+      },
+      "einheiten": [
+        770,
+        900
+      ]
     },
     "fuchs_sleep": {
       "ax": 0.491,
       "ay": 0.983,
-      "desc": "Fuchs schläft eingerollt im Schwanz, lächelt"
+      "desc": "Fuchs schläft eingerollt im Schwanz, lächelt",
+      "einheiten": [
+        870,
+        900
+      ]
     },
     "fuchs_seite": {
       "ax": 0.544,
       "ay": 0.984,
-      "desc": "Fuchs von der Seite, läuft nach rechts"
+      "desc": "Fuchs von der Seite, läuft nach rechts",
+      "einheiten": [
+        900,
+        804
+      ]
     },
     "eule_happy": {
       "ax": 0.499,
       "ay": 0.985,
-      "desc": "Eule freut sich riesig, Flügel hoch, lacht"
+      "desc": "Eule freut sich riesig, Flügel hoch, lacht",
+      "einheiten": [
+        869,
+        900
+      ]
     },
     "eule_eat": {
       "ax": 0.446,
@@ -724,22 +1104,38 @@
           535,
           450
         ]
-      }
+      },
+      "einheiten": [
+        731,
+        900
+      ]
     },
     "eule_sleep": {
       "ax": 0.479,
       "ay": 0.983,
-      "desc": "Eule kuschelt sich zusammen und schläft, lächelt"
+      "desc": "Eule kuschelt sich zusammen und schläft, lächelt",
+      "einheiten": [
+        709,
+        900
+      ]
     },
     "eule_seite": {
       "ax": 0.502,
       "ay": 0.983,
-      "desc": "Eule von der Seite, hüpft nach rechts"
+      "desc": "Eule von der Seite, hüpft nach rechts",
+      "einheiten": [
+        644,
+        900
+      ]
     },
     "igel_happy": {
       "ax": 0.509,
       "ay": 0.983,
-      "desc": "Igel freut sich riesig, Pfötchen hoch, lacht"
+      "desc": "Igel freut sich riesig, Pfötchen hoch, lacht",
+      "einheiten": [
+        791,
+        900
+      ]
     },
     "igel_eat": {
       "ax": 0.554,
@@ -750,22 +1146,38 @@
           545,
           480
         ]
-      }
+      },
+      "einheiten": [
+        728,
+        900
+      ]
     },
     "igel_sleep": {
       "ax": 0.506,
       "ay": 0.985,
-      "desc": "Igel schläft eingerollt, lächelt"
+      "desc": "Igel schläft eingerollt, lächelt",
+      "einheiten": [
+        807,
+        900
+      ]
     },
     "igel_seite": {
       "ax": 0.471,
       "ay": 0.982,
-      "desc": "Igel von der Seite, läuft nach rechts"
+      "desc": "Igel von der Seite, läuft nach rechts",
+      "einheiten": [
+        900,
+        820
+      ]
     },
     "eichhoernchen_happy": {
       "ax": 0.561,
       "ay": 0.983,
-      "desc": "Eichhörnchen freut sich riesig, Pfötchen hoch, lacht"
+      "desc": "Eichhörnchen freut sich riesig, Pfötchen hoch, lacht",
+      "einheiten": [
+        858,
+        900
+      ]
     },
     "eichhoernchen_eat": {
       "ax": 0.582,
@@ -776,22 +1188,38 @@
           640,
           450
         ]
-      }
+      },
+      "einheiten": [
+        845,
+        900
+      ]
     },
     "eichhoernchen_sleep": {
       "ax": 0.509,
       "ay": 0.985,
-      "desc": "Eichhörnchen schläft eingerollt im Schwanz, lächelt"
+      "desc": "Eichhörnchen schläft eingerollt im Schwanz, lächelt",
+      "einheiten": [
+        865,
+        900
+      ]
     },
     "eichhoernchen_seite": {
       "ax": 0.418,
       "ay": 0.983,
-      "desc": "Eichhörnchen von der Seite, läuft nach rechts"
+      "desc": "Eichhörnchen von der Seite, läuft nach rechts",
+      "einheiten": [
+        900,
+        792
+      ]
     },
     "maus_happy": {
       "ax": 0.559,
       "ay": 0.983,
-      "desc": "Maus freut sich riesig, Pfötchen hoch, lacht"
+      "desc": "Maus freut sich riesig, Pfötchen hoch, lacht",
+      "einheiten": [
+        738,
+        900
+      ]
     },
     "maus_eat": {
       "ax": 0.536,
@@ -802,17 +1230,29 @@
           525,
           460
         ]
-      }
+      },
+      "einheiten": [
+        773,
+        900
+      ]
     },
     "maus_sleep": {
       "ax": 0.439,
       "ay": 0.983,
-      "desc": "Maus schläft eingerollt, lächelt"
+      "desc": "Maus schläft eingerollt, lächelt",
+      "einheiten": [
+        895,
+        825
+      ]
     },
     "maus_seite": {
       "ax": 0.503,
       "ay": 0.982,
-      "desc": "Maus von der Seite, läuft nach rechts"
+      "desc": "Maus von der Seite, läuft nach rechts",
+      "einheiten": [
+        900,
+        747
+      ]
     }
   },
   "audio": {}

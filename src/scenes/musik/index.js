@@ -11,6 +11,7 @@ import { Instrumente } from './instrumente.js';
 export default class Musik extends SeitenSzene {
   static id = 'musik';
   static packs = ['musik', 'tiere'];
+  static tiere = ['baer', 'katze', 'elefant', 'hase', 'affe', 'maus'];
   static seiten = [Band, Instrumente];
 
   vorbereiten() {

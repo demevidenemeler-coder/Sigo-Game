@@ -12,7 +12,7 @@
 // Der Ursprung eines Fahrzeugs liegt am Boden (Unterkante der Räder) unter dem Anker des Körper-Bildes.
 
 import {
-  tex, hasTex, meta, spr, tween, after, killTweensOf, sfx, animal, Actor, fx, store, clamp, lerp, rand, PIXI,
+  tex, hasTex, meta, spr, tween, after, killTweensOf, sfx, animal, Actor, fx, store, clamp, lerp, rand, tierBedarf, PIXI,
 } from '../engine/index.js';
 
 const { Container, Graphics, Sprite, Texture, TilingSprite } = PIXI;
@@ -117,6 +117,11 @@ function gastBekannt(id) {
 function gastBild(id, pose = 'idle') {
   return (MENSCHEN.has(id) ? 'zug/' : 'tiere/') + id + '_' + pose;
 }
+
+// Gäste im gespeicherten Zug: Szenen mit dem Zug-Paket laden deren Tierbilder gleich mit (zu `static tiere`)
+tierBedarf((Klasse) => ((Klasse.packs || []).includes('zug')
+  ? ladeZug().wagen.map((w) => w.gast).filter((g) => g && TIERE.has(g))
+  : []));
 
 // ---------------------------------------------------------------- Radkästen ausmessen
 

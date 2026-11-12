@@ -13,6 +13,7 @@ import { Sammeln } from './sammeln.js';
 export default class Wald extends SeitenSzene {
   static id = 'wald';
   static packs = ['wald', 'tiere'];
+  static tiere = ['fuchs', 'hase', 'igel', 'baer', 'eichhoernchen', 'eule'];
   static music = 'musik/wiese';
   static seiten = [Verstecken, Nacht, Sammeln];
 

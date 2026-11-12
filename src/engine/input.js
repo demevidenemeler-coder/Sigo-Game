@@ -70,6 +70,23 @@ function meldeEingabe() {
   }
 }
 
+const tippHoerer = new Set();
+
+/**
+ * Rückruf cb(obj) bei jedem Antippen über tap() – direkt beim Berühren, bevor die Szene reagiert (z. B. damit der
+ * Kern schon beim Tipp auf einen Ort dessen Bilder anfordert). → Abmelde-Funktion
+ */
+export function onTap(cb) {
+  tippHoerer.add(cb);
+  return () => tippHoerer.delete(cb);
+}
+
+function meldeTipp(obj) {
+  for (const cb of tippHoerer) {
+    try { cb(obj); } catch (e) { console.error('[sigo] onTap:', e); }
+  }
+}
+
 /** Jedes Bild vom Szenen-Verwalter aufgerufen (für hold). */
 export function updateInput(dt) {
   for (const fn of [...tickHoerer]) fn(dt);
@@ -290,6 +307,7 @@ export function tap(obj, fn, opt = {}) {
     if (jetzt - letztes < 120) return; // Entprellen
     letztes = jetzt;
     meldeEingabe();
+    if (tippHoerer.size) meldeTipp(obj);
     if (stauchen) squash(obj);
     spieleTon(ton, 'tap');
     const p = obj.parent ? obj.parent.toLocal(e.global) : { x: e.global.x, y: e.global.y };

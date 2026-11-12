@@ -19,6 +19,25 @@
     { "imports": { "pixi": "./vendor/pixi.min.mjs" } }
   </script>
   <link rel="modulepreload" href="vendor/pixi.min.mjs">
+  <!-- Alle Kern-Module gleich mitholen (statt eins nach dem anderen, wie sie sich gegenseitig importieren) -->
+  <link rel="modulepreload" href="src/main.js">
+  <link rel="modulepreload" href="src/engine/index.js">
+  <link rel="modulepreload" href="src/engine/stage.js">
+  <link rel="modulepreload" href="src/engine/assets.js">
+  <link rel="modulepreload" href="src/engine/scene.js">
+  <link rel="modulepreload" href="src/engine/tween.js">
+  <link rel="modulepreload" href="src/engine/input.js">
+  <link rel="modulepreload" href="src/engine/audio.js">
+  <link rel="modulepreload" href="src/engine/actor.js">
+  <link rel="modulepreload" href="src/engine/fx.js">
+  <link rel="modulepreload" href="src/engine/ui.js">
+  <link rel="modulepreload" href="src/engine/ambient.js">
+  <link rel="modulepreload" href="src/engine/parallax.js">
+  <link rel="modulepreload" href="src/engine/store.js">
+  <link rel="modulepreload" href="src/engine/util.js">
+  <link rel="modulepreload" href="src/engine/test.js">
+  <link rel="modulepreload" href="src/gemeinsam/spielzeit.js">
+  <link rel="modulepreload" href="src/gemeinsam/eltern.js">
   <style>
     html, body {
       margin: 0;

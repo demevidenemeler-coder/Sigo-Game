@@ -34,6 +34,7 @@ const MAX_AEPFEL = 3;
 export default class Start extends Scene {
   static id = 'start';
   static packs = ['rahmen', 'zug', 'tiere'];
+  static tiere = [];
   static music = 'musik/karte';
   static ohneKarte = true;
 

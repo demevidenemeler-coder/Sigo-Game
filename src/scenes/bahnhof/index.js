@@ -60,6 +60,7 @@ const REIHE = ['lok', 'wagen', 'gast', 'ladung'];
 export default class Bahnhof extends Scene {
   static id = 'bahnhof';
   static packs = ['bahnhof', 'zug', 'tiere'];
+  static tiere = ['affe', 'baer', 'eichhoernchen', 'elefant', 'ente', 'eule', 'frosch', 'fuchs', 'giraffe', 'hahn', 'hase', 'huhn', 'hund', 'igel', 'katze', 'kuh', 'loewe', 'maus', 'pferd', 'pinguin', 'schaf', 'schwein'];   // Leiste: alle Gäste
   static music = 'musik/fahrt';
 
   async enter() {

@@ -1004,6 +1004,7 @@ class Waschplatz extends Seite {
 export default class Waschanlage extends SeitenSzene {
   static id = 'waschanlage';
   static packs = ['waschanlage', 'zug', 'tiere'];
+  static tiere = ['ente'];
   static music = 'musik/bau';
   static seiten = [Waschplatz];
 

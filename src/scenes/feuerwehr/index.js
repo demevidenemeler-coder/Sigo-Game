@@ -13,6 +13,7 @@ import { Waschplatz } from './waschplatz.js';
 export default class Feuerwehr extends SeitenSzene {
   static id = 'feuerwehr';
   static packs = ['feuerwehr', 'tiere', 'waschanlage'];
+  static tiere = ['fuchs', 'hund', 'katze', 'baer', 'hase', 'hahn'];
   static music = 'musik/bau';
   static seiten = [Wache, Einsatz, Waschplatz];
 

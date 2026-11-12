@@ -3,13 +3,14 @@
 export { stage, initStage } from './stage.js';
 export {
   tex, hasTex, meta, spr, localPoint, loadPack, loadPackAudio, unloadPack, isPackLoaded, audioUrls, onAudioRegistered,
+  ladeTiere, tierBedarf, bildBekannt,
 } from './assets.js';
 export { Scene, SceneManager, registerScene, go } from './scene.js';
 export {
   tween, ease, killTweensOf, killOwner, isTweening, after, every, wait,
 } from './tween.js';
 export {
-  tap, drag, wipe, hold, squash, setTapSound, onInput, setInputLocked, cancelAllFingers, pointerCount,
+  tap, drag, wipe, hold, squash, setTapSound, onInput, onTap, setInputLocked, cancelAllFingers, pointerCount,
 } from './input.js';
 export {
   sfx, sfxSchleife, music, voice, note, animal, preload, initAudio, setVolumes, registerAudio, audioState, resetSpoken,

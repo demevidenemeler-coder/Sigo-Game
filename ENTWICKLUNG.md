@@ -83,6 +83,7 @@ import { Scene, stage, spr, tex, meta, hasTex, tween, ease, sfx, sfxSchleife, mu
 export default class Bauernhof extends Scene {
   static id = 'bauernhof';
   static packs = ['bauernhof', 'tiere'];   // 'common' ist immer geladen
+  static tiere = ['kuh', 'schwein'];        // nur diese Tiere aus 'tiere' laden (siehe „Pakete“)
   static music = 'common/musik_wiese';      // optional
   async enter(params) { … }                 // Aufbau. Ebenen: this.bg, this.world, this.front, this.hud
   update(dt, t) { … }                       // dt Sekunden (höchstens 0.05), t Sekunden seit enter
@@ -94,7 +95,19 @@ export default class Bauernhof extends Scene {
   `front` (Vordergrund, Effekte), `hud` (Knöpfe; Koordinaten 0…stage.W / 0…stage.H).
 - An die Szene gebunden (endet automatisch beim Verlassen): `this.tween(obj, props, dauer, opt)`, `this.wait(sek)`
   (Promise), `this.after(sek, fn)`, `this.every(sek, fn)`, `this.go(id, params)` (Szenenwechsel mit weicher Blende:
-  eine cremefarbene Wolkendecke zieht in 1,0 s zu und in 1,0 s wieder auf, Helligkeit ändert sich fast gleichmäßig).
+  eine cremefarbene Wolkendecke zieht in 0,7 s zu und in 0,7 s wieder auf, Helligkeit ändert sich fast gleichmäßig –
+  die Ruhe-Regel verlangt mindestens 0,5 s, gemessen von 10 % bis 90 % Deckkraft sind es ≈ 0,52 s). Geladen wird
+  schon ab dem Tipp, während die Blende zuzieht; hinter der geschlossenen Blende schiebt der Kern die Bilder der neuen
+  Szene noch zur Grafikkarte (höchstens 0,8 s), damit beim Aufziehen nichts ruckelt. Bleibt das Laden länger,
+  erscheinen nach 0,8 s die ruhigen Lade-Punkte.
+- Zwischen dem Abbau der alten Szene und `enter()` der neuen wartet der Kern eine eigene Aufgabe ab: Was die alte
+  Szene in `exit()` mit `setTimeout(…, 0)` angesetzt hat (z. B. eigene Bilder freigeben), ist dann erledigt – auch
+  wenn dieselbe Szene sofort neu startet (Album → Album).
+- Sicherheitsnetz beim Zeichnen: Wirft Pixi beim Zeichnen (z. B. ein Sprite mit schon zerstörter Textur), ersetzt
+  der Kern kaputte Texturen durch leere, meldet den Fehler (`__sigo.errors`) und zeichnet weiter. Ohne das bliebe der
+  Ticker stehen und das Spiel hinter der geschlossenen Blende hängen.
+- `SceneManager.onWechsel((an) => …)` meldet Beginn (true) und Ende (false) jedes Wechsels (z. B. damit der
+  Service Worker dann nicht lädt); `SceneManager.phase` sagt nur zum Messen, wo der Wechsel gerade steht.
 - Kern-Haken am `SceneManager`: `onEnter(cb)`, `onExit(cb)`, `onIdle(cb, {after})` und `onLeave(cb)` – `onLeave`
   kommt, sobald ein Wechsel beginnt (die alte Szene ist noch zu sehen, die Blende zieht gerade zu). Solange die
   Blende schließt, ist `SceneManager.schliesst` true: Dann beginnt nichts Neues mehr (z. B. kein Satz der Stimme).
@@ -233,10 +246,50 @@ also auf derselben Seite, auch beim allerersten Öffnen. Ohne `von` oder mit `vo
 Zurück-Knopf, nur den Karten-Knopf. (`params.seite` des Albums ist dagegen seine eigene Start-Doppelseite.)
 
 ### Pakete
-- `common`, `tiere` und `zug` bleiben immer geladen. Die Tierbilder werden beim Laden auf höchstens 600 Bildpunkte
-  verkleinert (die Größe in Einheiten bleibt, `texture.source.resolution` < 1) – wer Bildpunkte einer Textur liest,
-  rechnet mit `source.resolution`.
+- `common`, `tiere`, `zug` und `rahmen` werden beim Szenenwechsel nie ganz entladen. Alle anderen Pakete der alten
+  Szene werden entladen – außer einem kleinen **Vorrat**: Die zuletzt besuchten Orte (höchstens 2, zusammen höchstens
+  45 Megapixel) bleiben im Speicher, damit „zurück zum Ort“ fast nur noch die Blende kostet.
+- **Tiere einzeln:** `static tiere = ['kuh', 'hase']` lädt aus dem Paket `tiere` nur diese Tiere (alle Posen; ein Eintrag
+  mit Pose wie `'kuh_happy'` nur dieses eine Bild). `'tiere'` bleibt trotzdem in `static packs`. Ohne `static tiere`
+  wird wie früher das ganze Paket geladen. **Jedes Tier, das die Szene zeigen kann, gehört in die Liste** – auch
+  zufällig gewählte, Sticker-Bilder und Tiere aus gemeinsamen Bausteinen. Gemeinsame Bausteine melden ihre Tiere
+  selbst an: `tierBedarf((Klasse) => [...])` (so macht es `zug.js` mit den Gästen der Wagen).
+- Später nachladen: `await ladeTiere(['fuchs'])`. Wird ein Tier gebraucht, das nicht geladen ist, stürzt nichts ab:
+  `tex()` gibt ein durchsichtiges Warte-Bild in der richtigen Größe, das sich von selbst in das echte Bild verwandelt,
+  sobald es (gleich danach) geladen ist; ein `Actor` behält so lange seine bisherige Pose. Mit `test=1` steht dann eine
+  Warnung „Bild … war nicht geladen“ in der Konsole (`shot.mjs` meldet sie) – das Tier in `static tiere` eintragen.
+  Nicht mehr gebrauchte Tierbilder bleiben bis zu 30 Stück im Speicher (zuletzt benutzt).
+- **Vorausladen:** `SceneManager.danach({ start: ['karte'], bahnhof: ['fahrt'], '*': ['karte'] })` (in `main.js`)
+  sagt, was wahrscheinlich als Nächstes kommt; 1,2 s nach dem Öffnen der Blende lädt der Kern das still im Hintergrund
+  (`SceneManager.vorausladen(id)`, je Bild ein Häppchen, zwei gleichzeitig, Pause bei Wechsel, Ruckeln oder
+  verstecktem Tab). Auf der Karte wird nur der Code aller Orte geholt (die Bilder aller Orte passen nicht in den
+  Speicher). Die erste Szene lädt schon, während die Grafik hochfährt.
+- **Laden ab dem Tipp:** Tippt das Kind ein Ding mit `label` `'ort:<id>'` an (so baut die Karte ihre Orte), fordert
+  `main.js` sofort die Bilder dieses Ortes an (`onTap` aus `input.js`, dann `vorausladen(id, {sofort: true})`) – die
+  Zugfahrt auf der Karte (1–2 s) läuft derweil. Nur der erste Ort je Kartenbesuch.
+- **Schneller erster Start:** `SceneManager.ersteBilder('start', liste, merke)` (in `main.js`): Beim allerersten
+  Wechsel wartet der Kern nur auf die Bilder der Liste (was die Start-Szene beim Aufbau anfasst; gemerkt in
+  `sigo2.erstebilder.start`, beim allerersten Besuch `START_BILDER`), alle anderen Bilder ihrer Pakete laden danach
+  leise. Fasst die Szene beim Aufbau doch ein noch nicht geladenes Bild an (`tex`/`hasTex`), baut der Kern sie
+  unsichtbar hinter der Blende mit allen Bildern noch einmal auf (Konsole: „Schneller Start: … fehlten“).
+- `onLaden(cb)` (aus `assets.js`) meldet, ob gerade Bilder mit voller Kraft laden (nicht das leise Vorausladen).
+- Bildgröße: Die Auflösung einer Textur rechnet der Kern aus der echten Größe der Datei und `w`/`h` aus pack.json.
+  Passen pack.json und Bilddatei nicht zur selben Fassung (Zwischenspeicher), stimmt die Größe im Spiel trotzdem.
+- `loadPack(id, { nur: ['kuh', 'hase_happy'], leise: true })` lädt nur Teile eines Pakets (`leise` = im Hintergrund).
 - `loadPackAudio(id)` meldet nur die Töne eines Pakets an (ohne Bilder), z. B. die Musik für alle Orte.
+- Bilder lädt der Kern selbst (`fetch` → `createImageBitmap` → Pixi-Textur), nicht über `Assets.load`: So teilen sich
+  zwei Pakete nie dieselbe Textur, und Entladen trifft nur das eigene Paket. Große Hintergründe (ab 2000×1400) bekommen
+  keine Mipmaps (spart Rechenzeit und ein Drittel Grafikspeicher; sie werden nie stark verkleinert gezeigt).
+- Service Worker (`sw.js`): sucht im Offline-Speicher nur genau (ohne `ignoreSearch` – das kostete am Tablet je Datei
+  über eine halbe Sekunde), meldet sich beim ersten Besuch erst an, wenn das erste Bild steht und das Kind einmal
+  getippt hat (+2 s; spätestens 30 s nach dem ersten Bild), holt die Dateien in einer sinnvollen Reihenfolge (Kern,
+  Start, Karte, Orte, Töne, Musik zuletzt) und pausiert, solange das Spiel selbst lädt (Szenenwechsel oder Bilder mit
+  voller Kraft). Jede Datei hat ein Zeitlimit (90 s, dann neuer Versuch); ihr Inhalt wird gegen die Prüfsumme aus
+  `sw-dateien.js` geprüft (passt er nicht, ein frischer Versuch; gespeichert wird immer mit der Prüfsumme des echten
+  Inhalts). Scheitert die Installation (langsames WLAN, Chrome bricht nach etwa 5 min ab), versucht `main.js` es in
+  derselben Sitzung wieder (nach 30, 60, 120, dann alle 240 s) – schon Gespeichertes bleibt, es kommt nur der Rest.
+  Scheitert schon die erste Installation, ist der nächste Versuch eine neue Anmeldung; `anmelden()` hängt sich jedes
+  Mal neu an (sonst bliebe ein zweiter Fehlschlag unbemerkt). Jeder Arbeiter wird nur einmal beobachtet.
 
 ### Sonstiges
 - `store.get(key, def)`, `store.set(key, val)`; `store.sticker(id)` → true, wenn neu im Album.
@@ -274,6 +327,9 @@ Zurück-Knopf, nur den Karten-Knopf. (`params.seite` des Albums ist dagegen sein
 - `node tools/shot.mjs --szene <id> --out shots/<name>.png [--warte 2] [--aktionen '<json>']` macht ein Testfoto mit
   echtem Chrome (ohne Fenster) und meldet Fehler aus der Konsole. Aktionen: `[["tap",x,y],["drag",x1,y1,x2,y2],
   ["warte",sek],["foto","name"]]` – Koordinaten in Bühnen-Einheiten (0…2560 / 0…1600).
+- Ladezeiten wie am Tablet (CPU- und Netz-Drosselung, Service Worker, 2560×1600): `node tools/ladezeit.mjs`
+  (siehe `tools/README.md`); Ausgangswerte in `shots/ladezeit_vorher.json`, nach dem Umbau für schnelleres Laden
+  in `shots/ladezeit_nachher.json`, nach der Nachprüfung in `shots/ladezeit_schluss.json`.
 - Jede Szene muss mit `--aktionen` einmal durchgespielt und die Fotos angesehen werden, bevor sie als fertig gilt.
 - Seiten-Orte starten mit `--param seite=N` direkt auf einer Seite (Zählung ab 0).
 - Nach jedem Szenenwechsel ist die Eingabe gesperrt, bis die Blende ganz offen ist (`isInputLocked()` aus
@@ -336,6 +392,15 @@ Fester Stil-Satz für jeden Prompt (englisch, wörtlich anhängen):
 ```
 `ax, ay` = Anker (0…1), `pts` = benannte Punkte in Bildpunkten des fertigen Bildes, `desc` = kurze Beschreibung, damit
 die Szenen-Bauer wissen, was es gibt. `pack.json` wird von `tools/bild.py pack` aus den Dateien und `punkte.json` gebaut.
+
+**Bildgrößen (Ladezeit!):** Jedes Bild nur so groß, wie es am Tablet höchstens gezeigt wird – jedes Megapixel kostet
+beim Laden am Tablet spürbar Zeit (Entpacken und Hochladen zur Grafikkarte) und Speicher. Hintergründe 1600 hoch;
+Figuren und Dinge nach ihrer größten Darstellung (Tiere: 600 Bildpunkte an der längeren Seite reichen, sie werden
+höchstens ~560 hoch gezeigt). Ist ein Bild zu groß, verkleinert `python tools/bild.py verkleinern <ordner> --max 600`
+die Dateien (fast verlustfrei, WebP-Qualität 92) und merkt sich die alte Größe als `einheiten` in `punkte.json`:
+`w`/`h` in pack.json bleiben dann die alte Größe in **Einheiten**, `res` (< 1) sagt, wie viele Bildpunkte je Einheit
+die Datei hat, und `pts` bleiben in diesen Einheiten. Für die Szenen ändert sich nichts (gleiche Größe auf dem Bildschirm);
+wer Bildpunkte einer Textur liest, rechnet mit `texture.source.resolution`.
 
 ### Töne
 - Geräusche: Modell `mirelo_text_to_audio` (0,5 Credits, `duration` in Sekunden). Musik: `elevenlabs_music_v2_5`

@@ -47,6 +47,19 @@ def dateien():
     return sorted(set(liste))
 
 
+# Textdateien: Git speichert sie mit LF (core.autocrlf), im Arbeitsordner unter Windows stehen sie oft mit CRLF.
+# Veröffentlicht (GitHub Pages) wird der Stand aus Git – die Prüfsumme muss zu DEM Inhalt passen, denn sw.js
+# vergleicht sie beim Installieren mit dem, was der Server wirklich liefert.
+TEXT = {'.js', '.mjs', '.json', '.html', '.webmanifest', '.css', '.svg', '.txt', '.md'}
+
+
+def inhalt_wie_veroeffentlicht(name):
+    inhalt = (WURZEL / name).read_bytes()
+    if Path(name).suffix.lower() in TEXT:
+        inhalt = inhalt.replace(b'\r\n', b'\n')
+    return inhalt
+
+
 def berechne():
     """→ (liste, stempel, prüfsummen je Datei, Bytes gesamt)"""
     liste = dateien()
@@ -54,7 +67,7 @@ def berechne():
     je_datei = {}
     bytes_gesamt = 0
     for name in liste:
-        inhalt = (WURZEL / name).read_bytes()
+        inhalt = inhalt_wie_veroeffentlicht(name)
         bytes_gesamt += len(inhalt)
         h = hashlib.sha256(inhalt).digest()
         je_datei[name] = h.hex()[:12]

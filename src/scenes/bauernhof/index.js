@@ -15,6 +15,7 @@ import { Waschen } from './waschen.js';
 export default class Bauernhof extends SeitenSzene {
   static id = 'bauernhof';
   static packs = ['bauernhof', 'tiere'];
+  static tiere = ['kuh', 'schwein', 'schaf', 'pferd', 'huhn', 'hahn', 'hase', 'hund', 'katze', 'ente'];
   static music = 'musik/wiese';
   static seiten = [Futterplatz, Huehner, Melken, Waschen];
 

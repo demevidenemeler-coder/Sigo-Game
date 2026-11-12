@@ -10,6 +10,7 @@ import { Saftbar } from './saftbar.js';
 export default class Eisdiele extends SeitenSzene {
   static id = 'eisdiele';
   static packs = ['eisdiele', 'tiere'];
+  static tiere = ['hase', 'katze', 'hund', 'baer', 'fuchs', 'schwein', 'maus', 'igel', 'eichhoernchen', 'pinguin', 'ente', 'frosch', 'affe', 'schaf', 'loewe', 'pferd', 'huhn', 'elefant', 'giraffe', 'kuh'];
   static music = 'musik/atelier';
   static seiten = [Theke, Saftbar];
 

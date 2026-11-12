@@ -13,6 +13,7 @@ import { Sandkasten, sandkastenVorbereiten } from './sandkasten.js';
 export default class Spielplatz extends SeitenSzene {
   static id = 'spielplatz';
   static packs = ['spielplatz', 'tiere'];
+  static tiere = ['ente', 'hase', 'frosch', 'katze', 'schaf', 'schwein', 'igel', 'maus', 'hund'];
   static music = 'musik/bau';
   static seiten = [Himmel, Geraete, Sandkasten];
 

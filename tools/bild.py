@@ -2,7 +2,7 @@
 
 Aufruf:  python tools/bild.py <unterbefehl> ...   (Hilfe: python tools/bild.py <unterbefehl> -h)
 
-Unterbefehle: holen, sprite, hintergrund, nahtlos, raster, bogen, pack, anker.
+Unterbefehle: holen, sprite, hintergrund, nahtlos, raster, bogen, pack, verkleinern, anker.
 Ergebnisse werden als eine JSON-Zeile auf stdout ausgegeben, Warnungen gehen nach stderr.
 """
 
@@ -442,9 +442,16 @@ def befehl_pack(args):
             with Image.open(datei) as im:
                 w, h = im.size
             extra = punkte['images'].get(name, {})
-            bilder[name] = {'file': datei.name, 'w': w, 'h': h,
-                            'ax': extra.get('ax', 0.5), 'ay': extra.get('ay', 0.5),
-                            'pts': extra.get('pts', {}), 'desc': extra.get('desc', '')}
+            eintrag = {'file': datei.name, 'w': w, 'h': h}
+            # Vorab verkleinert („verkleinern"): Größe in Einheiten bleibt die alte, res = Bildpunkte je Einheit
+            einheiten = extra.get('einheiten')
+            if einheiten and (einheiten[0] != w or einheiten[1] != h):
+                ew, eh = einheiten
+                eintrag['w'], eintrag['h'] = ew, eh
+                eintrag['res'] = round(max(w, h) / max(ew, eh), 6)
+            eintrag.update({'ax': extra.get('ax', 0.5), 'ay': extra.get('ay', 0.5),
+                            'pts': extra.get('pts', {}), 'desc': extra.get('desc', '')})
+            bilder[name] = eintrag
         elif endung in TON_ENDUNGEN:
             if name in toene:
                 warnung(f'{name}: mehrere Tondateien – nehme {toene[name]["file"]}')
@@ -462,6 +469,48 @@ def befehl_pack(args):
     ziel = ordner / 'pack.json'
     json_schreiben_atomar(ziel, None, text=pack_text(daten))
     ausgabe({'file': pfad_text(ziel), 'id': daten['id'], 'images': len(bilder), 'audio': len(toene)})
+
+
+def befehl_verkleinern(args):
+    """Bilder eines Pakets auf der Platte verkleinern (statt beim Laden im Spiel). Die Größe in Einheiten bleibt:
+    Die alte Bildgröße kommt als „einheiten" nach punkte.json, pack.json bekommt w/h wie vorher und dazu „res"
+    (Bildpunkte je Einheit). Anker (ax/ay) sind Anteile, Punkte (pts) stehen in Einheiten – beides bleibt gültig.
+    Ein zweiter Lauf ändert nichts (schon kleine Bilder bleiben, wie sie sind)."""
+    ordner = Path(args.ordner)
+    if not ordner.is_dir():
+        abbruch(f'Ordner nicht gefunden: {ordner}')
+    geaendert, vorher, nachher = [], 0, 0
+    with Dateisperre(ordner / 'punkte.json.lock'):
+        daten = punkte_lesen(ordner)
+        for datei in sorted(ordner.iterdir()):
+            if datei.suffix.lower() != '.webp' or not datei.is_file():
+                continue
+            if args.nur and not any(datei.stem.startswith(n) for n in args.nur):
+                continue
+            with Image.open(datei) as roh:
+                roh.load()
+                w, h = roh.size
+                if max(w, h) <= args.max:
+                    continue
+                eintrag = daten['images'].setdefault(datei.stem, {})
+                if not eintrag.get('einheiten'):
+                    eintrag['einheiten'] = [w, h]
+                faktor = args.max / max(w, h)
+                neu = (max(1, round(w * faktor)), max(1, round(h * faktor)))
+                im = roh.convert('RGBA').resize(neu, Image.LANCZOS)
+            im.putalpha(im.getchannel('A').point(lambda v: 0 if v < ALPHA_SCHWELLE else v))
+            groesse_vorher = datei.stat().st_size
+            zwischen = datei.with_name(datei.stem + '.verkleinern.tmp.webp')
+            webp_speichern(im, zwischen, args.qualitaet)
+            os.replace(zwischen, datei)
+            vorher += groesse_vorher
+            nachher += datei.stat().st_size
+            geaendert.append(f'{datei.name} {w}x{h}→{neu[0]}x{neu[1]}')
+        json_schreiben_atomar(ordner / 'punkte.json', daten)
+    if geaendert:
+        befehl_pack(argparse.Namespace(ordner=str(ordner)))
+    ausgabe({'ordner': pfad_text(ordner), 'verkleinert': len(geaendert), 'kb_vorher': round(vorher / 1024),
+             'kb_nachher': round(nachher / 1024), 'beispiele': geaendert[:3]})
 
 
 class Dateisperre:
@@ -616,6 +665,15 @@ def main():
             'python tools/bild.py pack assets/bauernhof')
     p.add_argument('ordner')
     p.set_defaults(fn=befehl_pack)
+
+    p = neu('verkleinern', 'Bilder eines Pakets auf der Platte verkleinern; Größe in Einheiten, Anker und Punkte '
+            'bleiben (punkte.json bekommt „einheiten", pack.json „res"). Baut danach pack.json neu.',
+            'python tools/bild.py verkleinern assets/tiere --max 600')
+    p.add_argument('ordner')
+    p.add_argument('--max', type=int, default=600, help='längste Seite höchstens (Standard 600)')
+    p.add_argument('--qualitaet', type=int, default=92, help='WebP-Qualität (Standard 92)')
+    p.add_argument('--nur', action='append', metavar='anfang', help='nur Bilder, deren Name so anfängt (mehrfach)')
+    p.set_defaults(fn=befehl_verkleinern)
 
     p = neu('anker', 'Anker, Punkte und Beschreibung in punkte.json eintragen.',
             'python tools/bild.py anker assets/tiere kuh_idle --ax 0.5 --ay 0.97 --pt mouth=420,380 '

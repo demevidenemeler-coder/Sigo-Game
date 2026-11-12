@@ -62,6 +62,7 @@ const ABBAU_HINTER = 500;        // so weit hinter dem linken Rand wird abgebaut
 export default class Fahrt extends Scene {
   static id = 'fahrt';
   static packs = ['fahrt', 'zug', 'tiere'];
+  static tiere = ['hund', 'katze', 'hase', 'schwein', 'pinguin', 'ente', 'fuchs', 'baer', 'affe', 'igel', 'eule', 'frosch', 'kuh', 'schaf', 'huhn', 'pferd'];
   static music = 'musik/fahrt';
 
   async enter(params = {}) {

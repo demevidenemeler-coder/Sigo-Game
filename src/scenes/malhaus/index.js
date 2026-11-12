@@ -1161,6 +1161,7 @@ class Stempeln extends MalSeite {
 export default class Malhaus extends SeitenSzene {
   static id = 'malhaus';
   static packs = ['malhaus', 'tiere'];
+  static tiere = ['katze'];
   static music = 'musik/atelier';
   static seiten = [Ausmalen, Freimalen, Stempeln];
 

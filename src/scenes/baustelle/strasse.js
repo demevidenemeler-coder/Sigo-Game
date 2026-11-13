@@ -452,7 +452,8 @@ export class Strasse extends Seite {
     }
     await this.wait(0.8);
     // der Satz sagt „weiße Striche" – nur in weißen Runden (bei Gelb malt das Wägelchen ohne Ansage)
-    if (farbe === STRICH_FARBEN[0]) voice('baustelle_linie', { nurWenn: () => this.aktiv && this.phase !== 'schotter' });
+    // (in gelben Runden der neutrale Satz ohne Farbe)
+    voice(farbe === STRICH_FARBEN[0] ? 'baustelle_linie' : 'baustelle_striche', { nurWenn: () => this.aktiv && this.phase !== 'schotter' });
     this.rolle.visible = true;
     this.rolle.x = -1650;
     // hält mit der Düse knapp links vom ersten Strich

@@ -1,6 +1,6 @@
 // Seite 1: Das Gemüsebeet – jede Runde kommt ein Gast mit einem Wunsch.
 // Ablauf einer Runde (jeder Schritt mit eigener Geste, nichts kann schiefgehen):
-//   1. Ein Gast (Hase, Schwein, Bär, Eichhörnchen, Pferd, Ente, Igel – nie einer der letzten drei) kommt
+//   1. Ein Gast (Hase, Schwein, Bär, Eichhörnchen, Pferd, Ente, Igel, Schaf, Huhn, Maus – nie einer der letzten drei) kommt
 //      ans Beet und zeigt in einer Denkblase, was er gern hätte.
 //   2. Unkraut zupfen: Auf ein paar Hügeln wachsen Löwenzahn oder Pusteblumen – nach oben ziehen (oder antippen).
 //      Pusteblumen pusten ihre Schirmchen weg, manchmal schaut dabei der Regenwurm heraus.
@@ -66,6 +66,10 @@ const GÄSTE = [
   { tier: 'pferd', scale: 0.38, wunsch: 'karotte', kraut: true },
   { tier: 'ente', scale: 0.32, wunsch: 'tomate', kraut: true },
   { tier: 'igel', scale: 0.32, wunsch: 'erdbeere', kraut: false },
+  // Runde 3: drei Gäste mehr (mehr Abwechslung)
+  { tier: 'schaf', scale: 0.34, wunsch: 'tomate', kraut: true },
+  { tier: 'huhn', scale: 0.3, wunsch: 'sonnenblume', kraut: false },
+  { tier: 'maus', scale: 0.26, wunsch: 'kuerbis', kraut: false },
 ];
 const GAST_X = 930;
 const GAST_WEG = 1520;         // dort kommen die Gäste her (rechts außerhalb des Bildes)

@@ -48,7 +48,7 @@ const WAND = { rot: 'baustelle/teil_wand_rot', gelb: 'baustelle/teil_wand_gelb' 
 // Hellwerden beim Umstreichen: dunkle rote Ziegel brauchen mehr als helle gelbe
 const HELL = { rot: { k: 1.5, b: 0.26 }, gelb: { k: 0.95, b: 0.16 }, turm: { k: 1.0, b: 0.16 }, dach: { k: 1.35, b: 0.18 } };
 
-const FARBEN = [
+export const FARBEN = [
   { id: 'blau', tex: 'baustelle/farbeimer_blau', c: 0x8fcaf2 },
   { id: 'rosa', tex: 'baustelle/farbeimer_rosa', c: 0xf7a9c6 },
   { id: 'gruen', tex: 'baustelle/farbeimer_gruen', c: 0x9ee0a2 },
@@ -82,7 +82,7 @@ const LAGER = [
 
 // Plätze als heller „Bauplan" (blassblau-weiß statt der echten Farben): hebt sich von den roten Ziegel-Ruinen
 // und dem gelben Zaun im Hintergrund ab
-function bauplanFilter() {
+export function bauplanFilter() {
   const f = new PIXI.ColorMatrixFilter();
   const a = 0.22;   // Anteil der echten Farbe
   const ziel = [0.8, 0.9, 1.0];

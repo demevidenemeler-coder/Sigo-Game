@@ -18,9 +18,10 @@ import { belohne, stickerFuerOrt } from '../../gemeinsam/sticker.js';
 import { Kundschaft } from './kunden.js';
 import { WimpelKette, Marienkaefer, belohneZiel } from './girlanden.js';
 import { Vogel, Schmetterling, bildFleck, bogenFlug, umhaengen, mischfarbe, schale } from './deko.js';
+import { partyHut, geburtstagsLied } from './stieleis.js';
 
 // Obst: Bild, Saftfarbe, Darstellungsgröße (längste Seite)
-const OBST = {
+export const OBST = {
   apfel: { tex: 'common/futter_apfel', farbe: 0xc6dc3a, g: 175 },
   banane: { tex: 'common/futter_banane', farbe: 0xffdc5a, g: 190 },
   erdbeere: { tex: 'common/futter_erdbeere', farbe: 0xff4f6e, g: 170 },
@@ -891,13 +892,20 @@ export class Saftbar extends Seite {
 
     a.pose('idle');
     this.runde++;
+    // Geburtstag: ein leises Lied, bevor sich das Tier freut
+    const geburtstag = this.geburtstag === a;
+    if (geburtstag) {
+      this.geburtstag = null;
+      await this.wait(geburtstagsLied(this));
+      if (a.destroyed) return;
+    }
     // ein Wimpel in der Saftfarbe kommt an die Kette (ist sie schon voll, beginnt eine neue)
     if (this.kette.voll) {
       this.kette.leeren();
       await this.wait(0.5);
     }
     const kopf = a.point('kopf');
-    const freude = this.kunde.freut(passt, a);
+    const freude = this.kunde.freut(passt || geburtstag, a);
     const voll = await this.kette.dazu(farbe, wimpelVon.x, wimpelVon.y);
     if (voll) {
       this.kette.freuen();
@@ -1008,6 +1016,15 @@ export class Saftbar extends Seite {
     if (this.runde === 0) this.hinweisAnmelden(0.5);
     // Versteckspiel: ab der zweiten Runde sitzt manchmal ein Marienkäfer hinter einer Frucht
     if (this.runde > 0 && Math.random() < 0.45) this.kaeferVerstecken();
+    // Überraschung: ab der dritten Runde hat ein Gast manchmal Geburtstag (Partyhütchen; nie zweimal hintereinander)
+    const fest = this.runde >= 2 && !this.letztesMalGeburtstag && Math.random() < 0.2;
+    this.letztesMalGeburtstag = fest;
+    if (fest) {
+      this.geburtstag = a;
+      this.after(0.4, () => partyHut(this, a));
+      const p = () => this.aktiv && this.geburtstag === a && !this.trinkt;
+      this.after(0.9, () => { if (p()) voice('eisdiele_geburtstag', { nurWenn: p }); });
+    }
   }
 
   blaseWeg() {

@@ -300,7 +300,7 @@ class Bahnhof extends Ding {
       if (zug.destroyed) return;
       if (!w.gast && zug.wagen[idx] === w) zug.setzeGast(idx, fg.id);
       if (!a.destroyed) {
-        s.tween(a, { alpha: 0 }, 0.18, { ease: 'sineInOut' }).then(() => { if (!a.destroyed) a.destroy({ children: true }); });
+        s.tween(a, { alpha: 0 }, 0.18, { ease: 'sineInOut' }).then(() => { if (!a.destroyed) a.destroy({ children: true, context: true }); });
       }
       s.after(0.8, () => {
         if (zug.destroyed) return;
@@ -343,13 +343,13 @@ class Bahnhof extends Ding {
     s.tween(a.scale, { x: skalaZiel, y: skalaZiel }, dauer, { ease: 'sineInOut' });
     a.hopTo(ziel.x, ziel.y, { hoehe, dauer, staub: false }).then((ok) => {
       if (this.tot) {
-        if (!a.destroyed) a.destroy({ children: true });
+        if (!a.destroyed) a.destroy({ children: true, context: true });
         return;
       }
       const i = this.fahrgaeste.indexOf(fg);
       if (i >= 0) this.fahrgaeste.splice(i, 1);
       const da = this.neuerFahrgast(id, frei);
-      if (!a.destroyed) a.destroy({ children: true });
+      if (!a.destroyed) a.destroy({ children: true, context: true });
       fx.pop(da.actor, 0.08);
       sfx('common/landen', { vol: 0.7 });
       gruss(s, da.actor);
@@ -594,19 +594,22 @@ class Bruecke extends Ding {
 // ================================================================ Tier auf dem Gleis
 
 let tierNr = 0;
+const GLEIS_TIERE = ['kuh', 'schaf', 'pferd', 'schwein'];
+const GLEIS_SKALA = { kuh: 0.3, schaf: 0.29, pferd: 0.3, schwein: 0.28 };
 const WIESE_X = 130;   // dorthin hüpft das Tier vom Gleis (rechts vom Gleisplatz, links vom Hebel-Pult)
 
 class TierAufGleis extends Ding {
   constructor(s, linkeKante) {
     super(s, 0);
     this.art = 'tier';
-    // abwechselnd Kuh und Schaf – aber nicht das Tier, das schon im Zug sitzt
-    let id = ['kuh', 'schaf'][tierNr++ % 2];
-    if (s.zug.wagen.some((w) => w.gastId === id)) id = id === 'kuh' ? 'schaf' : 'kuh';
+    // der Reihe nach Kuh, Schaf, Pferd, Schwein – aber kein Tier, das schon im Zug sitzt
+    const imZug = (x) => s.zug.wagen.some((w) => w.gastId === x);
+    let id = GLEIS_TIERE[tierNr++ % GLEIS_TIERE.length];
+    for (let i = 0; i < GLEIS_TIERE.length && imZug(id); i++) id = GLEIS_TIERE[tierNr++ % GLEIS_TIERE.length];
     this.tierId = id;
     const c = this.teil(s.ebAufGleis, 0);
     this.c = c;
-    this.tier = new Actor(this.tierId, { x: 0, y: GLEIS_Y + 6, scale: this.tierId === 'kuh' ? 0.3 : 0.29, parent: c, flip: true });
+    this.tier = new Actor(this.tierId, { x: 0, y: GLEIS_Y + 6, scale: GLEIS_SKALA[id] ?? 0.29, parent: c, flip: true });
     this.tier.onTap(() => this.tipp(), { pad: 60 });
     // Hinter dem Gleis, links vom Tier (beim Halt gleich rechts der Lok): bei der Kuh das Schild „Kuhweide",
     // beim Schaf ein Stück Zaun. Das Tier hüpft später nach rechts auf die Wiese – nicht davor.

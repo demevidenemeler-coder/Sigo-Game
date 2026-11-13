@@ -13,4 +13,11 @@ export default {
   bauernhof_stroh: 'Im Stroh ist etwas versteckt. Wisch es weg!',
   bauernhof_flasche: 'Das Tierkind hat Hunger. Gib ihm das Fläschchen.',
   bauernhof_schwamm: 'Hol den Schwamm und seif das Schwein ein.',
+  // Seite 5 – Ernte und Hofladen (Aufnahmen folgen)
+  bauernhof_baum: 'Tipp auf den Baum. Was fällt da herunter?',
+  bauernhof_kiste: 'Sammle das Obst in die Kiste.',
+  bauernhof_anhaenger: 'Stell die Kiste auf den Anhänger.',
+  bauernhof_traktor: 'Tipp auf den Traktor. Los geht die Fahrt!',
+  bauernhof_glocke: 'Läute die Glocke. Wer kommt einkaufen?',
+  bauernhof_laden: 'Was möchte der Gast? Gib es ihm.',
 };

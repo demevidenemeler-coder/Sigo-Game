@@ -5,6 +5,8 @@
 //      dann Glühwürmchen ins Glas holen und freilassen – sie werden Sterne am Himmel
 //   3. Picknick: Decke ausrollen → Gäste wünschen sich etwas → sammeln (Korb) → Teller decken → alle essen;
 //      die Wimpelkette wächst mit jedem Picknick
+//   4. Waldrand: Vogelhaus bauen (Dach, Nägel, aufhängen, Körner, Vögel singen) – die Häuser bleiben am Ast;
+//      Eichhörnchen versteckt Nüsse, es schneit, es findet sie wieder, das Bäumchen wird gegossen und wächst
 // Start direkt auf einer Seite: ?szene=wald&seite=1
 
 import { music, ui } from '../../engine/index.js';
@@ -12,6 +14,7 @@ import { SeitenSzene } from '../../gemeinsam/seiten.js';
 import { Verstecken } from './verstecken.js';
 import { Nacht } from './nacht.js';
 import { Sammeln } from './sammeln.js';
+import { Waldrand } from './waldrand.js';
 
 export default class Wald extends SeitenSzene {
   static id = 'wald';
@@ -19,7 +22,7 @@ export default class Wald extends SeitenSzene {
   // alle Tiere, deren tiere/<name>_*-Bilder der Wald zeigt (das Reh kommt aus dem Wald-Paket)
   static tiere = ['fuchs', 'hase', 'eule', 'igel', 'baer', 'eichhoernchen'];
   static music = 'musik/wiese';
-  static seiten = [Verstecken, Nacht, Sammeln];
+  static seiten = [Verstecken, Nacht, Sammeln, Waldrand];
 
   vorbereiten() {
     ui.albumKnopf(this);

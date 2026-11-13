@@ -13,4 +13,12 @@ export default {
   feuerwehr_aufrollen: 'Halte fest, dann rollt der Schlauch ein.',
   feuerwehr_schwamm: 'Tauch den Schwamm in den Schaum.',
   feuerwehr_tuch: 'Jetzt mit dem Tuch trocken reiben!',
+  // neu in Runde 3 (Aufnahmen fehlen noch)
+  feuerwehr_kuebel: 'Oh! Der Blumentopf ist umgefallen.',
+  feuerwehr_erde: 'Wisch die Erde zurück in den Topf.',
+  feuerwehr_blumen: 'Steck die Blumen in den Topf.',
+  feuerwehr_giessen: 'Jetzt noch gießen!',
+  feuerwehr_birne: 'Bring die Glühbirne zur Laterne.',
+  // von der Erzählerin gesprochen (nicht vom Tier): darum aus ihrer Sicht
+  feuerwehr_danke: 'Schau mal, ein Dankesbild für die Feuerwehr!',
 };

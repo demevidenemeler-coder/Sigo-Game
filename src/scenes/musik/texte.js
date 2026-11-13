@@ -13,4 +13,11 @@ export default {
   musik_besuch: 'Da kommt Besuch!',
   musik_nachspielen: 'Jetzt du! Tipp, was leuchtet.',
   musik_note: 'Häng die Note an die Leine.',
+  // neu (Runde 3: Werkstatt mit Instrumente-Bauen und Echo-Spiel) – Aufnahmen folgen
+  musik_werkstatt: 'Hier bauen wir Instrumente.',
+  musik_fuellen: 'Tipp auf eine Schale.',
+  musik_bemalen: 'Such dir eine Farbe aus.',
+  musik_ausprobieren: 'Probier es aus!',
+  musik_regal: 'Das kommt ins Regal.',
+  musik_echo: 'Hör gut zu. Jetzt du!',
 };

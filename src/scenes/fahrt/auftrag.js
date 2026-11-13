@@ -21,6 +21,7 @@ import { belohne, stickerFuerOrt } from '../../gemeinsam/sticker.js';
 import { Ding, tippbar, flaeche, ruhig } from './hilfen.js';
 import { figur, gruss, MENSCHEN } from './stationen.js';
 import { GLEIS_Y, LOK_X, HINTEN_Y, VORNE_Y } from './konst.js';
+import { FreundeLeine, merkeFreund } from './halte.js';
 
 const { Container, Graphics, Rectangle } = PIXI;
 
@@ -38,12 +39,15 @@ export const LIEFERUNGEN = [
   { id: 'aepfel', von: ['schwein', 'igel', 'kuh'], ladung: 'ladung_apfelkorb', an: ['pferd', 'schaf', 'schwein'], haus: 'scheune' },
   { id: 'koffer', von: ['elefant', 'giraffe', 'affe'], ladung: 'ladung_koffer', an: ['oma', 'papa', 'kind_m'] },
   { id: 'bausteine', von: ['kind_j', 'kind_m', 'papa'], ladung: 'ladung_bausteine', an: ['maus', 'affe', 'hase'] },
+  // Runde 3: zwei neue Lieferungen (neue Empfänger für die Freunde-Leine)
+  { id: 'fass', von: ['baer', 'schwein', 'oma'], ladung: 'ladung_fass', an: ['fuchs', 'eichhoernchen', 'igel'] },
+  { id: 'kiste', von: ['papa', 'elefant', 'pferd'], ladung: 'ladung_kiste', an: ['giraffe', 'loewe', 'oma'] },
 ];
 
 const HAUS_FARBEN = ['rot', 'blau', 'gelb'];
 
 /** Bild einer Figur (für Denkblasen) */
-const figurBild = (id) => (MENSCHEN.has(id) ? 'zug/' + id + '_idle' : 'tiere/' + id + '_idle');
+export const figurBild = (id) => (MENSCHEN.has(id) ? 'zug/' + id + '_idle' : 'tiere/' + id + '_idle');
 
 /**
  * Wer gerade schon zu sehen ist oder bald zu sehen sein wird: Gäste im Zug (auch die, die gerade hineinhüpfen),
@@ -109,7 +113,7 @@ export function neueLieferung(s) {
 // ---------------------------------------------------------------- Hilfen
 
 /** Ein Ding weich im Bogen nach (x, y) seines Eltern-Containers fliegen lassen (Größe gleitet mit). → thenable */
-function bogen(s, obj, x, y, { skala, dauer = 1, hoehe = 200, drehen = 0 } = {}) {
+export function bogen(s, obj, x, y, { skala, dauer = 1, hoehe = 200, drehen = 0 } = {}) {
   const x0 = obj.x;
   const y0 = obj.y;
   const s0 = Math.abs(obj.scale.y);
@@ -129,7 +133,7 @@ function bogen(s, obj, x, y, { skala, dauer = 1, hoehe = 200, drehen = 0 } = {})
 }
 
 /** Ding in einen anderen Container hängen, ohne dass es springt (Ort und Größe bleiben). */
-function umhaengen(obj, neu) {
+export function umhaengen(obj, neu) {
   const p = neu.toLocal(obj.getGlobalPosition());
   const k = Math.abs(obj.worldTransform.a) / Math.max(1e-6, Math.abs(neu.worldTransform.a));
   neu.addChild(obj);
@@ -241,7 +245,7 @@ function wareImZug(lief) {
 }
 
 /** Freude einer Figur (Tiere mit Laut und Herzen, Menschen winken mit Herzen). */
-function freude(s, a) {
+export function freude(s, a) {
   if (!a || a.destroyed) return;
   if (a.mensch) {
     gruss(s, a);
@@ -288,6 +292,10 @@ export class Ladeplatz extends Ding {
     const m = meta(id);
     this.links = -(m.w * m.ax) * skala - 20;
     this.rechts = (m.w * (1 - m.ax)) * skala + 20;
+    // Freunde-Leine vorn links unter dem Zug (wächst über alle Besuche)
+    this.leine = new FreundeLeine(s, this, -1180);
+    this.vorneLinks = this.leine.links;   // nur die vordere Reihe bleibt dort frei (hinten dürfen Bäume stehen)
+    this.vorneBelegt = true;
     this.wx = linkeKante - this.links;
     this.da = false;
     this.erledigt = false;
@@ -373,7 +381,8 @@ export class Ladeplatz extends Ding {
     return true;
   }
 
-  update(dt) {
+  update(dt, sx) {
+    this.leine.update(dt, sx);
     // Wartet das Kind, denkt der Absender noch einmal an den Empfänger, und die Ladung lädt sanft ein
     if (!this.da || this.lief.geladen) return;
     this.blasenZeit -= dt;
@@ -565,6 +574,7 @@ export class Ziel extends Ding {
         fx.pop(ware, 0.1);
         const a = this.empf;
         freude(s, a);
+        merkeFreund(lief.an);   // kommt beim nächsten Ladeplatz auf die Freunde-Leine
         // statt der Ladung denkt er jetzt an ein Herz (ersetzt die alte Denkblase)
         s.after(0.6, () => { if (!a.destroyed) a.bubble('common/p_herz', 2.2, { seite: 'links' }); });
         s.after(0.5, () => { if (!s.zug.destroyed) s.zug.gaesteJubeln(); });
@@ -799,10 +809,15 @@ export class Wasserturm extends Ding {
     const b = s.inWelt(s.zug.lok.getBounds());
     fx.burst('funkeln', b.x + b.w / 2, b.y + 40, { count: 6, parent: s.front });
     s.after(0.4, () => { if (!s.zug.destroyed) { s.zug.pfeife(); s.zug.lok.hupf(22); } });
+    s.after(1.0, () => {
+      if (this.tot) return;
+      s.belohneEinmal('wasser', store.stickers().includes('fahrt_wasserturm') ? 'lok' : 'fahrt_wasserturm',
+        this.c, 0, this.duese.y - 420);
+    });
     s.after(1.3, () => {
       const g = this.anzeige;
       if (!g || g.destroyed) return;
-      s.tween(g, { alpha: 0 }, 0.6, { ease: 'sineInOut' }).then(() => { if (!g.destroyed) g.destroy({ children: true }); });
+      s.tween(g, { alpha: 0 }, 0.6, { ease: 'sineInOut' }).then(() => { if (!g.destroyed) g.destroy({ children: true, context: true }); });
     });
     s.after(2.2, () => {
       if (this.tot) return;
@@ -839,7 +854,7 @@ export class Wasserturm extends Ding {
 
   zerstoere() {
     this.ton?.stop();
-    if (this.anzeige && !this.anzeige.destroyed) this.anzeige.destroy({ children: true });
+    if (this.anzeige && !this.anzeige.destroyed) this.anzeige.destroy({ children: true, context: true });
     super.zerstoere();
   }
 }
@@ -917,7 +932,7 @@ export class Signal extends Ding {
           .then((ok) => (ok && !a.destroyed ? a.walkTo(760, GLEIS_Y + 190, { tempo: 130 }) : ok))
           .then(() => {
             if (a.destroyed) return;
-            s.tween(a, { alpha: 0 }, 0.6, { ease: 'sineInOut' }).then(() => { if (!a.destroyed) a.destroy({ children: true }); });
+            s.tween(a, { alpha: 0 }, 0.6, { ease: 'sineInOut' }).then(() => { if (!a.destroyed) a.destroy({ children: true, context: true }); });
           });
       });
     }

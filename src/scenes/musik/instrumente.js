@@ -1,11 +1,11 @@
-// Seite 2: Im Musikzimmer selbst spielen.
+// Seite 3: Im Musikzimmer selbst spielen.
 //
 // Groß in der Mitte eins von drei Instrumenten, gewählt mit drei großen Bild-Knöpfen rechts:
 //   Xylophon  – 8 Regenbogen-Stäbe; antippen oder mit dem Finger darüberstreichen (jeder Finger zählt)
 //   Klavier   – 8 große Tasten, ebenfalls zum Tippen und Streichen
 //   Trommeln  – große Trommel, Becken, Triangel, Bongos, Tamburin, Rasseln zum Antippen
 // Links steht ein Notenständer mit einem Liedbild. Daran hängt die Lied-Kette (jede Runde ein anderes Lied):
-//   1. Lied aussuchen – Notenständer antippen: das Bild wechselt zum nächsten Lied (6 Lieder, keins der letzten drei;
+//   1. Lied aussuchen – Notenständer antippen: das Bild wechselt zum nächsten Lied (7 Lieder, keins der letzten drei;
 //                       über die Besuche gemerkt, zurück aus dem Stickerbuch geht die Kette mit demselben Lied weiter).
 //   2. Zuhören        – das Lied wird langsam vorgespielt, die passenden Stäbe/Tasten leuchten weich (≥ 0,5 s).
 //   3. Nachspielen    – jetzt das Kind: der nächste Stab/die nächste Taste leuchtet, Antippen spielt den Ton und das
@@ -58,6 +58,9 @@ const STUECKE = [
     [2, 1], [1, 1], [0, 1], [1, 1], [2, 1], [2, 1], [2, 2], [1, 1], [1, 1], [1, 2], [2, 1], [4, 1], [4, 2]] },
   { id: 'farm', gast: 'kuh', noten: [       // Old MacDonald (Anfang, in F)
     [3, 1], [3, 1], [3, 1], [0, 1], [1, 1], [1, 1], [0, 2], [5, 1], [5, 1], [4, 1], [4, 1], [3, 2]] },
+  { id: 'kuckuck', gast: 'igel', noten: [   // Kuckuck, Kuckuck, ruft's aus dem Wald (3/4: G E G E D C D C,
+    [4, 2], [2, 1], [4, 2], [2, 1], [1, 1], [0, 1], [1, 1], [0, 3],   //   „Lasset uns singen, tanzen und springen":
+    [1, 1], [1, 1], [2, 1], [3, 2], [1, 1], [2, 1], [2, 1], [3, 1], [4, 2], [2, 1]] },   //   D D E F D E E F G E)
 ];
 
 const GAST_Y = 1556;            // der Besuch steht vorn auf dem Holzboden

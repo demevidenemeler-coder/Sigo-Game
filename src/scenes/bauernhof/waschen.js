@@ -773,8 +773,9 @@ export class Waschen extends Seite {
 
   baueSchaf() {
     const p = this.punkt('schafplatz', { x: 915, y: 1270 });
-    // etwas weiter links als der Punkt, damit der Blätter-Pfeil rechts frei bleibt; schaut zum Schwein
-    const ort = { x: Math.min(p.x, 835), y: p.y };
+    // etwas weiter links als der Punkt, damit der Blätter-Pfeil rechts zur Seite 5 frei bleibt (auch beim Wischen
+    // bis an den rechten Rand der Wolle); schaut zum Schwein
+    const ort = { x: Math.min(p.x, 755), y: p.y };
     const skala = SCHAF_HOEHE / (meta('bauernhof/schaf_geschoren').h || 800);
     const schaf = bildFigur('bauernhof/schaf_geschoren', 'schaf', {
       x: ort.x, y: ort.y, scale: skala, parent: this.welt, z: 40, punkte: { kopf: [530, 90] },
@@ -813,7 +814,7 @@ export class Waschen extends Seite {
     });
 
     // Wollsack zwischen Waschplatz und Schaf
-    this.sack = this.bild('bauernhof/wollsack', 505, 1318, 0.58, 45);
+    this.sack = this.bild('bauernhof/wollsack', 450, 1318, 0.58, 45);
     wackelDing(this.sack, { ton: 'common/plopp', vol: 0.5, pad: 40 });
   }
 

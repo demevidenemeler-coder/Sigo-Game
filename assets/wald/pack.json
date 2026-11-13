@@ -8,6 +8,7 @@
     "baby_hase": {"file": "baby_hase.webp", "w": 329, "h": 420, "ax": 0.561, "ay": 0.983, "pts": {}, "desc": "Hasenbaby sitzt, lächelt"},
     "baby_igel": {"file": "baby_igel.webp", "w": 374, "h": 420, "ax": 0.548, "ay": 0.983, "pts": {}, "desc": "Igelbaby sitzt, lächelt"},
     "baby_reh": {"file": "baby_reh.webp", "w": 346, "h": 420, "ax": 0.462, "ay": 0.985, "pts": {}, "desc": "Rehkitz mit weißen Punkten, sitzt, lächelt"},
+    "baeumchen": {"file": "baeumchen.webp", "w": 374, "h": 500, "ax": 0.513, "ay": 0.984, "pts": {}, "desc": "Junges Eichenbäumchen mit Gesicht und Eicheln auf Erdhügel"},
     "baumstamm_hohl": {"file": "baumstamm_hohl.webp", "w": 700, "h": 379, "ax": 0.51, "ay": 0.98, "pts": {}, "desc": "Liegender hohler Baumstamm, Öffnung rechts (Versteck)"},
     "baumstumpf_hoehle": {"file": "baumstumpf_hoehle.webp", "w": 700, "h": 487, "ax": 0.478, "ay": 0.982, "pts": {}, "desc": "Baumstumpf mit Höhle vorn (Versteck)"},
     "blatt_bunt": {"file": "blatt_bunt.webp", "w": 240, "h": 236, "ax": 0.419, "ay": 0.986, "pts": {}, "desc": "Buntes Herbstblatt (Ahorn)"},
@@ -20,9 +21,11 @@
     "hg_lichtung": {"file": "hg_lichtung.webp", "w": 2829, "h": 1600, "ax": 0.5, "ay": 0.5, "pts": {"boden": [1415, 1250], "versteck1": [560, 1200], "versteck2": [900, 1380], "versteck3": [1260, 1180], "versteck4": [1560, 1400], "versteck5": [1780, 1170], "mama1": [2000, 1470], "mama2": [2200, 1470], "mama3": [2400, 1470]}, "desc": "Helle Waldlichtung am Tag, Bäume links/rechts als Rahmen, großer freier Moosboden ab y≈1000"},
     "hg_nacht": {"file": "hg_nacht.webp", "w": 2829, "h": 1600, "ax": 0.5, "ay": 0.5, "pts": {"boden": [1415, 1250], "ast": [1650, 420], "schlafplatz1": [430, 1110], "schlafplatz2": [900, 1260], "schlafplatz3": [1415, 1380], "schlafplatz4": [1930, 1260], "schlafplatz5": [2360, 1120]}, "desc": "Derselbe Wald bei Nacht, tiefblau mit Sternen und Mondlicht, waagrechter Ast oben Mitte (ast = Sitzplatz Eule), Wurzeln links/rechts"},
     "hg_sammeln": {"file": "hg_sammeln.webp", "w": 2829, "h": 1600, "ax": 0.5, "ay": 0.5, "pts": {"boden": [1415, 1150], "stumpf": [510, 590], "fund1": [700, 1150], "fund2": [1000, 1050], "fund3": [1300, 1250], "fund4": [1600, 1080], "fund5": [1900, 1220], "fund6": [2200, 1100], "fund7": [900, 1400], "fund8": [1700, 1420]}, "desc": "Waldboden mit Moos und Laub, großer Baumstumpf links (Oberseite = stumpf), viel freier Boden"},
+    "hg_waldrand": {"file": "hg_waldrand.webp", "w": 2829, "h": 1600, "ax": 0.5, "ay": 0.5, "pts": {"boden": [1415, 1250]}, "desc": "Waldrand am Tag mit großer Eiche rechts, langer waagrechter Ast oben Mitte (Vogelhäuser), freie Wiese unten"},
     "himbeere": {"file": "himbeere.webp", "w": 206, "h": 240, "ax": 0.41, "ay": 0.986, "pts": {}, "desc": "Große Himbeere"},
     "holzteller": {"file": "holzteller.webp", "w": 360, "h": 175, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Leerer runder Holzteller, schräg von vorn (Picknick)"},
     "kastanie": {"file": "kastanie.webp", "w": 240, "h": 219, "ax": 0.498, "ay": 0.981, "pts": {}, "desc": "Kastanie"},
+    "keimling": {"file": "keimling.webp", "w": 251, "h": 300, "ax": 0.552, "ay": 0.98, "pts": {}, "desc": "Eichen-Keimling auf kleinem Erdhügel"},
     "laterne_glas": {"file": "laterne_glas.webp", "w": 343, "h": 520, "ax": 0.497, "ay": 0.984, "pts": {}, "desc": "Leeres Einmachglas als Laterne mit Holzdeckel und Henkel (Glühwürmchen-Glas)"},
     "laubhaufen": {"file": "laubhaufen.webp", "w": 700, "h": 330, "ax": 0.483, "ay": 0.978, "pts": {}, "desc": "Weicher Laubhaufen aus bunten Herbstblättern (Versteck, Tierbett)"},
     "mondschein": {"file": "mondschein.webp", "w": 700, "h": 700, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Weicher runder heller Lichtschein (Mondlicht)"},
@@ -36,7 +39,14 @@
     "sammelkorb": {"file": "sammelkorb.webp", "w": 454, "h": 500, "ax": 0.491, "ay": 0.984, "pts": {}, "desc": "Leerer Weidenkorb mit Henkel und kariertem Tuch"},
     "specht": {"file": "specht.webp", "w": 217, "h": 400, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Specht von der Seite, blickt nach rechts, Krallen rechts: links an einen Baumstamm setzen (Stamm rechts vom Vogel)"},
     "stein_gross": {"file": "stein_gross.webp", "w": 700, "h": 398, "ax": 0.511, "ay": 0.98, "pts": {}, "desc": "Großer bemooster Fels (Versteck)"},
-    "tannenzapfen": {"file": "tannenzapfen.webp", "w": 182, "h": 240, "ax": 0.514, "ay": 0.986, "pts": {}, "desc": "Tannenzapfen"}
+    "tannenzapfen": {"file": "tannenzapfen.webp", "w": 182, "h": 240, "ax": 0.514, "ay": 0.986, "pts": {}, "desc": "Tannenzapfen"},
+    "vogel_gimpel": {"file": "vogel_gimpel.webp", "w": 300, "h": 296, "ax": 0.418, "ay": 0.983, "pts": {}, "desc": "Gimpel sitzt, Seitenansicht, schaut nach rechts"},
+    "vogel_meise": {"file": "vogel_meise.webp", "w": 299, "h": 300, "ax": 0.463, "ay": 0.983, "pts": {}, "desc": "Blaumeise sitzt, Seitenansicht, schaut nach rechts"},
+    "vogel_rotkehlchen": {"file": "vogel_rotkehlchen.webp", "w": 300, "h": 288, "ax": 0.452, "ay": 0.983, "pts": {}, "desc": "Rotkehlchen sitzt, Seitenansicht, schaut nach rechts"},
+    "vogel_spatz": {"file": "vogel_spatz.webp", "w": 300, "h": 279, "ax": 0.602, "ay": 0.983, "pts": {}, "desc": "Spatz sitzt, Seitenansicht, schaut nach rechts"},
+    "vogelhaus": {"file": "vogelhaus.webp", "w": 420, "h": 391, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Vogelhaus-Unterteil ohne Dach, Schale voller Körner, Sitzstange vorn"},
+    "vogelhaus_dach": {"file": "vogelhaus_dach.webp", "w": 420, "h": 345, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Helles Dach fürs Vogelhaus mit Ring oben (wird eingefärbt)"},
+    "vogelhaus_leer": {"file": "vogelhaus_leer.webp", "w": 420, "h": 390, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Vogelhaus-Unterteil ohne Dach, leere Schale (gleiche Form wie vogelhaus)"}
   },
   "audio": {
   }

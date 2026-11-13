@@ -283,6 +283,60 @@
       "ax": 0.504,
       "ay": 0.977,
       "desc": "Zusammengerollte rot-weiß karierte Picknickdecke mit Band"
+    },
+    "vogelhaus": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Vogelhaus-Unterteil ohne Dach, Schale voller Körner, Sitzstange vorn"
+    },
+    "vogelhaus_dach": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Helles Dach fürs Vogelhaus mit Ring oben (wird eingefärbt)"
+    },
+    "vogel_rotkehlchen": {
+      "ax": 0.452,
+      "ay": 0.983,
+      "desc": "Rotkehlchen sitzt, Seitenansicht, schaut nach rechts"
+    },
+    "vogel_meise": {
+      "ax": 0.463,
+      "ay": 0.983,
+      "desc": "Blaumeise sitzt, Seitenansicht, schaut nach rechts"
+    },
+    "vogelhaus_leer": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Vogelhaus-Unterteil ohne Dach, leere Schale (gleiche Form wie vogelhaus)"
+    },
+    "vogel_gimpel": {
+      "ax": 0.418,
+      "ay": 0.983,
+      "desc": "Gimpel sitzt, Seitenansicht, schaut nach rechts"
+    },
+    "vogel_spatz": {
+      "ax": 0.602,
+      "ay": 0.983,
+      "desc": "Spatz sitzt, Seitenansicht, schaut nach rechts"
+    },
+    "keimling": {
+      "ax": 0.552,
+      "ay": 0.98,
+      "desc": "Eichen-Keimling auf kleinem Erdhügel"
+    },
+    "baeumchen": {
+      "ax": 0.513,
+      "ay": 0.984,
+      "desc": "Junges Eichenbäumchen mit Gesicht und Eicheln auf Erdhügel"
+    },
+    "hg_waldrand": {
+      "pts": {
+        "boden": [
+          1415,
+          1250
+        ]
+      },
+      "desc": "Waldrand am Tag mit großer Eiche rechts, langer waagrechter Ast oben Mitte (Vogelhäuser), freie Wiese unten"
     }
   },
   "audio": {}

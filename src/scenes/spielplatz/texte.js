@@ -13,4 +13,11 @@ export default {
   spielplatz_klopfen: 'Klopf auf den Eimer!',
   spielplatz_fahne: 'Steck die Fahnen auf die Burg!',
   spielplatz_wasser: 'Gieß Wasser in den Graben!',
+  // neu (Runde 3: Wasser und Matsch)
+  spielplatz_rinne: 'Leg die Rinne zum Wasserrad!',
+  spielplatz_pumpen: 'Pump das Wasser!',
+  spielplatz_schiffchen: 'Setz das Schiffchen aufs Wasser!',
+  spielplatz_matsch: 'Wir backen einen Matschkuchen!',
+  spielplatz_verzieren: 'Schmück den Kuchen!',
+  spielplatz_servieren: 'Bring den Kuchen zum Gast!',
 };

@@ -11,12 +11,14 @@
 //   Froschsprünge tier_frosch. Der Sticker erscheint frei im Himmel.
 // - Haupttätigkeit (nest.js): Die linke Entenmama baut am Grasufer ein Nest, brütet Eier aus und bringt die Küken
 //   heim – die Familien wachsen von Runde zu Runde (gespeichert in 'teich.kueken').
+// - Ab und zu ein Gast (gast.js): Schwan oder Schildkröte möchte Krümel; jeder verabschiedet sich anders.
 
 import { Actor, spr, tap, drag, fx, sfx, voice, note, store, killTweensOf, rand, pick, clamp, PIXI } from '../../engine/index.js';
 import { Seite } from '../../gemeinsam/seiten.js';
 import { belohne } from '../../gemeinsam/sticker.js';
 import { ton, laut, freue, naechsterSticker, flugDauer, Ringe, Vogel, Schmetterling, Wolken } from './deko.js';
 import { NestAblauf } from './nest.js';
+import { Gast } from './gast.js';
 
 const WASSER_OBEN = 615;                 // hinteres Ufer (Szenen-y)
 const STICKER_ORT = { x: 0, y: 400 };   // dort erscheint ein neuer Sticker (freier Himmel über den Hügeln)
@@ -56,6 +58,7 @@ export class AmTeich extends Seite {
     this.baueBrot();
     this.baueDeko();
     this.nest = new NestAblauf(this, WASSER_POLY);
+    this.gast = new Gast(this);
 
     // Ab und zu hüpft der Frosch von selbst (zeigt, was geht) – nur wenn gerade niemand spielt
     // (zählt nicht für den Frosch-Sticker – den verdient nur das Kind)
@@ -524,6 +527,8 @@ export class AmTeich extends Seite {
     const y = k.y;
     // haben die Küken im Nest Hunger (nest.js), bekommen sie den Krümel
     if (this.nest.kruemelFuerKueken(k, x, y, false)) return;
+    // ein wartender Gast (Schwan, Schildkröte) bekommt, was man ihm bringt
+    if (this.gast.nimmKruemel(k, x, y)) return;
     // Direkt auf eine Ente (oder ihr Küken) gelegt: der Krümel plumpst vor ihren Schnabel
     const ente = this.enteBei(x, y);
     if (ente) {
@@ -556,6 +561,7 @@ export class AmTeich extends Seite {
   // Brot nur angetippt: der Krümel fliegt im Bogen vor die Ente, die am längsten nichts bekam
   wirfKruemel(k) {
     if (this.nest.kruemelFuerKueken(k, k.x, k.y, true)) return;
+    if (this.gast.wirfZu(k)) return;
     const frei = this.enten.filter((e) => e.modus === 'schwimmt');
     const liste = frei.length ? frei : this.enten;
     const ente = liste.reduce((a, b) => ((a.zuletzt || 0) <= (b.zuletzt || 0) ? a : b));
@@ -879,6 +885,7 @@ export class AmTeich extends Seite {
     }
     this.updateEnten(dt, t);
     this.nest.update(dt, t);
+    this.gast.update(dt, t);
     this.updateKruemel(dt, t);
     this.updateDeko(dt, t);
   }
@@ -891,6 +898,9 @@ export class AmTeich extends Seite {
     const nest = this.nest.hinweis();
     // läuft eine Nest-Runde, zeigt die Hand zuerst (zweimal) den nächsten Schritt
     if (nest) return [nest, nest, andere[0], { von: this.brot, nach: ente.c }];
+    // ein Gast wartet auf Krümel
+    const gast = this.gast.hinweis();
+    if (gast) return [gast, andere[0], gast, this.frosch];
     return [andere[0], { von: this.brot, nach: ente.c }, this.frosch];
   }
 }

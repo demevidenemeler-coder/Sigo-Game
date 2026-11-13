@@ -408,6 +408,73 @@
         ]
       },
       "desc": "Saftpresse ohne Kurbelrad"
+    },
+    "kochtopf": {
+      "ax": 0.493,
+      "ay": 0.982,
+      "desc": "roter Kochtopf mit weißen Punkten auf kleinem Steinherd, oben offen",
+      "pts": {
+        "oeffnung": [
+          300,
+          72
+        ],
+        "rand": [
+          300,
+          118
+        ]
+      }
+    },
+    "kochloeffel": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "langer Holzlöffel, Laffe unten"
+    },
+    "brett": {
+      "ax": 0.405,
+      "ay": 0.972,
+      "desc": "leeres Holz-Schneidebrett mit Griff rechts",
+      "pts": {
+        "mitte": [
+          170,
+          62
+        ]
+      }
+    },
+    "holzmesser": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "stumpfes Spielzeug-Holzmesser, Klinge nach unten links"
+    },
+    "schale": {
+      "ax": 0.495,
+      "ay": 0.982,
+      "desc": "leere cremeweiße Suppenschale mit rotem Herz",
+      "pts": {
+        "innen": [
+          150,
+          58
+        ]
+      }
+    },
+    "glas": {
+      "ax": 0.5,
+      "ay": 0.983,
+      "desc": "leeres durchsichtiges Marmeladenglas ohne Deckel"
+    },
+    "deckel": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "rot-weiß karierter Stoffdeckel mit Schleife"
+    },
+    "schale_suppe": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Schale voll Gemüsesuppe (Wunschbild, Sticker)"
+    },
+    "glas_voll": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "volles Erdbeer-Marmeladenglas mit kariertem Deckel (Wunschbild, Sticker)"
     }
   },
   "audio": {}

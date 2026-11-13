@@ -157,6 +157,16 @@
       "ax": 0.5,
       "ay": 0.5,
       "desc": "Leerer Holz-Bilderrahmen mit Knäufen an den Ecken, quer, innen durchsichtig (9-Slice)"
+    },
+    "knete_schnecke": {
+      "ax": 0.375,
+      "ay": 0.982,
+      "desc": "Kleine Knete-Schnecke (Sticker, Regal)"
+    },
+    "perlenkette": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Selbst gefädelte Perlenkette (Sticker)"
     }
   },
   "audio": {}

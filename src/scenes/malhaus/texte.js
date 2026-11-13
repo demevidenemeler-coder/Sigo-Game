@@ -13,4 +13,11 @@ export default {
   malhaus_punkte: 'Fahr mit dem Finger über die Punkte.',
   malhaus_wischen: 'Wisch mit dem Finger über das Blatt.',
   malhaus_aufhaengen: 'Danke! Das Bild hängen wir auf.',
+  // neu (Bastelecke, Runde 3) – Aufnahmen folgen
+  malhaus_knete: 'Nimm dir ein Stück Knete.',
+  malhaus_rollen: 'Roll die Knete hin und her.',
+  malhaus_ofen: 'Und jetzt ab in den Ofen!',
+  malhaus_regal: 'Danke! Das kommt ins Regal.',
+  malhaus_perlen: 'Tipp auf die Perlen. Sie kommen auf die Schnur.',
+  malhaus_kette: 'Häng dem Besuch die Kette um.',
 };

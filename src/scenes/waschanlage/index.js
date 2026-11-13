@@ -29,6 +29,7 @@ import { belohne, gesammelt, stickerFuerOrt } from '../../gemeinsam/sticker.js';
 import { TYPEN, plan, baueFahrzeug, flaechenPunkte, ohneGesicht, verteile, streue, oberkante } from './fahrzeuge.js';
 import { Schleife } from './schleife.js';
 import { Wolken, Vogel, Falter } from './deko.js';
+import { Tankstelle } from './tankstelle.js';
 import {
   KUNDEN, DEKO, SCHMUTZ, FUNDE, FARBEN, STAUB, neuOhne, Pumpe, StickerBrett, Wimpelkette, dachPunkt,
 } from './werkstatt.js';
@@ -1359,7 +1360,9 @@ class Waschplatz extends Seite {
   // Ein Sticker je geschaffter Runde, solange es noch neue gibt; danach nur ab und zu ein leiser Gruß
   belohnung(w) {
     if (this.w !== w || w.f.destroyed) return;
-    const ids = stickerFuerOrt('waschanlage', { nurVorhandene: true }).map((s) => s.id);
+    // nur die Sticker des Waschplatzes (Zapfsäule und Kakao gibt es auf der Tankstellen-Seite)
+    const ids = stickerFuerOrt('waschanlage', { nurVorhandene: true }).map((s) => s.id)
+      .filter((id) => id === 'waschanlage_schwamm' || id === 'waschanlage_buerste');
     if (!ids.length) return;
     const schon = new Set(gesammelt());
     const neu = ids.find((id) => !schon.has(id));
@@ -1739,10 +1742,18 @@ export default class Waschanlage extends SeitenSzene {
   static tiere = ['ente', 'frosch', 'kuh', 'schaf', 'schwein', 'pferd', 'hund', 'katze', 'hase', 'fuchs', 'igel',
     'baer', 'maus', 'pinguin', 'eichhoernchen', 'huhn'];
   static music = 'musik/bau';
-  static seiten = [Waschplatz];
+  static seiten = [Waschplatz, Tankstelle];
 
   vorbereiten() {
     ui.albumKnopf(this);
+  }
+
+  // Tankstelle: Rollt gerade ein Fahrzeug herein oder hinaus (oder läuft ein Schritt von selbst), zeigt die Hand
+  // nichts – auch nicht auf den Blätter-Pfeil, sonst schickte sie das Kind mitten im Abschied weg. Nach langer
+  // Ruhe (30 s) zeigt sie wie überall den Pfeil.
+  hints() {
+    if (!this.gleitet && this.seite?.wartetGerade?.() && this.idle < 30) return [];
+    return super.hints();
   }
 
   exit() {

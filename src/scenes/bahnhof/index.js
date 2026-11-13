@@ -21,7 +21,8 @@
 // das Signal wird grün – dann hebt der Schaffner die Kelle. Der freie Zugbau oben bleibt jederzeit möglich.
 
 import {
-  Scene, stage, spr, sfx, voice, tap, drag, Actor, fx, ui, store, killTweensOf, pick, clamp, PIXI,
+  Scene, stage, spr, sfx, voice, tap, drag, Actor, fx, ui, store, killTweensOf, pick, clamp, cancelAllFingers,
+  pruefeStimme, PIXI,
 } from '../../engine/index.js';
 import { setzeHintergrund, hgPunkt } from '../../gemeinsam/seiten.js';
 import {
@@ -31,6 +32,7 @@ import {
 import { belohne, stickerFuerOrt } from '../../gemeinsam/sticker.js';
 import { Vogel, Schmetterling, Uhr, Wolken } from './deko.js';
 import { Abfahrt } from './ablauf.js';
+import { Gueterbahnhof } from './gueter.js';
 
 const { Container, Graphics, Circle, Rectangle, Point } = PIXI;
 
@@ -67,6 +69,12 @@ const ARTEN = {
   ladung: { icon: 'bahnhof/icon_ladung', stimme: 'bahnhof_ladung', items: LADUNGEN.map((id) => ({ id, tex: 'zug/' + id })) },
 };
 const REIHE = ['lok', 'wagen', 'gast', 'ladung'];
+// Zweite Seite (Güterbahnhof, gueter.js): liegt so weit rechts (Hintergründe sind 2829 breit); Blättern wie bei den
+// Seiten-Orten (1,0 s, sineInOut). Pfeil-Tipps während des Gleitens und 0,3 s danach zählen nicht.
+const WEITE = 2900;
+const GLEITEN = 1.0;
+const PFEIL_Y = 840;             // Blätter-Pfeile: unter der Kelle, über dem Signal
+const PFEIL_HINWEIS_AB = 30;     // so lange Ruhe, dann zeigt die Hand auf den Pfeil
 
 export default class Bahnhof extends Scene {
   static id = 'bahnhof';
@@ -76,7 +84,13 @@ export default class Bahnhof extends Scene {
     'baer', 'affe', 'loewe', 'elefant', 'giraffe', 'pinguin', 'fuchs', 'eule', 'eichhoernchen', 'hahn'];
   static music = 'musik/fahrt';
 
-  async enter() {
+  async enter(params = {}) {
+    this.nr = 0;                 // sichtbare Seite: 0 Bahnsteig, 1 Güterbahnhof
+    this.gleitet = false;
+    this._ruhtBis = 0;
+    this.gueter = null;
+    this.hud1 = new Container({ label: 'seite1:hud', sortableChildren: true });
+    this.hud.addChild(this.hud1);
     this.modus = 'kommt';        // 'kommt' (rollt herein) → 'steht' → 'faehrt' (Abfahrt)
     this.v = 0;                  // Geschwindigkeit beim Hereinrollen
     this.leiste = null;
@@ -110,7 +124,80 @@ export default class Bahnhof extends Scene {
 
     // Begrüßung – aber nicht mehr, wenn der Zug schon abfährt (sie kann hinter einem Leisten-Satz warten).
     // Die Hinweise zu den Schritten sagt der Ablauf selbst an (nur, solange das Kind den Schritt noch nicht tut).
-    this.after(1.2, () => voice('bahnhof_hallo', { nurWenn: () => this.modus !== 'faehrt' }));
+    this.after(1.2, () => voice('bahnhof_hallo', { nurWenn: () => this.modus !== 'faehrt' && this.nr === 0 }));
+
+    // Start auf der zweiten Seite (Rückweg aus dem Album, ?seite=1 beim Testen)
+    if (startSeite(params) === 1) this.zeigeSeite(1, true);
+  }
+
+  // ---------------------------------------------------------------- Seiten (Bahnsteig ↔ Güterbahnhof)
+
+  holeGueter() {
+    if (!this.gueter) {
+      this.gueter = new Gueterbahnhof(this, WEITE);
+      this.versatz(this.nr);
+    }
+    return this.gueter;
+  }
+
+  // k = 0: Bahnsteig, 1: Güterbahnhof (dazwischen: beim Gleiten)
+  versatz(k) {
+    const x = -WEITE * k;
+    this.bg.x = x;
+    this.world.x = x;
+    this.front.x = x;
+    this.hud1.x = -stage.W * k;
+    this.hud1.visible = k < 0.999;
+    if (this.gueter) {
+      this.gueter.hud.x = stage.W * (1 - k);
+      this.gueter.hud.visible = k > 0.001;
+      // Auf dem Bahnsteig ist vom Güterbahnhof nichts zu sehen (dort wartende Züge ragten sonst herein)
+      const g = this.gueter;
+      g.hinten.visible = g.welt.visible = g.vorn.visible = k > 0.001;
+    }
+  }
+
+  async zeigeSeite(n, sofort = false) {
+    if (this.gleitet || n === this.nr || (!sofort && this.t < this._ruhtBis)) return;
+    if (n === 1 && this.modus === 'faehrt') return;
+    const g = this.holeGueter();
+    const alt = this.nr;
+    this.gleitet = true;
+    // Was gerade gezogen oder gezeigt wird, endet sauber; während des Gleitens keine Eingabe
+    cancelAllFingers();
+    ui.handWeg(0.2);
+    this.schliesseLeiste();
+    this.zuege.forEach((z) => z.ende());
+    this.zuege.clear();
+    if (alt === 1) g.verlassen();
+    this.nr = n;
+    pruefeStimme();
+    const ebenen = [this.bg, this.world, this.front, this.hud1, g.hud];
+    for (const c of ebenen) c.interactiveChildren = false;
+    if (!sofort) {
+      sfx('common/wusch', { vol: 0.35 });
+      const p = { k: alt };
+      await this.tween(p, { k: n }, GLEITEN, { ease: 'sineInOut', onUpdate: () => this.versatz(p.k) });
+    }
+    this.versatz(n);
+    for (const c of ebenen) c.interactiveChildren = true;
+    this.gleitet = false;
+    this._ruhtBis = this.t + 0.3;
+    if (n === 1) g.betreten();
+  }
+
+  rückkehr() {
+    return { seite: this.nr };
+  }
+
+  get hinweisHaende() {
+    return 4;
+  }
+
+  // Die Stimme wiederholt einen Hinweis nur, solange die Hand noch nicht auf den Blätter-Pfeil zeigt
+  hinweisWiederholbar() {
+    if (this.gleitet || this.idle >= PFEIL_HINWEIS_AB) return false;
+    return this.hints().length > 0;
   }
 
   // ---------------------------------------------------------------- Bahnsteig und Nebensachen
@@ -723,6 +810,7 @@ export default class Bahnhof extends Scene {
 
   exit() {
     this.ablauf?.exit();
+    this.gueter?.exit();
     window.removeEventListener('pointermove', this._zugBewegt);
     window.removeEventListener('pointerup', this._zugEnde);
     window.removeEventListener('pointercancel', this._zugEnde);
@@ -737,7 +825,12 @@ export default class Bahnhof extends Scene {
       this.knoepfe[art] = this.rundKnopf(ARTEN[art].icon, 250, () => this.oeffneLeiste(art));
     }
     // Abfahrts-Knopf: grüne Platte mit der grünen Kelle – „Tipp auf Grün" ist so auch ohne das Wort „Kelle" klar
-    this.losKnopf = ui.button('bahnhof/fahne_gruen', { size: 290, farbe: 0x9fe08f, parent: this.hud, onTap: () => this.abfahren(), sound: null });
+    this.losKnopf = ui.button('bahnhof/fahne_gruen', { size: 290, farbe: 0x9fe08f, parent: this.hud1, onTap: () => this.abfahren(), sound: null });
+    // Pfeil zum Güterbahnhof
+    this.pfeilRechts = ui.button('common/icon_pfeil_rechts', {
+      size: 220, parent: this.hud1, sound: null, onTap: () => { if (this.modus !== 'faehrt') this.zeigeSeite(1); },
+    });
+    this.pfeilRechts.label = 'pfeilRechts';
     this.ordneKnoepfe();
   }
 
@@ -755,23 +848,26 @@ export default class Bahnhof extends Scene {
       killTweensOf(ring, ['alpha']);
       this.tween(ring, { alpha: an ? 1 : 0 }, 0.5, { ease: 'sineInOut' });
     };
-    this.hud.addChild(k);
+    this.hud1.addChild(k);
     tap(k, () => onTap(), { hitArea: new Circle(0, 0, d / 2 + 20) });
     return k;
   }
 
   resize() {
     this.ordneKnoepfe();
+    this.gueter?.ordne();
+    if (!this.gleitet) this.versatz(this.nr);
   }
 
   ordneKnoepfe() {
     const W = stage.W;
     REIHE.forEach((art, i) => this.knoepfe[art]?.position.set(W / 2 + 280 + (i - 1.5) * 290, 215));
     this.losKnopf?.position.set(W / 2 + 1066 - 190, 560);
+    this.pfeilRechts?.position.set(W - 175, PFEIL_Y);
   }
 
   oeffneLeiste(art) {
-    if (this.modus === 'faehrt') return;
+    if (this.modus === 'faehrt' || this.nr !== 0 || this.gleitet) return;
     if (this.leisteArt === art) {
       this.schliesseLeiste();
       return;
@@ -878,6 +974,7 @@ export default class Bahnhof extends Scene {
   }
 
   async abfahren() {
+    if (this.nr !== 0 || this.gleitet) return;
     if (this.modus !== 'steht') {
       fx.wobble(this.losKnopf, 0.03);
       return;
@@ -936,7 +1033,8 @@ export default class Bahnhof extends Scene {
         this.v = 0;
         z.x = ziel;
         this.modus = 'steht';
-        this.after(0.4, () => z.pfeife());
+        // (kein Pfiff vom Bahnsteig, während das Kind im Güterbahnhof spielt)
+        this.after(0.4, () => { if (this.nr === 0) z.pfeife(); });
         this.ablauf?.start();
       }
       z.geschwindigkeit = this.v;
@@ -953,10 +1051,18 @@ export default class Bahnhof extends Scene {
     this.ablauf?.update(dt);
     this.vogel.update(dt);
     this.falter.update(dt);
+    if (this.gueter && (this.nr === 1 || this.gleitet)) this.gueter.update(dt);
   }
 
   hints() {
+    if (this.gleitet) return [];
+    if (this.nr === 1) {
+      // Erst die Schritte des Güterbahnhofs; ab 30 s Ruhe der Pfeil zurück. Während Kran, Lok oder Zug gerade
+      // selbst etwas tun (keine Hinweise), zeigt die Hand nicht vorschnell zurück zum Bahnsteig.
+      return this.idle >= PFEIL_HINWEIS_AB ? [this.gueter.pfeilLinks] : this.gueter.hinweise();
+    }
     if (this.modus !== 'steht') return [];
+    if (this.idle >= PFEIL_HINWEIS_AB) return [this.pfeilRechts];
     const z = this.zug;
     const liste = [];
     // Offene Leiste: erst zeigen, wohin ein Ding aus ihr gehört
@@ -1016,10 +1122,22 @@ export default class Bahnhof extends Scene {
 
   // Ton abspielen, aber nicht öfter als alle `pause` Sekunden (gleiche Töne nicht stapeln). → true, wenn gespielt
   ton(id, pause = 0.5, opt) {
+    // Töne des Bahnsteigs schweigen, solange der Güterbahnhof zu sehen ist (z. B. die Tür, wenn Fahrgäste kommen)
+    if (this.nr === 1) return false;
     const jetzt = this.t;
     if (jetzt - (this.toene.get(id) ?? -99) < pause) return false;
     this.toene.set(id, jetzt);
     sfx(id, opt);
     return true;
   }
+}
+
+// Start-Seite: params.seite, sonst – wenn die Szene direkt über die Adresse gestartet wurde – ?seite=n, sonst 0
+function startSeite(params) {
+  if (params && params.seite !== undefined && params.seite !== null) return Number(params.seite) === 1 ? 1 : 0;
+  try {
+    const suche = new URLSearchParams(location.search);
+    if (suche.get('szene') === 'bahnhof' && suche.get('seite') === '1') return 1;
+  } catch { /* ohne Adresse: erste Seite */ }
+  return 0;
 }

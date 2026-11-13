@@ -5,11 +5,15 @@ import { spr, tex, meta, sfx, Actor, clamp, PIXI } from '../../engine/index.js';
 import { Fahrzeug } from '../../gemeinsam/zug.js';
 import { stickerFuerOrt, gesammelt } from '../../gemeinsam/sticker.js';
 
+// Diese Sticker gibt es nur für ihren eigenen Einsatz (Laterne repariert, Blumenkübel gerettet) – nie als Ersatz für
+// eine andere geschaffte Runde (sonst bekäme ein Kind mit altem Speicherstand die Laterne fürs Helme-Verteilen).
+const NUR_EIGENER_EINSATZ = ['feuerwehr_laterne', 'feuerwehr_blumenkuebel'];
+
 /** Sticker für eine geschaffte Runde: der gewünschte, falls schon im Album ein anderer noch fehlender des Ortes. */
 export function feuerSticker(bevorzugt) {
   const schon = new Set(gesammelt());
   if (!schon.has(bevorzugt)) return bevorzugt;
-  const frei = stickerFuerOrt('feuerwehr').find((s) => !schon.has(s.id));
+  const frei = stickerFuerOrt('feuerwehr').find((s) => !schon.has(s.id) && !NUR_EIGENER_EINSATZ.includes(s.id));
   return frei ? frei.id : bevorzugt;
 }
 

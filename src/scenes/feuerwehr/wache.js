@@ -8,13 +8,17 @@
 // Kommt das Auto zurück: Mannschaft steigt aus, legt die Helme zurück, der Orden vom Einsatz schwebt an die Wand
 // (die Orden-Reihe wächst über die Runden), das Auto fährt rückwärts in die Garage, das Tor geht zu, und ein Tier der
 // Mannschaft geht nach Hause – ein neues kommt. Hydrant, Schlauchrolle, Eimer, Stange, Orden reagieren beim Antippen.
+// Dankesbilder am Rolltor (neu in Runde 3): Für jede Einsatz-Art, die das Kind zum ersten Mal schafft, malt der
+// Gerettete ein Bild. Nach der Heimkehr klebt ein Tier der Mannschaft es ans Tor; die Sammlung bleibt über die Besuche.
+// Antippen eines Bildes: es wackelt, das gemalte Tier ruft.
 
-import { spr, sfx, voice, note, tap, drag, Actor, fx, rand, pick, clamp, PIXI } from '../../engine/index.js';
+import { spr, sfx, voice, note, animal, tap, drag, Actor, fx, rand, pick, clamp, PIXI } from '../../engine/index.js';
 import { Seite } from '../../gemeinsam/seiten.js';
 import { belohne } from '../../gemeinsam/sticker.js';
 import { FeuerAuto, setzeHelm, helmSitz, helmSprite, kopfPunkt, freue, feuerSticker } from './auto.js';
 import { Vogel, Schmetterling, Wolken, tippStelle, entprellt, zeigeBlase } from './deko.js';
-import { EINSAETZE, naechsterEinsatz, waehleMannschaft, MANNSCHAFT, ordenZahl, ordenDazu, ORDEN_MAX } from './einsaetze.js';
+import { EINSAETZE, naechsterEinsatz, waehleMannschaft, MANNSCHAFT, ordenZahl, ordenDazu, ORDEN_MAX, dankListe } from './einsaetze.js';
+import { dankBild } from './dank.js';
 
 const AUTO_SKALA = 0.8;
 const AUTO_Z_GARAGE = 10;     // in der Garage: hinter dem Rolltor (z 20)
@@ -36,6 +40,11 @@ const ORDEN_PLAETZE = [-315, -195, -75, 345, 465, 585].map((x) => ({ x, y: 522 }
 const ORDEN_SKALA = 0.3;
 // Denkblase an der Glocke (kleinstes Bläschen)
 const BLASE_GLOCKE = { x: -470, y: 640 };
+// Dankesbilder am Rolltor: zwei Reihen zu je vier (Mitte des Tors x 88), über dem Griff
+const DANK_PLAETZE = [];
+for (const y of [905, 1095]) for (const k of [-1.5, -0.5, 0.5, 1.5]) DANK_PLAETZE.push({ x: 88 + k * 228, y });
+const DANK_DREH = [-0.06, 0.04, -0.03, 0.06, 0.05, -0.04, 0.03, -0.06];
+const DANK_SKALA = 0.92;
 
 export class Wache extends Seite {
   static hg = 'feuerwehr/hg_wache';
@@ -63,6 +72,7 @@ export class Wache extends Seite {
     this.baueHelme();
     this.baueKleinkram();
     this.baueOrden();
+    this.baueDank();
 
     this.vogel = new Vogel(this, {
       parent: this.welt,
@@ -463,6 +473,7 @@ export class Wache extends Seite {
     this.szene.einsatzWahl = null;
     this.helmAufgesetzt = false;
     await this.wait(0.8);
+    await this.dankAnsTor();
     this.mannschaftWechselt();
   }
 
@@ -680,6 +691,88 @@ export class Wache extends Seite {
     }
   }
 
+  // ---------------------------------------------------------------- Dankesbilder am Rolltor (wachsen über die Besuche)
+
+  baueDank() {
+    // eigene Ebene über dem Tor, gleich abgeschnitten wie das Tor (verschwindet beim Hochfahren unter der Rolle)
+    const e = new PIXI.Container({ label: 'dankbilder' });
+    e.zIndex = 21;
+    this.welt.addChild(e);
+    const maske = new PIXI.Graphics().rect(TOR.links - 20, TOR.oben, TOR.rechts - TOR.links + 40, TOR.unten - TOR.oben + 40).fill(0xffffff);
+    this.welt.addChild(maske);
+    e.mask = maske;
+    this.dankEbene = e;
+    this.dankBilder = [];
+    // was schon gemalt wurde – ohne das Bild, das gerade erst ans Tor geklebt werden will
+    const neu = this.szene.dankNeu;
+    for (const id of dankListe()) if (id !== neu) this.dankKlebt(id, false);
+  }
+
+  dankKlebt(id, mitPop) {
+    const i = this.dankBilder.length;
+    const p = DANK_PLAETZE[i];
+    if (!p) return null;
+    const b = dankBild(id);
+    b.position.set(p.x, p.y);
+    b.rotation = DANK_DREH[i];
+    b.scale.set(DANK_SKALA);
+    b.einsatz = id;
+    this.dankEbene.addChild(b);
+    const tierId = EINSAETZE[id]?.retter;
+    tap(b, () => {
+      fx.wobble(b, 0.08);
+      // wie ein Tipp aufs Tor: die Glocke zeigt sich (sie startet den Alarm)
+      if (this.zustand === 'zu') fx.pop(this.glocke, 0.1);
+      if (tierId && this.pling('common/rascheln', { vol: 0.3 })) animal(tierId);
+    }, { sound: null, squash: false, pad: 26 });
+    this.dankBilder.push(b);
+    if (mitPop) fx.pop(b, 0.12);
+    return b;
+  }
+
+  // Ein neues Dankesbild wird vom Platz eines Mannschafts-Tiers im Bogen ans Tor geklebt (nur bei geschlossenem Tor)
+  async dankAnsTor() {
+    const id = this.szene.dankNeu;
+    if (!id || this._dankLaeuft || this.zustand !== 'zu') return;
+    this._dankLaeuft = true;
+    this.szene.dankNeu = null;
+    const i = this.dankBilder.length;
+    const p = DANK_PLAETZE[i];
+    if (!p || this.dankBilder.some((b) => b.einsatz === id)) {
+      this._dankLaeuft = false;
+      return;
+    }
+    const tier = this.tiere.find((t) => !t.destroyed && t.visible) || null;
+    const start = tier ? kopfPunkt(tier, this.welt) : { x: p.x, y: 1450 };
+    const b = dankBild(id);
+    b.position.set(start.x, start.y - 60);
+    b.scale.set(0.3);
+    b.alpha = 0;
+    b.zIndex = 60;
+    b.eventMode = 'none';
+    this.welt.addChild(b);
+    if (tier) freue(this, tier, { herzen: 2, laut: true });
+    sfx('common/rascheln', { vol: 0.45 });
+    this.tween(b, { alpha: 1 }, 0.4, { ease: 'sineInOut' });
+    const von = { x: b.x, y: b.y, s: 0.3 };
+    const q = { t: 0 };
+    this.tween(b, { rotation: DANK_DREH[i] }, 1.4, { ease: 'sineInOut' });
+    await this.tween(q, { t: 1 }, 1.4, {
+      ease: 'sineInOut',
+      onUpdate: () => {
+        b.x = von.x + (p.x - von.x) * q.t;
+        b.y = von.y + (p.y + this.dankEbene.y - von.y) * q.t - Math.sin(Math.PI * q.t) * 180;
+        b.scale.set(von.s + (DANK_SKALA - von.s) * q.t);
+      },
+    });
+    b.destroy({ children: true });
+    this.dankKlebt(id, true);
+    sfx('common/plopp', { vol: 0.55 });
+    this.burst('funkeln', p.x, p.y + this.dankEbene.y, { count: 4 });
+    await this.wait(0.6);
+    this._dankLaeuft = false;
+  }
+
   // ---------------------------------------------------------------- Hydrant, Schlauchrolle, Eimer
 
   baueKleinkram() {
@@ -713,7 +806,13 @@ export class Wache extends Seite {
     const passt = () => this.aktiv && this.zustand === 'zu';
     this._hinweis = this.after(4, () => { if (passt()) voice('feuerwehr_glocke', { nurWenn: passt }); });
     if (this.zustand === 'weg') this.heimkommen();
-    else if (this.zustand === 'zu' && this.szene.ordenOffen > 0) this.after(1.2, () => { if (this.zustand === 'zu') this.ordenAnDieWand(false); });
+    else if (this.zustand === 'zu' && (this.szene.ordenOffen > 0 || this.szene.dankNeu)) {
+      this.after(1.2, async () => {
+        if (this.zustand !== 'zu' || this._dankLaeuft) return;
+        await this.ordenAnDieWand(false);
+        this.dankAnsTor();
+      });
+    }
     else if (this.zustand === 'helme') this.helmHinweis(2);
     else if (this.zustand === 'stange') this.stangeHinweis(2);
   }
@@ -724,6 +823,8 @@ export class Wache extends Seite {
   }
 
   update(dt) {
+    // die Dankesbilder kleben am Tor: sie fahren mit ihm hoch und herunter
+    this.dankEbene.y = this.tor.y - this.torZuY;
     this.auto.update(dt);
     this.wolken.update(dt);
     this.vogel.update(dt);

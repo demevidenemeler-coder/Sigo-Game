@@ -273,6 +273,49 @@
       "ax": 0.5,
       "ay": 0.5,
       "desc": "weiche weiße Entenfeder (Nest-Baustoff)"
+    },
+    "laich": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Froschlaich: Klumpen aus glasigen Kugeln mit Punkt"
+    },
+    "wasserpflanze": {
+      "ax": 0.545,
+      "ay": 0.98,
+      "desc": "Büschel grüner Wasserpflanzen (Futter der Kaulquappen)"
+    },
+    "kaulquappe": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Kaulquappe schwimmt nach rechts"
+    },
+    "kaulquappe_beine": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Kaulquappe mit Hinterbeinchen schwimmt nach rechts"
+    },
+    "schildkroete": {
+      "ax": 0.449,
+      "ay": 0.977,
+      "desc": "Schildkröte schwimmt nach rechts (Unterkante = Wasserlinie), Gast"
+    },
+    "schwan": {
+      "ax": 0.481,
+      "ay": 0.984,
+      "desc": "Schwan schwimmt nach rechts (Unterkante = Wasserlinie), Gast"
+    },
+    "hg_bucht": {
+      "pts": {
+        "stein": [
+          497,
+          1310
+        ],
+        "ufer_wasser": [
+          1414,
+          580
+        ]
+      },
+      "desc": "Stille Bucht: Wasser unten zwei Drittel, links unten flaches Ufer mit zwei Steinen"
     }
   },
   "audio": {}

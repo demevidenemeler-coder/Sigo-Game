@@ -309,6 +309,80 @@
       "ax": 0.5,
       "ay": 0.5,
       "desc": "Einzelner Eiswürfel"
+    },
+    "eismaschine": {
+      "ax": 0.423,
+      "ay": 0.984,
+      "desc": "Eismaschine mint mit rosa Trichter oben und Ausguss rechts, Gesicht",
+      "pts": {
+        "trichter": [
+          175,
+          45
+        ],
+        "ausguss": [
+          372,
+          360
+        ],
+        "kurbel": [
+          12,
+          320
+        ]
+      }
+    },
+    "kuehltruhe": {
+      "ax": 0.497,
+      "ay": 0.984,
+      "desc": "offene hellblaue Kühltruhe, Deckel hochgeklappt",
+      "pts": {
+        "innen": [
+          184,
+          222
+        ],
+        "rand": [
+          184,
+          294
+        ]
+      }
+    },
+    "schokotopf": {
+      "ax": 0.498,
+      "ay": 0.982,
+      "desc": "rosa Töpfchen mit geschmolzener Schokolade",
+      "pts": {
+        "oben": [
+          160,
+          55
+        ]
+      }
+    },
+    "wanne_leer": {
+      "ax": 0.498,
+      "ay": 0.98,
+      "desc": "leere silberne Eiswanne von vorn"
+    },
+    "eiscreme_weiss": {
+      "ax": 0.5,
+      "ay": 0.976,
+      "desc": "weißer Eis-Berg mit Schwung (zum Einfärben), liegt hinter der Wanne"
+    },
+    "stieleis": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "rosa Eis am Stiel mit Schokolade und Streuseln (Sticker)"
+    },
+    "milchkanne": {
+      "ax": 0.579,
+      "ay": 0.986,
+      "desc": "Milchkännchen weiß mit rosa Rand, Henkel links",
+      "pts": {
+        "tuelle": [
+          255,
+          25
+        ]
+      }
+    },
+    "hg_eiskueche": {
+      "desc": "Eisküche von vorn: lange Arbeitstheke (Fläche y 920-1000), gestreifte Wand links frei, rundes Fenster rechts, Fliesen unten"
     }
   },
   "audio": {}

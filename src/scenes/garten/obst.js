@@ -4,7 +4,7 @@
 //      antippen lässt sie auch fallen). Jede Runde hängen etwas andere Mengen Äpfel und Birnen am Baum.
 //   2. Sortieren: Frucht in den passenden Korb ziehen (roter Korb = Äpfel, gelber Korb = Birnen); falscher Korb →
 //      hüpft freundlich zurück. Manchmal schaut ein kleiner Wurm aus einem Apfel.
-//   3. Einfüllen: Ist alles einsortiert, kommen ein oder zwei Gäste (Igel, Maus, Eichhörnchen, Hase, Ente, Fuchs –
+//   3. Einfüllen: Ist alles einsortiert, kommen ein oder zwei Gäste (Igel, Maus, Eichhörnchen, Hase, Ente, Fuchs, Hund, Katze –
 //      hinter den Körben entlang), dann steht eine Saftpresse unter dem Baum. Korb antippen → die Früchte hüpfen
 //      nacheinander in die Presse (immer nur ein Korb zugleich).
 //   4. Kurbeln: Das Kurbelrad im Kreis drehen (wischen, ziehen – jede Bewegung dreht; ein Tipp dreht ein Stück) →
@@ -51,7 +51,7 @@ const SAFT_APFEL = 0xf0b43c;
 const SAFT_BIRNE = 0xe7dc6a;
 // Gäste: Tier, Größe; Plätze links und rechts neben der Presse
 const GÄSTE = {
-  igel: 0.3, maus: 0.22, eichhoernchen: 0.28, hase: 0.3, ente: 0.27, fuchs: 0.3,
+  igel: 0.3, maus: 0.22, eichhoernchen: 0.28, hase: 0.3, ente: 0.27, fuchs: 0.3, hund: 0.28, katze: 0.27,
 };
 const GAST_PLÄTZE = [{ x: -400, y: 1430, von: -1500 }, { x: 400, y: 1430, von: 1500 }];
 const HINTEN_Y = 1300;         // dort laufen die Gäste hinter den Körben entlang

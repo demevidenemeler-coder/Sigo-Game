@@ -12,4 +12,11 @@ export default {
   teich_korken: 'Eine Flaschenpost! Zieh den Korken raus.',
   teich_brief: 'Wisch über den Brief.',
   teich_suchen: 'Angel, was auf dem Brief steht.',
+  // Seite 3 (Froschbucht)
+  teich_laich: 'Tipp auf den Froschlaich.',
+  teich_futter: 'Die Kaulquappen haben Hunger.',
+  teich_chor: 'Bring den kleinen Frosch zum Froschchor.',
+  teich_libelle: 'Tipp auf die Libelle. Die Frösche singen!',
+  teich_wecken: 'Psst, die Frösche schlafen. Weck sie auf!',
+  teich_lied: 'Tipp auf den Frosch, der leuchtet.',
 };

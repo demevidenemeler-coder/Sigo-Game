@@ -616,6 +616,41 @@
           470
         ]
       }
+    },
+    "holzstapel": {
+      "ax": 0.5,
+      "ay": 0.977,
+      "desc": "Holzstapel mit Dach und Gesicht, runde Scheite (Holz nachlegen)",
+      "pts": {
+        "scheite": [
+          300,
+          220
+        ],
+        "gesicht": [
+          300,
+          262
+        ]
+      }
+    },
+    "holzscheit": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Einzelnes rundes Holzscheit mit Blatt"
+    },
+    "marktstand": {
+      "ax": 0.499,
+      "ay": 0.981,
+      "desc": "Marktstand mit rot-weißem Dach, leerer Theke, Körbe darunter (Markt-Halt)",
+      "pts": {
+        "theke": [
+          300,
+          345
+        ],
+        "hinten": [
+          300,
+          395
+        ]
+      }
     }
   },
   "audio": {}

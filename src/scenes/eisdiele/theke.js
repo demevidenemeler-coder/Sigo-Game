@@ -22,6 +22,7 @@ import { KundenWand, belohneZiel } from './girlanden.js';
 import {
   waffelHalter, toppingWagen, schale, Vogel, Schmetterling, bildFleck, bogenFlug, umhaengen,
 } from './deko.js';
+import { partyHut, kerze, geburtstagsLied } from './stieleis.js';
 
 const WANNE_X = [-110, 120, 350, 580, 810];   // die Punkte wanne1…5 liegen zu weit rechts (Pfeil, Rand)
 const WANNE_SKALA = 0.62;
@@ -571,6 +572,26 @@ export class Theke extends Seite {
       await this.wait(0.4);
     }
     if (a.destroyed) return;
+    // Geburtstag: eine Kerze steckt im Eis, das Tier pustet sie aus, ein leises Lied
+    const geburtstag = this.geburtstag === a;
+    if (geburtstag) {
+      const k = kerze();
+      k.position.set(e.anzahl ? 0 : 30, e.kante() + 26);
+      k.scale.set(0.01);
+      k.zIndex = 30;
+      e.addChild(k);
+      sfx('common/plopp', { vol: 0.4, rate: 1.2 });
+      await this.tween(k, { scale: 0.9 }, 0.45, { ease: 'backOut' });
+      await this.wait(0.7);
+      if (a.destroyed || e.destroyed) return;
+      sfx('common/zisch', { vol: 0.3 });
+      this.tween(k.flamme, { alpha: 0 }, 0.6, { ease: 'sineInOut' });
+      const f = this.welt.toLocal(k.toGlobal({ x: 0, y: -100 }));
+      this.burst('rauch', f.x, f.y, { count: 2 });
+      await this.wait(0.5);
+      await this.wait(geburtstagsLied(this));
+      if (a.destroyed || e.destroyed) return;
+    }
     a.pose('eat');
     await this.wait(0.12);
     if (a.destroyed) return;
@@ -590,7 +611,8 @@ export class Theke extends Seite {
     await this.tween(e, { alpha: 0, scale: s * 0.6 }, 0.35, { ease: 'sineInOut' });
     e.destroy({ children: true });
     a.pose('idle');
-    await this.kunde.freut(passt, a);
+    await this.kunde.freut(passt || geburtstag, a);
+    if (this.geburtstag === a) this.geburtstag = null;
     await this.wait(0.2);
     this.bedient = false;
     await this.bezahlen(a);
@@ -748,6 +770,18 @@ export class Theke extends Seite {
     this.blase = b;
     this.mini = m;
     if (this.runde === 0) this.hinweisAnmelden(0.7);
+    this.vielleichtGeburtstag(a);
+  }
+
+  /** Überraschung: Ab der dritten Runde hat ein Gast manchmal Geburtstag (Partyhütchen; nie zweimal hintereinander). */
+  vielleichtGeburtstag(a) {
+    const fest = this.runde >= 2 && !this.letztesMalGeburtstag && Math.random() < 0.2;
+    this.letztesMalGeburtstag = fest;
+    if (!fest) return;
+    this.geburtstag = a;
+    this.after(0.4, () => partyHut(this, a));
+    const p = () => this.aktiv && this.geburtstag === a && !this.bedient;
+    this.after(0.9, () => { if (p()) voice('eisdiele_geburtstag', { nurWenn: p }); });
   }
 
   blaseWeg() {

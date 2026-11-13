@@ -451,7 +451,14 @@ export class Besuch {
     if (!a || a.destroyed || a !== nur) return true;
     this.wunschWeg();
     this.da = false;
-    const ok = await a.walkTo(this.x - 440, BESUCH_Y, { tempo: 300 });
+    // Abwechslung beim Gehen: meist laufen, manchmal fröhlich hinaushüpfen (ruhige, flache Hüpfer)
+    let ok;
+    if (Math.random() < 0.4) {
+      ok = await a.hopTo(this.x - 200, BESUCH_Y, { hoehe: 60, dauer: 0.7, staub: false });
+      if (ok && this.actor === a) ok = await a.hopTo(this.x - 440, BESUCH_Y, { hoehe: 60, dauer: 0.75, staub: false });
+    } else {
+      ok = await a.walkTo(this.x - 440, BESUCH_Y, { tempo: 300 });
+    }
     if (this.actor === a) this.actor = null;
     if (!a.destroyed) a.destroy({ children: true });
     return ok;

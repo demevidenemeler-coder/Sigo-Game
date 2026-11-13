@@ -258,6 +258,89 @@
       "ax": 0.497,
       "ay": 0.984,
       "desc": "weißes Handtuch, über die Leine gehängt (wird eingefärbt)"
+    },
+    "anhaenger": {
+      "ax": 0.417,
+      "ay": 0.978,
+      "desc": "leerer Holz-Anhänger von der Seite, Deichsel rechts",
+      "pts": {
+        "ladeflaeche": [
+          250,
+          135
+        ],
+        "deichsel": [
+          575,
+          195
+        ]
+      }
+    },
+    "apfelbaum": {
+      "ax": 0.493,
+      "ay": 0.984,
+      "desc": "Apfelbaum ohne Früchte, runde Krone",
+      "pts": {
+        "krone": [
+          356,
+          265
+        ],
+        "radius": [
+          320,
+          0
+        ]
+      }
+    },
+    "hofladen": {
+      "ax": 0.501,
+      "ay": 0.984,
+      "desc": "Hofladen-Stand mit gestreiftem Dach, leere Theke",
+      "pts": {
+        "theke_l": [
+          90,
+          478
+        ],
+        "theke_r": [
+          660,
+          478
+        ],
+        "dach_l": [
+          105,
+          262
+        ],
+        "dach_r": [
+          645,
+          262
+        ]
+      }
+    },
+    "kiste": {
+      "ax": 0.495,
+      "ay": 0.98,
+      "desc": "leere Obstkiste aus Holz",
+      "pts": {
+        "rand": [
+          200,
+          100
+        ],
+        "oben": [
+          200,
+          10
+        ]
+      }
+    },
+    "birne": {
+      "ax": 0.5,
+      "ay": 0.983,
+      "desc": "gelbgrüne Birne mit Blatt"
+    },
+    "pflaume": {
+      "ax": 0.498,
+      "ay": 0.983,
+      "desc": "blaue Pflaume mit Blatt"
+    },
+    "glocke": {
+      "ax": 0.5,
+      "ay": 0.986,
+      "desc": "goldene Ladenglocke auf Holzfuß"
     }
   },
   "audio": {}

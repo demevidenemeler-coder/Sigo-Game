@@ -9,6 +9,8 @@
 //                                   trinken lassen → es schläft im Heu ein (bis zu drei Tierkinder)
 //   4. Waschen   (waschen.js)     – Schwein: Matsch weg, einseifen, abspülen, abtrocknen, Handtuch an die Leine
 //                                   (die Leine füllt sich); Schaf scheren, Wolle wächst bunt nach
+//   5. Ernte     (ernte.js)       – Obst vom Baum in die Kiste, Kiste auf den Anhänger, mit dem Traktor zum
+//                                   Hofladen; dort Gäste bedienen (die Girlande am Laden wächst)
 // Start direkt auf einer Seite: ?szene=bauernhof&seite=2
 
 import { ui } from '../../engine/index.js';
@@ -17,14 +19,15 @@ import { Futterplatz } from './futterplatz.js';
 import { Huehner } from './huehner.js';
 import { Melken } from './melken.js';
 import { Waschen } from './waschen.js';
+import { Ernte } from './ernte.js';
 
 export default class Bauernhof extends SeitenSzene {
   static id = 'bauernhof';
   static packs = ['bauernhof', 'tiere'];
   // alle Tiere, deren Bilder (tiere/<name>_*) der Bauernhof irgendwann zeigt – auch zufällige Gäste
-  static tiere = ['kuh', 'schwein', 'schaf', 'pferd', 'huhn', 'hahn', 'hase', 'hund', 'katze', 'ente', 'maus'];
+  static tiere = ['kuh', 'schwein', 'schaf', 'pferd', 'huhn', 'hahn', 'hase', 'hund', 'katze', 'ente', 'maus', 'igel', 'eichhoernchen'];
   static music = 'musik/wiese';
-  static seiten = [Futterplatz, Huehner, Melken, Waschen];
+  static seiten = [Futterplatz, Huehner, Melken, Waschen, Ernte];
 
   vorbereiten() {
     ui.albumKnopf(this);

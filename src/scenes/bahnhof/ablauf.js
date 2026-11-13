@@ -1001,7 +1001,8 @@ export class Abfahrt {
     // Denkblasen und die Hand, wohin es geht)
     if (neu === 'einsteigen' && this.gaeste.some((g) => !g.drin && MENSCHEN.has(g.id))) satz = null;
     if (satz) {
-      const passt = () => this.schrittName === neu && !this.aus && this.s.modus === 'steht';
+      // (nur auf dem Bahnsteig – nicht, während das Kind im Güterbahnhof spielt)
+      const passt = () => this.schrittName === neu && !this.aus && this.s.modus === 'steht' && this.s.nr === 0 && !this.s.gleitet;
       this.s.after(neu === 'karte' ? 2.2 : 2.8, () => { if (passt()) voice(satz, { nurWenn: passt }); });
     }
     if (neu === 'los') fx.pulse(this.s.losKnopf);
@@ -1070,7 +1071,7 @@ export class Abfahrt {
 
     // Wartet das Kind, zeigt der Schaffner (bzw. der Gast) den nächsten Schritt noch einmal
     this.erinnert += dt;
-    if (this.schrittName !== 'warten' && this.ruhe > 9 && this.erinnert > 11 && this.s.modus === 'steht') this.zeigeNaechstes();
+    if (this.schrittName !== 'warten' && this.ruhe > 9 && this.erinnert > 11 && this.s.modus === 'steht' && this.s.nr === 0) this.zeigeNaechstes();
   }
 
   /** Ziele der Zeige-Hand für den aktuellen Schritt (das wichtigste zuerst). */

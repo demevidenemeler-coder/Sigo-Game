@@ -13,4 +13,9 @@ export default {
   fahrt_wasser: 'Die Lok hat Durst. Halt den Finger auf den Wasserturm.',
   fahrt_signal: 'Rot heißt warten. Tipp auf das Signal!',
   fahrt_regenbogen: 'Oh, ein Regenbogen!',
+  // Runde 3 (neu – Aufnahmen folgen)
+  fahrt_holz: 'Die Lok braucht Holz. Zieh es zur Lok!',
+  fahrt_markt: 'Schau mal, was der Gast möchte!',
+  fahrt_freunde: 'Schau, ein neues Bild für die Freunde-Leine!',
+  fahrt_licht: 'Es wird dunkel. Die Lok macht ihr Licht an.',
 };

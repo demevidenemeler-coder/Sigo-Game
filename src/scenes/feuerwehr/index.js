@@ -2,8 +2,11 @@
 //   1. Wache      – Glocke läuten (der Fuchs zeigt, was los ist) → Fuchs die Stange hinunterziehen → Helme für die
 //                   Mannschaft → alle steigen ein → Auto antippen: Tatü, hinaus. Zurück: Orden an die Wand.
 //   2. Einsatz    – wechselnde Einsätze: Feuer im Fenster, Feuer im Mülleimer (Schlauch zum Hydranten ziehen,
-//                   Hydrant aufdrehen, löschen, Schlauch einrollen) oder Katze im Baum, Ballon im Baum, Entenkind
-//                   auf dem Dach (Leiter aufrichten, Korb hinaufziehen, Korb herunterziehen) → alle steigen ein, zurück.
+//                   Hydrant aufdrehen, löschen, Schlauch einrollen) oder Katze im Baum, Ballon oder Drachen im Baum,
+//                   Entenkind auf dem Dach (Leiter aufrichten, Korb hinaufziehen, Korb herunterziehen), Laterne
+//                   (Korb hinauf, Glühbirne bringen und eindrehen) oder umgefallener Blumenkübel (aufrichten, Erde
+//                   zurückwischen, Blumen einsetzen, gießen) → alle steigen ein, zurück. Neue Einsatz-Arten bringen
+//                   ein Dankesbild, das am Rolltor der Wache klebt (die Sammlung wächst über die Besuche).
 //   3. Waschplatz – Schmutz wechselt (Matsch, Ruß, Laub, Sand): wischen → Schwamm in den Schaum-Eimer →
 //                   einschäumen → abspülen → mit dem Tuch polieren → Auto antippen, es fährt heim. Wimpel wachsen.
 // Start direkt auf einer Seite: ?szene=feuerwehr&seite=1
@@ -18,7 +21,7 @@ export default class Feuerwehr extends SeitenSzene {
   static id = 'feuerwehr';
   static packs = ['feuerwehr', 'tiere'];
   // Alle Tiere, die dieser Ort irgendwann zeigt (Fahrer, Mannschaft, Gerettete, Gäste)
-  static tiere = ['fuchs', 'hund', 'katze', 'baer', 'affe', 'schwein', 'hase', 'igel', 'maus', 'ente', 'frosch'];
+  static tiere = ['fuchs', 'hund', 'katze', 'baer', 'affe', 'schwein', 'hase', 'igel', 'maus', 'ente', 'frosch', 'eule', 'schaf'];
   static music = 'musik/bau';
   static seiten = [Wache, Einsatz, Waschplatz];
 
@@ -30,6 +33,7 @@ export default class Feuerwehr extends SeitenSzene {
     this.mannschaft = null;     // wer mit Helm mitgefahren ist (Tier-ids)
     this.schmutz = null;        // wie schmutzig das Auto vom letzten Einsatz kommt
     this.ordenOffen = 0;        // geschaffte Einsätze, deren Orden noch nicht an der Wand der Wache hängt
+    this.dankNeu = null;        // neues Dankesbild (Einsatz-id), das noch ans Tor der Wache geklebt werden will
     ui.albumKnopf(this);
   }
 }

@@ -13,4 +13,11 @@ export default {
   baustelle_farbe: 'Such dir eine Farbe aus!',
   baustelle_schotter: 'Schieb den Kipper über die Straße.',
   baustelle_band: 'Die Straße ist fertig. Schneid das Band durch!',
+  // neu (Runde 3: Bauhof, gelbe Striche) – Aufnahmen folgen
+  baustelle_bretter: 'Tipp auf die Bretter. Wir bauen etwas!',
+  baustelle_naegel: 'Klopf die Nägel fest!',
+  baustelle_tanken: 'Halt die Zapfsäule fest. Wir tanken.',
+  baustelle_halle: 'Tipp das Fahrzeug an. Ab in die Halle!',
+  baustelle_feierabend: 'Feierabend! Gute Nacht, ihr Fahrzeuge.',
+  baustelle_striche: 'Jetzt malen wir Striche.',
 };

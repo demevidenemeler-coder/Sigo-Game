@@ -14,8 +14,11 @@
 //   3. Die Katze bzw. das Entenkind hüpft hinein / der Ballon hängt sich an den Korb.
 //   4. Den Korb hinunterziehen: die Leiter legt sich wieder hin; der Gerettete kommt zu seinem Freund, alle freuen sich.
 //   5. Auto antippen: alle steigen ein, Tatü, weiter zum Waschplatz.
+//   (Drachen im Baum: wie der Ballon. Laterne: oben die Glühbirne bringen und eindrehen – siehe laterne.js.)
+// Blumenkübel umgefallen (eigene Kette, siehe kuebel.js): aufrichten, Erde zurückwischen, Blumen einsetzen, gießen.
 // Überraschungen: manchmal ein Regenbogen im Sprühwasser, manchmal fällt ein Apfel vom Baum (die Mannschaft nascht).
 // Was wächst: Gerettete bleiben als Zuschauer auf der Straße (bis zu drei, wer schon da ist, freut sich nur).
+// Beim ersten Mal je Einsatz-Art malt der Gerettete ein Dankesbild – es klebt danach am Rolltor der Wache.
 
 import { sfx, voice, tap, drag, hold, Actor, fx, rand, pick, shuffle, clamp, spr, stage, pointerCount, PIXI } from '../../engine/index.js';
 import { Seite } from '../../gemeinsam/seiten.js';
@@ -24,7 +27,10 @@ import { FeuerAuto, freue, feuerSticker, setzeHelm, LEITER_SPITZE, LEITER_LIEGT 
 import { Wasserstrahl } from './strahl.js';
 import { TonSchleife } from './schleife.js';
 import { Vogel, Schmetterling, Wolken, tippStelle, entprellt, zeigeBlase, tippRand } from './deko.js';
-import { EINSAETZE, naechsterEinsatz, waehleMannschaft } from './einsaetze.js';
+import { EINSAETZE, naechsterEinsatz, waehleMannschaft, dankDazu } from './einsaetze.js';
+import { dankBild } from './dank.js';
+import { LaterneTeil } from './laterne.js';
+import { KuebelTeil } from './kuebel.js';
 
 const AUTO_SKALA = 0.75;
 const FLAMME_SKALA = 0.46;
@@ -41,7 +47,10 @@ const HYDRANT = { x: -205, y: GEHWEG - 4, scale: 0.42 };
 const MUELL = { x: 40, y: GEHWEG - 2, scale: 0.42 };
 const MANNSCHAFT_PLAETZE = [{ x: -250, y: 1505 }, { x: -60, y: 1518 }];
 const ZUSCHAUER = [{ x: 480, y: 1500 }, { x: 680, y: 1512 }, { x: 880, y: 1500 }];
+// Beim Blumenkübel brauchen Erde und Blumen die Straße vor dem Haus: die Zuschauer rücken solange nach links
+const ZUSCHAUER_SEITE = [{ x: 110, y: 1500 }, { x: 250, y: 1512 }, { x: 390, y: 1500 }];
 const BALLON = { x: -640, y: 560, scale: 0.62 };      // Schnurende im Laub
+const DRACHEN = { x: -600, y: 470, scale: 0.42, rotation: 0.35 };   // Drachen hängt im Laub (Mitte)
 const MAUS = { x: -20, y: GEHWEG + 4, scale: 0.22 };
 const KUEKEN = { x: 150, y: 566, scale: 0.13 };       // auf der Dachtraufe links
 const MAMA = { x: 620, y: GEHWEG + 6, scale: 0.24 };
@@ -100,6 +109,8 @@ export class Einsatz extends Seite {
     this.baueSchlauch();
     this.baueKorb();
     this.baueStrahl();
+    this.baueLaterne();
+    this.baueKuebel();
 
     this.vogel = new Vogel(this, {
       parent: this.welt,
@@ -546,6 +557,11 @@ export class Einsatz extends Seite {
       this.leiterEinfahren();
       return;
     }
+    // die aufgerichtete Leiter liegt vor dem Laternenpfahl: dort gilt ein Tipp der Laterne
+    if (['birne', 'drehen'].includes(this.zustand)) {
+      this.laterneAngetippt();
+      return;
+    }
     // Die Tippfläche der Leiter liegt oben hinten auf dem Auto: dort zählt ein Tipp wie ein Tipp aufs Auto
     if (this.zustand === 'einsteigen') {
       this.abfahren();
@@ -586,6 +602,13 @@ export class Einsatz extends Seite {
     this.tween(k, { alpha: 1 }, 0.4, { ease: 'sineInOut' });
     fx.pop(k, 0.12);
     sfx('common/plopp', { vol: 0.5 });
+    if (this.einsatz === 'laterne') {
+      // ein Tier der Mannschaft fährt mit hinauf (es dreht oben die Birne ein)
+      this.leiterFaehrt = true;
+      await this.wait(0.3);
+      await this.helferInKorb();
+      this.leiterFaehrt = false;
+    }
     this.korbZiehbar(true);
     this.hinweisSatz('feuerwehr_korb', () => this.zustand === 'ausfahren' && !this.korbGezogen);
   }
@@ -650,6 +673,10 @@ export class Einsatz extends Seite {
     this.zustand = 'holen';
     sfx('common/klack', { vol: 0.5 });
     await this.wait(0.3);
+    if (this.einsatz === 'laterne') {
+      this.birneBeginnt();
+      return;
+    }
     if (this.apfelRunde && this.einsatz !== 'kueken') this.apfelFaellt();
     await this.einsteigenInKorb();
     this.zustand = 'runter';
@@ -659,14 +686,14 @@ export class Einsatz extends Seite {
   async einsteigenInKorb() {
     const r = this.retter;
     const b = this.korbBoden();
-    if (this.einsatz === 'ballon') {
-      // der Ballon löst sich aus dem Laub und hängt sich an den Korb
+    if (this.flugDing) {
+      // der Ballon (bzw. Drachen) löst sich aus dem Laub und hängt sich an den Korb
       const bl = this.ballon;
       sfx('common/rascheln', { vol: 0.55 });
       this.burst('blaetter', bl.x, bl.y - 120, { count: 3 });
-      await this.tween(bl, { x: b.x + 30, y: b.y - 40, rotation: 0 }, 0.8, { ease: 'sineInOut' });
+      await this.tween(bl, { x: b.x + 30, y: b.y - 40, rotation: this.einsatz === 'drachen' ? 0.2 : 0 }, 0.8, { ease: 'sineInOut' });
       this.korbBallon = bl;
-      sfx('common/ballon', { vol: 0.5 });
+      sfx(this.einsatz === 'drachen' ? 'common/wusch' : 'common/ballon', { vol: 0.5 });
       return;
     }
     r.schatten.visible = false;
@@ -737,7 +764,14 @@ export class Einsatz extends Seite {
       setzeHelm(t);
       t.alpha = 0;
       t.schatten.visible = false;
-      t.onTap(() => freue(this, t, { herzen: 3 }), { pad: tippRand(t) });
+      t.onTap(() => {
+        // im Korb oben an der Laterne: der Tipp gilt der Laterne (das Tier verdeckt sie teilweise)
+        if (t === this.helfer && ['birne', 'drehen'].includes(this.zustand)) {
+          this.laterneAngetippt();
+          return;
+        }
+        freue(this, t, { herzen: 3 });
+      }, { pad: tippRand(t) });
       this.mannschaft.push(t);
       this.tween(t, { alpha: 1 }, 0.25, { ease: 'sineOut' });
       sfx('common/hupf', { vol: 0.45 });
@@ -785,14 +819,34 @@ export class Einsatz extends Seite {
     }
     this.zuschauer[platz] = gruppe;
     this.zuschauerFolge.push(platz);
-    const p = ZUSCHAUER[platz];
+    const p = this.zuschauerPlatz(platz);
     const laeufe = gruppe.map((f, i) => {
       f.zIndex = 38;
       f.onTap(() => freue(this, f, { herzen: 3 }), { pad: tippRand(f) });
       return f.walkTo(p.x + i * 95, p.y + i * 6, { tempo: 340 });
     });
     await Promise.all(laeufe);
-    for (const f of gruppe) if (!f.destroyed) f.lookAt(f.x - 100);
+    for (const f of gruppe) if (!f.destroyed) f.lookAt(this.zuschauerSeite ? f.x + 100 : f.x - 100);
+  }
+
+  zuschauerPlatz(platz) {
+    return (this.zuschauerSeite ? ZUSCHAUER_SEITE : ZUSCHAUER)[platz];
+  }
+
+  // Zuschauer rücken zur Seite (seite = true) bzw. zurück an ihre Plätze – gemächlich, alle zusammen
+  zuschauerRuecken(seite) {
+    if (!!this.zuschauerSeite === seite) return;
+    this.zuschauerSeite = seite;
+    this.zuschauer.forEach((g, platz) => {
+      if (!g) return;
+      const p = this.zuschauerPlatz(platz);
+      g.forEach((f, i) => {
+        if (f.destroyed) return;
+        f.walkTo(p.x + i * 95, p.y + i * 6, { tempo: 240 }).then((ok) => {
+          if (ok && !f.destroyed) f.lookAt(seite ? f.x + 100 : f.x - 100);
+        });
+      });
+    });
   }
 
   // ---------------------------------------------------------------- Eine Runde vorbereiten
@@ -812,7 +866,13 @@ export class Einsatz extends Seite {
     this.korbGezogen = false;
     this.regenbogenGezeigt = false;
     this.regenbogenRunde = this.e.art === 'feuer' && Math.random() < 0.5;
-    this.apfelRunde = this.e.art === 'leiter' && Math.random() < 0.5;
+    this.apfelRunde = this.e.art === 'leiter' && id !== 'laterne' && Math.random() < 0.5;
+    this.flugDing = id === 'ballon' || id === 'drachen';
+    this.helfer = null;
+    this.kanneSelbst = false;
+    this.zuschauerRuecken(id === 'kuebel');
+    this.kuebelVorbereiten(id === 'kuebel');
+    const lampOben = this.laterneVorbereiten(id === 'laterne');
     this.radStufe = 0;
     this.rad.rotation = 0;
     // Brennt der Mülleimer, darf ein Druck auf ihn nicht das Spritzen schlucken (sein Wackeln fängt den Finger sonst ab)
@@ -837,24 +897,35 @@ export class Einsatz extends Seite {
       this.retter = k;
       this.rettZiel = { x: k.x, y: k.y };
       this.erscheine(k);
-    } else if (id === 'ballon') {
-      const farbe = pick(BALLON_FARBEN);
-      const bl = spr('feuerwehr/ballon', { x: BALLON.x, y: BALLON.y, scale: BALLON.scale, parent: this.welt, z: 24 });
-      bl.tint = farbe;
-      bl.rotation = -0.12;
+    } else if (this.flugDing) {
+      // Ballon (jedes Mal eine andere Farbe) oder Drachen im Baum
+      const drachen = id === 'drachen';
+      const d = drachen ? DRACHEN : BALLON;
+      const bl = spr(drachen ? 'feuerwehr/drachen' : 'feuerwehr/ballon', { x: d.x, y: d.y, scale: d.scale, parent: this.welt, z: 24 });
+      if (!drachen) {
+        this.ballonFarbe = pick(BALLON_FARBEN.filter((f) => f !== this.ballonFarbe));
+        bl.tint = this.ballonFarbe;
+      }
+      bl.rotation = drachen ? DRACHEN.rotation : -0.12;
       bl.eventMode = 'none';
       this.ballon = bl;
-      this.ballonFarbe = farbe;
       const m = new Actor('maus', { x: MAUS.x, y: MAUS.y, scale: MAUS.scale, parent: this.welt, z: 37 });
       m.flip = true;
       this.retter = m;
-      this.rettZiel = { x: BALLON.x - 60, y: BALLON.y + 30 };
+      this.rettZiel = drachen ? { x: DRACHEN.x - 40, y: DRACHEN.y + 40 } : { x: BALLON.x - 60, y: BALLON.y + 30 };
       this.erscheine(m);
-      m.onTap(() => { fx.wobble(m); m.sound(); m.bubble('feuerwehr/ballon', 1.6); }, { pad: tippRand(m) });
+      m.onTap(() => { fx.wobble(m); m.sound(); m.bubble(drachen ? 'feuerwehr/drachen' : 'feuerwehr/ballon', 1.6); }, { pad: tippRand(m) });
       tap(bl, () => {
-        sfx('common/ballon', { vol: 0.4 });
+        sfx(drachen ? 'common/wusch' : 'common/ballon', { vol: 0.4 });
         fx.wobble(bl, 0.08);
       }, { sound: null, pad: 60, squash: false });
+    } else if (id === 'laterne') {
+      // die Eule sitzt oben auf der Laterne: ohne Birne bleibt es nachts dunkel
+      const eu = new Actor('eule', { x: lampOben.x, y: lampOben.y + 6, scale: 0.15, parent: this.welt, z: 9 });
+      eu.schatten.visible = false;
+      this.retter = eu;
+      this.rettZiel = { x: this.lampGlas.x, y: this.lampGlas.y + 10 };
+      this.erscheine(eu);
     } else if (id === 'kueken') {
       const kk = new Actor('ente', { x: KUEKEN.x, y: KUEKEN.y, scale: KUEKEN.scale, parent: this.welt, z: 25 });
       kk.schatten.visible = false;
@@ -867,12 +938,13 @@ export class Einsatz extends Seite {
       this.erscheine(mama);
     }
     // Gerettete auf dem Ast/Dach lassen sich antippen: wie Antippen der Leiter
-    if (this.retter && this.e.art === 'leiter' && id !== 'ballon') {
+    if (this.retter && this.e.art === 'leiter' && !this.flugDing) {
       const r = this.retter;
       r.onTap(() => {
         fx.wobble(r);
         r.sound();
         if (this.zustand === 'leiter' || this.zustand === 'ausfahren') this.leiterAngetippt();
+        else if (['birne', 'drehen'].includes(this.zustand)) this.laterneAngetippt();
       }, { pad: tippRand(r, 280, 70) });   // auch das kleine Entenkind: Tippfläche ≥ 280
     }
   }
@@ -887,7 +959,9 @@ export class Einsatz extends Seite {
     this.vorbereiten();
     await this.ankunft();
     await this.mannschaftSteigtAus();
-    if (this.e.art === 'feuer') {
+    if (this.e.art === 'garten') {
+      this.kuebelBeginnt();
+    } else if (this.e.art === 'feuer') {
       this.zustand = 'schlauch';
       this.schlauchZiehbar(true);
       this.blase('feuerwehr/hydrant');
@@ -954,8 +1028,12 @@ export class Einsatz extends Seite {
     await this.ordenZumAuto();
     freue(this, this.auto.fahrer, { herzen: 3, laut: false });
     for (const t of this.mannschaft) this.after(rand(0, 0.5), () => freue(this, t, { herzen: 2, laut: false }));
+    if (dankDazu(this.einsatz)) {
+      this.szene.dankNeu = this.einsatz;
+      await this.dankUebergeben();
+    }
     await this.wait(0.7);
-    belohne(this, feuerSticker('feuerwehr_feuerwehrauto'), 20, 560);
+    belohne(this, feuerSticker(this.e.sticker || 'feuerwehr_feuerwehrauto'), 20, 560);
     this.szene.ordenOffen = Math.min(3, (this.szene.ordenOffen || 0) + 1);
     this.szene.schmutz = this.e.schmutz;
     await this.wait(1.6);
@@ -963,7 +1041,9 @@ export class Einsatz extends Seite {
 
   async gerettet() {
     const r = this.retter;
-    if (this.einsatz === 'ballon') {
+    if (this.einsatz === 'laterne') {
+      await this.laterneGeschafft(MANNSCHAFT_PLAETZE[0]);
+    } else if (this.flugDing) {
       // der Ballon schwebt vom Korb zur Maus, sie hält ihn fest
       const bl = this.korbBallon;
       this.korbBallon = null;
@@ -977,7 +1057,7 @@ export class Einsatz extends Seite {
       bl.position.set((ziel.x - m.x) / m.scale.x, (ziel.y - m.y) / m.scale.y);
       bl.scale.set(s * 0.8);
       bl.zIndex = 5;
-      bl.rotation = 0.08;
+      bl.rotation = this.einsatz === 'drachen' ? 0.25 : 0.08;
       bl.eventMode = 'none';
       m.flip = false;
       await freue(this, m, { herzen: 5 });
@@ -989,7 +1069,8 @@ export class Einsatz extends Seite {
       r.schatten.visible = true;
       sfx('common/hupf', { vol: 0.45 });
       // langer Weg vom Dach: gemächlicher Hüpfer (Spitze knapp 1050 Einheiten/s)
-      await r.hopTo(unten.x, unten.y, { hoehe: 170, dauer: 1.4 });
+      // (sicher: ein Tipp mitten im Sprung ließe es sonst oben auf dem Auto sitzen – siehe laterne.js)
+      await this.sicherHuepfen(r, unten.x, unten.y, { hoehe: 170, dauer: 1.4 });
       if (this.einsatz === 'kueken') {
         // Entenmama kommt, beide freuen sich
         const mama = this.mama;
@@ -1009,6 +1090,41 @@ export class Einsatz extends Seite {
     this.zuDenZuschauern(gruppe);
     await this.wait(1.0);
     this.einsteigenBeginnt();
+  }
+
+  // Der Gerettete hat ein Bild gemalt: es erscheint über ihm, dann schwebt es hinten ins Auto (für die Wache)
+  async dankUebergeben() {
+    const r = this.retter;
+    const start = r && !r.destroyed ? this.vorn.toLocal(r.toGlobal({ x: 0, y: 0 })) : { x: 0, y: 1100 };
+    const b = dankBild(this.einsatz);
+    b.eventMode = 'none';
+    b.zIndex = 60;
+    b.position.set(clamp(start.x, -900, 900), clamp(start.y - 330, 330, 1100));
+    b.scale.set(0.3);
+    b.alpha = 0;
+    b.rotation = -0.05;
+    this.vorn.addChild(b);
+    voice('feuerwehr_danke', { nurWenn: () => this.aktiv });
+    sfx('common/rascheln', { vol: 0.4 });
+    this.tween(b, { alpha: 1 }, 0.5, { ease: 'sineInOut' });
+    await this.tween(b, { scale: 1.05 }, 0.6, { ease: 'backOut' });
+    if (r && !r.destroyed) freue(this, r, { herzen: 3 });
+    await this.wait(1.6);
+    const ziel = this.auto.punkt('heck', this.vorn);
+    const von = { x: b.x, y: b.y };
+    const p = { t: 0 };
+    this.tween(b, { scale: 0.25, rotation: 0.3 }, 1.3, { ease: 'sineInOut' });
+    this.tween(b, { alpha: 0 }, 0.4, { ease: 'sineIn', delay: 0.95 });
+    await this.tween(p, { t: 1 }, 1.3, {
+      ease: 'sineInOut',
+      onUpdate: () => {
+        b.x = von.x + (ziel.x - von.x) * p.t;
+        b.y = von.y + (ziel.y - 40 - von.y) * p.t - Math.sin(Math.PI * p.t) * 120;
+      },
+    });
+    b.destroy({ children: true });
+    sfx('common/plopp', { vol: 0.45 });
+    fx.pop(this.auto.f.rumpf, 0.03);
   }
 
   // Orden erscheint über dem Geretteten, schaukelt kurz und schwebt dann an die Fahrertür (bleibt dort)
@@ -1390,6 +1506,7 @@ export class Einsatz extends Seite {
       if (this.reiter && !this.reiter.destroyed) this.reiter.position.set(b.x, b.y - (this.reiterHoch || 0));
       if (this.korbBallon) this.korbBallon.position.set(b.x + 30, b.y - 40);
     }
+    this.kuebelTakt(dt);
     this.schlauchTakt(dt);
     this.fingerNachsehen(dt);
     this.strahlTakt(dt);
@@ -1397,6 +1514,8 @@ export class Einsatz extends Seite {
 
   hinweise() {
     const auto = this.auto.f.koerper;
+    const neu = this.kuebelHinweise() || this.laterneHinweise();
+    if (neu) return neu;
     switch (this.zustand) {
       case 'schlauch': return [{ von: this.kupplung, nach: { x: this.hydrantAnschluss.x, y: this.hydrantAnschluss.y } }];
       case 'hydrant': return [this.rad];
@@ -1405,6 +1524,7 @@ export class Einsatz extends Seite {
         return an.length ? an : [auto];
       }
       case 'leiter': return [this.auto.leiter];
+      case 'leuchtet': return [this.laterne];
       case 'ausfahren': return this.korb.visible ? [{ von: this.korb, nach: this.korbZiel() }] : [this.auto.leiter];
       case 'runter': return [{ von: this.korb, nach: { x: this.auto.f.x + 60, y: 1150 } }];
       case 'aufrollen': return [{ x: this.fach.x, y: this.fach.y }];
@@ -1414,3 +1534,6 @@ export class Einsatz extends Seite {
     }
   }
 }
+
+// Laterne und Blumenkübel (neu in Runde 3) liegen in eigenen Dateien
+Object.assign(Einsatz.prototype, LaterneTeil, KuebelTeil);

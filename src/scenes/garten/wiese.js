@@ -1,6 +1,6 @@
 // Seite 2: Die Blumenwiese – ein Strauß für einen Gast.
 // Ablauf einer Runde:
-//   1. Ein Gast (Kuh, Schaf, Ente, Katze, Huhn, Frosch – nie einer der letzten zwei) kommt auf die Wiese und
+//   1. Ein Gast (Kuh, Schaf, Ente, Katze, Huhn, Frosch, Schwein, Hase – nie einer der letzten zwei) kommt auf die Wiese und
 //      zeigt in einer Denkblase seine Lieblingsblume (nie eine der letzten drei Farben).
 //   2. Öffnen: Knospen antippen → sie gehen weich auf und singen (jede Blume ein Ton der Fünftonleiter).
 //   3. Pflücken: Blumen in die Vase ziehen (eine Knospe geht dabei von selbst auf). Drei Blumen machen den Strauß.
@@ -40,6 +40,7 @@ const FÄCHER = [-0.3, 0.3, 0];   // Neigung der Blumen in der Vase (die dritte 
 const GÄSTE = [
   { tier: 'kuh', scale: 0.3 }, { tier: 'schaf', scale: 0.3 }, { tier: 'ente', scale: 0.29 },
   { tier: 'katze', scale: 0.29 }, { tier: 'huhn', scale: 0.29 }, { tier: 'frosch', scale: 0.3 },
+  { tier: 'schwein', scale: 0.29 }, { tier: 'hase', scale: 0.3 },   // Runde 3: mehr Gäste
 ];
 const GAST = { x: 995, y: 1320 };
 const GAST_WEG = 1560;

@@ -185,6 +185,80 @@
       "ax": 0.5,
       "ay": 0.5,
       "desc": "Heller Fleck e zum Einfärben (Farbe, Staub) – Form wie matsch_e"
+    },
+    "zapfsaeule": {
+      "ax": 0.445,
+      "ay": 0.985,
+      "desc": "Freundliche türkis-gelbe Zapfsäule mit rundem Fenster (Anzeige) und Haken rechts, steht",
+      "pts": {
+        "fenster": [
+          238,
+          262
+        ],
+        "haken": [
+          420,
+          300
+        ],
+        "schlauch": [
+          380,
+          470
+        ]
+      }
+    },
+    "zapfhahn": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Gelber Zapfhahn, Tülle links unten, Schlauchanschluss rechts",
+      "pts": {
+        "spitze": [
+          18,
+          140
+        ],
+        "anschluss": [
+          310,
+          85
+        ]
+      }
+    },
+    "kakao_automat": {
+      "ax": 0.499,
+      "ay": 0.985,
+      "desc": "Freundliche rote Kakao-Maschine mit Gesicht, Hahn über leerem Fach mit Gitter, steht",
+      "pts": {
+        "hahn": [
+          175,
+          370
+        ],
+        "tablett": [
+          175,
+          465
+        ]
+      }
+    },
+    "becher": {
+      "ax": 0.388,
+      "ay": 0.981,
+      "desc": "Leerer hellblauer Becher mit weißen Punkten, Öffnung oben sichtbar, Henkel rechts",
+      "pts": {
+        "oeffnung": [
+          125,
+          38
+        ]
+      }
+    },
+    "hg_tankstelle": {
+      "pts": {
+        "boden": [
+          1414,
+          1380
+        ]
+      },
+      "desc": "Tankstelle mit Café: Dach links, Kiosk mit Markise rechts, leere Wand oben Mitte, ruhiger Boden"
+    },
+    "kakao_becher": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Becher voll Kakao mit Sahnehaube und Streuseln (Symbol für Kakao)"
     }
   },
   "audio": {}

@@ -12,4 +12,11 @@ export default {
   eisdiele_eiswuerfel: 'Ein paar Eiswürfel ins Glas!',
   eisdiele_strohhalm: 'Jetzt kommt ein Strohhalm hinein.',
   eisdiele_deko: 'Und noch etwas Schönes obendrauf.',
+  // Runde 3: Eisküche und Geburtstags-Gäste (Aufnahmen folgen)
+  eisdiele_milch: 'Gieß die Milch in die Eismaschine.',
+  eisdiele_kurbel: 'Jetzt kurbeln, kurbeln, kurbeln!',
+  eisdiele_sorte: 'Eine neue Eissorte! Stell sie ins Regal.',
+  eisdiele_stiel: 'Steck den Stiel hinein.',
+  eisdiele_kuehlen: 'Ab in die Kühltruhe!',
+  eisdiele_geburtstag: 'Heute hat jemand Geburtstag!',
 };

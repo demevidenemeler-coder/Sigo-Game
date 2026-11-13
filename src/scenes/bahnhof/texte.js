@@ -13,4 +13,11 @@ export default {
   bahnhof_putzen: 'Die Lok ist staubig. Wisch sie sauber!',
   bahnhof_dampf: 'Halt die Lok fest. Sie macht Dampf.',
   bahnhof_signal: 'Tipp auf das Signal. Grün heißt los!',
+  // Güterbahnhof (zweite Seite, neu, Aufnahmen folgen)
+  bahnhof_schuppen: 'Die Lok schläft noch. Tipp sie an!',
+  bahnhof_drehscheibe: 'Tipp auf die Drehscheibe. Die Lok dreht sich um.',
+  bahnhof_ankuppeln: 'Tipp auf die Lok. Sie holt die Wagen.',
+  bahnhof_kran: 'Tipp auf eine Ladung. Der Kran hebt sie hoch.',
+  bahnhof_wagenbild: 'Welcher Wagen will das? Schau auf die Bilder.',
+  bahnhof_gueterzug: 'Alles geladen! Tipp auf die Lok.',
 };

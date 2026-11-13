@@ -1,4 +1,5 @@
-// Malhaus – ein ruhiges Atelier mit Staffelei. Drei Bilderbuch-Seiten, alle vor hg_atelier;
+// Malhaus – ein ruhiges Atelier mit Staffelei. Vier Bilderbuch-Seiten, alle vor hg_atelier (Seite 4, die Bastelecke
+// mit Knete, Perlenkette, Ofen und Regal, steht in bastelecke.js);
 // gemalt wird immer auf dem großen weißen Blatt (Punkte blatt_lo … blatt_ru), jede Seite hat ihre eigene Leinwand.
 //
 // Auf jeder Seite kommt ein Tier zu Besuch (unten links) und wünscht sich ein Bild (Denkblase bleibt sichtbar).
@@ -13,7 +14,7 @@
 // Schritt. „Neues Blatt" (unten links) beginnt das Bild neu, der Rahmen-Knopf (unten rechts) führt zum Rahmen.
 // Die Leine füllt sich über die Runden (höchstens 8 Bilder, bleiben über Besuche hinweg).
 
-import { tex, meta, sfx, voice, tap, fx, ui, rand, shuffle, clamp, PIXI } from '../../engine/index.js';
+import { tex, meta, sfx, voice, note, tap, fx, ui, rand, shuffle, clamp, PIXI } from '../../engine/index.js';
 import { Seite, SeitenSzene } from '../../gemeinsam/seiten.js';
 import { belohne } from '../../gemeinsam/sticker.js';
 import { Malflaeche, FingerVerteiler } from './leinwand.js';
@@ -23,6 +24,7 @@ import {
   RAHMEN, baueRahmen, GalerieLeine, galerieNeu, galerieLaden, Besuch, naechsterWunsch, blasenKarte, farbKlecks,
 } from './ablauf.js';
 import { umrissPunkte, silhouette } from './formen.js';
+import { Bastelecke } from './bastelecke.js';
 
 const HG = 'malhaus/hg_atelier';
 
@@ -76,6 +78,11 @@ const WUENSCHE_AUSMALEN = [
   { tier: 'pinguin', bild: 'mal_fisch', farbe: 5 },
   { tier: 'ente', bild: 'mal_ente', farbe: 2 },
   { tier: 'baer', bild: 'mal_haus', farbe: 3 },
+  // neue Gäste (Runde 3)
+  { tier: 'fuchs', bild: 'mal_bagger', farbe: 1 },
+  { tier: 'maus', bild: 'mal_haus', farbe: 8 },
+  { tier: 'schaf', bild: 'mal_schmetterling', farbe: 6 },
+  { tier: 'maus', bild: 'mal_zug', farbe: 4 },
 ];
 
 // Seite 2: Form zum Nachspuren und Farbe
@@ -88,6 +95,10 @@ const WUENSCHE_FREI = [
   { tier: 'hund', form: 'stempel_auto', farbe: 6 },
   { tier: 'baer', form: 'stempel_baum', farbe: 3 },
   { tier: 'hund', form: 'stempel_katze', farbe: 1 },
+  // neue Gäste (Runde 3)
+  { tier: 'maus', form: 'stempel_herz', farbe: 8 },
+  { tier: 'fuchs', form: 'stempel_stern', farbe: 1 },
+  { tier: 'schaf', form: 'stempel_blume', farbe: 7 },
 ];
 
 // Seite 3: Untergrund (oben/unten, Horizont als Anteil der Höhe) und Wunsch-Stempel
@@ -99,6 +110,10 @@ const WUENSCHE_STEMPEL = [
   { tier: 'hund', oben: 0xd0ebff, unten: 0xdccba8, horizont: 0.62, stempel: ['stempel_auto', 'stempel_baum'] },
   { tier: 'ente', oben: 0xfff2b8, unten: 0xb6df80, horizont: 0.62, stempel: ['stempel_sonne', 'stempel_blume'] },
   { tier: 'baer', oben: 0xdaf2ff, unten: 0xaadb8e, horizont: 0.6, stempel: ['stempel_katze', 'stempel_baum'] },
+  // neue Gäste (Runde 3)
+  { tier: 'schaf', oben: 0xe6f6ff, unten: 0xc6e89a, horizont: 0.5, stempel: ['stempel_blume', 'stempel_sonne'] },
+  { tier: 'fuchs', oben: 0xffd9b0, unten: 0xe9b97a, horizont: 0.66, stempel: ['stempel_baum', 'stempel_sonne'] },
+  { tier: 'maus', oben: 0xf0e4ff, unten: 0xd8c4f2, horizont: 0.58, stempel: ['stempel_herz', 'stempel_stern'] },
 ];
 
 // ---------------------------------------------------------------- kleine Hilfen
@@ -720,11 +735,21 @@ class MalSeite extends Seite {
         d.katze.pose('idle');
         d.katze.cheer({ parent: this.vorn });
       });
-    } else if (r < 0.65 && d?.sm) {
+    } else if (r < 0.6 && d?.sm) {
       // der Schmetterling besucht das neue Bild (gemächlich)
       d.sm.ziel = { x: ziel.x + 20, y: ziel.y - 30, setzen: true };
       d.sm.sitzt = false;
       d.sm.tempo = 160;
+    } else if (r < 0.82) {
+      // der Besuch tanzt vor Freude: ein Hüpfer, ein paar Noten, eine kleine Melodie
+      const a = this.besuch.actor;
+      this.after(0.2, () => {
+        if (!a || a.destroyed || a !== this.besuch.actor) return;
+        a.hop(60);
+        const k = a.point('kopf');
+        this.burst('noten', k.x, k.y, { count: 3 });
+      });
+      [72, 76, 79].forEach((n, i) => this.after(0.25 + i * 0.3, () => { if (this.aktiv) note('glocke', n, { vol: 0.15 }); }));
     }
   }
 
@@ -2005,6 +2030,8 @@ class Stempeln extends MalSeite {
     if (!warBereit && this.rahmenBereit) {
       voice('malhaus_schoen', { nurWenn: () => this.aktiv });
       if (this.wunschDa) this.besuch.freu();
+      const b = this.blatt;
+      belohne(this, 'malhaus_stempel', b.x + b.w / 2, b.y + b.h * 0.42);
     } else if (this.wunschDa && this.wunschIndex(this.stempelNr) >= 0) {
       this.besuch.nicke();
     }
@@ -2066,9 +2093,11 @@ export default class Malhaus extends SeitenSzene {
   static id = 'malhaus';
   static packs = ['malhaus', 'tiere'];
   // alle Tiere, deren Bilder der Ort zeigt (Besuche und die Katze vor dem Regal)
-  static tiere = ['katze', 'kuh', 'baer', 'hund', 'eule', 'hase', 'pinguin', 'ente'];
+  // Besuche brauchen nur stehen, gehen und freuen (idle, seite, happy) – die Katze auch schlafen (alle Posen)
+  static tiere = ['katze', ...['kuh', 'baer', 'hund', 'eule', 'hase', 'pinguin', 'ente', 'fuchs', 'maus', 'schaf']
+    .flatMap((t) => [t + '_idle', t + '_seite', t + '_happy'])];
   static music = 'musik/atelier';
-  static seiten = [Ausmalen, Freimalen, Stempeln];
+  static seiten = [Ausmalen, Freimalen, Stempeln, Bastelecke];
 
   vorbereiten() {
     ui.albumKnopf(this);

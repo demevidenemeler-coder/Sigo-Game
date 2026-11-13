@@ -16,11 +16,11 @@ import { belohne, sticker as stickerVon } from '../../gemeinsam/sticker.js';
 import { ton, laut, Wolken, Vogel, Schmetterling, wackelDing, engeTippflaeche } from './hilfen.js';
 
 const TIERE = ['kuh', 'schwein', 'schaf', 'pferd', 'huhn', 'hase', 'hund', 'katze', 'ente'];
-const GAESTE = ['maus', 'hahn'];          // kleine Überraschungsgäste (höchstens einer je Runde)
+const GAESTE = ['maus', 'hahn', 'igel', 'eichhoernchen'];   // kleine Überraschungsgäste (höchstens einer je Runde)
 // Höhe der Tiere auf dem Bild (Bühnen-Einheiten) – große Tiere etwas größer
 const HOEHE = {
   kuh: 540, pferd: 545, schwein: 500, schaf: 505, hund: 500, katze: 470, hase: 490, huhn: 470, ente: 460,
-  maus: 400, hahn: 470,
+  maus: 400, hahn: 470, igel: 380, eichhoernchen: 440,
 };
 
 // Scheunentor im Hintergrundbild (Bildpunkte des Hintergrunds 2829×1600)

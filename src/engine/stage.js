@@ -17,6 +17,18 @@ const STUFEN = [1, 0.85, 0.7, 0.55];  // Qualitätsstufen (Faktor auf die Auflö
 export const HINTERGRUND = 0xf4ecdf;  // Cremeton (wie im Manifest)
 const RAND_WEICH = 40;                // weicher Übergang zum Rand in Einheiten
 
+// Speicher-Schutz: Pixi gibt die Zeichendaten eines Graphics nur frei, wenn destroy() OHNE Angaben aufgerufen wird
+// oder mit {context: true}. Bei destroy({children: true}) – so räumen Szenen fast immer auf – blieben sie für immer
+// im Grafikspeicher liegen, und bei langem Spielen wuchs der Speicher stetig. Darum gilt hier für alle: Gehören die
+// Zeichendaten dem Graphics allein (nicht geteilt), werden sie mit ihm freigegeben, außer {context: false} steht da.
+const graphicsDestroy = Graphics.prototype.destroy;
+Graphics.prototype.destroy = function (optionen) {
+  if (optionen && typeof optionen === 'object' && optionen.context === undefined && this._ownedContext) {
+    optionen = { ...optionen, context: true };
+  }
+  return graphicsDestroy.call(this, optionen);
+};
+
 // Ereignisse der Bühne (z. B. 'resize')
 const hoerer = new Map();
 

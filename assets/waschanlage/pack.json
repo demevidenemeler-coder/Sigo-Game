@@ -2,6 +2,7 @@
   "id": "waschanlage",
   "images": {
     "auto_klein": {"file": "auto_klein.webp", "w": 861, "h": 580, "ax": 0.491, "ay": 0.98, "pts": {"rad1": [212, 560], "rad2": [562, 560]}, "desc": "Rotes rundes Spielzeugauto von der Seite, Front rechts, mit Gesicht, ohne Raeder (Radkaesten leer)"},
+    "becher": {"file": "becher.webp", "w": 260, "h": 222, "ax": 0.388, "ay": 0.981, "pts": {"oeffnung": [125, 38]}, "desc": "Leerer hellblauer Becher mit weißen Punkten, Öffnung oben sichtbar, Henkel rechts"},
     "brause": {"file": "brause.webp", "w": 288, "h": 400, "ax": 0.5, "ay": 0.0, "pts": {"duese": [148, 385]}, "desc": "Grosser gelber Duschkopf an Rohr (Anker oben am Rohrende), Duesen unten"},
     "buerste_walze": {"file": "buerste_walze.webp", "w": 498, "h": 500, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Grosse flauschige blaue Waschbuerste frontal, rund (zum Drehen)"},
     "eimer_schaum": {"file": "eimer_schaum.webp", "w": 349, "h": 420, "ax": 0.496, "ay": 0.985, "pts": {}, "desc": "Roter Eimer voll Schaum mit gelbem Schwamm"},
@@ -9,10 +10,13 @@
     "fleck_hell_d": {"file": "fleck_hell_d.webp", "w": 255, "h": 360, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Heller Fleck d zum Einfärben (Farbe, Staub) – Form wie matsch_d"},
     "fleck_hell_e": {"file": "fleck_hell_e.webp", "w": 360, "h": 359, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Heller Fleck e zum Einfärben (Farbe, Staub) – Form wie matsch_e"},
     "glanzstern": {"file": "glanzstern.webp", "w": 221, "h": 240, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Weicher weisser vierzackiger Glanz (sauber!)"},
+    "hg_tankstelle": {"file": "hg_tankstelle.webp", "w": 2829, "h": 1600, "ax": 0.5, "ay": 0.5, "pts": {"boden": [1414, 1380]}, "desc": "Tankstelle mit Café: Dach links, Kiosk mit Markise rechts, leere Wand oben Mitte, ruhiger Boden"},
     "hg_waschanlage": {"file": "hg_waschanlage.webp", "w": 2829, "h": 1600, "ax": 0.5, "ay": 0.5, "pts": {"boden": [1414, 1380], "fahrzeug": [1414, 1390], "eimer": [2080, 1420], "dusche": [1522, 345], "abfluss": [1400, 1330]}, "desc": "Waschanlage draussen: Fliesenboden, blaue Wand mit gelben Rohren und Düsen, bunte Bürsten links/rechts, Rohrende oben Mitte für Brause"},
     "icon_auto_wahl": {"file": "icon_auto_wahl.webp", "w": 344, "h": 360, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Rundes Auswahl-Symbol: rotes Auto"},
     "icon_traktor_wahl": {"file": "icon_traktor_wahl.webp", "w": 354, "h": 360, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Rundes Auswahl-Symbol: gruener Traktor"},
     "icon_zug_wahl": {"file": "icon_zug_wahl.webp", "w": 350, "h": 360, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Rundes Auswahl-Symbol: Lok"},
+    "kakao_automat": {"file": "kakao_automat.webp", "w": 364, "h": 560, "ax": 0.499, "ay": 0.985, "pts": {"hahn": [175, 370], "tablett": [175, 465]}, "desc": "Freundliche rote Kakao-Maschine mit Gesicht, Hahn über leerem Fach mit Gitter, steht"},
+    "kakao_becher": {"file": "kakao_becher.webp", "w": 216, "h": 260, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Becher voll Kakao mit Sahnehaube und Streuseln (Symbol für Kakao)"},
     "matsch_a": {"file": "matsch_a.webp", "w": 520, "h": 516, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Matschfleck a (flache Auflage zum Wegwischen)"},
     "matsch_b": {"file": "matsch_b.webp", "w": 520, "h": 148, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Matschfleck b (flache Auflage zum Wegwischen)"},
     "matsch_c": {"file": "matsch_c.webp", "w": 520, "h": 431, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Matschfleck c (flache Auflage zum Wegwischen)"},
@@ -26,7 +30,9 @@
     "schaum_a": {"file": "schaum_a.webp", "w": 600, "h": 184, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Breiter weisser Seifenschaum-Teppich (Auflage)"},
     "schaum_b": {"file": "schaum_b.webp", "w": 600, "h": 451, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Runder weisser Seifenschaum-Haufen (Auflage)"},
     "traktor_ohne": {"file": "traktor_ohne.webp", "w": 894, "h": 586, "ax": 0.515, "ay": 0.98, "pts": {"rad_gross": [232, 530], "rad_klein": [615, 555]}, "desc": "Gruener Traktor von der Seite, Front rechts, mit Gesicht, ohne Raeder (hinten grosser, vorn kleiner Radkasten)"},
-    "wasserfaden": {"file": "wasserfaden.webp", "w": 477, "h": 700, "ax": 0.5, "ay": 0.0, "pts": {}, "desc": "Buendel feiner hellblauer Wasserstrahlen nach unten, unten durchsichtig auslaufend (Anker oben)"}
+    "wasserfaden": {"file": "wasserfaden.webp", "w": 477, "h": 700, "ax": 0.5, "ay": 0.0, "pts": {}, "desc": "Buendel feiner hellblauer Wasserstrahlen nach unten, unten durchsichtig auslaufend (Anker oben)"},
+    "zapfhahn": {"file": "zapfhahn.webp", "w": 320, "h": 207, "ax": 0.5, "ay": 0.5, "pts": {"spitze": [18, 140], "anschluss": [310, 85]}, "desc": "Gelber Zapfhahn, Tülle links unten, Schlauchanschluss rechts"},
+    "zapfsaeule": {"file": "zapfsaeule.webp", "w": 451, "h": 620, "ax": 0.445, "ay": 0.985, "pts": {"fenster": [238, 262], "haken": [420, 300], "schlauch": [380, 470]}, "desc": "Freundliche türkis-gelbe Zapfsäule mit rundem Fenster (Anzeige) und Haken rechts, steht"}
   },
   "audio": {
   }

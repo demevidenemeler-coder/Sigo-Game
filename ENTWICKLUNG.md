@@ -297,6 +297,10 @@ Zurück-Knopf, nur den Karten-Knopf. (`params.seite` des Albums ist dagegen sein
   meisten drei oder vier Sticker; das Album richtet Seitenzahl und Raster (18 je Doppelseite) nach der Liste.
   Der Platz eines Stickers folgt seiner Stelle in `STICKER` (je 18 eine Doppelseite). Hat die letzte Doppelseite
   weniger (heute 6), sitzen ihre Sticker ruhig in der Mitte jeder Buchseite (bis 4 je Buchseite etwas größer).
+- Speicher-Schutz für Gezeichnetes (`stage.js`): Pixi gibt die Zeichendaten eines `Graphics` bei
+  `destroy({children: true})` von sich aus nicht frei. Der Kern ergänzt darum für alle `context: true`, sobald die
+  Zeichendaten dem `Graphics` allein gehören. Folge: `Graphics.clone()` ohne `true` nicht benutzen (die Kopie teilt
+  die Zeichendaten mit dem Original) – lieber zweimal zeichnen oder `clone(true)`.
 - Zug-Baustein: `zug.gaesteJubeln()` bremst sich selbst – ein Gast freut sich höchstens alle 0,6 s neu, der
   Jubel-Ton kommt höchstens alle 0,6 s (Anleitung: `src/gemeinsam/zug.md`).
 - `ambient.set({zeit: 'tag'|'abend'|'nacht', wetter: 'klar'|'regen'|'schnee'})` – weiche Tönung + ruhige Partikel
@@ -349,6 +353,11 @@ Zurück-Knopf, nur den Karten-Knopf. (`params.seite` des Albums ist dagegen sein
   Stickerbuch → zurück auf Seite 2 → Bahnhof → Fahrt → Spielzeit-Ende → Gute-Nacht → Ruhe-Bild) läuft mit leerer
   Konsole. Umlaut-Kontrolle ohne Fund (übrig sind nur Bezeichner und Schlüssel im Code). Die Offline-Liste
   `sw-dateien.js` ist neu geschrieben, die Kontrolle von `tools/sw_liste.py` meldet „passt".
+- Stand nach Runde 3 „Orte vertiefen" (13.11.2026): 17 Szenen, 41 Seiten in den 12 Seiten-Orten, 93 Sticker auf
+  6 Album-Doppelseiten. `shots/sk_alle.sh` und `shots/sk_album.sh` (alle 51 Starts und alle 6 Doppelseiten) ohne
+  Fehler und Warnungen; jede Szene und Seite startet im älteren Chrome 114; ein Langlauf (4 Runden durch alle Orte
+  und Seiten mit Tippen) zeigt keinen wachsenden Grafikspeicher und keinen Fehler; Ladezeiten wie vorher (Karte →
+  Ort rund 2,6 s samt Zugfahrt, zurück 1,4 s, späterer Start 1,4 s). Alle Sätze der Stimme sind aufgenommen.
 - Nur am echten Tablet prüfbar bleiben: Gefühl der Finger und Mehrfinger-Berührung (auch das Eltern-Zahnrad mit „genau
   einem kleinen Finger" und Handballen), Leistung bei 120 Hz und der Auflösungs-Wächter, Lautstärke und Mischung der
   Töne samt Stimme (Pausen, Ton-Bremse), Vollbild, Bildschirm-wach-halten, Installation und Offline-Betrieb über https

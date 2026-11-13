@@ -46,7 +46,7 @@ const REIHE_Y = 1478;            // die Instrumente liegen vorn im Gras
 const REIHE_GROESSE = 200;
 const STRAUSS_X = [-570, 570, -190, 190, -950, 950];
 const STRAUSS_Y = 1398;          // Vorderkante der Bühne
-const GAESTE = ['kuh', 'schaf', 'ente', 'frosch', 'igel', 'eule'];
+const GAESTE = ['kuh', 'schaf', 'ente', 'frosch', 'igel', 'eule', 'fuchs', 'pinguin'];
 const GAST_X = -830;
 const GAST_Y = 1566;
 const GAST_SKALA = 0.32;
@@ -725,6 +725,8 @@ export class Band extends Seite {
       this.tween(l.schein, { alpha: LAMPE_AN }, 0.6, { ease: 'sineInOut', delay: 0.25 * k++ });
     }
     this.tween(this.abend, { alpha: 1 }, 2.5, { ease: 'sineInOut' });
+    // Überraschung in den Runden ohne Vogel (nicht im allerersten Konzert): der Abendstern geht auf
+    if (!this.vogelGeplant && this.runde > 0) this.after(2.2, () => this.sternKommt());
     this.after(1.6, () => {
       this.phase = 'einsatz';
       this.tierHier = false;
@@ -1084,6 +1086,7 @@ export class Band extends Seite {
         });
       }
       this.vogelGeht();
+      this.sternGeht();
       this.runde++;
       this.neueRunde();
     });
@@ -1137,6 +1140,8 @@ export class Band extends Seite {
   }
 
   vogelLeben(dt, t) {
+    const st = this.stern;
+    if (st && !st.s.destroyed) st.s.scale.set(0.9 + 0.04 * Math.sin(t * 1.6));
     const d = this.vogelDa;
     if (!d || d.c.destroyed) return;
     d.koerper.rotation = 0.04 * Math.sin(t * 1.3) + 0.08 * d.singen * Math.sin(t * 6);
@@ -1162,6 +1167,37 @@ export class Band extends Seite {
         d.c.y = lerp(y0, y1, p.k) - 60 * Math.sin(Math.PI * p.k);
       },
     }).then(() => { if (!d.c.destroyed) d.c.destroy({ children: true }); });
+  }
+
+  // ---------------------------------------------------------------- Abendstern (Überraschung ohne Vogel)
+
+  // Ein Stern blendet weich am Abendhimmel ein (1,5 s), atmet langsam und klingt beim Antippen wie ein Glöckchen.
+  sternKommt() {
+    if (this.stern) return;
+    const [px, py] = pick([[1300, 250], [1620, 300], [1060, 300]]);
+    const p = this.bildPunkt(px, py);
+    const s = spr('common/stern_himmel', { anchor: 0.5, x: p.x, y: p.y, parent: this.welt, z: 5 });
+    s.scale.set(0.9);
+    s.alpha = 0;
+    this.stern = { s, t: 0, zuletzt: -9 };
+    this.tween(s, { alpha: 1 }, 1.5, { ease: 'sineInOut' });
+    tap(s, () => {
+      const st = this.stern;
+      const t = this.szene.t;
+      fx.wobble(s, 0.08);
+      if (!st || t - st.zuletzt < 0.8) return;
+      st.zuletzt = t;
+      [84, 88, 91].forEach((m, k) => this.after(0.15 * k, () => note('glocke', m, { vol: 0.18 })));
+      this.burst('funkeln', s.x, s.y, { count: 4 });
+    }, { sound: null, squash: false, hitArea: new PIXI.Circle(0, 0, 135) });
+  }
+
+  sternGeht() {
+    const st = this.stern;
+    this.stern = null;
+    if (!st || st.s.destroyed) return;
+    st.s.eventMode = 'none';
+    this.tween(st.s, { alpha: 0 }, 1.2, { ease: 'sineInOut' }).then(() => { if (!st.s.destroyed) st.s.destroy(); });
   }
 
   // Alle hören nacheinander weich auf (von außen nach innen, im Abstand eines halben Schlags)

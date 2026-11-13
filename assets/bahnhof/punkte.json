@@ -111,6 +111,46 @@
           36
         ]
       }
+    },
+    "lokschuppen": {
+      "ax": 0.498,
+      "ay": 0.981,
+      "desc": "Lokschuppen von der Seite, links ein großes offenes Bogentor (dunkel innen), Ziegeldach mit Schornstein",
+      "einheiten": [
+        840,
+        540
+      ]
+    },
+    "kran": {
+      "ax": 0.127,
+      "ay": 0.981,
+      "desc": "Gelber Ladekran: Turm links, langer Arm nach rechts (ohne Haken)",
+      "einheiten": [
+        1300,
+        665
+      ]
+    },
+    "kranhaken": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Kranhaken: rote Rolle oben, gelber Haken unten"
+    },
+    "ladung_staemme": {
+      "ax": 0.508,
+      "ay": 0.982,
+      "desc": "Drei Baumstämme mit rotem Seil gebunden"
+    },
+    "drehscheibe": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Drehscheibe: flache ovale Grube mit Brücke und Schienen"
+    },
+    "hg_gueter": {
+      "einheiten": [
+        2829,
+        1600
+      ],
+      "desc": "Güterbahnhof von der Seite: Wiese mit Hügeln und Zaun, Apfelbaum oben links, leerer Schotterstreifen mit Gleisbett (y≈1215-1340), Wiese vorn (y≈1400-1600) – Kran, Lokschuppen, Drehscheibe kommen als Sprites"
     }
   },
   "audio": {}

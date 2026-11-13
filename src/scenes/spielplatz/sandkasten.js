@@ -72,7 +72,7 @@ const WIMPEL_X = [-850, -720, -590, -460, -330, 330, 460, 590, 720, 850];
 const WIMPEL_Y = 206;
 const WIMPEL_SKALA = 0.42;
 let wimpelFarben = [];          // bleibt für die ganze Spielzeit (auch nach dem Verlassen des Spielplatzes)
-const UEBERRASCHUNGEN = ['gummiente', 'frosch', 'ente'];
+const UEBERRASCHUNGEN = ['gummiente', 'frosch', 'ente', 'schiffchen'];
 
 export class Sandkasten extends Seite {
   static hg = 'spielplatz/hg_sandkasten';
@@ -950,12 +950,16 @@ export class Sandkasten extends Seite {
     const art = andere(UEBERRASCHUNGEN, this.ueberraschung);
     this.ueberraschung = art;
     const vorn = BURG.y + BURG.ry - BURG.dy / 2;
-    if (art === 'gummiente') {
+    if (art === 'gummiente' || art === 'schiffchen') {
+      // Quietscheente oder ein buntes Papierschiffchen schwimmt im Graben
       const e = this.gummiente;
       killTweensOf(e);
+      const boot = art === 'schiffchen';
+      e.texture = tex(boot ? 'spielplatz/schiffchen' : 'spielplatz/schatz_ente');
+      e.tint = boot ? pick(FARBEN) : 0xffffff;
       e.position.set(BURG.x + rand(-200, 200), vorn + 12);
       e.basisY = e.y;
-      const k = 110 / 300;
+      const k = boot ? 150 / 300 : 110 / 300;
       e.scale.set(k * 0.3);
       e.alpha = 1;
       e.visible = true;

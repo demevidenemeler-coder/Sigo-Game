@@ -283,6 +283,55 @@
       "ax": 0.5,
       "ay": 0.5,
       "desc": "Rotes Eröffnungsband waagrecht mit großer Schleife in der Mitte"
+    },
+    "werkbank": {
+      "ax": 0.499,
+      "ay": 0.98,
+      "desc": "Hölzerne Werkbank von vorn, leere Platte, blaugrüne Beine"
+    },
+    "zapfsaeule": {
+      "ax": 0.388,
+      "ay": 0.983,
+      "desc": "Grün-gelbe Zapfsäule mit lächelndem Uhr-Gesicht, Schlauch und Zapfhahn rechts"
+    },
+    "hundehuette": {
+      "ax": 0.496,
+      "ay": 0.984,
+      "desc": "Hundehütte aus hellem Holz, von vorn, ungestrichen"
+    },
+    "vogelhaus": {
+      "ax": 0.5,
+      "ay": 0.984,
+      "desc": "Vogelhaus auf Pfosten aus hellem Holz, von vorn, ungestrichen"
+    },
+    "briefkasten": {
+      "ax": 0.499,
+      "ay": 0.984,
+      "desc": "Briefkasten auf Pfosten aus hellem Holz, von vorn, ungestrichen"
+    },
+    "hammer": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Spielzeug-Hammer waagrecht, roter Stiel links, grauer Kopf rechts"
+    },
+    "brett": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Langes helles Holzbrett, waagrecht"
+    },
+    "pinsel": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Dicker Spielzeug-Pinsel schräg, Borsten unten links, gelber Stiel"
+    },
+    "hg_bauhof": {
+      "pts": {
+        "boden": [
+          1414,
+          1195
+        ]
+      },
+      "desc": "Bauhof: links Hof mit Baum und Holzzaun, rechts Fahrzeughalle aus Ziegeln mit drei offenen Rundbogen-Toren (Mitte x 1295, 1866, 2442; Bogen-Mitte y 820, Halbbreite 200; Boden 1195), vorn breiter heller Platz"
     }
   },
   "audio": {}

@@ -8,7 +8,7 @@ import { Actor, fx, shuffle } from '../../engine/index.js';
 
 export const TIERE = [
   'hase', 'katze', 'hund', 'baer', 'fuchs', 'schwein', 'maus', 'igel', 'eichhoernchen', 'pinguin',
-  'ente', 'frosch', 'affe', 'schaf', 'loewe', 'pferd', 'huhn', 'elefant', 'giraffe', 'kuh',
+  'ente', 'frosch', 'affe', 'schaf', 'loewe', 'pferd', 'huhn', 'elefant', 'giraffe', 'kuh', 'eule', 'hahn',
 ];
 
 const DRAUSSEN = -1560;   // Standard: hier beginnen und enden die Wege (links außerhalb des Bildes)
@@ -18,7 +18,8 @@ export class Kundschaft {
    * @param seite  die Seite (für Zeit und Ebenen)
    * @param opt    {x, y, scale, z, tempo, draussen = -1560 (wo die Wege beginnen/enden), onTipp(actor),
    *                kleinDx (wo das Kleine neben dem Kunden steht, Standard -200),
-   *                kleinPad (Rand der Tippfläche des Kleinen, Standard 70 – kleiner, wenn daneben etwas Antippbares liegt)}
+   *                kleinPad (Rand der Tippfläche des Kleinen, Standard 70 – kleiner, wenn daneben etwas Antippbares liegt),
+   *                tiere (welche Tiere kommen, Standard TIERE)}
    */
   constructor(seite, opt) {
     this.seite = seite;
@@ -31,6 +32,7 @@ export class Kundschaft {
     this.draussen = opt.draussen ?? DRAUSSEN;
     this.kleinDx = opt.kleinDx ?? -200;
     this.kleinPad = opt.kleinPad ?? 70;
+    this.tiere = opt.tiere ?? TIERE;
     this.actor = null;
     this.klein = null;        // das mitgebrachte Kleine (oder null)
     this.bereit = false;      // steht am Platz und wartet
@@ -42,7 +44,7 @@ export class Kundschaft {
 
   naechstesTier() {
     if (!this.reihe.length) {
-      this.reihe = shuffle(TIERE.slice());
+      this.reihe = shuffle(this.tiere.slice());
       if (this.reihe[0] === this.letzter) this.reihe.push(this.reihe.shift());
     }
     this.letzter = this.reihe.shift();

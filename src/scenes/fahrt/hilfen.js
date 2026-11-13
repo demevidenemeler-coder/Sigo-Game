@@ -102,7 +102,7 @@ export class Ding {
     this.tot = true;
     // Figuren erst anhalten: ein laufender Hüpfer (hopTo/walkTo) schriebe sonst noch in die abgebaute Figur
     for (const c of this.teile) if (!c.destroyed) stoppeFiguren(c);
-    for (const c of this.teile) if (!c.destroyed) c.destroy({ children: true });
+    for (const c of this.teile) if (!c.destroyed) c.destroy({ children: true, context: true });
     this.teile.length = 0;
   }
 }

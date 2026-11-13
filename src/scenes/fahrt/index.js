@@ -32,6 +32,7 @@ import { neueStation } from './stationen.js';
 import {
   Ladeplatz, Ziel, Wasserturm, Signal, Regenschauer, Sternbrett, neueLieferung, figurenUnterwegs,
 } from './auftrag.js';
+import { Holzlager, Markt, Picknick } from './halte.js';
 
 const { Container, Graphics, Rectangle, TilingSprite } = PIXI;
 
@@ -57,12 +58,15 @@ const ZUSTAENDE = [
 const WARTENDE_TIERE = ['hund', 'katze', 'hase', 'schwein', 'pinguin', 'ente', 'fuchs', 'baer', 'affe', 'igel', 'eule'];
 
 // Stationen zwischen den Schritten einer Lieferfahrt (gemischt, nie zweimal dieselbe hintereinander)
-const ZWISCHEN = ['apfel', 'bahnhof', 'tunnel', 'bruecke', 'uebergang', 'wasch', 'ballons', 'regen'];
-// Aufgaben unterwegs (wechseln sich ab)
-const AUFGABEN = ['wasser', 'signal', 'tier'];
+const ZWISCHEN = ['apfel', 'bahnhof', 'tunnel', 'bruecke', 'uebergang', 'wasch', 'ballons', 'regen', 'picknick'];
+// Aufgaben unterwegs (zwei je Runde, aus einem gemischten Beutel, der über Besuche gespeichert bleibt)
+const AUFGABEN = ['wasser', 'signal', 'tier', 'holz', 'markt'];
 const ALLE = [...ZWISCHEN, ...AUFGABEN, 'laden', 'ziel'];
-// Stationen aus auftrag.js (die übrigen baut stationen.js)
-const NEU = { laden: Ladeplatz, ziel: Ziel, wasser: Wasserturm, signal: Signal, regen: Regenschauer };
+// Stationen aus auftrag.js und halte.js (die übrigen baut stationen.js)
+const NEU = {
+  laden: Ladeplatz, ziel: Ziel, wasser: Wasserturm, signal: Signal, regen: Regenschauer,
+  holz: Holzlager, markt: Markt, picknick: Picknick,
+};
 
 const HEBEL_WINKEL = 0.42;       // Halten = nach links gekippt, Fahren = nach rechts
 const HEBEL_PULT = { b: 300, oben: -410, h: 450 };   // Holz-Schaltpult unter dem Hebel (relativ zum Sockel-Fuß)
@@ -120,6 +124,7 @@ export default class Fahrt extends Scene {
     this.dunkelSchicht.zIndex = 900;
     this.dunkelSchicht.eventMode = 'none';
     this.front.addChild(this.dunkelSchicht);
+    this.baueLicht();
 
     // Strecke planen: am Anfang steht ein Apfelbaum gleich hinter dem Zug, dann geht es los
     this.planHinten = -this.W / 2 - 300;
@@ -128,13 +133,19 @@ export default class Fahrt extends Scene {
     this.beutel = [];           // gemischte Zwischen-Stationen
     this.letzteZwischen = null;
     this.letzteAufgabe = null;
-    // Erste Runde in fester Folge (das Kind sieht gleich viel), danach gemischte Runden
-    const lief = neueLieferung(this);
-    this.folge = [
-      { art: 'laden', lief }, 'bruecke', 'wasser', 'ballons', { art: 'ziel', lief }, 'bahnhof',
-    ];
-    this.letzteAufgabe = 'wasser';
-    this.letzteZwischen = 'bahnhof';
+    // Beim allerersten Besuch: erste Runde in fester Folge (das Kind sieht gleich viel). Bei jedem weiteren Besuch
+    // gleich eine gemischte Runde – die Aufgaben kommen aus dem gespeicherten Beutel (Neues zuerst).
+    const schonDa = store.get('fahrt.lieferung', null) !== null;
+    if (schonDa) {
+      this.folge = this.neueRunde();
+    } else {
+      const lief = neueLieferung(this);
+      this.folge = [
+        { art: 'laden', lief }, 'bruecke', 'wasser', 'ballons', { art: 'ziel', lief }, 'bahnhof',
+      ];
+      this.letzteAufgabe = 'wasser';
+      this.letzteZwischen = 'bahnhof';
+    }
     // Zum Ausprobieren: erste Station wählen (go('fahrt', {station}) oder im Test ?station=tunnel)
     const wunsch = params.station || (isTest ? new URLSearchParams(location.search).get('station') : null);
     if (ALLE.includes(wunsch) && wunsch !== 'laden') this.folge.unshift(wunsch === 'ziel' ? { art: 'ziel', lief: neueLieferung(this) } : wunsch);
@@ -381,6 +392,52 @@ export default class Fahrt extends Scene {
     this.wetterKnopf.setIcon(z.icon);
     ambient.set({ zeit: z.zeit, wetter: z.wetter }, { dauer: 2.5 });
     this.himmel.setze(z.zeit, z.wetter);
+    this.setzeLicht();
+  }
+
+  // ---------------------------------------------------------------- Lok-Laterne (Abend, Nacht, Tunnel)
+
+  baueLicht() {
+    const b = this.inWelt(this.zug.lok.getBounds());
+    const x = b.x + b.w - 34;
+    const y = b.y + b.h * 0.6;
+    const c = new Container({ label: 'lok-licht' });
+    c.zIndex = 905;
+    c.eventMode = 'none';
+    c.alpha = 0;
+    c.visible = false;
+    const farbe = 0xffe7a3;
+    const g = new Graphics()
+      // Lichtkegel auf die Schiene vor der Lok
+      .poly([x, y - 14, x + 600, y - 80, x + 640, y + 120, x + 560, GLEIS_Y + 50, x, y + 20]).fill({ color: farbe, alpha: 0.24 })
+      .poly([x, y - 8, x + 420, y - 36, x + 440, y + 90, x, y + 14]).fill({ color: farbe, alpha: 0.2 });
+    // weicher Schein um die Laterne (viele zarte Ringe = weicher Rand)
+    for (let i = 10; i >= 1; i--) g.circle(x, y, 16 + i * 15).fill({ color: farbe, alpha: 0.1 });
+    g.circle(x, y, 17).fill(0xfff6d8);
+    c.addChild(g);
+    this.front.addChild(c);
+    this.licht = c;
+    this.lichtAn = false;
+  }
+
+  /** Laterne weich an (Abend, Nacht, im Tunnel) oder aus. */
+  setzeLicht() {
+    const c = this.licht;
+    if (!c) return;
+    const nacht = this.zeit === 'nacht';
+    const ziel = this.imTunnel || nacht ? 1 : this.zeit === 'abend' ? 0.7 : 0;
+    if (ziel > 0) c.visible = true;
+    this.tween(c, { alpha: ziel }, 1.6, { ease: 'sineInOut' }).then((ok) => { if (ok && ziel === 0 && !c.destroyed) c.visible = false; });
+    const an = ziel > 0;
+    if (an && !this.lichtAn) {
+      sfx('common/klick', { vol: 0.4 });
+      // Einmal ansagen, wenn es dunkel wird (nicht im Tunnel – der ist gleich vorbei)
+      if (this.zeit !== 'tag' && !this.lichtGesagt) {
+        this.lichtGesagt = true;
+        this.after(1.2, () => voice('fahrt_licht', { nurWenn: () => this.zeit !== 'tag' }));
+      }
+    }
+    this.lichtAn = an;
   }
 
   // ---------------------------------------------------------------- Hilfen für die Stationen
@@ -465,6 +522,8 @@ export default class Fahrt extends Scene {
   /** Weich dunkler (Tunnel) und wieder hell. */
   dunkel(an) {
     this.tween(this.dunkelSchicht, { alpha: an ? 0.3 : 0 }, an ? 0.9 : 1.2, { ease: 'sineInOut' });
+    this.imTunnel = an;
+    this.setzeLicht();
   }
 
   /**
@@ -493,9 +552,23 @@ export default class Fahrt extends Scene {
     const d = NEU[art] ? new NEU[art](this, linkeKante, eintrag.lief) : neueStation(this, art, linkeKante);
     this.dinge.push(d);
     this.letzteArt = art;
-    this.sperren.push({
-      von: d.wx + d.links, bis: d.wx + d.rechts, hinten: d.sperrtHinten !== false, vorne: !!d.vorneBelegt,
-    });
+    if (d.vorneLinks !== undefined) {
+      // vordere Reihe weiter nach links belegt als hinten (Freunde-Leine am Ladeplatz)
+      this.sperren.push({ von: d.wx + d.links, bis: d.wx + d.rechts, hinten: d.sperrtHinten !== false, vorne: false });
+      this.sperren.push({ von: d.wx + d.vorneLinks, bis: d.wx + d.rechts, hinten: false, vorne: true });
+      // schon geplante Blumen o. Ä. der vorderen Reihe in diesem Bereich weichen (sie wären noch nicht zu sehen)
+      const von = d.wx + d.vorneLinks - 60;
+      const bis = d.wx + d.rechts;
+      for (const e of this.dinge) {
+        if (e === d || e.tot || e.teile[0]?.parent !== this.ebVorne || NEU[e.art] || e.art === 'ballons') continue;
+        if (e.wx + e.rechts > von && e.wx + e.links < bis && e.wx + e.links - this.strecke > this.W / 2) e.zerstoere();
+      }
+      this.dinge = this.dinge.filter((e) => !e.tot);
+    } else {
+      this.sperren.push({
+        von: d.wx + d.links, bis: d.wx + d.rechts, hinten: d.sperrtHinten !== false, vorne: !!d.vorneBelegt,
+      });
+    }
     d.setze(d.wx - this.strecke);
     return d;
   }
@@ -505,14 +578,37 @@ export default class Fahrt extends Scene {
     return this.folge.shift();
   }
 
-  /** Eine Lieferfahrt: Ladeplatz → Station → Aufgabe → Station → Ziel → Station. */
+  /** Eine Lieferfahrt: Ladeplatz → Station → Aufgabe → Station → Ziel → zweite Aufgabe. */
   neueRunde() {
     const lief = neueLieferung(this);
-    const aufgabe = pick(AUFGABEN.filter((a) => a !== this.letzteAufgabe));
-    this.letzteAufgabe = aufgabe;
+    const a1 = this.naechsteAufgabe();
+    const a2 = this.naechsteAufgabe();
     return [
-      { art: 'laden', lief }, this.zwischen(), aufgabe, this.zwischen(), { art: 'ziel', lief }, this.zwischen(),
+      { art: 'laden', lief }, this.zwischen(), a1, this.zwischen(), { art: 'ziel', lief }, a2,
     ];
+  }
+
+  /**
+   * Nächste Aufgabe aus dem gemischten Beutel (alle kommen dran, bevor sich eine wiederholt; nie zweimal dieselbe
+   * hintereinander). Gespeichert über Besuche; gibt es noch keinen Beutel, kommen die neuen Aufgaben zuerst.
+   */
+  naechsteAufgabe() {
+    let beutel = store.get('fahrt.aufgabenBeutel', null);
+    const neu = beutel === null;
+    beutel = Array.isArray(beutel) ? beutel.filter((a) => AUFGABEN.includes(a)) : [];
+    if (!beutel.length) {
+      const rest = AUFGABEN.filter((a) => a !== 'holz' && a !== 'markt').sort(() => Math.random() - 0.5);
+      beutel = neu ? ['holz', 'markt', ...rest] : [...AUFGABEN].sort(() => Math.random() - 0.5);
+      if (beutel[0] === this.letzteAufgabe) beutel.push(beutel.shift());
+    }
+    let a = beutel.shift();
+    if (a === this.letzteAufgabe && beutel.length) {
+      beutel.push(a);
+      a = beutel.shift();
+    }
+    store.set('fahrt.aufgabenBeutel', beutel);
+    this.letzteAufgabe = a;
+    return a;
   }
 
   /** Nächste Zwischen-Station aus dem gemischten Beutel (nie zweimal dieselbe hintereinander). */

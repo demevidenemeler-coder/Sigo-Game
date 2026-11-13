@@ -16,11 +16,12 @@
 //   6. Aufräumen – die Gäste gehen nacheinander, die Decke rollt sich ein. Nächste Runde: andere Gäste, andere Wünsche.
 // Wie bisher: Specht antippen → klopft; ein buntes Blatt segelt ab und zu vom Baum (antippen → in den Korb);
 // ein Schmetterling gaukelt herum. Ein Eichhörnchen als Gast wünscht sich immer eine Nuss.
+// Runde 3: Auch Eule und Reh kommen zum Picknick (3 von 7 Gästen, am längsten nicht dran).
 
 import { spr, tex, meta, sfx, voice, note, tap, drag, Actor, fx, store, rand, pick, shuffle, clamp, killTweensOf, PIXI } from '../../engine/index.js';
 import { Seite } from '../../gemeinsam/seiten.js';
 import { belohne } from '../../gemeinsam/sticker.js';
-import { jubel, laut, geheZu, blase, tiefe, bogen, flugDauer, Schmetterling, waehleArten, waehleSticker } from './deko.js';
+import { jubel, laut, geheZu, blase, tiefe, bogen, flugDauer, Schmetterling, waehleArten, waehleSticker, mamaFuer } from './deko.js';
 
 const DINGE = ['pilz_rot', 'pilz_braun', 'himbeere', 'blaubeere_zweig', 'tannenzapfen', 'eichel', 'kastanie', 'blatt_bunt'];
 const NUESSE = ['eichel', 'kastanie'];
@@ -57,6 +58,9 @@ const GAESTE = {
   eichhoernchen: { hoehe: 270, mag: ['eichel', 'kastanie'] },
   fuchs: { hoehe: 290, mag: ['himbeere', 'blaubeere_zweig', 'pilz_rot'] },
   baer: { hoehe: 335, mag: ['himbeere', 'blaubeere_zweig', 'tannenzapfen'] },
+  // Runde 3: mehr Gäste
+  eule: { hoehe: 270, mag: ['blaubeere_zweig', 'himbeere', 'eichel'] },
+  reh: { hoehe: 330, mag: ['himbeere', 'blaubeere_zweig', 'pilz_braun'] },
 };
 const SPECHT = { x: 545, y: 430, hoehe: 290 };
 // Wimpelkette oben: wächst mit jedem Picknick um einen Wimpel (gespeichert)
@@ -233,7 +237,7 @@ export class Sammeln extends Seite {
 
   gastKommt(art, wuensche, sitz, warten) {
     const def = GAESTE[art];
-    const g = new Actor(art, { x: 1450, y: sitz.y, parent: this.welt, z: sitz.y });
+    const g = mamaFuer(art, { x: 1450, y: sitz.y, parent: this.welt, z: sitz.y });   // das Reh kommt aus dem Wald-Paket
     g.scale.set(def.hoehe / 900);
     g.art = art;
     g.hoehe = def.hoehe;
@@ -636,7 +640,7 @@ export class Sammeln extends Seite {
     gaeste.forEach((g, i) => this.after(i * 0.75, () => jubel(this, g, { herzen: 4 })));
     this.klopfen();
     await this.wait(1.4);
-    belohne(this, waehleSticker(['wald_beeren', ...gaeste.map((g) => 'tier_' + g.art)]), DECKE.x, 820);
+    belohne(this, waehleSticker(['wald_beeren', ...gaeste.map((g) => (g.art === 'reh' ? 'wald_reh' : 'tier_' + g.art))]), DECKE.x, 820);
     this.runden++;
     this.after(1.2, () => this.neuerWimpel());
     await this.wait(3.6);

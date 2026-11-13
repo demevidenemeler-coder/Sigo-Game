@@ -161,6 +161,11 @@
       "ax": 0.5,
       "ay": 0.5,
       "desc": "Goldene Vorhang-Kordel mit Quaste unten"
+    },
+    "hg_werkstatt": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Holz-Werkstatt (Seite 3): Werkbank links (Oberfläche y≈960, x≈100-1700), leeres Wandregal rechts (Bretter y≈392 und ≈690, x≈1500-2620), runder Fenster oben, Holzboden ab y≈1300"
     }
   },
   "audio": {

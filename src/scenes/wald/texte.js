@@ -13,4 +13,11 @@ export default {
   wald_glas: 'Hol die Glühwürmchen ins Glas.',
   wald_decke: 'Roll die Decke aus. Wir machen Picknick!',
   wald_teller: 'Was möchten die Tiere essen?',
+  // Runde 3 – Waldrand (Aufnahmen folgen)
+  wald_vogelhaus: 'Komm, wir bauen ein Vogelhaus!',
+  wald_koerner: 'Füll Körner hinein. Dann kommen die Vögel.',
+  wald_singen: 'Tipp die Vögel an. Hör mal, wie sie singen!',
+  wald_nuesse: 'Hilf dem Eichhörnchen, seine Nüsse zu verstecken.',
+  wald_winter: 'Es ist Winter. Wo sind die Nüsse?',
+  wald_giessen: 'Gieß das Bäumchen. Dann wächst es.',
 };

@@ -13,4 +13,11 @@ export default {
   waschanlage_schmuck: 'Such einen Aufkleber aus.',
   waschanlage_fund: 'Nanu, was hat sich da versteckt?',
   waschanlage_tschuess: 'Tschüss, gute Fahrt!',
+  // Seite 2: Tankstelle und Café (Aufnahmen folgen)
+  waschanlage_tankstelle_hallo: 'Hallo! Hier wird getankt, und es gibt Kakao.',
+  waschanlage_deckel: 'Mach den Tankdeckel auf.',
+  waschanlage_tanken: 'Drück auf die Zapfsäule, dann wird getankt.',
+  waschanlage_voll: 'Voll! Häng den Zapfhahn zurück.',
+  waschanlage_durst: 'Wer hat Durst? Stell den Becher in die Kakao-Maschine.',
+  waschanlage_foto: 'Jetzt ein Foto für die Wand!',
 };

@@ -336,6 +336,83 @@
           295
         ]
       }
+    },
+    "pumpe": {
+      "ax": 0.358,
+      "ay": 0.983,
+      "desc": "Grüne Schwengelpumpe ohne Hebel auf Steinsockel, Auslauf nach rechts (Punkte lager, auslauf)",
+      "pts": {
+        "lager": [
+          60,
+          162
+        ],
+        "auslauf": [
+          382,
+          300
+        ]
+      }
+    },
+    "wasserrad": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Hölzernes Wasserrad von vorn mit acht Schaufeln, rote Nabe (dreht sich um die Mitte)"
+    },
+    "schiffchen": {
+      "ax": 0.45,
+      "ay": 0.978,
+      "desc": "Weißes Papierschiffchen von der Seite, Bug rechts (zum Einfärben mit tint)"
+    },
+    "becken": {
+      "ax": 0.506,
+      "ay": 0.979,
+      "desc": "Flaches rundes Wasserbecken mit Steinrand, schräg von oben",
+      "pts": {
+        "wasser": [
+          400,
+          170
+        ]
+      }
+    },
+    "rinne": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Gerade Holzrinne (Wasserlauf), waagrecht, Innenseite sichtbar"
+    },
+    "pumpe_hebel": {
+      "ax": 0.18,
+      "ay": 0.5,
+      "desc": "Pumpen-Schwengel: grüne Stange, links Ring (Lager), rechts gelbe Kugel"
+    },
+    "matschkueche": {
+      "ax": 0.499,
+      "ay": 0.984,
+      "desc": "Hölzerne Matschküche (Spieltheke) von vorn mit leerer Arbeitsfläche",
+      "pts": {
+        "platte": [
+          320,
+          330
+        ]
+      }
+    },
+    "schuessel": {
+      "ax": 0.52,
+      "ay": 0.82,
+      "desc": "Hellblaue Rührschüssel, leer, schräg von vorn (Punkt innen = Mitte der Öffnung)",
+      "pts": {
+        "innen": [
+          187,
+          105
+        ]
+      }
+    },
+    "hg_wasser": {
+      "pts": {
+        "boden": [
+          1414,
+          1300
+        ]
+      },
+      "desc": "Wasserspiel-Ecke: heller Steinboden (y 760-1480) vor Holzzaun, Büschen und Bäumen, Baum oben links"
     }
   },
   "audio": {}

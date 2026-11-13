@@ -271,6 +271,81 @@
       "ax": 0.5,
       "ay": 0.5,
       "desc": "Trockener gelber Spülschwamm mit feinen Poren und grüner Unterseite (vor dem Eintauchen)"
+    },
+    "blume_rot_auf": {
+      "ax": 0.478,
+      "ay": 0.985,
+      "desc": "Rote Blume offen (Kopie aus garten)"
+    },
+    "blume_rot_zu": {
+      "ax": 0.477,
+      "ay": 0.983,
+      "desc": "Rote Blume Knospe (Kopie aus garten)"
+    },
+    "blume_gelb_auf": {
+      "ax": 0.472,
+      "ay": 0.985,
+      "desc": "Gelbe Blume offen (Kopie aus garten)"
+    },
+    "blume_gelb_zu": {
+      "ax": 0.476,
+      "ay": 0.983,
+      "desc": "Gelbe Blume Knospe (Kopie aus garten)"
+    },
+    "blume_blau_auf": {
+      "ax": 0.452,
+      "ay": 0.983,
+      "desc": "Blaue Blume offen (Kopie aus garten)"
+    },
+    "blume_blau_zu": {
+      "ax": 0.477,
+      "ay": 0.985,
+      "desc": "Blaue Blume Knospe (Kopie aus garten)"
+    },
+    "drachen": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Bunter Papierdrachen mit Schleifenschwanz (Kopie aus spielplatz)"
+    },
+    "lichtschein_warm": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Weicher warmgelber Lichtschein (Kopie aus schlafen, verkleinert) für die Laterne",
+      "einheiten": [
+        900,
+        889
+      ]
+    },
+    "blumenkuebel": {
+      "ax": 0.497,
+      "ay": 0.985,
+      "desc": "Leerer runder Terrakotta-Blumenkübel (Öffnung oben sichtbar)",
+      "pts": {
+        "oeffnung": [
+          200,
+          52
+        ]
+      }
+    },
+    "laterne": {
+      "ax": 0.505,
+      "ay": 0.983,
+      "desc": "Alte grüne Straßenlaterne, aus, Glas leer",
+      "pts": {
+        "glas": [
+          100,
+          165
+        ],
+        "spitze": [
+          100,
+          12
+        ]
+      }
+    },
+    "gluehbirne": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Glühbirne, warm leuchtend, Schraubsockel unten"
     }
   },
   "audio": {}

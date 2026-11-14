@@ -1,0 +1,29 @@
+{
+  "id": "zoo",
+  "images": {
+    "blume": {"file": "blume.webp", "w": 205, "h": 260, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Rosa lächelnde Blume"},
+    "decke": {"file": "decke.webp", "w": 500, "h": 340, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Karierte Kuscheldecke mit Sternen"},
+    "fotowand": {"file": "fotowand.webp", "w": 600, "h": 520, "ax": 0.495, "ay": 0.982, "pts": {"kork_lo": [70, 180], "kork_ru": [530, 445]}, "desc": "Leere Korkwand im Holzrahmen mit Dach und Blumen"},
+    "futterkiste": {"file": "futterkiste.webp", "w": 600, "h": 350, "ax": 0.496, "ay": 0.979, "pts": {}, "desc": "Offene leere Holzkiste von vorn"},
+    "futterwagen": {"file": "futterwagen.webp", "w": 600, "h": 300, "ax": 0.629, "ay": 0.977, "pts": {"ladung": [370, 40]}, "desc": "Grüner Holz-Handwagen von der Seite, Griff links (Punkt ladung = Mitte der Ladefläche oben)"},
+    "hg_bahn": {"file": "hg_bahn.webp", "w": 2829, "h": 1600, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Zoo-Weg: links Eingangsbogen, drei Gehege (Palme/Sand, Teich, Büsche mit Hütte), vorn Sandweg und Blumen"},
+    "hg_futter": {"file": "hg_futter.webp", "w": 2829, "h": 1600, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Futterhof im Zoo: links Futterhütte, großer Baum mit langem Ast oben, Felsen, Teich hinter dem Zaun, vorn Sandplatz"},
+    "hg_pflege": {"file": "hg_pflege.webp", "w": 2829, "h": 1600, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Pflegehof: Holzwand mit Regal (Handtücher, Eimer), Schlauch, rundes Fenster, rechts offenes Stalltor, Steinfliesen"},
+    "kamm": {"file": "kamm.webp", "w": 500, "h": 220, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Großer orangefarbener Tierkamm, Zinken nach unten"},
+    "kissen": {"file": "kissen.webp", "w": 260, "h": 190, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Weißes Kissen mit blauen Punkten"},
+    "krone": {"file": "krone.webp", "w": 260, "h": 196, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Kleine goldene Spielzeugkrone"},
+    "matschfleck": {"file": "matschfleck.webp", "w": 200, "h": 113, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Brauner Matschfleck"},
+    "pumpe": {"file": "pumpe.webp", "w": 538, "h": 600, "ax": 0.523, "ay": 0.985, "pts": {"auslauf": [505, 385], "griff": [60, 40]}, "desc": "Blaue Schwengelpumpe mit Gesicht, Schwengel links oben, Auslauf rechts"},
+    "schleife": {"file": "schleife.webp", "w": 260, "h": 210, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Rote Schleife"},
+    "seife": {"file": "seife.webp", "w": 200, "h": 300, "ax": 0.5, "ay": 0.983, "pts": {}, "desc": "Rosa Schaumbad-Flasche mit Pumpkopf"},
+    "spiegel": {"file": "spiegel.webp", "w": 427, "h": 600, "ax": 0.5, "ay": 0.983, "pts": {}, "desc": "Rosa Standspiegel mit Blumen"},
+    "spieluhr": {"file": "spieluhr.webp", "w": 260, "h": 219, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Runde Holz-Spieluhr mit Kurbel"},
+    "strohbett": {"file": "strohbett.webp", "w": 600, "h": 376, "ax": 0.495, "ay": 0.98, "pts": {}, "desc": "Rundes Nest-Bett aus Stroh mit Blümchen"},
+    "tor": {"file": "tor.webp", "w": 400, "h": 357, "ax": 0.497, "ay": 0.983, "pts": {}, "desc": "Gehege-Tor geschlossen (für den Sticker)"},
+    "tor_rahmen": {"file": "tor_rahmen.webp", "w": 600, "h": 536, "ax": 0.497, "ay": 0.99, "pts": {}, "desc": "Gehege-Tor ohne Tür: zwei Pfosten, Bogen mit Pfote"},
+    "tor_tuer": {"file": "tor_tuer.webp", "w": 337, "h": 373, "ax": 0.0, "ay": 0.99, "pts": {}, "desc": "Türflügel des Gehege-Tors (türkis, Herz), Anker an der linken Kante (Scharnier)"},
+    "trog": {"file": "trog.webp", "w": 600, "h": 277, "ax": 0.498, "ay": 0.976, "pts": {"wasser": [300, 62]}, "desc": "Langer Holz-Wassertrog, leer (Punkt wasser = Mitte der Wasserfläche)"}
+  },
+  "audio": {
+  }
+}

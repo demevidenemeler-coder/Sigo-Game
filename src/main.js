@@ -35,12 +35,15 @@ const SZENEN = {
   spielplatz: () => import('./scenes/spielplatz/index.js'),
   wald: () => import('./scenes/wald/index.js'),
   waschanlage: () => import('./scenes/waschanlage/index.js'),
+  zoo: () => import('./scenes/zoo/index.js'),
+  flughafen: () => import('./scenes/flughafen/index.js'),
+  baeckerei: () => import('./scenes/baeckerei/index.js'),
 };
 
 const START = 'start';
 const MIT_ZAHNRAD = new Set(['start', 'karte']);   // im Ruhe-Bild setzt die Schlafen-Szene es selbst
 const ORTE = ['bahnhof', 'bauernhof', 'feuerwehr', 'baustelle', 'garten', 'teich', 'musik', 'malhaus', 'eisdiele',
-  'spielplatz', 'wald', 'waschanlage', 'schlafen', 'fahrt', 'album'];
+  'spielplatz', 'wald', 'waschanlage', 'schlafen', 'zoo', 'flughafen', 'baeckerei', 'fahrt', 'album'];
 // Vorausladen: Was wahrscheinlich als Nächstes kommt, lädt still im Hintergrund (Bilder in kleinen Häppchen).
 // Auf der Karte kann das Kind überall hin – dort wird nur der Code der Orte geholt (die Bilder aller Orte passen
 // nicht zugleich in den Speicher); der zuletzt besuchte Ort bleibt ohnehin im Speicher (Vorrat im Kern).

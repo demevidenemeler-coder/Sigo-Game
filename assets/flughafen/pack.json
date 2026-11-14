@@ -1,0 +1,30 @@
+{
+  "id": "flughafen",
+  "images": {
+    "ballon": {"file": "ballon.webp", "w": 583, "h": 700, "ax": 0.5, "ay": 0.983, "pts": {"seile": [292, 700], "brenner": [292, 575], "gesicht": [292, 280]}, "desc": "Gestreifte Ballonhülle mit Gesicht, vier Seile unten (ohne Korb)"},
+    "doppeldecker": {"file": "doppeldecker.webp", "w": 800, "h": 589, "ax": 0.515, "ay": 0.982, "pts": {"tuer": [345, 230], "tuer_unten": [345, 300], "tank": [230, 440], "cockpit": [600, 330], "propeller": [748, 330], "f1": [345, 215], "nase": [700, 350]}, "desc": "Mintgrüner Spielzeug-Doppeldecker von der Seite, nach rechts, Gesicht, offener Sitz, Propeller vorn"},
+    "flugzeug": {"file": "flugzeug.webp", "w": 900, "h": 618, "ax": 0.501, "ay": 0.982, "pts": {"tuer": [582, 350], "tuer_unten": [582, 450], "tank": [330, 470], "cockpit": [780, 190], "f1": [245, 260], "f2": [330, 260], "f3": [410, 260], "f4": [490, 260], "triebwerk": [560, 470], "nase": [880, 330]}, "desc": "Rundes Spielzeug-Passagierflugzeug von der Seite, fliegt nach rechts, Gesicht an der Nase, Tür hinter dem Cockpit"},
+    "gepaeckwagen": {"file": "gepaeckwagen.webp", "w": 700, "h": 261, "ax": 0.5, "ay": 0.975, "pts": {"flaeche_l": [90, 140], "flaeche_r": [590, 140], "deichsel": [685, 150]}, "desc": "Leerer flacher Gepäckwagen, Deichsel rechts"},
+    "hg_gepaeck": {"file": "hg_gepaeck.webp", "w": 2829, "h": 1600, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": ""},
+    "hg_himmel": {"file": "hg_himmel.webp", "w": 2829, "h": 1600, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": ""},
+    "hg_vorfeld": {"file": "hg_vorfeld.webp", "w": 2829, "h": 1600, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": ""},
+    "hubschrauber": {"file": "hubschrauber.webp", "w": 800, "h": 616, "ax": 0.569, "ay": 0.982, "pts": {"tuer": [457, 385], "tuer_unten": [457, 482], "tank": [280, 470], "cockpit": [690, 270], "rotor": [450, 95], "f1": [300, 345], "f2": [381, 345], "heckrotor": [80, 355], "nase": [780, 430]}, "desc": "Gelber runder Spielzeug-Hubschrauber von der Seite, nach rechts, Gesicht, Tür, Rotor oben"},
+    "koffer": {"file": "koffer.webp", "w": 219, "h": 300, "ax": 0.5, "ay": 0.983, "pts": {}, "desc": "Roter Koffer mit Griff und Rollen"},
+    "korb": {"file": "korb.webp", "w": 400, "h": 290, "ax": 0.5, "ay": 0.983, "pts": {}, "desc": "Leerer Ballonkorb mit rotem Rand"},
+    "postkarte": {"file": "postkarte.webp", "w": 400, "h": 400, "ax": 0.5, "ay": 0.5, "pts": {}, "desc": "Urlaubs-Postkarte mit Insel und Herz-Briefmarke (Sticker)"},
+    "rucksack": {"file": "rucksack.webp", "w": 229, "h": 260, "ax": 0.5, "ay": 0.982, "pts": {}, "desc": "Gelber Rucksack mit Gesicht und grüner Tasche"},
+    "schalter": {"file": "schalter.webp", "w": 500, "h": 438, "ax": 0.5, "ay": 0.983, "pts": {"schlitz": [360, 170], "drucker": [380, 130]}, "desc": "Check-in-Schalter mit Anhänger-Drucker (Gesicht), Anhänger schaut heraus"},
+    "schlepper": {"file": "schlepper.webp", "w": 450, "h": 370, "ax": 0.5, "ay": 0.985, "pts": {"haken": [20, 295]}, "desc": "Kleiner roter Schlepper mit Gesicht und gelbem Dach, nach rechts, Haken hinten links"},
+    "surfbrett": {"file": "surfbrett.webp", "w": 149, "h": 360, "ax": 0.5, "ay": 0.985, "pts": {}, "desc": "Türkis-rotes Surfbrett, stehend"},
+    "tankwagen": {"file": "tankwagen.webp", "w": 600, "h": 443, "ax": 0.5, "ay": 0.981, "pts": {"schlauch": [75, 240]}, "desc": "Oranger Tankwagen mit Gesicht, nach rechts, Schlauchrolle hinten links"},
+    "treppe": {"file": "treppe.webp", "w": 600, "h": 501, "ax": 0.5, "ay": 0.984, "pts": {"plattform": [120, 135]}, "desc": "Hellblauer Treppenwagen mit Gesicht, nach links, Plattform oben links"},
+    "tunnel": {"file": "tunnel.webp", "w": 500, "h": 334, "ax": 0.5, "ay": 0.981, "pts": {}, "desc": "Lila Gepäck-Tunnel mit Gesicht und Streifenvorhängen, unten offen"},
+    "vogelkaefig": {"file": "vogelkaefig.webp", "w": 232, "h": 320, "ax": 0.5, "ay": 0.984, "pts": {}, "desc": "Runder Vogelkäfig mit gelbem Vögelchen auf der Schaukel"},
+    "ziel_berge": {"file": "ziel_berge.webp", "w": 1300, "h": 360, "ax": 0.5, "ay": 0.974, "pts": {"bahn_a": [320, 295], "bahn_b": [1000, 295]}, "desc": "Reiseziel berge: Landschafts-Streifen mit kleiner Landebahn"},
+    "ziel_insel": {"file": "ziel_insel.webp", "w": 1300, "h": 666, "ax": 0.477, "ay": 0.981, "pts": {"bahn_a": [700, 468], "bahn_b": [1060, 468]}, "desc": "Reiseziel insel: Landschafts-Streifen mit kleiner Landebahn"},
+    "ziel_meer": {"file": "ziel_meer.webp", "w": 1300, "h": 401, "ax": 0.5, "ay": 0.973, "pts": {"bahn_a": [905, 330], "bahn_b": [1240, 330]}, "desc": "Reiseziel Meer: Strand-Streifen mit Palmen und kleiner Landebahn rechts"},
+    "ziel_schnee": {"file": "ziel_schnee.webp", "w": 1300, "h": 368, "ax": 0.5, "ay": 0.974, "pts": {"bahn_a": [240, 312], "bahn_b": [1050, 312]}, "desc": "Reiseziel schnee: Landschafts-Streifen mit kleiner Landebahn"}
+  },
+  "audio": {
+  }
+}

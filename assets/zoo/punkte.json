@@ -1,0 +1,140 @@
+{
+  "images": {
+    "hg_futter": {
+      "desc": "Futterhof im Zoo: links Futterhütte, großer Baum mit langem Ast oben, Felsen, Teich hinter dem Zaun, vorn Sandplatz"
+    },
+    "hg_pflege": {
+      "desc": "Pflegehof: Holzwand mit Regal (Handtücher, Eimer), Schlauch, rundes Fenster, rechts offenes Stalltor, Steinfliesen"
+    },
+    "hg_bahn": {
+      "desc": "Zoo-Weg: links Eingangsbogen, drei Gehege (Palme/Sand, Teich, Büsche mit Hütte), vorn Sandweg und Blumen"
+    },
+    "futterwagen": {
+      "desc": "Grüner Holz-Handwagen von der Seite, Griff links (Punkt ladung = Mitte der Ladefläche oben)",
+      "ax": 0.629,
+      "ay": 0.977,
+      "pts": {
+        "ladung": [
+          370,
+          40
+        ]
+      }
+    },
+    "futterkiste": {
+      "desc": "Offene leere Holzkiste von vorn",
+      "ax": 0.496,
+      "ay": 0.979
+    },
+    "trog": {
+      "desc": "Langer Holz-Wassertrog, leer (Punkt wasser = Mitte der Wasserfläche)",
+      "ax": 0.498,
+      "ay": 0.976,
+      "pts": {
+        "wasser": [
+          300,
+          62
+        ]
+      }
+    },
+    "pumpe": {
+      "desc": "Blaue Schwengelpumpe mit Gesicht, Schwengel links oben, Auslauf rechts",
+      "ax": 0.523,
+      "ay": 0.985,
+      "pts": {
+        "auslauf": [
+          505,
+          385
+        ],
+        "griff": [
+          60,
+          40
+        ]
+      }
+    },
+    "tor_rahmen": {
+      "desc": "Gehege-Tor ohne Tür: zwei Pfosten, Bogen mit Pfote",
+      "ax": 0.497,
+      "ay": 0.99
+    },
+    "tor_tuer": {
+      "desc": "Türflügel des Gehege-Tors (türkis, Herz), Anker an der linken Kante (Scharnier)",
+      "ax": 0.0,
+      "ay": 0.99
+    },
+    "fotowand": {
+      "desc": "Leere Korkwand im Holzrahmen mit Dach und Blumen",
+      "ax": 0.495,
+      "ay": 0.982,
+      "pts": {
+        "kork_lo": [
+          70,
+          180
+        ],
+        "kork_ru": [
+          530,
+          445
+        ]
+      }
+    },
+    "kamm": {
+      "desc": "Großer orangefarbener Tierkamm, Zinken nach unten",
+      "ax": 0.5,
+      "ay": 0.5
+    },
+    "spiegel": {
+      "desc": "Rosa Standspiegel mit Blumen",
+      "ax": 0.5,
+      "ay": 0.983
+    },
+    "strohbett": {
+      "desc": "Rundes Nest-Bett aus Stroh mit Blümchen",
+      "ax": 0.495,
+      "ay": 0.98
+    },
+    "decke": {
+      "desc": "Karierte Kuscheldecke mit Sternen",
+      "ax": 0.5,
+      "ay": 0.5
+    },
+    "matschfleck": {
+      "desc": "Brauner Matschfleck",
+      "ax": 0.5,
+      "ay": 0.5
+    },
+    "seife": {
+      "desc": "Rosa Schaumbad-Flasche mit Pumpkopf",
+      "ax": 0.5,
+      "ay": 0.983
+    },
+    "schleife": {
+      "desc": "Rote Schleife",
+      "ax": 0.5,
+      "ay": 0.5
+    },
+    "blume": {
+      "desc": "Rosa lächelnde Blume",
+      "ax": 0.5,
+      "ay": 0.5
+    },
+    "krone": {
+      "desc": "Kleine goldene Spielzeugkrone",
+      "ax": 0.5,
+      "ay": 0.5
+    },
+    "kissen": {
+      "desc": "Weißes Kissen mit blauen Punkten",
+      "ax": 0.5,
+      "ay": 0.5
+    },
+    "spieluhr": {
+      "desc": "Runde Holz-Spieluhr mit Kurbel",
+      "ax": 0.5,
+      "ay": 0.5
+    },
+    "tor": {
+      "ax": 0.497,
+      "ay": 0.983,
+      "desc": "Gehege-Tor geschlossen (für den Sticker)"
+    }
+  }
+}

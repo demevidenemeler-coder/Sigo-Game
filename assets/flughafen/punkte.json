@@ -1,0 +1,311 @@
+{
+  "images": {
+    "flugzeug": {
+      "ax": 0.501,
+      "ay": 0.982,
+      "desc": "Rundes Spielzeug-Passagierflugzeug von der Seite, fliegt nach rechts, Gesicht an der Nase, Tür hinter dem Cockpit",
+      "pts": {
+        "tuer": [
+          582,
+          350
+        ],
+        "tuer_unten": [
+          582,
+          450
+        ],
+        "tank": [
+          330,
+          470
+        ],
+        "cockpit": [
+          780,
+          190
+        ],
+        "f1": [
+          245,
+          260
+        ],
+        "f2": [
+          330,
+          260
+        ],
+        "f3": [
+          410,
+          260
+        ],
+        "f4": [
+          490,
+          260
+        ],
+        "triebwerk": [
+          560,
+          470
+        ],
+        "nase": [
+          880,
+          330
+        ]
+      }
+    },
+    "hubschrauber": {
+      "ax": 0.569,
+      "ay": 0.982,
+      "desc": "Gelber runder Spielzeug-Hubschrauber von der Seite, nach rechts, Gesicht, Tür, Rotor oben",
+      "pts": {
+        "tuer": [
+          457,
+          385
+        ],
+        "tuer_unten": [
+          457,
+          482
+        ],
+        "tank": [
+          280,
+          470
+        ],
+        "cockpit": [
+          690,
+          270
+        ],
+        "rotor": [
+          450,
+          95
+        ],
+        "f1": [
+          300,
+          345
+        ],
+        "f2": [
+          381,
+          345
+        ],
+        "heckrotor": [
+          80,
+          355
+        ],
+        "nase": [
+          780,
+          430
+        ]
+      }
+    },
+    "doppeldecker": {
+      "ax": 0.515,
+      "ay": 0.982,
+      "desc": "Mintgrüner Spielzeug-Doppeldecker von der Seite, nach rechts, Gesicht, offener Sitz, Propeller vorn",
+      "pts": {
+        "tuer": [
+          345,
+          230
+        ],
+        "tuer_unten": [
+          345,
+          300
+        ],
+        "tank": [
+          230,
+          440
+        ],
+        "cockpit": [
+          600,
+          330
+        ],
+        "propeller": [
+          748,
+          330
+        ],
+        "f1": [
+          345,
+          215
+        ],
+        "nase": [
+          700,
+          350
+        ]
+      }
+    },
+    "ballon": {
+      "ax": 0.5,
+      "ay": 0.983,
+      "desc": "Gestreifte Ballonhülle mit Gesicht, vier Seile unten (ohne Korb)",
+      "pts": {
+        "seile": [
+          292,
+          700
+        ],
+        "brenner": [
+          292,
+          575
+        ],
+        "gesicht": [
+          292,
+          280
+        ]
+      }
+    },
+    "korb": {
+      "ax": 0.5,
+      "ay": 0.983,
+      "desc": "Leerer Ballonkorb mit rotem Rand"
+    },
+    "tankwagen": {
+      "ax": 0.5,
+      "ay": 0.981,
+      "desc": "Oranger Tankwagen mit Gesicht, nach rechts, Schlauchrolle hinten links",
+      "pts": {
+        "schlauch": [
+          75,
+          240
+        ]
+      }
+    },
+    "treppe": {
+      "ax": 0.5,
+      "ay": 0.984,
+      "desc": "Hellblauer Treppenwagen mit Gesicht, nach links, Plattform oben links",
+      "pts": {
+        "plattform": [
+          120,
+          135
+        ]
+      }
+    },
+    "gepaeckwagen": {
+      "ax": 0.5,
+      "ay": 0.975,
+      "desc": "Leerer flacher Gepäckwagen, Deichsel rechts",
+      "pts": {
+        "flaeche_l": [
+          90,
+          140
+        ],
+        "flaeche_r": [
+          590,
+          140
+        ],
+        "deichsel": [
+          685,
+          150
+        ]
+      }
+    },
+    "schlepper": {
+      "ax": 0.5,
+      "ay": 0.985,
+      "desc": "Kleiner roter Schlepper mit Gesicht und gelbem Dach, nach rechts, Haken hinten links",
+      "pts": {
+        "haken": [
+          20,
+          295
+        ]
+      }
+    },
+    "ziel_berge": {
+      "ax": 0.5,
+      "ay": 0.974,
+      "desc": "Reiseziel berge: Landschafts-Streifen mit kleiner Landebahn",
+      "pts": {
+        "bahn_a": [
+          320,
+          295
+        ],
+        "bahn_b": [
+          1000,
+          295
+        ]
+      }
+    },
+    "ziel_schnee": {
+      "ax": 0.5,
+      "ay": 0.974,
+      "desc": "Reiseziel schnee: Landschafts-Streifen mit kleiner Landebahn",
+      "pts": {
+        "bahn_a": [
+          240,
+          312
+        ],
+        "bahn_b": [
+          1050,
+          312
+        ]
+      }
+    },
+    "ziel_insel": {
+      "ax": 0.477,
+      "ay": 0.981,
+      "desc": "Reiseziel insel: Landschafts-Streifen mit kleiner Landebahn",
+      "pts": {
+        "bahn_a": [
+          700,
+          468
+        ],
+        "bahn_b": [
+          1060,
+          468
+        ]
+      }
+    },
+    "ziel_meer": {
+      "ax": 0.5,
+      "ay": 0.973,
+      "desc": "Reiseziel Meer: Strand-Streifen mit Palmen und kleiner Landebahn rechts",
+      "pts": {
+        "bahn_a": [
+          905,
+          330
+        ],
+        "bahn_b": [
+          1240,
+          330
+        ]
+      }
+    },
+    "koffer": {
+      "ax": 0.5,
+      "ay": 0.983,
+      "desc": "Roter Koffer mit Griff und Rollen"
+    },
+    "surfbrett": {
+      "ax": 0.5,
+      "ay": 0.985,
+      "desc": "Türkis-rotes Surfbrett, stehend"
+    },
+    "vogelkaefig": {
+      "ax": 0.5,
+      "ay": 0.984,
+      "desc": "Runder Vogelkäfig mit gelbem Vögelchen auf der Schaukel"
+    },
+    "schalter": {
+      "ax": 0.5,
+      "ay": 0.983,
+      "desc": "Check-in-Schalter mit Anhänger-Drucker (Gesicht), Anhänger schaut heraus",
+      "pts": {
+        "schlitz": [
+          360,
+          170
+        ],
+        "drucker": [
+          380,
+          130
+        ]
+      }
+    },
+    "tunnel": {
+      "ax": 0.5,
+      "ay": 0.981,
+      "desc": "Lila Gepäck-Tunnel mit Gesicht und Streifenvorhängen, unten offen"
+    },
+    "rucksack": {
+      "ax": 0.5,
+      "ay": 0.982,
+      "desc": "Gelber Rucksack mit Gesicht und grüner Tasche"
+    },
+    "postkarte": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Urlaubs-Postkarte mit Insel und Herz-Briefmarke (Sticker)"
+    }
+  },
+  "audio": {}
+}

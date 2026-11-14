@@ -1,0 +1,171 @@
+{
+  "images": {
+    "schuessel": {
+      "ax": 0.496,
+      "ay": 0.984,
+      "desc": "leere cremefarbene Rührschüssel mit blauem Streifen",
+      "pts": {
+        "innen": [
+          210,
+          100
+        ]
+      }
+    },
+    "ei": {
+      "ax": 0.497,
+      "ay": 0.985,
+      "desc": "braunes Ei"
+    },
+    "milchkanne": {
+      "ax": 0.578,
+      "ay": 0.982,
+      "desc": "Milchkännchen, Tülle rechts"
+    },
+    "butter": {
+      "ax": 0.523,
+      "ay": 0.985,
+      "desc": "Butterstück auf Papier"
+    },
+    "zucker": {
+      "ax": 0.5,
+      "ay": 0.982,
+      "desc": "Zuckerglas mit rosa Deckel"
+    },
+    "mehlsack": {
+      "ax": 0.498,
+      "ay": 0.984,
+      "desc": "offener Mehlsack mit Schaufel"
+    },
+    "schneebesen": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Schneebesen, Griff oben"
+    },
+    "teig": {
+      "ax": 0.498,
+      "ay": 0.983,
+      "desc": "Teigkugel"
+    },
+    "blech": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "leeres Backblech"
+    },
+    "ofen": {
+      "ax": 0.498,
+      "ay": 0.985,
+      "desc": "Backofen aus Ziegeln mit runder Öffnung",
+      "pts": {
+        "mund": [
+          332,
+          470
+        ],
+        "mundboden": [
+          332,
+          548
+        ]
+      }
+    },
+    "brezel": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "gebackene Brezel"
+    },
+    "broetchen": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "gebackenes Brötchen"
+    },
+    "hoernchen": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "gebackenes Hörnchen"
+    },
+    "brot": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "gebackenes Brot"
+    },
+    "keks_stern": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Keks Stern (ohne Guss)"
+    },
+    "keks_mond": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Keks Mond (ohne Guss)"
+    },
+    "keks_herz": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Keks Herz (ohne Guss)"
+    },
+    "keks_hase": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Keks Hase (ohne Guss)"
+    },
+    "nudelholz": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Nudelholz, waagrecht"
+    },
+    "streuer": {
+      "ax": 0.5,
+      "ay": 0.982,
+      "desc": "Streuselglas mit bunten Streuseln"
+    },
+    "keksglas": {
+      "ax": 0.499,
+      "ay": 0.984,
+      "desc": "leeres Keksglas mit Holzdeckel"
+    },
+    "tortenboden": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Biskuitboden (Tortenschicht)"
+    },
+    "tortenteller": {
+      "ax": 0.498,
+      "ay": 0.981,
+      "desc": "mintfarbene Tortenplatte mit Fuß"
+    },
+    "kirschen": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "zwei Kirschen am Stiel"
+    },
+    "tuete_offen": {
+      "ax": 0.473,
+      "ay": 0.984,
+      "desc": "offene braune Papiertüte"
+    },
+    "tuete_zu": {
+      "ax": 0.477,
+      "ay": 0.984,
+      "desc": "zugefaltete Papiertüte mit Herz-Aufkleber"
+    },
+    "lastenrad": {
+      "ax": 0.495,
+      "ay": 0.981,
+      "desc": "hellblaues Lastenrad mit Holzkiste vorn, fährt nach rechts"
+    },
+    "torte": {
+      "ax": 0.5,
+      "ay": 0.985,
+      "desc": "Geburtstagstorte mit Kerzen (Wunsch-Bild, Sticker)"
+    },
+    "kasse": {
+      "ax": 0.441,
+      "ay": 0.985,
+      "desc": "Ladenkasse"
+    },
+    "heidelbeeren": {
+      "ax": 0.5,
+      "ay": 0.5,
+      "desc": "Häufchen Heidelbeeren"
+    }
+  },
+  "audio": {}
+}

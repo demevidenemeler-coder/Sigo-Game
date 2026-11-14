@@ -19,7 +19,9 @@ import { recordError, isTest } from './test.js';
 const KERN = Symbol('kern');                       // Besitzer für Tweens des Kerns (Blende)
 // Diese Pakete bleiben immer geladen ('tiere': das Paket bleibt, seine Bilder werden je Szene verwaltet –
 // static tiere). 'rahmen' (Karte, Start, Album) bleibt, damit der Weg zurück zur Karte nur die Blende kostet.
-const BLEIBEN = new Set(['common', 'tiere', 'zug', 'rahmen']);
+// 'karte2' (zweite Kartenseite) lädt erst auf der Karte nach und bleibt dann ebenfalls – so nimmt es den Orten
+// keinen Platz im Vorrat weg, und Umblättern wie Rückkehr auf die zweite Seite kosten nichts.
+const BLEIBEN = new Set(['common', 'tiere', 'zug', 'rahmen', 'karte2']);
 // Zuletzt benutzte Orts-Pakete bleiben im Speicher (schneller zweiter Besuch, Album und zurück), solange die
 // gebrauchten und die behaltenen Orts-Pakete zusammen höchstens VORRAT_MPX Millionen Bildpunkte haben.
 const VORRAT_ANZAHL = 2;

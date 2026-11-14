@@ -313,6 +313,22 @@ Zurück-Knopf, nur den Karten-Knopf. (`params.seite` des Albums ist dagegen sein
   nächsten Seite (höchstens 4 Hände bis zur nächsten Berührung, wenn es einen Pfeil gibt; Haken `hinweisHaende`).
   Die Stimme wiederholt einen Seiten-Hinweis nur vor dem Pfeil-Wechsel – kommt ein Hinweis erst spät (nach mehr
   als 5 s Ruhe), wiederholt ihn auf Seiten mit Pfeil die Hand, nicht die Stimme (Haken `hinweisWiederholbar`).
+- Landkarte mit zwei Seiten (`src/scenes/karte/`, Liste `SEITEN`): Seite 1 = `rahmen/karte` mit den 13 ersten Orten,
+  Seite 2 „das Land hinter dem Hügel" = `karte2/karte2` (eigenes Paket, 0,9 MB) mit Zoo, Flughafen und Bäckerei
+  und viel freier Wiese für spätere Orte. Je Seite stehen Orte, Tiere und Pfeil in Bildpunkten des Kartenbilds;
+  beide Bilder haben dasselbe Holzgleis (`GLEIS`). Ein neuer Ort bekommt eine Zeile in `ORTE_2` (Umriss, Tippkreis,
+  Halteplatz des Zugs, Ring) und seine id in `ORTE` in `main.js`. Umblättern mit großem Pfeil (260; rechts auf
+  Seite 1 unter dem Spielplatz zwischen Schlafhaus und Gleis, links auf Seite 2), Gleiten 1,0 s wie in den Seiten-Orten; während des
+  Gleitens oder der Zugfahrt lassen Tipps die Orte nur wackeln – nichts startet zweimal. Die Karte öffnet
+  sich auf der Seite des Orts in `karte.zug` (zurück aus dem Stickerbuch, ohne dass seitdem ein Ort besucht wurde:
+  auf der Seite, die beim Verlassen zu sehen war – gemerkt nur in der Sitzung); steht der Zug auf der anderen Seite, fährt er beim Tipp auf einen Ort
+  vom Rand herein. Ladezeit: `static packs`/`static tiere` der Karte sind Getter – `karte2` und die Tiere der
+  zweiten Seite laden nur dann vor dem Öffnen mit, wenn die Karte dort aufgeht, sonst 1,5 s nach dem Öffnen still
+  im Hintergrund (Pfeil-Tipp vorher: mit voller Kraft, geblättert wird erst, wenn das Bild steht). Start und
+  „zurück zur Karte" bleiben so gleich schnell (gemessen 14.11.2026: zurück 1,41 s wie vorher). Einmal geladen, bleibt
+  `karte2` im Speicher (steht in `BLEIBEN` in `scene.js`) und nimmt den Orten keinen Platz im Vorrat weg. Solange die zweite
+  Seite nie gesehen wurde (`karte.seite2gesehen`), atmet hinter dem Pfeil ein weicher Schein; sind auf der
+  sichtbaren Seite alle Orte besucht und drüben nicht, zeigt die Hand auf den Pfeil. Testen: `--param seite=1`.
 - Eltern-Bereich (`src/gemeinsam/eltern.js`): Zahnrad unten rechts 3 s mit genau einem kleinen Finger halten (liegt
   ein zweiter Finger auf, zeigt ein rötlicher Ring, warum nichts passiert), dann zwei verschiedene Zahlen in fester
   Reihenfolge antippen („Tippe erst auf die Zahl 3, dann auf die Zahl 7."; die Zahlen wechseln). Ein falscher Tipp schließt den Bereich
@@ -358,6 +374,12 @@ Zurück-Knopf, nur den Karten-Knopf. (`params.seite` des Albums ist dagegen sein
   Fehler und Warnungen; jede Szene und Seite startet im älteren Chrome 114; ein Langlauf (4 Runden durch alle Orte
   und Seiten mit Tippen) zeigt keinen wachsenden Grafikspeicher und keinen Fehler; Ladezeiten wie vorher (Karte →
   Ort rund 2,6 s samt Zugfahrt, zurück 1,4 s, späterer Start 1,4 s). Alle Sätze der Stimme sind aufgenommen.
+- Stand nach Runde 4 „neue Orte" (14.11.2026): Zoo, Flughafen und Bäckerei (je 3 Seiten) auf der zweiten
+  Kartenseite – 20 Szenen, 50 Seiten in 15 Seiten-Orten, 105 Sticker. `shots/sk_alle.sh` (61 Starts) ohne Fehler und
+  Warnungen, alle 61 Starts auch im älteren Chrome 114, Ladezeiten unverändert (Karte → Ort rund 2,5 s samt
+  Zugfahrt, zurück 1,4 s, späterer Start 1,3 s); die neuen Pakete sind je 2,0–2,3 MB klein. Alle Sätze der Stimme
+  sind aufgenommen. `tools/ladezeit.mjs` kennt die Orte der zweiten Kartenseite noch nicht (Fall c mit `--orte zoo`
+  meldet „nicht auf der Karte gefunden").
 - Nur am echten Tablet prüfbar bleiben: Gefühl der Finger und Mehrfinger-Berührung (auch das Eltern-Zahnrad mit „genau
   einem kleinen Finger" und Handballen), Leistung bei 120 Hz und der Auflösungs-Wächter, Lautstärke und Mischung der
   Töne samt Stimme (Pausen, Ton-Bremse), Vollbild, Bildschirm-wach-halten, Installation und Offline-Betrieb über https

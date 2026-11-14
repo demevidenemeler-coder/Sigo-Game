@@ -64,6 +64,9 @@ export const STICKER = [
   ding('wald', 'wald/vogel_meise', 'meise'), ding('wald', 'wald/vogel_rotkehlchen', 'rotkehlchen'), ding('wald', 'wald/baeumchen'),
   ding('waschanlage', 'common/schwamm'), ding('waschanlage', 'common/buerste'),
   ding('waschanlage', 'waschanlage/zapfsaeule'), ding('waschanlage', 'waschanlage/kakao_becher', 'kakao'),
+  ding('flughafen', 'flughafen/koffer'), ding('flughafen', 'flughafen/flugzeug'), ding('flughafen', 'flughafen/ballon'), ding('flughafen', 'flughafen/postkarte'),
+  ding('baeckerei', 'baeckerei/brezel'), ding('baeckerei', 'baeckerei/keks_herz', 'keks'), ding('baeckerei', 'baeckerei/torte'), ding('baeckerei', 'baeckerei/tuete_zu', 'tuete'),
+  ding('zoo', 'zoo/futterwagen'), ding('zoo', 'zoo/kamm'), ding('zoo', 'zoo/tor'), ding('zoo', 'zoo/fotowand'),
   ding('schlafen', 'schlafen/kuscheltier_hase', 'kuschelhase'), ding('schlafen', 'schlafen/schlafmond', 'mond'),
 ];
 
